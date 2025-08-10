@@ -1,12 +1,14 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config";
 import { nanoid } from "nanoid";
 
-const viteLogger = createLogger();
+// Módosított importálási rész
+import * as vite from "vite";
+
+const viteLogger = vite.createLogger();
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -26,7 +28,7 @@ export async function setupVite(app: Express, server: Server) {
     allowedHosts: true as const,
   };
 
-  const vite = await createViteServer({
+  const viteDevServer = await vite.createServer({
     ...viteConfig,
     configFile: false,
     customLogger: {
@@ -40,7 +42,7 @@ export async function setupVite(app: Express, server: Server) {
     appType: "custom",
   });
 
-  app.use(vite.middlewares);
+  app.use(viteDevServer.middlewares);
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
@@ -58,10 +60,10 @@ export async function setupVite(app: Express, server: Server) {
         `src="/src/main.tsx"`,
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
-      const page = await vite.transformIndexHtml(url, template);
+      const page = await viteDevServer.transformIndexHtml(url, template);
       res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
-      vite.ssrFixStacktrace(e as Error);
+      viteDevServer.ssrFixStacktrace(e as Error);
       next(e);
     }
   });

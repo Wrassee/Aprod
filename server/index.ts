@@ -1,6 +1,26 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
+// ------------------------------------------------
+// Ide másold a teljes konfigurációs objektumot, amit a Firebase generált
+// ------------------------------------------------
+const firebaseConfig = {
+  apiKey: "AIzaSyCWL9DwDE3_sWawO-cRjICh3FMU_kcItT8",
+  authDomain: "aprod-otis-github.firebaseapp.com",
+  projectId: "aprod-otis-github",
+  storageBucket: "aprod-otis-github.firebasestorage.app",
+  messagingSenderId: "570224780465",
+  appId: "1:570224780465:web:f3a997ac594b3e1ee92e90",
+  measurementId: "G-PCYV4JLDV9"
+};
+// ------------------------------------------------
+
+// Inicializáld a Firebase alkalmazást
+const firebaseApp = initializeApp(firebaseConfig);
+const analytics = getAnalytics(firebaseApp);
 
 const app = express();
 app.use(express.json());
@@ -50,9 +70,6 @@ app.use((req, res, next) => {
       res.status(status).json({ message });
     });
 
-    // importantly only setup vite in development and after
-    // setting up all the other routes so the catch-all route
-    // doesn't interfere with the other routes
     if (app.get("env") === "development") {
       console.log('Setting up Vite in development mode...');
       await setupVite(app, server);
@@ -61,10 +78,6 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    // ALWAYS serve the app on the port specified in the environment variable PORT
-    // Other ports are firewalled. Default to 5000 if not specified.
-    // this serves both the API and the client.
-    // It is the only port that is not firewalled.
     const port = parseInt(process.env.PORT || '5000', 10);
     server.listen({
       port,

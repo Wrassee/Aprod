@@ -1,0 +1,448 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Acceptance Protocol - Abnahmeprotokoll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/heroicons/2.0.18/24/outline/heroicons.min.css">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    'inter': ['Inter', 'sans-serif'],
+                },
+                colors: {
+                    primary: '#1976D2',
+                    secondary: '#424242',
+                    accent: '#4CAF50',
+                    neutral: '#F5F5F5',
+                    error: '#FF5722',
+                    warning: '#FF9800',
+                }
+            }
+        }
+    };
+    </script>
+</head>
+<body class="font-inter bg-neutral min-h-screen">
+    <!-- @COMPONENT: LanguageSelector -->
+    <div id="languageSelector" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <svg class="w-16 h-16 mx-auto mb-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                <h2 class="text-2xl font-semibold text-secondary mb-2">Select Language / Nyelv kiválasztása</h2>
+                <p class="text-gray-600">Choose your preferred language for the acceptance protocol</p>
+            </div>
+            <div class="space-y-3">
+                <button data-event="click:selectLanguage" data-implementation="Should set app language to German" class="w-full bg-primary text-white py-4 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-3">
+                    <span class="text-2xl">🇩🇪</span>
+                    <span>Deutsch</span>
+                </button>
+                <button data-event="click:selectLanguage" data-implementation="Should set app language to Hungarian" class="w-full bg-primary text-white py-4 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center space-x-3">
+                    <span class="text-2xl">🇭🇺</span>
+                    <span>Magyar</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LanguageSelector -->
+
+    <!-- @COMPONENT: MainApplication -->
+    <div id="mainApplication" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-4xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <div>
+                            <h1 class="text-xl font-semibold text-secondary">Abnahmeprotokoll</h1>
+                            <p class="text-sm text-gray-600">Digital Acceptance Protocol</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button class="p-2 text-gray-500 hover:text-primary" data-implementation="Should open settings">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </button>
+                        <span class="px-3 py-1 bg-primary text-white text-sm rounded-full" data-bind="selectedLanguage">DE</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Bar -->
+        <!-- @COMPONENT: ProgressIndicator -->
+        <div class="bg-white border-b border-gray-200">
+            <div class="max-w-4xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-secondary">Fortschritt</span>
+                    <span class="text-sm text-gray-600" data-bind="progress.text">Schritt 3 von 8</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-accent h-2 rounded-full transition-all duration-300" style="width: 37.5%" data-bind="progress.percentage"></div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ProgressIndicator -->
+
+        <!-- Main Content -->
+        <main class="max-w-4xl mx-auto px-4 py-6">
+            <!-- Current Step Card -->
+            <!-- @COMPONENT: FormStepCard -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden mb-6">
+                <div class="bg-gradient-to-r from-primary to-blue-600 text-white p-6">
+                    <div class="flex items-center space-x-3">
+                        <div class="bg-white bg-opacity-20 rounded-full p-2">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-semibold">Objektdaten erfassen</h2>
+                            <p class="text-blue-100">Grundlegende Informationen zum Objekt</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 space-y-6">
+                    <!-- Date Picker -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-secondary">Abnahmedatum *</label>
+                        <div class="relative">
+                            <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" data-bind="acceptanceDate" data-implementation="Should populate Excel cell A1">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Text Input -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-secondary">Objektbezeichnung *</label>
+                        <input type="text" placeholder="z.B. Wohnanlage Musterstraße 1" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" data-bind="objectName" data-implementation="Should populate Excel cell B2">
+                    </div>
+
+                    <!-- Number Input -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-secondary">Anzahl Wohneinheiten</label>
+                        <div class="relative">
+                            <input type="number" placeholder="0" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" data-bind="unitCount" data-implementation="Should populate Excel cell C3">
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 text-sm">Einheiten</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Radio Button Group -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-secondary">Objekttyp *</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="objectType" value="residential" class="w-4 h-4 text-primary focus:ring-primary" data-implementation="Should map to Excel cell D4">
+                                <span class="text-gray-700">Wohngebäude</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="objectType" value="commercial" class="w-4 h-4 text-primary focus:ring-primary">
+                                <span class="text-gray-700">Gewerbeobjekt</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="radio" name="objectType" value="mixed" class="w-4 h-4 text-primary focus:ring-primary">
+                                <span class="text-gray-700">Mischnutzung</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Yes/No/N/A Question -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-secondary">Liegt ein gültiger Bauantrag vor? *</label>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="buildingPermit" value="yes" class="w-4 h-4 text-accent focus:ring-accent" data-implementation="Should map to Excel cell E5">
+                                <span class="px-3 py-2 bg-accent text-white rounded-lg text-sm">Ja</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="buildingPermit" value="no" class="w-4 h-4 text-error focus:ring-error">
+                                <span class="px-3 py-2 bg-error text-white rounded-lg text-sm">Nein</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer">
+                                <input type="radio" name="buildingPermit" value="na" class="w-4 h-4 text-gray-500 focus:ring-gray-500">
+                                <span class="px-3 py-2 bg-gray-500 text-white rounded-lg text-sm">N/A</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Image Attachment -->
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-secondary">Dokumentation (Optional)</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" data-implementation="Should open camera/gallery for image selection">
+                            <svg class="w-12 h-12 mx-auto text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                            <p class="text-gray-600 mb-2">Bilder hinzufügen</p>
+                            <p class="text-xs text-gray-500">Tippen zum Fotografieren oder Auswählen</p>
+                        </div>
+                        <!-- Preview of attached images -->
+                        <div class="grid grid-cols-3 gap-3" data-mock="true">
+                            <!-- Placeholder for attached image preview -->
+                            <div class="relative aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                                <!-- Sample attached document photo -->
+                                <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=300&h=300" alt="Building permit document" class="w-full h-full object-cover" data-mock-image="true">
+                                <button class="absolute top-2 right-2 bg-error text-white rounded-full p-1" data-implementation="Should remove attached image">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: FormStepCard -->
+
+            <!-- AI Assistant Panel -->
+            <!-- @COMPONENT: AIAssistant -->
+            <div class="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6 mb-6">
+                <div class="flex items-start space-x-4">
+                    <div class="bg-purple-100 rounded-full p-2">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="font-medium text-secondary mb-2">KI-Assistent Vorschlag</h3>
+                        <p class="text-sm text-gray-700 mb-3" data-mock="true">Basierend auf dem Objekttyp "Wohngebäude" und der Anzahl der Wohneinheiten empfehle ich, besonders auf folgende Punkte zu achten:</p>
+                        <ul class="text-sm text-gray-600 space-y-1" data-mock="true">
+                            <li>• Brandschutzbestimmungen für Mehrfamilienhäuser</li>
+                            <li>• Barrierefreiheit gemäß DIN 18040-2</li>
+                            <li>• Schallschutz zwischen den Wohneinheiten</li>
+                        </ul>
+                        <button class="mt-3 text-purple-600 text-sm font-medium hover:text-purple-700" data-implementation="Should expand AI suggestions">
+                            Mehr anzeigen →
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: AIAssistant -->
+
+            <!-- Step Navigation -->
+            <!-- @COMPONENT: StepNavigation -->
+            <div class="flex items-center justify-between">
+                <button class="flex items-center space-x-2 px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:goToPreviousStep" data-implementation="Should navigate to previous form step">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span>Zurück</span>
+                </button>
+
+                <div class="flex items-center space-x-3">
+                    <button class="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:saveTemporary" data-implementation="Should save current form data temporarily">
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Speichern
+                    </button>
+                    <button class="flex items-center space-x-2 px-6 py-3 bg-primary text-white rounded-lg hover:bg-blue-700 transition-colors" data-event="click:goToNextStep" data-implementation="Should validate current step and navigate to next step">
+                        <span>Weiter</span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: StepNavigation -->
+
+            <!-- Summary Modal (shown when completing all steps) -->
+            <!-- @COMPONENT: CompletionModal -->
+            <div id="completionModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+                <div class="bg-white rounded-xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                    <div class="bg-accent text-white p-6 rounded-t-xl">
+                        <div class="flex items-center space-x-3">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div>
+                                <h2 class="text-xl font-semibold">Protokoll abschließen</h2>
+                                <p class="text-green-100">Alle Daten erfasst - Bereit für Generierung</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 space-y-6">
+                        <!-- Digital Signature -->
+                        <!-- @FUNCTIONALITY: This drawing tool should implement free-hand drawing using canvas API -->
+                        <div class="space-y-3">
+                            <label class="block text-sm font-medium text-secondary">Digitale Unterschrift *</label>
+                            <div class="border-2 border-gray-300 rounded-lg p-4">
+                                <canvas class="w-full h-32 border border-gray-200 rounded cursor-crosshair" data-implementation="Should implement touch/stylus signature capture"></canvas>
+                                <div class="flex justify-between items-center mt-3">
+                                    <span class="text-sm text-gray-600">Bitte hier unterschreiben</span>
+                                    <button class="text-sm text-primary hover:text-blue-700" data-implementation="Should clear signature canvas">Löschen</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Optional printed name -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-secondary">Name (gedruckt) - Optional</label>
+                            <input type="text" placeholder="Max Mustermann" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" data-bind="signatureName">
+                        </div>
+
+                        <!-- Export Options -->
+                        <div class="bg-gray-50 rounded-lg p-6 space-y-4">
+                            <h3 class="font-medium text-secondary">Export-Optionen</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Excel Export -->
+                                <button class="flex items-center space-x-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-primary transition-colors" data-event="click:exportExcel" data-implementation="Should generate and export filled Excel template">
+                                    <div class="bg-green-100 p-2 rounded">
+                                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="font-medium">Excel exportieren</div>
+                                        <div class="text-sm text-gray-600">Ausgefüllte Vorlage</div>
+                                    </div>
+                                </button>
+
+                                <!-- PDF Export -->
+                                <button class="flex items-center space-x-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-primary transition-colors" data-event="click:exportPDF" data-implementation="Should generate PDF from filled Excel template">
+                                    <div class="bg-red-100 p-2 rounded">
+                                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="font-medium">PDF generieren</div>
+                                        <div class="text-sm text-gray-600">Druckfertige Version</div>
+                                    </div>
+                                </button>
+
+                                <!-- Email -->
+                                <button class="flex items-center space-x-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-primary transition-colors" data-event="click:sendEmail" data-implementation="Should open email client with attached documents">
+                                    <div class="bg-blue-100 p-2 rounded">
+                                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="font-medium">Per Email senden</div>
+                                        <div class="text-sm text-gray-600">Excel & PDF anhängen</div>
+                                    </div>
+                                </button>
+
+                                <!-- Cloud Storage -->
+                                <button class="flex items-center space-x-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-primary transition-colors" data-event="click:saveToCloud" data-implementation="Should upload documents to Google Drive">
+                                    <div class="bg-purple-100 p-2 rounded">
+                                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="text-left">
+                                        <div class="font-medium">Cloud speichern</div>
+                                        <div class="text-sm text-gray-600">Google Drive</div>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex justify-between pt-4">
+                            <button class="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:closeModal">
+                                Abbrechen
+                            </button>
+                            <button class="px-8 py-3 bg-accent text-white rounded-lg hover:bg-green-600 transition-colors font-medium" data-event="click:completeProtocol" data-implementation="Should finalize protocol and execute selected export options">
+                                Protokoll abschließen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: CompletionModal -->
+        </main>
+
+        <!-- Bottom Tab Bar (for quick access) -->
+        <!-- @COMPONENT: BottomTabBar -->
+        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-around">
+                    <button class="flex flex-col items-center space-y-1 py-2 px-3 text-primary" data-implementation="Should show current step overview">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <span class="text-xs">Formular</span>
+                    </button>
+                    <button class="flex flex-col items-center space-y-1 py-2 px-3 text-gray-500" data-implementation="Should show saved draft protocols">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        <span class="text-xs">Entwürfe</span>
+                    </button>
+                    <button class="flex flex-col items-center space-y-1 py-2 px-3 text-gray-500" data-implementation="Should show completed protocols history">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-xs">Verlauf</span>
+                    </button>
+                    <button class="flex flex-col items-center space-y-1 py-2 px-3 text-gray-500" data-implementation="Should open application settings">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span class="text-xs">Einstellungen</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: BottomTabBar -->
+    </div>
+    <!-- @END_COMPONENT: MainApplication -->
+
+    <!-- Loading States and Validation Messages -->
+    <!-- @COMPONENT: ValidationToast -->
+    <div id="validationToast" class="fixed top-4 right-4 bg-error text-white px-6 py-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
+        <div class="flex items-center space-x-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span data-bind="validationMessage">Bitte füllen Sie alle Pflichtfelder aus</span>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: ValidationToast -->
+
+    <script>
+        // TODO: Implement business logic, API calls, state management
+        // Language selection handling
+        (function() {
+            // TODO: Implement language switching functionality
+            // TODO: Load form questions from JSON based on selected language
+            // TODO: Implement form validation and step navigation
+            // TODO: Implement Excel template mapping and PDF generation
+            // TODO: Implement signature capture using canvas
+            // TODO: Implement image attachment and cloud storage integration
+            
+            // Demo functionality for the mockup
+            const languageSelector = document.getElementById('languageSelector');
+            const mainApplication = document.getElementById('mainApplication');
+            
+            // Show main app after language selection (demo)
+            setTimeout(() => {
+                if (languageSelector && mainApplication) {
+                    languageSelector.style.display = 'none';
+                    mainApplication.classList.remove('hidden');
+                }
+            }, 3000); // Auto-proceed after 3 seconds for demo
+        })();
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import "dotenv/config";
 
 // ------------------------------------------------
 // Ide másold a teljes konfigurációs objektumot, amit a Firebase generált
@@ -18,9 +18,8 @@ const firebaseConfig = {
 };
 // ------------------------------------------------
 
-// Inicializáld a Firebase alkalmazást
+// Inicializáld a Firebase alkalmazást a szerver-oldali kódban
 const firebaseApp = initializeApp(firebaseConfig);
-const analytics = getAnalytics(firebaseApp);
 
 const app = express();
 app.use(express.json());
@@ -78,14 +77,13 @@ app.use((req, res, next) => {
       serveStatic(app);
     }
 
-    const port = parseInt(process.env.PORT || '5000', 10);
+    const port = parseInt(process.env.PORT || '3000', 10);
     server.listen({
       port,
-      host: "0.0.0.0",
-      reusePort: true,
-    }, () => {
-      log(`serving on port ${port}`);
-    });
+      host: "localhost"
+}, () => {
+  log(`serving on port ${port}`);
+});
   } catch (error) {
     console.error('Failed to start server:', error);
     process.exit(1);

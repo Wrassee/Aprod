@@ -107,7 +107,7 @@ const Questionnaire = memo(function Questionnaire({
           const fallbackQuestions = [
             {
               id: 'q1',
-              title: language === 'hu' ? 'Átvevő neve' : 'Name des Empfängers',
+              title: language === 'hu' ? 'Átvevő neve' : 'Name des Abnahmers',
               type: 'text' as const,
               required: true,
             },
@@ -412,7 +412,7 @@ const Questionnaire = memo(function Questionnaire({
                 )}
               </div>
               <span className="text-sm font-medium text-otis-blue">
-                {currentPage + 1} / {totalPages}
+                {currentPage + 1} / {totalPages} {t.groupOf}
               </span>
             </div>
             <Progress value={progress} className="w-full h-2" />

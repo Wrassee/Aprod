@@ -9,7 +9,7 @@ import { LanguageProvider } from "@/components/language-provider";
 // import { PWAInstallBanner, OfflineIndicator } from "@/components/pwa-install-banner";
 import { StartScreen } from "@/pages/start-screen";
 import Questionnaire from "@/pages/questionnaire";
-import { NiedervoltTable } from "@/pages/niedervolt-table";
+import { NiedervoltMeasurements } from "@/pages/niedervolt-measurements";
 import { Signature } from "@/pages/signature";
 import { Completion } from "@/pages/completion";
 import { Admin } from "@/pages/admin";
@@ -18,6 +18,22 @@ import { SmartHelpWizard } from "@/components/smart-help-wizard";
 import { FormData, MeasurementRow } from "@/lib/types";
 import { AnswerValue, ProtocolError } from "@shared/schema";
 import NotFound from "@/pages/not-found";
+
+// A mérési típusok adatai típusának meghatározása
+type MeasurementType = {
+  id: string;
+  name: string;
+  unit: string;
+};
+
+// Visszaállítva a keményen kódolt lista, mint alapértelmezett
+const defaultMeasurementTypes: MeasurementType[] = [
+  { id: 'feszultseg', name: 'Feszültség', unit: 'V' },
+  { id: 'aram', name: 'Áramerősség', unit: 'A' },
+  { id: 'ellenallas', name: 'Ellenállás', unit: 'Ω' },
+  { id: 'szigeteles', name: 'Szigetelési ellenállás', unit: 'MΩ' },
+  { id: 'foldeles', name: 'Földelési ellenállás', unit: 'Ω' },
+];
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'start' | 'questionnaire' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview'>('start');
@@ -31,17 +47,14 @@ function App() {
     signature: '',
     signatureName: '',
     niedervoltMeasurements: [],
-    niedervoltTableMeasurements: {},
   });
+  const [measurementTypes, setMeasurementTypes] = useState<MeasurementType[]>(defaultMeasurementTypes); // Alapértelmezett lista beállítva
   const formDataRef = useRef(formData);
-  
+
   // Keep ref updated with latest formData
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
-
-  // Disabled auto-save to prevent component re-mounting during manual saves
-  // Manual save through the Save button only
 
   // Load saved form data on initialization
   useEffect(() => {
@@ -58,6 +71,27 @@ function App() {
         console.error('Error loading saved form data:', e);
       }
     }
+
+    // A mérési típusok betöltése a háttérrendszer API-ból (ha elérhető)
+    const loadMeasurementTypes = async () => {
+      try {
+        const response = await fetch('/api/measurement-types');
+        if (response.ok) {
+          const data: MeasurementType[] = await response.json();
+          // Ha sikeres a betöltés, akkor felülírjuk az alapértelmezett listát
+          setMeasurementTypes(data);
+          console.log('Measurement types loaded from API:', data);
+        } else {
+          console.error('Failed to load measurement types from API, using default list:', response.statusText);
+          // Ha hibás a válasz, marad a default lista
+        }
+      } catch (error) {
+        console.error('Error fetching measurement types, using default list:', error);
+        // Ha hiba történik, marad a default lista
+      }
+    };
+    loadMeasurementTypes();
+
   }, []);
 
   const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
@@ -555,10 +589,10 @@ function App() {
         );
       case 'niedervolt':
         return (
-          <NiedervoltTable
-            key="stable-niedervolt-table"
-            measurements={formData.niedervoltTableMeasurements || {}}
-            onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
+          <NiedervoltMeasurements
+            key="stable-niedervolt"
+            measurements={formData.niedervoltMeasurements || []}
+            onMeasurementsChange={handleMeasurementsChange}
             onBack={handleNiedervoltBack}
             onNext={handleNiedervoltNext}
             receptionDate={formData.receptionDate}
@@ -566,6 +600,7 @@ function App() {
             onAdminAccess={handleAdminAccess}
             onHome={handleGoHome}
             onStartNew={handleStartNew}
+            measurementTypes={measurementTypes} // Itt adjuk át a listát
           />
         );
       case 'signature':
@@ -621,8 +656,8 @@ function App() {
           {(currentScreen === 'questionnaire' || currentScreen === 'niedervolt' || currentScreen === 'signature') && (
             <SmartHelpWizard
               currentPage={currentScreen === 'questionnaire' ? currentQuestionnaireePage + 1 : 
-                          currentScreen === 'niedervolt' ? 5 : 
-                          currentScreen === 'signature' ? 6 : 1}
+                           currentScreen === 'niedervolt' ? 5 : 
+                           currentScreen === 'signature' ? 6 : 1}
               formData={formData}
               currentQuestionId={currentQuestionId}
               errors={formData.errors}

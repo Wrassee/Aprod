@@ -1,0 +1,358 @@
+[33mcommit 36199d65bed8dddf697a2fcf88dedd7505fb44fc[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Wrasse <netkodok@gmail.com>
+Date:   Mon Aug 11 23:21:23 2025 +0200
+
+    Sikeresen beállítva a Firebase és a Drizzle-séma, a program működik
+
+[33mcommit 1d97a4bdb833c1890e0b2cb952218158be232164[m
+Author: Wrasse <netkodok@gmail.com>
+Date:   Mon Aug 11 00:16:30 2025 +0200
+
+    Integrate Firebase SDK and Analytics
+
+[33mcommit 84dcbaf3dafe7c07ce04f0586f128bd2c0db159b[m
+Author: Wrasse <netkodok@gmail.com>
+Date:   Sun Aug 10 23:45:43 2025 +0200
+
+    Fix Vite import for Vercel
+
+[33mcommit 7a780ae3e6daf2046cde0d10a9c03361cfa21e05[m
+Author: Wrasse <netkodok@gmail.com>
+Date:   Sun Aug 10 23:18:31 2025 +0200
+
+    Update vercel.json with rewrites property
+
+[33mcommit 86bf326910cab466791cf175e53e940a004104f6[m
+Author: Wrasse <netkodok@gmail.com>
+Date:   Sun Aug 10 23:15:22 2025 +0200
+
+    Remove builds property from vercel.json
+
+[33mcommit e17d35b01e0ebd64ccf1b7e6ca60217706fee3f7[m
+Merge: c582dc8 640fd92
+Author: Wrasse <netkodok@gmail.com>
+Date:   Sun Aug 10 23:08:49 2025 +0200
+
+    Merge branch 'main' of https://github.com/Wrassee/Aprod
+
+[33mcommit 640fd92a3080fedbe005f8cdfb911c3526726b15[m
+Author: Wrassee <netkodok@gmail.com>
+Date:   Sun Aug 10 23:07:13 2025 +0200
+
+    Delete README.md
+
+[33mcommit d2b9ac09f717169aad2a88e7bcf935619c1acad1[m
+Author: Wrassee <netkodok@gmail.com>
+Date:   Sun Aug 10 23:02:48 2025 +0200
+
+    Add files via upload
+
+[33mcommit c582dc8347190b98e0846847af8a51e7f09639b7[m
+Author: Wrasse <netkodok@gmail.com>
+Date:   Sun Aug 10 22:53:21 2025 +0200
+
+    First commit
+
+[33mcommit 9f619e2ae687667bfa93e37ccdd16aac22f9acc7[m
+Author: Wrassee <netkodok@gmail.com>
+Date:   Sun Aug 10 22:45:40 2025 +0200
+
+    Initial commit
+
+[33mcommit 219b4504029ba8f8d00c188bc1ec8d38c12110ce[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 10 20:39:30 2025 +0000
+
+    Add intelligent help and guidance to inspection protocols
+    
+    Integrates an AI-powered smart help wizard, adds OpenAI dependency, and passes relevant state to the wizard component for context-aware assistance.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 1a7bf941-4647-4be9-999d-6f3d3f7ff88e
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/1a7bf941-4647-4be9-999d-6f3d3f7ff88e/724BpRn
+
+[33mcommit 64bdaec9b98e38d36eb2132410d1454c67bac354[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 10 20:29:30 2025 +0000
+
+    Prepare application for Vercel deployment and serverless functions
+    
+    Migrates the project to Vercel, including the setup of serverless API routes using Express, optimized build configurations for the client, and the addition of deployment scripts.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 1a7bf941-4647-4be9-999d-6f3d3f7ff88e
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/1a7bf941-4647-4be9-999d-6f3d3f7ff88e/04xsy0j
+
+[33mcommit 33a9b8d0fa07a0b076c444bcb37a8c5f57f90b77[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 10 20:20:42 2025 +0000
+
+    Migrate the application to Vercel for deployment
+    
+    Update project configuration and files to support deployment on Vercel, including a new API handler, build scripts, and environment variable setup.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 1a7bf941-4647-4be9-999d-6f3d3f7ff88e
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/1a7bf941-4647-4be9-999d-6f3d3f7ff88e/04xsy0j
+
+[33mcommit 98356cec27f5a2807dea7b94fb3a7db9150ca870[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 10 20:12:30 2025 +0000
+
+    Restored to '87dbe797d837e0b2e6f06855ab27f348ea86cd79'
+    
+    Replit-Restored-To: 87dbe797d837e0b2e6f06855ab27f348ea86cd79
+
+[33mcommit eab3e7372eab4dc4699a8f30be5c56f7e4ee3a28[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 10 20:12:23 2025 +0000
+
+    Saved your changes before rolling back
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 1a7bf941-4647-4be9-999d-6f3d3f7ff88e
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+
+[33mcommit 30dc72b87621425567bf24e766d8586d4f950005[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 10 20:12:20 2025 +0000
+
+    Saved your changes before starting work
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 1a7bf941-4647-4be9-999d-6f3d3f7ff88e
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+
+[33mcommit d5b331e5194c606aa5961175c0b42d6661a4e349[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Tue Aug 5 16:21:42 2025 +0000
+
+    Improve template parsing to support OTIS multilingual templates
+    
+    Updates template parsing logic to correctly read and process OTIS multilingual XLSX templates and adds new template files.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/l3wxtRQ
+
+[33mcommit df18fa1342402c77399e243b3f9142d24d19e651[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Tue Aug 5 16:12:13 2025 +0000
+
+    Improve Excel file handling and question parsing for inspection templates
+    
+    Updates multer file filter, adds XLSX file examples, enhances question parsing in routes.ts, and adds question details to local storage.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/sjJdDVI
+
+[33mcommit 0cbd4e04b441ccee9642421abe41cdaf34f8afc2[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Tue Aug 5 16:02:56 2025 +0000
+
+    Improve template handling by automatically extracting question data
+    
+    Refactor template parsing using a child process to extract question configurations and save them to the local database.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/URixpks
+
+[33mcommit 85ca63aae4c1e0484665236b8ae005dd88134f82[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Tue Aug 5 11:47:35 2025 +0000
+
+    Fix file upload errors and improve template handling in the application
+    
+    Correctly store boolean values as integers in SQLite and add a default template.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/Iui5Rf1
+
+Notes:
+    Fix file upload errors and improve template handling in the application
+
+[33mcommit 228244f54240d5010de5aadd3cbfa4baf3e5d0f8[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Tue Aug 5 11:40:57 2025 +0000
+
+    Improve template uploads with error messages and form handling
+    
+    Fixes template upload issues, adds error handling, and disables question parsing.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/PMXhZT6
+
+[33mcommit 07843312d546203853ff9bd96e90e6b870a6246e[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Tue Aug 5 11:33:27 2025 +0000
+
+    Enable offline functionality and local data storage for the application
+    
+    Migrates from Neon API to local SQLite, implements local file handling, and calculates values locally.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/PMXhZT6
+
+[33mcommit 9e492d2539432f6fa4edb59ccc13b55d78312857[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Tue Aug 5 11:23:42 2025 +0000
+
+    Enable users to download problem reports on the protocol completion page
+    
+    Adds file upload functionality for issue reports in protocol completion.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/Zeffic0
+
+[33mcommit c2b24b8c9187b9b4f70e8e2ae02a1fd117406324[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 3 06:52:42 2025 +0000
+
+    Always display error export options on completion page for documentation
+    
+    Modify ErrorExport component in completion.tsx to always render export options.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/Zeffic0
+
+[33mcommit 87dbe797d837e0b2e6f06855ab27f348ea86cd79[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 3 06:49:07 2025 +0000
+
+    Update application version to reflect the latest improvements and fixes
+    
+    Updates application version to 0.4.8 in VERSION file, admin page, manifest.json, and replit.md, enabling PWA offline support and enhanced validation.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/be3771c5-7df0-4737-9d07-f0d419c46b40/fDcudrE
+
+Notes:
+    Update application version to reflect the latest improvements and fixes
+
+[33mcommit 15241effed638bb418c10a7f748d893301147a01[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 3 06:45:55 2025 +0000
+
+    Restored to 'e47cbdb9d88f7c6797ac23f654e053f6071ca42e'
+    
+    Replit-Restored-To: e47cbdb9d88f7c6797ac23f654e053f6071ca42e
+
+[33mcommit b606828d7424f575f18d11901d38e16f2f5949de[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 3 06:45:47 2025 +0000
+
+    Saved your changes before rolling back
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: be3771c5-7df0-4737-9d07-f0d419c46b40
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+
+Notes:
+    Saved your changes before rolling back
+
+[33mcommit a023e715dcf0f27da6db2920749b365500442512[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 3 06:45:43 2025 +0000
+
+    Add new interface for low voltage measurements to the final inspection page
+    
+    Implements the NiedervoltMeasurements component with data persistence using localStorage in questionnaire.tsx.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 28481b97-1a2a-458a-9b62-a7503f0425a5
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/28481b97-1a2a-458a-9b62-a7503f0425a5/MQvFxXN
+
+[33mcommit 6b61e80819ef6068a8791e042791515bf7f860dd[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sun Aug 3 06:44:10 2025 +0000
+
+    Update the application version number to reflect the latest changes
+    
+    Updates the VERSION file to reflect version 0.4.8, released on Sun Feb 02 23:30:00 UTC 2025.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 28481b97-1a2a-458a-9b62-a7503f0425a5
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/28481b97-1a2a-458a-9b62-a7503f0425a5/MQvFxXN
+
+[33mcommit e47cbdb9d88f7c6797ac23f654e053f6071ca42e[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sat Aug 2 23:14:32 2025 +0000
+
+    Enable complete offline support and data persistence for the application
+    
+    Implement Service Worker v0.4.8 with offline caching, enhanced PWA meta tags, and measurement data persistence using localStorage.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 28481b97-1a2a-458a-9b62-a7503f0425a5
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/28481b97-1a2a-458a-9b62-a7503f0425a5/MQvFxXN
+
+Notes:
+    Enable complete offline support and data persistence for the application
+
+[33mcommit 1ee7906e0d484617f065f9777e150a2a86ff0915[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sat Aug 2 23:05:18 2025 +0000
+
+    Retain entered data in measurement fields when navigating between sections
+    
+    Persist and pre-populate input values using cached and localStorage data in MeasurementBlock and StableInput components.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 28481b97-1a2a-458a-9b62-a7503f0425a5
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/28481b97-1a2a-458a-9b62-a7503f0425a5/30E4oV9
+
+Notes:
+    Retain entered data in measurement fields when navigating between sections
+
+[33mcommit 6294d1e072f8bcd56ea1e265010700ba2c673eeb[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sat Aug 2 23:01:24 2025 +0000
+
+    Improve input validation and protect data integrity during inspections
+    
+    Implement bulletproof numeric input validation with real-time cleaning in replit.md.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 28481b97-1a2a-458a-9b62-a7503f0425a5
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/28481b97-1a2a-458a-9b62-a7503f0425a5/NGxlaCe
+
+[33mcommit fb059f2f6717ecc07e41d63eb7ee360846c6e5e7[m
+Author: netkodok <45534679-netkodok@users.noreply.replit.com>
+Date:   Sat Aug 2 22:58:35 2025 +0000
+
+    Restrict measurement fields to only accept numeric input and decimal points
+    
+    Implement input validation for measurement fields in StableInput component using regex and key press filtering.
+    
+    Replit-Commit-Author: Agent
+    Replit-Commit-Session-Id: 28481b97-1a2a-458a-9b62-a7503f0425a5
+    Replit-Commit-Checkpoint-Type: full_checkpoint
+    Replit-Commit-Screenshot-Url: https://storage.googleapis.com/screenshot-production-us-central1/81db43ca-5fb4-437b-bfda-4fcd8b7b2002/28481b97-1a2a-458a-9b62-a7503f0425a5/NGxlaCe
+
+[33mcommit 014537e12f112df706259f3863db48eeeb721307[m
+Author: netko

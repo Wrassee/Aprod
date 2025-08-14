@@ -1,0 +1,82 @@
+[
+  {
+    "id": "voltage",
+    "name_hu": "Feszültség",
+    "name_de": "Spannung",
+    "unit": "V",
+    "questions_hu": [
+      {
+        "text": "Üresjáratban mért feszültség",
+        "excelCell": "C667"
+      },
+      {
+        "text": "Terhelés alatt mért feszültség",
+        "excelCell": "D667"
+      }
+    ],
+    "questions_de": [
+      {
+        "text": "Gemessene Spannung im Leerlauf",
+        "excelCell": "C667"
+      },
+      {
+        "text": "Gemessene Spannung unter Last",
+        "excelCell": "D667"
+      }
+    ]
+  },
+  {
+    "id": "isolation",
+    "name_hu": "Isolationsmessung",
+    "name_de": "Isolationsmessung",
+    "unit": "MOhm",
+    "questions_hu": [
+      {
+        "text": "Isolationsmérés eredménye",
+        "excelCell": "E667"
+      }
+    ],
+    "questions_de": [
+      {
+        "text": "Ergebnis der Isolationsmessung",
+        "excelCell": "E667"
+      }
+    ]
+  },
+  {
+    "id": "earth_resistance",
+    "name_hu": "Erdelési ellenállás",
+    "name_de": "Erdungswiderstand",
+    "unit": "Ohm",
+    "questions_hu": [
+      {
+        "text": "Erdelési ellenállás értéke",
+        "excelCell": "F667"
+      }
+    ],
+    "questions_de": [
+      {
+        "text": "Wert des Erdungswiderstandes",
+        "excelCell": "F667"
+      }
+    ]
+  },
+  {
+    "id": "continuity",
+    "name_hu": "Folyamatossági vizsgálat",
+    "name_de": "Durchgangsprüfung",
+    "unit": "Ohm",
+    "questions_hu": [
+      {
+        "text": "Folyamatossági vizsgálat eredménye",
+        "excelCell": "G667"
+      }
+    ],
+    "questions_de": [
+      {
+        "text": "Ergebnis der Durchgangsprüfung",
+        "excelCell": "G667"
+      }
+    ]
+  }
+]

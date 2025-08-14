@@ -73,6 +73,13 @@ export interface Translation {
   // Common
   loading: string;
   error: string;
+  
+  // Measurement and calculation components
+  measurementData: string;
+  calculatedValues: string;
+  calculatedValuesValidated: string;
+  outOfRange: string;
+  errorRecordingRequired: string;
   success: string;
   
   // Admin Interface
@@ -95,6 +102,15 @@ export interface Translation {
   questionConfiguration: string;
   uploadExcelFile: string;
   selectExcelFile: string;
+  
+  // Page specific translations
+  generalData: string;
+  machineRoom: string;
+  modernizationAffected: string;
+  questionsInGroup: string;
+  groupOf: string;
+  viewErrors: string;
+  downloadErrorList: string;
 }
 
 export const translations: Record<string, Translation> = {
@@ -105,7 +121,7 @@ export const translations: Record<string, Translation> = {
     german: "Deutsch",
     
     // Header
-    title: "OTIS APROD - Átvételi Protokoll",
+    title: "OTIS APROD",
     receptionDate: "Átvételi dátum:",
     progress: "Folyamat",
     
@@ -158,7 +174,7 @@ export const translations: Record<string, Translation> = {
     // Completion
     completionTitle: "Protokoll befejezve",
     protocolComplete: "Protokoll sikeresen befejezve",
-    completionMessage: "Az átvételi protokoll elkészült és készen áll a terjesztésre.",
+    completionMessage: "Az átvételi protokoll elkészült és készen áll a megosztásra.",
     emailPDF: "PDF küldése e-mailben",
     saveToCloud: "Mentés Google Drive-ra",
     downloadPDF: "PDF letöltése",
@@ -195,6 +211,20 @@ export const translations: Record<string, Translation> = {
     questionConfiguration: "Kérdés konfiguráció",
     uploadExcelFile: "Excel fájl feltöltése",
     selectExcelFile: "Excel fájl kiválasztása",
+    
+    // Page specific translations
+    generalData: "Általános adatok",
+    machineRoom: "Gépház",
+    modernizationAffected: "A modernizációban érintett elemek",
+    measurementData: "Távolság mérési adatok",
+    questionsInGroup: "kérdés ebben a csoportban",
+    groupOf: "oldal",
+    calculatedValuesValidated: "A számított értékek automatikusan validálva vannak. A határértéken kívüli értékek pirossal jelennek meg.",
+    calculatedValues: "Számított értékek",
+    errorRecordingRequired: "Hiba rögzítése szükséges",
+    outOfRange: "Határértéken kívül (700-9000 mm)",
+    viewErrors: "Hibák megtekintése",
+    downloadErrorList: "Hibalista letöltése",
   },
   de: {
     // Start Screen
@@ -229,7 +259,7 @@ export const translations: Record<string, Translation> = {
     noErrors: "Keine Fehler gemeldet",
     editError: "Bearbeiten",
     deleteError: "Löschen",
-    errorRegistrationRequired: "Fehlerregistrierung erforderlich",
+    errorRegistrationRequired: "Fehlerspeicherung erforderlich",
     
     // Error Modal
     addErrorTitle: "Neuen Fehler hinzufügen",
@@ -281,7 +311,7 @@ export const translations: Record<string, Translation> = {
     templateName: "Vorlagenname",
     templateType: "Vorlagentyp",
     questionsTemplate: "Fragen-Vorlage",
-    protocolTemplate: "Protokoll-Vorlage",
+    protocolTemplate: "OTIS Protokoll-Vorlage",
     activate: "Aktivieren",
     active: "Aktiv",
     inactive: "Inaktiv",
@@ -293,5 +323,19 @@ export const translations: Record<string, Translation> = {
     questionConfiguration: "Fragenkonfiguration",
     uploadExcelFile: "Excel-Datei hochladen",
     selectExcelFile: "Excel-Datei auswählen",
+    
+    // Page specific translations
+    generalData: "Allgemeine Daten",
+    machineRoom: "Maschinenraum",
+    modernizationAffected: "Von Modernisierung betroffen",
+    measurementData: "Messdaten",
+    questionsInGroup: "Fragen in dieser Gruppe",
+    groupOf: "Seite",
+    calculatedValuesValidated: "Die berechneten Werte werden automatisch validiert. Werte außerhalb der Grenzwerte werden rot angezeigt.",
+    calculatedValues: "Berechnete Werte",
+    errorRecordingRequired: "Dokumentation erforderlich",
+    outOfRange: "Außerhalb der Grenzwerte (700-9000 mm)",
+    viewErrors: "Fehler anzeigen",
+    downloadErrorList: "Fehlerliste herunterladen",
   },
 };

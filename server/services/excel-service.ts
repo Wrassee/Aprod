@@ -148,7 +148,7 @@ class ExcelService {
         compression: true,
         cellStyles: true,
         // REMOVED: cellNF is not a valid WritingOption
-        cellHTML: false,
+        // REMOVED: cellHTML is not a valid WritingOption
         sheetStubs: true,
         cellDates: true
       });

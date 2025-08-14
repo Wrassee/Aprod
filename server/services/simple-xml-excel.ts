@@ -279,11 +279,11 @@ class SimpleXmlExcelService {
           }
         } else if (config.type === 'true_false') {
           // Handle true_false questions - convert to X/-
-          let cellValue: string = '-'; // Explicitly set type to string, default to '-'
+          let cellValue: string = ''; // Explicitly set type to string, default to empty
           
-          if (answer === 'true' || answer === true) {
+          if (answer === true || String(answer).toLowerCase() === 'true') {
             cellValue = 'X';
-          } else if (answer === 'false' || answer === false) {
+          } else if (answer === false || String(answer).toLowerCase() === 'false') {
             cellValue = '-';
           }
           

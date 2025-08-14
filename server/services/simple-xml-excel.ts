@@ -281,9 +281,11 @@ class SimpleXmlExcelService {
           // Handle true_false questions - convert to X/-
           let cellValue: string = ''; // Explicitly set type to string, default to empty
           
-          if (answer === true || String(answer).toLowerCase() === 'true') {
+          const answerAsString = String(answer).toLowerCase();
+          
+          if (answerAsString === 'true') {
             cellValue = 'X';
-          } else if (answer === false || String(answer).toLowerCase() === 'false') {
+          } else if (answerAsString === 'false') {
             cellValue = '-';
           }
           

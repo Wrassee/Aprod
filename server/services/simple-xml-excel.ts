@@ -102,7 +102,7 @@ class SimpleXmlExcelService {
         
         // Replace existing cell content while preserving attributes
         if (cellPattern.test(worksheetXml)) {
-          worksheetXml = worksheetXml.replace(cellPattern, `$1<is><t>${this.escapeXml(value)}</t></is>$3`);
+          worksheetXml = worksheetXml.replace(cellPattern, `$1<is><t>${this.escapeXml(String(value))}</t></is>$3`);
           modifiedCount++;
           console.log(`XML: Replaced ${cell} = "${value}" (formatting preserved)`);
         } 
@@ -112,7 +112,7 @@ class SimpleXmlExcelService {
           const styleMatch = worksheetXml.match(new RegExp(`<c r="${cell}" s="([^"]+)"/>`));
           if (styleMatch) {
             const styleValue = styleMatch[1];
-            const replacement = `<c r="${cell}" s="${styleValue}" t="inlineStr"><is><t>${this.escapeXml(value)}</t></is></c>`;
+            const replacement = `<c r="${cell}" s="${styleValue}" t="inlineStr"><is><t>${this.escapeXml(String(value))}</t></is></c>`;
             worksheetXml = worksheetXml.replace(
               new RegExp(`<c r="${cell}" s="${styleValue}"/>`), 
               replacement
@@ -129,7 +129,7 @@ class SimpleXmlExcelService {
           const defaultStyle = this.inferCellStyle(cell, rowNum);
           
           worksheetXml = worksheetXml.replace(emptyPattern, 
-            `<c r="${cell}"$1${defaultStyle} t="inlineStr"><is><t>${this.escapeXml(value)}</t></is></c>`);
+            `<c r="${cell}"$1${defaultStyle} t="inlineStr"><is><t>${this.escapeXml(String(value))}</t></is></c>`);
           modifiedCount++;
           console.log(`XML: Added ${cell} = "${value}" (with inferred style)`);
         }
@@ -141,7 +141,7 @@ class SimpleXmlExcelService {
             if (rowPattern.test(worksheetXml)) {
               const defaultStyle = this.inferCellStyle(cell, rowNumber);
               worksheetXml = worksheetXml.replace(rowPattern, 
-                `$1$2<c r="${cell}"${defaultStyle} t="inlineStr"><is><t>${this.escapeXml(value)}</t></is></c>$3`);
+                `$1$2<c r="${cell}"${defaultStyle} t="inlineStr"><is><t>${this.escapeXml(String(value))}</t></is></c>$3`);
               modifiedCount++;
               console.log(`XML: Inserted ${cell} = "${value}" (with inferred style)`);
             }
@@ -279,23 +279,12 @@ class SimpleXmlExcelService {
           }
         } else if (config.type === 'true_false') {
           // Handle true_false questions - convert to X/-
-          let cellValue: string | boolean = answer;
-          
-          console.log(`DEBUG: Processing true_false question ${questionId}`);
-          console.log(`DEBUG: Raw answer value:`, answer, `(type: ${typeof answer})`);
-          console.log(`DEBUG: Answer === 'true':`, answer === 'true');
-          console.log(`DEBUG: Answer === true:`, answer === true);
-          console.log(`DEBUG: Answer === 'false':`, answer === 'false');
-          console.log(`DEBUG: Answer === false:`, answer === false);
+          let cellValue: string = '-'; // Explicitly set type to string, default to '-'
           
           if (answer === 'true' || answer === true) {
             cellValue = 'X';
           } else if (answer === 'false' || answer === false) {
             cellValue = '-';
-          } else {
-            // Handle any unexpected values
-            console.log(`WARNING: Unexpected true_false value for question ${questionId}:`, answer);
-            cellValue = '-'; // Default to false
           }
           
           console.log(`Processing true_false question ${questionId}: ${answer} -> ${cellValue}, cellRef: ${config.cellReference}`);

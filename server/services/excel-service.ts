@@ -60,7 +60,6 @@ class ExcelService {
         cellNF: true,
         cellHTML: false,
         sheetStubs: true,
-        // 'bookSST' is not a valid option, it is handled internally.
       });
       
       // Log template info
@@ -148,10 +147,9 @@ class ExcelService {
         bookType: 'xlsx',
         compression: true,
         cellStyles: true,
-        cellNF: true,
+        // REMOVED: cellNF is not a valid WritingOption
         cellHTML: false,
         sheetStubs: true,
-        // 'bookSST' is not a valid option, it is handled internally.
         cellDates: true
       });
       

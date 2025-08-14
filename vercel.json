@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.ts"
+      "destination": "/server/index.ts"
     },
     {
       "source": "/(.*)",
@@ -11,7 +11,7 @@
     }
   ],
   "functions": {
-    "api/index.ts": {
+    "server/index.ts": {
       "maxDuration": 30,
       "includeFiles": "templates/**/*.xlsx"
     }

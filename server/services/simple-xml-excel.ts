@@ -1,7 +1,7 @@
 import JSZip from 'jszip';
 import * as fs from 'fs';
 import { storage } from '../storage';
-import type { FormData } from '../../shared/types';
+import type { FormData } from '../../client/src/lib/types';
 
 class SimpleXmlExcelService {
   async generateExcelFromTemplate(formData: FormData, language: string): Promise<Buffer> {
@@ -173,7 +173,7 @@ class SimpleXmlExcelService {
   }
 
   private createCellMappings(formData: FormData, questionConfigs: any[], language: string) {
-    const mappings: Array<{cell: string, value: string, label: string}> = [];
+    const mappings: Array<{cell: string, value: any, label: string}> = [];
     
     // Add answers based on question configs
     Object.entries(formData.answers).forEach(([questionId, answer]) => {
@@ -237,7 +237,7 @@ class SimpleXmlExcelService {
                 mappings.push({
                   cell: cell,
                   value: 'x', 
-                  label: `${config.title} - Nem (${cell})`
+                  label: `${config.title} - Nem`
                 });
               });
             } else if (answer === 'na') {
@@ -246,7 +246,7 @@ class SimpleXmlExcelService {
                 mappings.push({
                   cell: cell,
                   value: 'x',
-                  label: `${config.title} - Nem alkalmazható (${cell})`
+                  label: `${config.title} - Nem alkalmazható`
                 });
               });
             }
@@ -279,7 +279,7 @@ class SimpleXmlExcelService {
           }
         } else if (config.type === 'true_false') {
           // Handle true_false questions - convert to X/-
-          let cellValue = answer;
+          let cellValue: string | boolean = answer;
           
           console.log(`DEBUG: Processing true_false question ${questionId}`);
           console.log(`DEBUG: Raw answer value:`, answer, `(type: ${typeof answer})`);

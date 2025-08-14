@@ -66,8 +66,10 @@ class PDFService {
         try {
           fs.unlinkSync(tempExcelPath);
           fs.unlinkSync(pdfPath);
-        } catch (e) {
-          console.log('Excel-to-PDF: Cleanup warning:', e.message);
+        } catch (e: unknown) {
+          if (e instanceof Error) {
+            console.log('Excel-to-PDF: Cleanup warning:', e.message);
+          }
         }
         
         console.log('Excel-to-PDF: SUCCESS! Perfect PDF generated, size:', pdfBuffer.length);
@@ -77,8 +79,12 @@ class PDFService {
         throw new Error('LibreOffice conversion failed');
       }
       
-    } catch (error) {
-      console.log('Excel-to-PDF: LibreOffice error:', error.message, '- using fallback');
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log('Excel-to-PDF: LibreOffice error:', error.message, '- using fallback');
+      } else {
+        console.log('Excel-to-PDF: LibreOffice error:', error, '- using fallback');
+      }
       return this.generateHTMLBasedPDF(excelBuffer);
     }
   }
@@ -94,7 +100,7 @@ class PDFService {
         cellNF: true,
         cellHTML: true,
         sheetStubs: true,
-        bookSST: true,
+        // 'bookSST' is not a valid option, it is handled internally.
         dense: false
       });
       
@@ -120,8 +126,12 @@ class PDFService {
       // Return the Excel buffer as PDF for now (user can manually save as PDF)
       return excelBuffer;
       
-    } catch (error) {
-      console.error('Excel-to-PDF: HTML generation failed:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Excel-to-PDF: HTML generation failed:', error.message);
+      } else {
+        console.error('Excel-to-PDF: HTML generation failed:', error);
+      }
       return this.generateFallbackPDF(excelBuffer);
     }
   }
@@ -440,8 +450,12 @@ startxref
         questions: [] 
       }));
       
-    } catch (error) {
-      console.error('Fallback PDF generation failed:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Fallback PDF generation failed:', error.message);
+      } else {
+        console.error('Fallback PDF generation failed:', error);
+      }
       
       // Ultra simple fallback
       const simplePDF = this.createSimplePDF();
@@ -535,8 +549,12 @@ startxref
       console.log('Generated error list PDF content length:', pdfContent.length);
       return Buffer.from(pdfContent, 'utf-8');
       
-    } catch (error) {
-      console.error('Error generating error list PDF:', error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error generating error list PDF:', error.message);
+      } else {
+        console.error('Error generating error list PDF:', error);
+      }
       throw new Error('Failed to generate error list PDF');
     }
   }

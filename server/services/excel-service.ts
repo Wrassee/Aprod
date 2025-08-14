@@ -5,6 +5,12 @@ import { excelParserService } from './excel-parser';
 import { simpleXmlExcelService } from './simple-xml-excel';
 import fs from 'fs';
 
+interface CellMapping {
+  cell: string;
+  value: any; // Use `any` here to allow for various types like number or string
+  label: string;
+}
+
 class ExcelService {
   async generateExcel(formData: FormData, language: string): Promise<Buffer> {
     try {
@@ -12,7 +18,11 @@ class ExcelService {
       console.log('Using XML-based Excel manipulation for perfect formatting preservation');
       return await simpleXmlExcelService.generateExcelFromTemplate(formData, language);
     } catch (xmlError) {
-      console.error('XML-based approach failed, falling back to XLSX library:', xmlError);
+      if (xmlError instanceof Error) {
+        console.error('XML-based approach failed, falling back to XLSX library:', xmlError.message);
+      } else {
+        console.error('XML-based approach failed with unknown error, falling back to XLSX library');
+      }
       
       // Fallback to original XLSX approach
       try {
@@ -31,7 +41,11 @@ class ExcelService {
           return await this.createBasicExcel(formData, language);
         }
       } catch (fallbackError) {
-        console.error('Fallback also failed, using basic Excel:', fallbackError);
+        if (fallbackError instanceof Error) {
+          console.error('Fallback also failed, using basic Excel:', fallbackError.message);
+        } else {
+          console.error('Fallback also failed with unknown error, using basic Excel');
+        }
         return await this.createBasicExcel(formData, language);
       }
     }
@@ -46,7 +60,7 @@ class ExcelService {
         cellNF: true,
         cellHTML: false,
         sheetStubs: true,
-        bookSST: true
+        // 'bookSST' is not a valid option, it is handled internally.
       });
       
       // Log template info
@@ -77,7 +91,7 @@ class ExcelService {
       let filledCells = 0;
       
       // Create cell mappings based on question configs
-      const cellMappings = [];
+      const cellMappings: CellMapping[] = [];
       
       // Add answers based on question configs
       Object.entries(formData.answers).forEach(([questionId, answer]) => {
@@ -132,19 +146,23 @@ class ExcelService {
       const buffer = XLSX.write(workbook, { 
         type: 'buffer', 
         bookType: 'xlsx',
-        compression: true,  // Use compression for smaller files
-        cellStyles: true,   // Preserve cell styles
-        cellNF: true,       // Preserve number formats  
-        cellHTML: false,    // Don't convert to HTML
-        sheetStubs: true,   // Include empty cells
-        bookSST: true,      // Preserve shared string table
-        cellDates: true     // Preserve date formatting
+        compression: true,
+        cellStyles: true,
+        cellNF: true,
+        cellHTML: false,
+        sheetStubs: true,
+        // 'bookSST' is not a valid option, it is handled internally.
+        cellDates: true
       });
       
       console.log('Successfully populated protocol template preserving original format');
       return buffer;
     } catch (error) {
-      console.error('Error populating protocol template:', error);
+      if (error instanceof Error) {
+        console.error('Error populating protocol template:', error.message);
+      } else {
+        console.error('Error populating protocol template:', error);
+      }
       throw error;
     }
   }
@@ -266,7 +284,11 @@ class ExcelService {
 
       return buffer;
     } catch (error) {
-      console.error('Error generating Excel:', error);
+      if (error instanceof Error) {
+        console.error('Error generating Excel:', error.message);
+      } else {
+        console.error('Error generating Excel:', error);
+      }
       throw new Error('Failed to generate Excel file');
     }
   }

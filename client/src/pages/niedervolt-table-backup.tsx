@@ -340,10 +340,62 @@ export function NiedervoltTable({
         </div>
       </header>
 
-      {/* Hidden Device Selection Dialog */}
-      <Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
+      {/* Main content and table */}
+      <main className="max-w-7xl mx-auto px-6 py-8">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100">{language === 'hu' ? 'Összes Eszköz' : 'Gesamte Geräte'}</p>
+                  <p className="text-3xl font-bold">{totalDevices}</p>
+                </div>
+                <Settings className="h-8 w-8 text-blue-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100">{language === 'hu' ? 'Kitöltött' : 'Ausgefüllt'}</p>
+                  <p className="text-3xl font-bold">{filledDevices}</p>
+                </div>
+                <Check className="h-8 w-8 text-green-200" />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100">{language === 'hu' ? 'Kitöltöttség' : 'Fortschritt'}</p>
+                  <p className="text-3xl font-bold">{completionPercentage}%</p>
+                </div>
+                <ArrowRight className="h-8 w-8 text-purple-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Measurements Table */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-xl">
+                {language === 'hu' ? 'Niedervolt Installációk Mérései' : 'Niedervolt Installations Messungen'}
+              </CardTitle>
+              
+              {/* Device Selection Button */}
+              <Dialog>
                 <DialogTrigger asChild>
-                  <div style={{ display: 'none' }} />
+                  <Button variant="outline" size="sm">
+                    <Filter className="h-4 w-4 mr-2" />
+                    {language === 'hu' ? 'Eszközök' : 'Geräte'} ({activeDevices.length})
+                  </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
                   <DialogHeader>
@@ -367,18 +419,15 @@ export function NiedervoltTable({
                               onCheckedChange={() => {
                                 const isCurrentlySelected = selectedDevices.has(device.id);
                                 if (isCurrentlySelected) {
-                                  // Remove device from selection
                                   setSelectedDevices(prev => {
                                     const newSet = new Set(prev);
                                     newSet.delete(device.id);
                                     return newSet;
                                   });
-                                  // Remove measurements for unselected device
                                   const newMeasurements = { ...measurements };
                                   delete newMeasurements[device.id];
                                   onMeasurementsChange(newMeasurements);
                                 } else {
-                                  // Add device to selection
                                   setSelectedDevices(prev => new Set([...prev, device.id]));
                                 }
                               }}
@@ -430,18 +479,15 @@ export function NiedervoltTable({
                               onCheckedChange={() => {
                                 const isCurrentlySelected = selectedDevices.has(device.id);
                                 if (isCurrentlySelected) {
-                                  // Remove custom device from selection
                                   setSelectedDevices(prev => {
                                     const newSet = new Set(prev);
                                     newSet.delete(device.id);
                                     return newSet;
                                   });
-                                  // Remove measurements for unselected device
                                   const newMeasurements = { ...measurements };
                                   delete newMeasurements[device.id];
                                   onMeasurementsChange(newMeasurements);
                                 } else {
-                                  // Add custom device to selection
                                   setSelectedDevices(prev => new Set([...prev, device.id]));
                                 }
                               }}
@@ -463,132 +509,12 @@ export function NiedervoltTable({
                   </div>
                   
                   <div className="flex justify-end space-x-2 mt-4">
-                    <Button variant="outline" onClick={() => setShowDeviceSelector(false)}>
-                      {language === 'hu' ? 'Mentés' : 'Speichern'}
+                    <Button onClick={() => setShowDeviceSelector(false)}>
+                      {language === 'hu' ? 'Bezárás' : 'Schließen'}
                     </Button>
                   </div>
                 </DialogContent>
               </Dialog>
-
-              {/* Save Button */}
-              <Button
-                onClick={handleManualSave}
-                className={`transition-all duration-300 ${
-                  saveStatus === 'saved' 
-                    ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border-green-300 dark:border-green-600' 
-                    : 'bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'
-                }`}
-                variant="outline"
-                disabled={saveStatus === 'saving'}
-              >
-                {saveStatus === 'saving' && (
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-                )}
-                {saveStatus === 'saved' && <Check className="h-4 w-4 mr-2" />}
-                {saveStatus !== 'saving' && saveStatus !== 'saved' && <Save className="h-4 w-4 mr-2" />}
-                {saveStatus === 'saving' ? (language === 'hu' ? 'Mentés...' : 'Speichern...') :
-                 saveStatus === 'saved' ? (language === 'hu' ? 'Mentve' : 'Gespeichert') :
-                 (language === 'hu' ? 'Mentés' : 'Speichern')}
-              </Button>
-
-              {/* Settings */}
-              <Button variant="outline" size="sm" onClick={onAdminAccess}>
-                <Settings className="h-4 w-4" />
-              </Button>
-
-              {/* Home */}
-              <Button variant="outline" size="sm" onClick={onHome}>
-                <Home className="h-4 w-4" />
-              </Button>
-
-              {/* Start New */}
-              <Button variant="outline" size="sm" onClick={handleStartNew}>
-                <RotateCcw className="h-4 w-4" />
-              </Button>
-            </div>
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Reception Date */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-lg">
-              {language === 'hu' ? 'Mérés Dátuma' : 'Messdatum'}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="reception-date">
-                  {language === 'hu' ? 'Átvétel dátuma' : 'Übernahmedatum'}
-                </Label>
-                <Input
-                  id="reception-date"
-                  type="date"
-                  value={receptionDate}
-                  onChange={(e) => onReceptionDateChange(e.target.value)}
-                  className="mt-1"
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-blue-100">{language === 'hu' ? 'Összes Eszköz' : 'Gesamte Geräte'}</p>
-                  <p className="text-3xl font-bold">{totalDevices}</p>
-                </div>
-                <Settings className="h-8 w-8 text-blue-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-green-100">{language === 'hu' ? 'Kitöltött' : 'Ausgefüllt'}</p>
-                  <p className="text-3xl font-bold">{filledDevices}</p>
-                </div>
-                <Check className="h-8 w-8 text-green-200" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-purple-100">{language === 'hu' ? 'Kitöltöttség' : 'Fortschritt'}</p>
-                  <p className="text-3xl font-bold">{Math.round((filledDevices / totalDevices) * 100)}%</p>
-                </div>
-                <ArrowRight className="h-8 w-8 text-purple-200" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Measurements Table */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-xl">
-                {language === 'hu' ? 'Niedervolt Installációk Mérései' : 'Niedervolt Installations Messungen'}
-              </CardTitle>
-              
-              {/* Device Selection Button - moved here below the stats cards */}
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setShowDeviceSelector(true)}
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                {language === 'hu' ? 'Eszközök' : 'Geräte'} ({activeDevices.length})
-              </Button>
             </div>
           </CardHeader>
           <CardContent>
@@ -707,7 +633,7 @@ export function NiedervoltTable({
                         <td className="border border-gray-300 dark:border-gray-600 p-2">
                           <Input
                             type="text"
-                            placeholder="L-T-V.."
+                            placeholder="Jellemző"
                             value={measurement.merkmal || ''}
                             onChange={(e) => updateMeasurement(device.id, 'merkmal', e.target.value)}
                             className="w-full text-center"
@@ -773,20 +699,25 @@ export function NiedervoltTable({
             </div>
           </CardContent>
         </Card>
-
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-8">
-          <Button variant="outline" onClick={onBack} className="flex items-center">
+      </main>
+      
+      {/* Footer Buttons */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 shadow-lg border-t border-gray-200 p-4">
+        <div className="max-w-7xl mx-auto flex justify-between">
+          <Button onClick={onBack} className="bg-gray-500 hover:bg-gray-600 text-white flex items-center">
             <ArrowLeft className="h-4 w-4 mr-2" />
             {language === 'hu' ? 'Vissza' : 'Zurück'}
           </Button>
-
-          <Button onClick={onNext} className="flex items-center bg-blue-600 hover:bg-blue-700">
-            {language === 'hu' ? 'Tovább az aláíráshoz' : 'Weiter zur Unterschrift'}
+          <Button
+            onClick={onNext}
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center"
+            disabled={completionPercentage < 100}
+          >
+            {language === 'hu' ? 'Tovább' : 'Weiter'}
             <ArrowRight className="h-4 w-4 ml-2" />
           </Button>
         </div>
-      </main>
+      </div>
     </div>
   );
 }

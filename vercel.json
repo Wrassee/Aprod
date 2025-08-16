@@ -1,3 +1,10 @@
+// Force new deployment by adding a comment
+{
+  "version": 2,
+  "builds": [
+    // ... a fájl többi része változatlan ...
+  ]
+}
 {
   "version": 2,
   "builds": [

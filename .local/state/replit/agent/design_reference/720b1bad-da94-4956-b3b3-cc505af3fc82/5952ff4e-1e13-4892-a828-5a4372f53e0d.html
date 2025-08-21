@@ -1,0 +1,403 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Acceptance Protocol - Digitális Átvételi Protokoll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#1976D2',
+                        secondary: '#424242',
+                        success: '#388E3C',
+                        warning: '#F57C00',
+                        error: '#D32F2F',
+                        surface: '#FFFFFF',
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-inter">
+    
+    <!-- Language Selection Screen -->
+    <!-- @COMPONENT: LanguageSelector -->
+    <div id="languageSelector" class="min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
+            <div class="mb-8">
+                <i class="fas fa-clipboard-check text-6xl text-primary mb-4"></i>
+                <h1 class="text-2xl font-semibold text-gray-800 mb-2">Digital Acceptance Protocol</h1>
+                <p class="text-gray-600">Digitális Átvételi Protokoll</p>
+            </div>
+            
+            <div class="space-y-4">
+                <h2 class="text-lg font-medium text-gray-700 mb-6">Select Language / Nyelv választás</h2>
+                
+                <button data-event="click:selectLanguage" data-implementation="Set app language to Hungarian" 
+                        class="w-full bg-primary hover:bg-blue-700 text-white font-medium py-4 px-6 rounded-lg transition-colors duration-200 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-globe mr-3"></i>
+                        <span>Magyar</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                
+                <button data-event="click:selectLanguage" data-implementation="Set app language to German"
+                        class="w-full bg-secondary hover:bg-gray-600 text-white font-medium py-4 px-6 rounded-lg transition-colors duration-200 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-globe mr-3"></i>
+                        <span>Deutsch</span>
+                    </div>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LanguageSelector -->
+
+    <!-- Main Application Interface (Hungarian) -->
+    <!-- @COMPONENT: MainApplication -->
+    <div id="mainApp" class="hidden min-h-screen bg-gray-50">
+        
+        <!-- Header -->
+        <!-- @COMPONENT: AppHeader -->
+        <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+            <div class="max-w-4xl mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i class="fas fa-clipboard-check text-2xl text-primary mr-3"></i>
+                        <h1 class="text-xl font-semibold text-gray-800">Átvételi Protokoll</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <!-- @STATE: currentLanguage:string = 'hu' -->
+                        <button data-event="click:toggleLanguage" class="text-gray-600 hover:text-primary transition-colors">
+                            <i class="fas fa-language mr-2"></i>DE
+                        </button>
+                        <button data-event="click:saveProgress" class="text-gray-600 hover:text-success transition-colors">
+                            <i class="fas fa-save mr-2"></i>Mentés
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- @END_COMPONENT: AppHeader -->
+
+        <!-- Progress Bar -->
+        <!-- @COMPONENT: ProgressIndicator -->
+        <div class="bg-white border-b border-gray-200">
+            <div class="max-w-4xl mx-auto px-6 py-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Haladás</span>
+                    <span class="text-sm text-gray-500" data-bind="progress.current + '/' + progress.total">3 / 12</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 25%" data-bind="progress.percentage"></div>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: ProgressIndicator -->
+
+        <!-- Main Content -->
+        <main class="max-w-4xl mx-auto px-6 py-8">
+            
+            <!-- Date Selection Section -->
+            <!-- @COMPONENT: DateSelector -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+                <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-calendar-alt text-primary mr-3"></i>
+                    Átvétel dátuma
+                </h2>
+                <div class="relative">
+                    <input type="date" data-bind="protocol.receiptDate" 
+                           class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary transition-colors"
+                           data-implementation="Date picker component with validation">
+                </div>
+            </div>
+            <!-- @END_COMPONENT: DateSelector -->
+
+            <!-- Current Question Section -->
+            <!-- @COMPONENT: QuestionCard -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6">
+                <div class="mb-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
+                        Kérdés 3/12
+                    </span>
+                </div>
+                
+                <h3 class="text-xl font-semibold text-gray-800 mb-4" data-bind="currentQuestion.title">
+                    A szállítmány sérülésmentes állapotban érkezett meg?
+                </h3>
+                
+                <p class="text-gray-600 mb-6" data-bind="currentQuestion.description">
+                    Ellenőrizze a csomagolás külső állapotát és jelezze, ha bármilyen sérülést észlel.
+                </p>
+
+                <!-- Field Type: Yes/No/Not Applicable -->
+                <div class="space-y-3 mb-6">
+                    <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                        <input type="radio" name="question_3" value="yes" class="mr-4 text-primary focus:ring-primary" data-bind="answers.question3">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-circle text-success mr-3"></i>
+                            <span class="font-medium">Igen</span>
+                        </div>
+                    </label>
+                    
+                    <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                        <input type="radio" name="question_3" value="no" class="mr-4 text-primary focus:ring-primary" data-bind="answers.question3">
+                        <div class="flex items-center">
+                            <i class="fas fa-times-circle text-error mr-3"></i>
+                            <span class="font-medium">Nem</span>
+                        </div>
+                    </label>
+                    
+                    <label class="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                        <input type="radio" name="question_3" value="na" class="mr-4 text-primary focus:ring-primary" data-bind="answers.question3">
+                        <div class="flex items-center">
+                            <i class="fas fa-minus-circle text-gray-400 mr-3"></i>
+                            <span class="font-medium">Nem alkalmazható</span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Megjegyzések (opcionális)</label>
+                    <textarea class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" 
+                              rows="3" placeholder="Írja be a megjegyzéseit..." data-bind="answers.question3Comments"
+                              data-implementation="Auto-save comments as user types"></textarea>
+                </div>
+
+                <!-- Image Attachment -->
+                <!-- @COMPONENT: ImageAttachment -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Képek csatolása</label>
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors">
+                        <i class="fas fa-camera text-3xl text-gray-400 mb-3"></i>
+                        <p class="text-gray-600 mb-2">Koppintson a kép készítéséhez</p>
+                        <button class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors" 
+                                data-event="click:captureImage" data-implementation="Open camera or file picker">
+                            <i class="fas fa-plus mr-2"></i>Kép hozzáadása
+                        </button>
+                    </div>
+                    
+                    <!-- Attached Images Preview -->
+                    <div class="mt-4 grid grid-cols-3 gap-4" data-mock="true">
+                        <!-- A close-up photo of a shipping box corner showing minor damage -->
+                        <div class="relative">
+                            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=300" 
+                                 alt="Damaged shipping box corner" class="w-full h-24 object-cover rounded-lg">
+                            <button class="absolute -top-2 -right-2 bg-error text-white rounded-full w-6 h-6 flex items-center justify-center text-sm" 
+                                    data-event="click:removeImage" data-implementation="Remove image from attachments">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: ImageAttachment -->
+
+            </div>
+            <!-- @END_COMPONENT: QuestionCard -->
+
+            <!-- Number Input Question Example -->
+            <!-- @COMPONENT: NumberInputQuestion -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 p-6 hidden" data-implementation="Show when question type is number">
+                <div class="mb-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary">
+                        Kérdés 7/12
+                    </span>
+                </div>
+                
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">
+                    Csomagok száma
+                </h3>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Érték</label>
+                    <input type="number" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" 
+                           placeholder="Adja meg a csomagok számát" data-bind="answers.packageCount"
+                           data-implementation="Validate numeric input and show real-time feedback">
+                </div>
+            </div>
+            <!-- @END_COMPONENT: NumberInputQuestion -->
+
+            <!-- Navigation Buttons -->
+            <!-- @COMPONENT: NavigationControls -->
+            <div class="flex items-center justify-between">
+                <button class="flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" 
+                        data-event="click:previousQuestion" data-implementation="Save current answer and go to previous question">
+                    <i class="fas fa-chevron-left mr-2"></i>
+                    Előző
+                </button>
+                
+                <div class="flex space-x-3">
+                    <button class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" 
+                            data-event="click:saveAndExit" data-implementation="Save progress and exit to main menu">
+                        <i class="fas fa-save mr-2"></i>
+                        Mentés és kilépés
+                    </button>
+                    
+                    <button class="flex items-center px-6 py-3 bg-primary hover:bg-blue-700 text-white rounded-lg transition-colors" 
+                            data-event="click:nextQuestion" data-implementation="Validate current answer and proceed to next question">
+                        Következő
+                        <i class="fas fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- @END_COMPONENT: NavigationControls -->
+
+        </main>
+
+        <!-- Signature Section (Final Step) -->
+        <!-- @COMPONENT: SignatureSection -->
+        <div id="signatureSection" class="hidden max-w-4xl mx-auto px-6 py-8">
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 flex items-center">
+                    <i class="fas fa-signature text-primary mr-3"></i>
+                    Digitális aláírás
+                </h2>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Név (opcionális)</label>
+                    <input type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-700 focus:ring-2 focus:ring-primary focus:border-primary transition-colors" 
+                           placeholder="Írja be a nevét" data-bind="signature.name">
+                </div>
+
+                <!-- @FUNCTIONALITY: This drawing area should implement touch-based signature capture using canvas API -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Aláírás</label>
+                    <div class="border-2 border-gray-300 rounded-lg p-4 bg-gray-50">
+                        <canvas id="signatureCanvas" width="600" height="200" class="w-full border border-gray-200 rounded bg-white cursor-crosshair"
+                                data-implementation="Implement touch/mouse drawing with undo/clear functionality"></canvas>
+                        <div class="mt-3 flex space-x-3">
+                            <button class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" 
+                                    data-event="click:clearSignature">
+                                <i class="fas fa-eraser mr-2"></i>Törlés
+                            </button>
+                            <button class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" 
+                                    data-event="click:undoSignature">
+                                <i class="fas fa-undo mr-2"></i>Visszavonás
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <button class="flex items-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" 
+                            data-event="click:backToQuestions">
+                        <i class="fas fa-chevron-left mr-2"></i>
+                        Vissza a kérdésekhez
+                    </button>
+                    
+                    <button class="flex items-center px-8 py-3 bg-success hover:bg-green-700 text-white rounded-lg transition-colors font-medium" 
+                            data-event="click:completeProtocol" data-implementation="Generate Excel, PDF and show completion options">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Protokoll befejezése
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: SignatureSection -->
+
+        <!-- Completion Modal -->
+        <!-- @COMPONENT: CompletionModal -->
+        <div id="completionModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-6">
+            <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-8">
+                <div class="text-center mb-6">
+                    <i class="fas fa-check-circle text-5xl text-success mb-4"></i>
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-2">Protokoll elkészült!</h2>
+                    <p class="text-gray-600">Az átvételi protokoll sikeresen létrehozva.</p>
+                </div>
+                
+                <div class="space-y-3">
+                    <button class="w-full flex items-center justify-center px-6 py-3 bg-primary hover:bg-blue-700 text-white rounded-lg transition-colors" 
+                            data-event="click:emailProtocol" data-implementation="Open email composer with PDF attachment">
+                        <i class="fas fa-envelope mr-3"></i>
+                        E-mail küldése
+                    </button>
+                    
+                    <button class="w-full flex items-center justify-center px-6 py-3 bg-warning hover:bg-orange-600 text-white rounded-lg transition-colors" 
+                            data-event="click:saveToCloud" data-implementation="Upload to Google Drive or selected cloud storage">
+                        <i class="fas fa-cloud-upload-alt mr-3"></i>
+                        Mentés felhőbe
+                    </button>
+                    
+                    <button class="w-full flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" 
+                            data-event="click:downloadLocal" data-implementation="Download PDF and Excel files locally">
+                        <i class="fas fa-download mr-3"></i>
+                        Helyi mentés
+                    </button>
+                    
+                    <button class="w-full flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" 
+                            data-event="click:newProtocol" data-implementation="Clear all data and start new protocol">
+                        <i class="fas fa-plus mr-3"></i>
+                        Új protokoll
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- @END_COMPONENT: CompletionModal -->
+
+    </div>
+    <!-- @END_COMPONENT: MainApplication -->
+
+    <script>
+        (function() {
+            // TODO: Implement business logic, API calls, and state management
+            
+            // Language selection demo
+            document.querySelectorAll('[data-event="click:selectLanguage"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.getElementById('languageSelector').classList.add('hidden');
+                    document.getElementById('mainApp').classList.remove('hidden');
+                });
+            });
+
+            // Basic signature canvas demo setup
+            const canvas = document.getElementById('signatureCanvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                let isDrawing = false;
+                
+                canvas.addEventListener('mousedown', () => isDrawing = true);
+                canvas.addEventListener('mouseup', () => isDrawing = false);
+                canvas.addEventListener('mousemove', (e) => {
+                    if (!isDrawing) return;
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = '#1976D2';
+                    ctx.lineTo(e.offsetX, e.offsetY);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(e.offsetX, e.offsetY);
+                });
+                
+                // Clear signature
+                document.querySelector('[data-event="click:clearSignature"]')?.addEventListener('click', () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                });
+            }
+
+            // Demo completion flow
+            document.querySelector('[data-event="click:completeProtocol"]')?.addEventListener('click', function() {
+                document.getElementById('completionModal').classList.remove('hidden');
+            });
+
+            // Close modal when clicking outside
+            document.getElementById('completionModal')?.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.add('hidden');
+                }
+            });
+        })();
+    </script>
+
+</body>
+</html>

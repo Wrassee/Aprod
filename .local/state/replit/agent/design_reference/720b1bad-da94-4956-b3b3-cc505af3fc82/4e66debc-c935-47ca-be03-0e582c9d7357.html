@@ -1,0 +1,586 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTIS Digital Acceptance Protocol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'otis-blue': '#0066CC',
+                        'otis-light-blue': '#E6F2FF',
+                        'steel-gray': '#64748B',
+                        'light-surface': '#F8FAFC'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="font-inter bg-gray-50 min-h-screen">
+    
+    <!-- @COMPONENT: StartScreen -->
+    <div id="startScreen" class="min-h-screen flex flex-col items-center justify-center bg-white">
+        <!-- OTIS Logo -->
+        <div class="mb-12">
+            <!-- OTIS company logo in blue -->
+            <img src="https://pixabay.com/get/gc9c3a1bbefb0fc4084b8ce6d8a37df96ce0e43a9e25a0783b9d49c58b99a48db67cd2ce76572e73a410cdd79b8871b96cd099a3e9228b884de94b22bb838b799_1280.jpg" 
+                 alt="OTIS Logo" 
+                 class="h-20 w-auto" 
+                 data-mock-image="true" 
+                 data-implementation="Replace with actual OTIS logo">
+        </div>
+        
+        <!-- Slogan -->
+        <h1 class="text-4xl font-light text-gray-800 mb-16 text-center">Made to move you</h1>
+        
+        <!-- Language Selection -->
+        <div class="flex space-x-8">
+            <!-- Hungarian Flag -->
+            <button class="flex flex-col items-center p-6 rounded-xl border-2 border-gray-200 hover:border-otis-blue hover:bg-otis-light-blue transition-all duration-200 transform hover:scale-105" 
+                    data-event="click:selectHungarian">
+                <div class="w-20 h-14 bg-red-500 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1/3 bg-red-500"></div>
+                    <div class="absolute top-1/3 left-0 w-full h-1/3 bg-white"></div>
+                    <div class="absolute top-2/3 left-0 w-full h-1/3 bg-green-500"></div>
+                </div>
+                <span class="text-lg font-medium text-gray-700">Magyar</span>
+            </button>
+            
+            <!-- German Flag -->
+            <button class="flex flex-col items-center p-6 rounded-xl border-2 border-gray-200 hover:border-otis-blue hover:bg-otis-light-blue transition-all duration-200 transform hover:scale-105" 
+                    data-event="click:selectGerman">
+                <div class="w-20 h-14 bg-black rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1/3 bg-black"></div>
+                    <div class="absolute top-1/3 left-0 w-full h-1/3 bg-red-500"></div>
+                    <div class="absolute top-2/3 left-0 w-full h-1/3 bg-yellow-400"></div>
+                </div>
+                <span class="text-lg font-medium text-gray-700">Deutsch</span>
+            </button>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: StartScreen -->
+
+    <!-- @COMPONENT: QuestionnaireScreen -->
+    <div id="questionnaireScreen" class="hidden min-h-screen bg-light-surface">
+        <!-- Header with Logo and Progress -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center">
+                        <!-- OTIS logo in header -->
+                        <img src="https://pixabay.com/get/g798e78c4e20fa6eeebce98b715e09fc15a8e9e0aa11ba83564a30c98f0a6ba2688ecc371af8d1fbf5e4af390895abae6090cfa72082791566771c677f6fc59cd_1280.jpg" 
+                             alt="OTIS Logo" 
+                             class="h-8 w-auto mr-4"
+                             data-mock-image="true">
+                        <span class="text-lg font-medium text-gray-800" data-bind="currentLanguage.title">Acceptance Protocol</span>
+                    </div>
+                    
+                    <!-- Date Picker -->
+                    <div class="flex items-center space-x-4">
+                        <label class="text-sm font-medium text-gray-600">Reception Date:</label>
+                        <input type="date" 
+                               class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent"
+                               data-bind="receptionDate">
+                    </div>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="mt-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-medium text-gray-600" data-bind="currentLanguage.progress">Progress</span>
+                        <span class="text-sm font-medium text-otis-blue" data-bind="progressText">3 / 12</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-otis-blue h-2 rounded-full transition-all duration-300" style="width: 25%"></div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-6 py-8">
+            <!-- Question Grid (2x2 Layout) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                
+                <!-- Question Block 1 -->
+                <!-- @COMPONENT: QuestionBlock -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800" data-bind="questions[0].title">1. Elevator installation complete?</h3>
+                        <button class="text-gray-400 hover:text-otis-blue transition-colors" data-event="click:attachImage">
+                            <i class="fas fa-camera text-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="q1" value="yes" class="sr-only peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-otis-blue peer-checked:bg-otis-blue flex items-center justify-center mr-3">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                            </div>
+                            <span class="text-gray-700" data-bind="currentLanguage.yes">Yes</span>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="q1" value="no" class="sr-only peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-otis-blue peer-checked:bg-otis-blue flex items-center justify-center mr-3">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                            </div>
+                            <span class="text-gray-700" data-bind="currentLanguage.no">No</span>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="q1" value="na" class="sr-only peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-otis-blue peer-checked:bg-otis-blue flex items-center justify-center mr-3">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                            </div>
+                            <span class="text-gray-700" data-bind="currentLanguage.notApplicable">Not Applicable</span>
+                        </label>
+                    </div>
+                    
+                    <!-- Image Attachments Preview -->
+                    <div class="mt-4 hidden" id="imagePreview1">
+                        <div class="flex space-x-2">
+                            <div class="w-16 h-16 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                <i class="fas fa-image text-gray-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: QuestionBlock -->
+
+                <!-- Question Block 2 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800" data-bind="questions[1].title">2. Safety systems operational?</h3>
+                        <button class="text-gray-400 hover:text-otis-blue transition-colors" data-event="click:attachImage">
+                            <i class="fas fa-camera text-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="q2" value="yes" class="sr-only peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-otis-blue peer-checked:bg-otis-blue flex items-center justify-center mr-3">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                            </div>
+                            <span class="text-gray-700">Yes</span>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="q2" value="no" class="sr-only peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-otis-blue peer-checked:bg-otis-blue flex items-center justify-center mr-3">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                            </div>
+                            <span class="text-gray-700">No</span>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="q2" value="na" class="sr-only peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-gray-300 peer-checked:border-otis-blue peer-checked:bg-otis-blue flex items-center justify-center mr-3">
+                                <div class="w-2 h-2 bg-white rounded-full opacity-0 peer-checked:opacity-100"></div>
+                            </div>
+                            <span class="text-gray-700">Not Applicable</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Question Block 3 - Number Input -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800" data-bind="questions[2].title">3. Load capacity (kg)</h3>
+                        <button class="text-gray-400 hover:text-otis-blue transition-colors" data-event="click:attachImage">
+                            <i class="fas fa-camera text-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <input type="number" 
+                               placeholder="Enter load capacity"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent text-lg"
+                               data-bind="questions[2].value">
+                    </div>
+                </div>
+
+                <!-- Question Block 4 - Text Input -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800" data-bind="questions[3].title">4. Additional comments</h3>
+                        <button class="text-gray-400 hover:text-otis-blue transition-colors" data-event="click:attachImage">
+                            <i class="fas fa-camera text-lg"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <textarea rows="4" 
+                                  placeholder="Enter any additional comments or observations"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent resize-none"
+                                  data-bind="questions[3].value"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error List Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800" data-bind="currentLanguage.errorList">Error List</h2>
+                    <button class="bg-otis-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center" 
+                            data-event="click:addError">
+                        <i class="fas fa-plus mr-2"></i>
+                        <span data-bind="currentLanguage.addError">Add Error</span>
+                    </button>
+                </div>
+                
+                <!-- Sample Error Entry -->
+                <div class="border border-gray-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <span class="bg-red-500 text-white px-2 py-1 rounded text-sm font-medium mr-3">Critical</span>
+                                <h4 class="font-medium text-gray-800" data-mock="true">Door alignment issue</h4>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3" data-mock="true">Elevator door does not align properly with floor level on the 3rd floor.</p>
+                            
+                            <!-- Photo attachments for error -->
+                            <div class="flex space-x-2">
+                                <!-- Sample attached image for error documentation -->
+                                <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=80&h=80" 
+                                     alt="Error documentation photo" 
+                                     class="w-16 h-16 object-cover rounded border"
+                                     data-mock-image="true">
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-2 ml-4">
+                            <button class="text-gray-400 hover:text-otis-blue transition-colors" data-event="click:editError">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-gray-400 hover:text-red-500 transition-colors" data-event="click:deleteError">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Placeholder for no errors -->
+                <div class="text-center py-8 text-gray-500 hidden" id="noErrors">
+                    <i class="fas fa-check-circle text-4xl mb-4 text-green-500"></i>
+                    <p data-bind="currentLanguage.noErrors">No errors reported</p>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="flex justify-between items-center">
+                <button class="flex items-center px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" 
+                        data-event="click:previousStep">
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span data-bind="currentLanguage.previous">Previous</span>
+                </button>
+                
+                <div class="flex space-x-4">
+                    <button class="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" 
+                            data-event="click:saveProgress">
+                        <i class="fas fa-save mr-2"></i>
+                        <span data-bind="currentLanguage.save">Save Progress</span>
+                    </button>
+                    
+                    <button class="flex items-center px-6 py-3 bg-otis-blue text-white rounded-lg hover:bg-blue-700 transition-colors" 
+                            data-event="click:nextStep">
+                        <span data-bind="currentLanguage.next">Next</span>
+                        <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- @END_COMPONENT: QuestionnaireScreen -->
+
+    <!-- @COMPONENT: SignatureScreen -->
+    <div id="signatureScreen" class="hidden min-h-screen bg-light-surface">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex items-center">
+                    <!-- OTIS logo -->
+                    <img src="https://pixabay.com/get/gfed8a0577a9e1e9962193e9335eb19c15ff99b10d3438e021544459310139aaaed919057c3d43b526c93af626b610206e5d805e26debeff6d3dc8db4c17b0227_1280.jpg" 
+                         alt="OTIS Logo" 
+                         class="h-8 w-auto mr-4"
+                         data-mock-image="true">
+                    <span class="text-lg font-medium text-gray-800" data-bind="currentLanguage.signatureTitle">Digital Signature</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Signature Content -->
+        <main class="max-w-4xl mx-auto px-6 py-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-6" data-bind="currentLanguage.signatureInstruction">Please provide your signature</h2>
+                
+                <!-- Signature Canvas -->
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 mb-6 bg-gray-50">
+                    <div class="text-center">
+                        <i class="fas fa-signature text-4xl text-gray-400 mb-4"></i>
+                        <p class="text-gray-600 mb-4" data-bind="currentLanguage.signaturePrompt">Sign here with your finger or stylus</p>
+                        
+                        <!-- @FUNCTIONALITY: This drawing area should implement free-hand drawing using canvas API -->
+                        <canvas id="signatureCanvas" 
+                                width="600" 
+                                height="200" 
+                                class="border border-gray-300 rounded bg-white cursor-crosshair mx-auto"
+                                data-implementation="Implement signature capture using canvas drawing API"></canvas>
+                        
+                        <div class="flex justify-center space-x-4 mt-4">
+                            <button class="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50" 
+                                    data-event="click:clearSignature">
+                                <i class="fas fa-eraser mr-2"></i>
+                                <span data-bind="currentLanguage.clear">Clear</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Optional Name Input -->
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="currentLanguage.printedName">Printed Name (Optional)</label>
+                    <input type="text" 
+                           placeholder="Enter your full name"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent"
+                           data-bind="signatureName">
+                </div>
+                
+                <!-- Date Stamp -->
+                <div class="flex items-center text-sm text-gray-600 mb-8">
+                    <i class="fas fa-calendar mr-2"></i>
+                    <span data-bind="currentLanguage.signatureDate">Signed on: </span>
+                    <span data-bind="currentDate" data-mock="true">January 15, 2024</span>
+                </div>
+                
+                <!-- Navigation -->
+                <div class="flex justify-between">
+                    <button class="flex items-center px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" 
+                            data-event="click:goBack">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        <span data-bind="currentLanguage.back">Back</span>
+                    </button>
+                    
+                    <button class="flex items-center px-8 py-3 bg-otis-blue text-white rounded-lg hover:bg-blue-700 transition-colors" 
+                            data-event="click:completeProtocol">
+                        <i class="fas fa-check mr-2"></i>
+                        <span data-bind="currentLanguage.complete">Complete Protocol</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- @END_COMPONENT: SignatureScreen -->
+
+    <!-- @COMPONENT: CompletionScreen -->
+    <div id="completionScreen" class="hidden min-h-screen bg-light-surface">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-6 py-4">
+                <div class="flex items-center">
+                    <!-- OTIS logo -->
+                    <img src="https://pixabay.com/get/gfed8a0577a9e1e9962193e9335eb19c15ff99b10d3438e021544459310139aaaed919057c3d43b526c93af626b610206e5d805e26debeff6d3dc8db4c17b0227_1280.jpg" 
+                         alt="OTIS Logo" 
+                         class="h-8 w-auto mr-4"
+                         data-mock-image="true">
+                    <span class="text-lg font-medium text-gray-800" data-bind="currentLanguage.completionTitle">Protocol Completed</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Completion Content -->
+        <main class="max-w-4xl mx-auto px-6 py-8">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+                <div class="mb-8">
+                    <i class="fas fa-check-circle text-6xl text-green-500 mb-4"></i>
+                    <h2 class="text-3xl font-semibold text-gray-800 mb-4" data-bind="currentLanguage.protocolComplete">Protocol Successfully Completed</h2>
+                    <p class="text-gray-600" data-bind="currentLanguage.completionMessage">Your acceptance protocol has been generated and is ready for distribution.</p>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <!-- Email PDF -->
+                    <button class="flex items-center justify-center px-6 py-4 bg-otis-blue text-white rounded-lg hover:bg-blue-700 transition-colors" 
+                            data-event="click:emailPDF">
+                        <i class="fas fa-envelope mr-3"></i>
+                        <span data-bind="currentLanguage.emailPDF">Email PDF Report</span>
+                    </button>
+                    
+                    <!-- Save to Cloud -->
+                    <button class="flex items-center justify-center px-6 py-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors" 
+                            data-event="click:saveToCloud">
+                        <i class="fas fa-cloud-upload-alt mr-3"></i>
+                        <span data-bind="currentLanguage.saveToCloud">Save to Google Drive</span>
+                    </button>
+                    
+                    <!-- Download PDF -->
+                    <button class="flex items-center justify-center px-6 py-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors" 
+                            data-event="click:downloadPDF">
+                        <i class="fas fa-download mr-3"></i>
+                        <span data-bind="currentLanguage.downloadPDF">Download PDF</span>
+                    </button>
+                    
+                    <!-- View Protocol -->
+                    <button class="flex items-center justify-center px-6 py-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors" 
+                            data-event="click:viewProtocol">
+                        <i class="fas fa-eye mr-3"></i>
+                        <span data-bind="currentLanguage.viewProtocol">Preview Protocol</span>
+                    </button>
+                </div>
+                
+                <!-- Start New Protocol -->
+                <button class="px-8 py-3 text-otis-blue border-2 border-otis-blue rounded-lg hover:bg-otis-light-blue transition-colors" 
+                        data-event="click:startNew">
+                    <i class="fas fa-plus mr-2"></i>
+                    <span data-bind="currentLanguage.startNew">Start New Protocol</span>
+                </button>
+            </div>
+        </main>
+    </div>
+    <!-- @END_COMPONENT: CompletionScreen -->
+
+    <!-- @COMPONENT: AddErrorModal -->
+    <div id="addErrorModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-lg max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800" data-bind="currentLanguage.addErrorTitle">Add New Error</h3>
+                    <button class="text-gray-400 hover:text-gray-600" data-event="click:closeModal">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <!-- Error Form -->
+                <form class="space-y-6">
+                    <!-- Severity Level -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="currentLanguage.severity">Severity Level</label>
+                        <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent">
+                            <option value="critical" data-bind="currentLanguage.critical">Critical</option>
+                            <option value="medium" data-bind="currentLanguage.medium">Medium</option>
+                            <option value="low" data-bind="currentLanguage.low">Low</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Error Title -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="currentLanguage.errorTitle">Error Title</label>
+                        <input type="text" 
+                               placeholder="Brief description of the error"
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent">
+                    </div>
+                    
+                    <!-- Error Description -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="currentLanguage.errorDescription">Detailed Description</label>
+                        <textarea rows="4" 
+                                  placeholder="Provide detailed information about the error"
+                                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent resize-none"></textarea>
+                    </div>
+                    
+                    <!-- Photo Upload -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="currentLanguage.attachPhotos">Attach Photos</label>
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                            <i class="fas fa-camera text-3xl text-gray-400 mb-4"></i>
+                            <p class="text-gray-600 mb-2" data-bind="currentLanguage.uploadPhotos">Click to upload photos or drag and drop</p>
+                            <button type="button" class="text-otis-blue hover:text-blue-700 font-medium" data-event="click:uploadPhotos">
+                                <span data-bind="currentLanguage.selectFiles">Select Files</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal Actions -->
+                    <div class="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+                        <button type="button" 
+                                class="px-6 py-3 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" 
+                                data-event="click:cancelError">
+                            <span data-bind="currentLanguage.cancel">Cancel</span>
+                        </button>
+                        <button type="submit" 
+                                class="px-6 py-3 bg-otis-blue text-white rounded-lg hover:bg-blue-700 transition-colors" 
+                                data-event="click:saveError">
+                            <span data-bind="currentLanguage.saveError">Save Error</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: AddErrorModal -->
+
+    <!-- @STATE: currentScreen:string = 'start' -->
+    <!-- @STATE: selectedLanguage:string = '' -->
+    <!-- @STATE: currentQuestionPage:number = 1 -->
+    <!-- @STATE: totalQuestionPages:number = 3 -->
+    <!-- @STATE: answers:object = {} -->
+    <!-- @STATE: errors:array = [] -->
+    <!-- @STATE: receptionDate:string = '' -->
+    <!-- @STATE: signature:string = '' -->
+
+    <script>
+        // TODO: Implement business logic, API calls, and state management
+        (function() {
+            // Screen management
+            const screens = ['startScreen', 'questionnaireScreen', 'signatureScreen', 'completionScreen'];
+            let currentScreen = 'startScreen';
+            
+            function showScreen(screenId) {
+                screens.forEach(id => {
+                    document.getElementById(id).classList.add('hidden');
+                });
+                document.getElementById(screenId).classList.remove('hidden');
+                currentScreen = screenId;
+            }
+            
+            // Language selection handlers
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('[data-event="click:selectHungarian"]')) {
+                    // TODO: Load Hungarian language pack and update UI
+                    showScreen('questionnaireScreen');
+                }
+                
+                if (e.target.closest('[data-event="click:selectGerman"]')) {
+                    // TODO: Load German language pack and update UI
+                    showScreen('questionnaireScreen');
+                }
+                
+                if (e.target.closest('[data-event="click:nextStep"]')) {
+                    // TODO: Validate current answers and proceed to next step
+                    showScreen('signatureScreen');
+                }
+                
+                if (e.target.closest('[data-event="click:completeProtocol"]')) {
+                    // TODO: Generate PDF, populate Excel template
+                    showScreen('completionScreen');
+                }
+                
+                if (e.target.closest('[data-event="click:addError"]')) {
+                    document.getElementById('addErrorModal').classList.remove('hidden');
+                }
+                
+                if (e.target.closest('[data-event="click:closeModal"]') || e.target.closest('[data-event="click:cancelError"]')) {
+                    document.getElementById('addErrorModal').classList.add('hidden');
+                }
+            });
+            
+            // Initialize date picker with current date
+            const dateInput = document.querySelector('input[type="date"]');
+            if (dateInput) {
+                dateInput.valueAsDate = new Date();
+            }
+        })();
+    </script>
+</body>
+</html>

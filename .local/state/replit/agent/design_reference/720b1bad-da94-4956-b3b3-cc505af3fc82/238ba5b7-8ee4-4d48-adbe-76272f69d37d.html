@@ -1,0 +1,554 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTIS Digital Acceptance Protocol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    'otis-blue': '#0066CC',
+                    'otis-dark': '#004499',
+                    'surface': '#FAFAFA',
+                }
+            },
+            fontFamily: {
+                'inter': ['Inter', 'sans-serif'],
+            }
+        }
+    };
+    </script>
+</head>
+<body class="font-inter bg-surface min-h-screen">
+    
+    <!-- @COMPONENT: LanguageSelectionScreen -->
+    <div id="languageScreen" class="min-h-screen flex flex-col">
+        <!-- Header with OTIS Logo -->
+        <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-6">
+            <div class="flex items-center justify-center">
+                <!-- OTIS company logo -->
+                <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=80" alt="OTIS Logo" class="h-12" data-mock="true">
+            </div>
+        </header>
+
+        <!-- Main Language Selection -->
+        <main class="flex-1 flex items-center justify-center px-8">
+            <div class="max-w-2xl w-full text-center">
+                <div class="bg-white rounded-xl shadow-lg p-12">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-4">Digital Acceptance Protocol</h1>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Digitales Abnahmeprotokoll</h2>
+                    <p class="text-lg text-gray-600 mb-12">Select your language / Válassza ki a nyelvet</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Hungarian Selection -->
+                        <button data-event="click:selectLanguage" data-implementation="Set language to Hungarian and navigate to form" class="group bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-otis-blue hover:shadow-md transition-all duration-200">
+                            <div class="flex flex-col items-center space-y-4">
+                                <!-- Hungarian flag representation -->
+                                <div class="w-20 h-12 border border-gray-300 rounded overflow-hidden">
+                                    <div class="h-4 bg-red-600"></div>
+                                    <div class="h-4 bg-white"></div>
+                                    <div class="h-4 bg-green-600"></div>
+                                </div>
+                                <span class="text-xl font-semibold text-gray-800 group-hover:text-otis-blue transition-colors">Magyar</span>
+                                <span class="text-sm text-gray-500">Hungarian</span>
+                            </div>
+                        </button>
+
+                        <!-- German Selection -->
+                        <button data-event="click:selectLanguage" data-implementation="Set language to German and navigate to form" class="group bg-white border-2 border-gray-200 rounded-xl p-8 hover:border-otis-blue hover:shadow-md transition-all duration-200">
+                            <div class="flex flex-col items-center space-y-4">
+                                <!-- German flag representation -->
+                                <div class="w-20 h-12 border border-gray-300 rounded overflow-hidden">
+                                    <div class="h-4 bg-black"></div>
+                                    <div class="h-4 bg-red-600"></div>
+                                    <div class="h-4 bg-yellow-400"></div>
+                                </div>
+                                <span class="text-xl font-semibold text-gray-800 group-hover:text-otis-blue transition-colors">Deutsch</span>
+                                <span class="text-sm text-gray-500">German</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- @END_COMPONENT: LanguageSelectionScreen -->
+
+    <!-- @COMPONENT: FormInterface [hidden by default] -->
+    <div id="formScreen" class="min-h-screen flex flex-col hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4">
+            <div class="flex items-center justify-between max-w-6xl mx-auto">
+                <div class="flex items-center space-x-4">
+                    <!-- OTIS company logo -->
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=50" alt="OTIS Logo" class="h-8" data-mock="true">
+                    <div class="h-8 w-px bg-gray-300"></div>
+                    <h1 class="text-xl font-semibold text-gray-800" data-bind="selectedLanguage === 'hu' ? 'Átvételi Protokoll' : 'Abnahmeprotokoll'">Abnahmeprotokoll</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button data-event="click:changeLanguage" class="text-sm text-gray-600 hover:text-otis-blue transition-colors">
+                        <i class="fas fa-globe mr-2"></i>
+                        <span data-bind="selectedLanguage === 'hu' ? 'Deutsch' : 'Magyar'">Magyar</span>
+                    </button>
+                    <button data-event="click:saveProgress" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition-colors">
+                        <i class="fas fa-save mr-2"></i>
+                        <span data-bind="selectedLanguage === 'hu' ? 'Mentés' : 'Speichern'">Speichern</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Progress Indicator -->
+        <div class="bg-white border-b border-gray-200 px-8 py-4">
+            <div class="max-w-6xl mx-auto">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-600" data-bind="selectedLanguage === 'hu' ? `Lépés ${currentStep} / ${totalSteps}` : `Schritt ${currentStep} / ${totalSteps}`">Schritt 3 / 12</span>
+                    <span class="text-sm text-gray-500" data-bind="selectedLanguage === 'hu' ? 'Befejezve: 25%' : 'Abgeschlossen: 25%'">Abgeschlossen: 25%</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    <div class="bg-otis-blue h-2 rounded-full transition-all duration-300" style="width: 25%" data-bind="progressPercentage + '%'"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="flex-1 px-8 py-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Date Selection Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+                    <div class="flex items-center space-x-3 mb-6">
+                        <div class="w-8 h-8 bg-otis-blue rounded-full flex items-center justify-center">
+                            <i class="fas fa-calendar text-white text-sm"></i>
+                        </div>
+                        <h2 class="text-xl font-semibold text-gray-800" data-bind="selectedLanguage === 'hu' ? 'Átvételi dátum' : 'Abnahmedatum'">Abnahmedatum</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Válassza ki a dátumot' : 'Datum auswählen'">Datum auswählen</label>
+                            <input type="date" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent" data-bind="acceptanceDate" value="2024-01-15">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Idő (opcionális)' : 'Zeit (optional)'">Zeit (optional)</label>
+                            <input type="time" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent" data-bind="acceptanceTime">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Current Question Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+                    <div class="flex items-start space-x-4 mb-6">
+                        <div class="w-8 h-8 bg-otis-blue rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                            <span class="text-white font-semibold text-sm" data-bind="currentStep">3</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2" data-bind="currentQuestion.title">Sicherheitseinrichtungen</h3>
+                            <p class="text-gray-600 mb-6" data-bind="currentQuestion.description">Sind alle Sicherheitseinrichtungen ordnungsgemäß installiert und funktionsfähig?</p>
+                            
+                            <!-- Response Options -->
+                            <!-- @STATE: questionType:string = 'yes_no_na' -->
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="current_answer" value="yes" class="sr-only" data-bind="currentAnswer">
+                                        <div class="border-2 border-gray-200 rounded-lg p-4 text-center hover:border-green-300 transition-colors peer-checked:border-green-500 peer-checked:bg-green-50">
+                                            <i class="fas fa-check text-green-600 text-xl mb-2"></i>
+                                            <div class="font-medium text-gray-800" data-bind="selectedLanguage === 'hu' ? 'Igen' : 'Ja'">Ja</div>
+                                        </div>
+                                    </label>
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="current_answer" value="no" class="sr-only" data-bind="currentAnswer">
+                                        <div class="border-2 border-red-500 bg-red-50 rounded-lg p-4 text-center hover:border-red-400 transition-colors">
+                                            <i class="fas fa-times text-red-600 text-xl mb-2"></i>
+                                            <div class="font-medium text-gray-800" data-bind="selectedLanguage === 'hu' ? 'Nem' : 'Nein'">Nein</div>
+                                        </div>
+                                    </label>
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="current_answer" value="na" class="sr-only" data-bind="currentAnswer">
+                                        <div class="border-2 border-gray-200 rounded-lg p-4 text-center hover:border-gray-300 transition-colors peer-checked:border-gray-500 peer-checked:bg-gray-50">
+                                            <i class="fas fa-minus text-gray-600 text-xl mb-2"></i>
+                                            <div class="font-medium text-gray-800" data-bind="selectedLanguage === 'hu' ? 'Nem alkalmazható' : 'Nicht zutreffend'">Nicht zutreffend</div>
+                                        </div>
+                                    </label>
+                                </div>
+
+                                <!-- Error detected - show additional fields -->
+                                <div class="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                                    <div class="flex items-center space-x-2 mb-4">
+                                        <i class="fas fa-exclamation-triangle text-red-600"></i>
+                                        <span class="font-medium text-red-800" data-bind="selectedLanguage === 'hu' ? 'Hiba észlelve' : 'Fehler erkannt'">Fehler erkannt</span>
+                                    </div>
+                                    
+                                    <div class="space-y-4">
+                                        <!-- Error Description -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Hiba leírása' : 'Fehlerbeschreibung'">Fehlerbeschreibung</label>
+                                            <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent" rows="3" placeholder="Beschreiben Sie den Fehler..." data-bind="errorDescription"></textarea>
+                                        </div>
+
+                                        <!-- Error Severity -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Súlyosság' : 'Schweregrad'">Schweregrad</label>
+                                            <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent" data-bind="errorSeverity">
+                                                <option value="">Auswählen...</option>
+                                                <option value="critical" data-bind="selectedLanguage === 'hu' ? 'Kritikus' : 'Kritisch'">Kritisch</option>
+                                                <option value="medium" data-bind="selectedLanguage === 'hu' ? 'Közepes' : 'Mittel'">Mittel</option>
+                                                <option value="low" data-bind="selectedLanguage === 'hu' ? 'Alacsony' : 'Niedrig'">Niedrig</option>
+                                            </select>
+                                        </div>
+
+                                        <!-- Image Attachment -->
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Fotó csatolása' : 'Foto hinzufügen'">Foto hinzufügen</label>
+                                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-otis-blue transition-colors cursor-pointer" data-event="click:openImagePicker">
+                                                <i class="fas fa-camera text-3xl text-gray-400 mb-3"></i>
+                                                <p class="text-gray-600" data-bind="selectedLanguage === 'hu' ? 'Koppintson a fotó készítéséhez vagy fájl kiválasztásához' : 'Tippen Sie, um ein Foto aufzunehmen oder eine Datei auszuwählen'">Tippen Sie, um ein Foto aufzunehmen oder eine Datei auszuwählen</p>
+                                                <input type="file" accept="image/*" class="hidden" data-implementation="Camera/file picker integration">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Comments Section -->
+                                <div class="mt-6">
+                                    <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Megjegyzések (opcionális)' : 'Kommentare (optional)'">Kommentare (optional)</label>
+                                    <textarea class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent" rows="3" placeholder="Zusätzliche Bemerkungen..." data-bind="questionComments"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-between items-center">
+                    <button data-event="click:previousStep" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                        <i class="fas fa-chevron-left"></i>
+                        <span data-bind="selectedLanguage === 'hu' ? 'Előző' : 'Zurück'">Zurück</span>
+                    </button>
+
+                    <div class="flex space-x-4">
+                        <button data-event="click:skipQuestion" class="text-gray-600 hover:text-gray-800 px-6 py-3 font-medium transition-colors" data-bind="selectedLanguage === 'hu' ? 'Kihagyás' : 'Überspringen'">Überspringen</button>
+                        <button data-event="click:nextStep" class="bg-otis-blue hover:bg-otis-dark text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                            <span data-bind="selectedLanguage === 'hu' ? 'Következő' : 'Weiter'">Weiter</span>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- @END_COMPONENT: FormInterface -->
+
+    <!-- @COMPONENT: ErrorListInterface [hidden by default] -->
+    <div id="errorListScreen" class="min-h-screen flex flex-col hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4">
+            <div class="flex items-center justify-between max-w-6xl mx-auto">
+                <div class="flex items-center space-x-4">
+                    <!-- OTIS company logo -->
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=50" alt="OTIS Logo" class="h-8" data-mock="true">
+                    <div class="h-8 w-px bg-gray-300"></div>
+                    <h1 class="text-xl font-semibold text-gray-800" data-bind="selectedLanguage === 'hu' ? 'Hibalista' : 'Fehlerliste'">Fehlerliste</h1>
+                </div>
+                <button data-event="click:addError" class="bg-otis-blue hover:bg-otis-dark text-white px-4 py-2 rounded-lg transition-colors flex items-center space-x-2">
+                    <i class="fas fa-plus"></i>
+                    <span data-bind="selectedLanguage === 'hu' ? 'Hiba hozzáadása' : 'Fehler hinzufügen'">Fehler hinzufügen</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Error List Content -->
+        <main class="flex-1 px-8 py-8">
+            <div class="max-w-6xl mx-auto">
+                <!-- Error Summary Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-4" data-bind="selectedLanguage === 'hu' ? 'Hiba összesítő' : 'Fehlerübersicht'">Fehlerübersicht</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div class="text-center p-4 bg-red-50 rounded-lg">
+                            <div class="text-2xl font-bold text-red-600" data-bind="criticalErrors">2</div>
+                            <div class="text-sm text-gray-600" data-bind="selectedLanguage === 'hu' ? 'Kritikus' : 'Kritisch'">Kritisch</div>
+                        </div>
+                        <div class="text-center p-4 bg-yellow-50 rounded-lg">
+                            <div class="text-2xl font-bold text-yellow-600" data-bind="mediumErrors">1</div>
+                            <div class="text-sm text-gray-600" data-bind="selectedLanguage === 'hu' ? 'Közepes' : 'Mittel'">Mittel</div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-lg">
+                            <div class="text-2xl font-bold text-green-600" data-bind="lowErrors">0</div>
+                            <div class="text-sm text-gray-600" data-bind="selectedLanguage === 'hu' ? 'Alacsony' : 'Niedrig'">Niedrig</div>
+                        </div>
+                        <div class="text-center p-4 bg-gray-50 rounded-lg">
+                            <div class="text-2xl font-bold text-gray-600" data-bind="totalErrors">3</div>
+                            <div class="text-sm text-gray-600" data-bind="selectedLanguage === 'hu' ? 'Összes' : 'Gesamt'">Gesamt</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Items -->
+                <!-- @MAP: errorList.map(error => ( -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-4">
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-shrink-0">
+                            <div class="w-3 h-3 bg-red-500 rounded-full mt-2" data-bind="error.severity === 'critical' ? 'bg-red-500' : error.severity === 'medium' ? 'bg-yellow-500' : 'bg-green-500'"></div>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 class="font-semibold text-gray-800" data-bind="error.title">Sicherheitseinrichtungen - Notbremsschalter</h3>
+                                    <p class="text-gray-600 mt-1" data-bind="error.description">Notbremsschalter in Kabine reagiert nicht ordnungsgemäß</p>
+                                    <div class="flex items-center space-x-4 mt-3 text-sm text-gray-500">
+                                        <span class="flex items-center space-x-1">
+                                            <i class="fas fa-exclamation-triangle text-red-500"></i>
+                                            <span data-bind="error.severity">Kritisch</span>
+                                        </span>
+                                        <span class="flex items-center space-x-1">
+                                            <i class="fas fa-calendar"></i>
+                                            <span data-bind="error.date">15.01.2024</span>
+                                        </span>
+                                        <!-- @COMPONENT: ErrorImages -->
+                                        <span class="flex items-center space-x-1" data-bind="error.images.length > 0 ? 'visible' : 'hidden'">
+                                            <i class="fas fa-camera"></i>
+                                            <span data-bind="error.images.length + ' Foto(s)'">1 Foto(s)</span>
+                                        </span>
+                                        <!-- @END_COMPONENT: ErrorImages -->
+                                    </div>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button data-event="click:editError" data-implementation="Open error edit modal" class="text-gray-400 hover:text-otis-blue transition-colors">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button data-event="click:deleteError" data-implementation="Show delete confirmation" class="text-gray-400 hover:text-red-500 transition-colors">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Error Images Preview -->
+                            <div class="mt-4">
+                                <!-- Industrial equipment with safety system visible -->
+                                <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=150" alt="Error documentation photo" class="w-32 h-24 object-cover rounded-lg" data-mock-image="true">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+
+                <!-- Navigation -->
+                <div class="flex justify-between items-center mt-8">
+                    <button data-event="click:backToForm" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                        <i class="fas fa-chevron-left"></i>
+                        <span data-bind="selectedLanguage === 'hu' ? 'Vissza az űrlaphoz' : 'Zurück zum Formular'">Zurück zum Formular</span>
+                    </button>
+                    <button data-event="click:continueToSignature" class="bg-otis-blue hover:bg-otis-dark text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                        <span data-bind="selectedLanguage === 'hu' ? 'Aláíráshoz' : 'Zur Unterschrift'">Zur Unterschrift</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- @END_COMPONENT: ErrorListInterface -->
+
+    <!-- @COMPONENT: SignatureInterface [hidden by default] -->
+    <div id="signatureScreen" class="min-h-screen flex flex-col hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4">
+            <div class="flex items-center justify-between max-w-6xl mx-auto">
+                <div class="flex items-center space-x-4">
+                    <!-- OTIS company logo -->
+                    <img src="https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&h=50" alt="OTIS Logo" class="h-8" data-mock="true">
+                    <div class="h-8 w-px bg-gray-300"></div>
+                    <h1 class="text-xl font-semibold text-gray-800" data-bind="selectedLanguage === 'hu' ? 'Digitális aláírás' : 'Digitale Unterschrift'">Digitale Unterschrift</h1>
+                </div>
+            </div>
+        </header>
+
+        <!-- Signature Content -->
+        <main class="flex-1 px-8 py-8">
+            <div class="max-w-4xl mx-auto">
+                <!-- Signature Instructions -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4" data-bind="selectedLanguage === 'hu' ? 'Kérjük, írja alá a protokollt' : 'Bitte unterschreiben Sie das Protokoll'">Bitte unterschreiben Sie das Protokoll</h2>
+                    <p class="text-gray-600 mb-6" data-bind="selectedLanguage === 'hu' ? 'Ujjával vagy stylus tollal írja alá az alábbi mezőbe.' : 'Unterschreiben Sie mit Ihrem Finger oder einem Stylus in dem unten stehenden Feld.'">Unterschreiben Sie mit Ihrem Finger oder einem Stylus in dem unten stehenden Feld.</p>
+                    
+                    <!-- Signature Pad -->
+                    <!-- @FUNCTIONALITY: This drawing area should implement free-hand drawing using canvas API -->
+                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 mb-6 bg-gray-50">
+                        <div class="bg-white rounded border h-64 flex items-center justify-center cursor-crosshair" data-implementation="Canvas-based signature pad">
+                            <div class="text-center text-gray-400">
+                                <i class="fas fa-signature text-3xl mb-3"></i>
+                                <p data-bind="selectedLanguage === 'hu' ? 'Itt írja alá' : 'Hier unterschreiben'">Hier unterschreiben</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Signature Controls -->
+                    <div class="flex justify-between items-center mb-6">
+                        <button data-event="click:clearSignature" class="text-gray-600 hover:text-gray-800 px-4 py-2 border border-gray-300 rounded-lg transition-colors">
+                            <i class="fas fa-eraser mr-2"></i>
+                            <span data-bind="selectedLanguage === 'hu' ? 'Törlés' : 'Löschen'">Löschen</span>
+                        </button>
+                    </div>
+
+                    <!-- Name Entry (Optional) -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Név (opcionális)' : 'Name (optional)'">Name (optional)</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent" placeholder="Vor- und Nachname" data-bind="signerName">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2" data-bind="selectedLanguage === 'hu' ? 'Pozíció/Cím' : 'Position/Titel'">Position/Titel</label>
+                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-otis-blue focus:border-transparent" placeholder="z.B. Bauleiter, Techniker" data-bind="signerPosition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4" data-bind="selectedLanguage === 'hu' ? 'Protokoll összefoglaló' : 'Protokoll-Zusammenfassung'">Protokoll-Zusammenfassung</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="text-sm text-gray-600 mb-1" data-bind="selectedLanguage === 'hu' ? 'Átvételi dátum' : 'Abnahmedatum'">Abnahmedatum</div>
+                            <div class="font-medium" data-bind="acceptanceDate">15. Januar 2024</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 mb-1" data-bind="selectedLanguage === 'hu' ? 'Összes kérdés' : 'Gesamte Fragen'">Gesamte Fragen</div>
+                            <div class="font-medium" data-bind="totalQuestions">12</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 mb-1" data-bind="selectedLanguage === 'hu' ? 'Megválaszolt' : 'Beantwortet'">Beantwortet</div>
+                            <div class="font-medium text-green-600" data-bind="answeredQuestions">12</div>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-600 mb-1" data-bind="selectedLanguage === 'hu' ? 'Észlelt hibák' : 'Gefundene Fehler'">Gefundene Fehler</div>
+                            <div class="font-medium text-red-600" data-bind="totalErrors">3</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Actions -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-4" data-bind="selectedLanguage === 'hu' ? 'Protokoll befejezése' : 'Protokoll abschließen'">Protokoll abschließen</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <button data-event="click:generatePDF" class="bg-green-600 hover:bg-green-700 text-white px-6 py-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-file-pdf"></i>
+                            <span data-bind="selectedLanguage === 'hu' ? 'PDF generálása' : 'PDF generieren'">PDF generieren</span>
+                        </button>
+                        <button data-event="click:sendEmail" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-envelope"></i>
+                            <span data-bind="selectedLanguage === 'hu' ? 'Email küldése' : 'Email senden'">Email senden</span>
+                        </button>
+                        <button data-event="click:saveToCloud" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                            <i class="fab fa-google-drive"></i>
+                            <span data-bind="selectedLanguage === 'hu' ? 'Felhőbe mentés' : 'In Cloud speichern'">In Cloud speichern</span>
+                        </button>
+                        <button data-event="click:newProtocol" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-4 rounded-lg font-medium transition-colors flex items-center justify-center space-x-2">
+                            <i class="fas fa-plus"></i>
+                            <span data-bind="selectedLanguage === 'hu' ? 'Új protokoll' : 'Neues Protokoll'">Neues Protokoll</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-between items-center mt-8">
+                    <button data-event="click:backToErrors" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors flex items-center space-x-2">
+                        <i class="fas fa-chevron-left"></i>
+                        <span data-bind="selectedLanguage === 'hu' ? 'Vissza a hibalistához' : 'Zurück zu Fehlern'">Zurück zu Fehlern</span>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <!-- @END_COMPONENT: SignatureInterface -->
+
+    <script>
+    // TODO: Implement business logic, API calls, and state management
+    (function() {
+        'use strict';
+        
+        // Screen management - Simple demo navigation
+        const screens = {
+            language: document.getElementById('languageScreen'),
+            form: document.getElementById('formScreen'),
+            errors: document.getElementById('errorListScreen'),
+            signature: document.getElementById('signatureScreen')
+        };
+
+        let currentScreen = 'language';
+
+        function showScreen(screenName) {
+            Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+            if (screens[screenName]) {
+                screens[screenName].classList.remove('hidden');
+                currentScreen = screenName;
+            }
+        }
+
+        // Language selection demo
+        document.querySelectorAll('[data-event="click:selectLanguage"]').forEach(button => {
+            button.addEventListener('click', function() {
+                // TODO: Implement language state management
+                showScreen('form');
+            });
+        });
+
+        // Navigation demo
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('[data-event]');
+            if (!target) return;
+
+            const event = target.getAttribute('data-event');
+            
+            // Simple demo navigation
+            switch(event) {
+                case 'click:nextStep':
+                    if (currentScreen === 'form') {
+                        showScreen('errors');
+                    }
+                    break;
+                case 'click:continueToSignature':
+                    showScreen('signature');
+                    break;
+                case 'click:backToForm':
+                    showScreen('form');
+                    break;
+                case 'click:backToErrors':
+                    showScreen('errors');
+                    break;
+                case 'click:previousStep':
+                    if (currentScreen === 'form') {
+                        showScreen('language');
+                    }
+                    break;
+            }
+        });
+
+        // Form interaction demos
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                // Update visual state for selected options
+                const container = this.closest('.grid');
+                if (container) {
+                    container.querySelectorAll('div').forEach(div => {
+                        div.classList.remove('border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'border-gray-500', 'bg-gray-50');
+                    });
+                    
+                    const selectedDiv = this.nextElementSibling;
+                    if (this.value === 'yes') {
+                        selectedDiv.classList.add('border-green-500', 'bg-green-50');
+                    } else if (this.value === 'no') {
+                        selectedDiv.classList.add('border-red-500', 'bg-red-50');
+                    } else {
+                        selectedDiv.classList.add('border-gray-500', 'bg-gray-50');
+                    }
+                }
+            });
+        });
+
+        // Start with language screen
+        showScreen('language');
+    })();
+    </script>
+</body>
+</html>

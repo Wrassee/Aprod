@@ -1,18 +1,12 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "api/index.ts",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/**/*",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+  "functions": {
+    "api/index.ts": {
+      "runtime": "@vercel/node",
+      "maxDuration": 30,
+      "includeFiles": "server/**, shared/**, templates/**"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
@@ -23,14 +17,6 @@
       "dest": "/client/dist/$1"
     }
   ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 30
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
@@ -40,7 +26,7 @@
           "value": "DENY"
         },
         {
-          "key": "X-Content-Type-Options", 
+          "key": "X-Content-Type-Options",
           "value": "nosniff"
         },
         {

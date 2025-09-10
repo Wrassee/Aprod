@@ -16,10 +16,16 @@ class PDFService {
       const htmlContent = this.createExcelLikeHTML(worksheet);
 
       console.log(' launching Puppeteer with bundled Chromium...');
+
+      // --- JAVÍTÁS: Ellenőrizzük, hogy a Chromium elérési útja létezik-e ---
+      const executablePath = await chromium.executablePath();
+      if (!executablePath) {
+        throw new Error('Chromium executable not found. Puppeteer cannot start.');
+      }
+
       browser = await puppeteer.launch({
-        // --- JAVÍTÁS: Megadjuk a Chromium csomag elérési útját ---
         args: chromium.args,
-        executablePath: await chromium.executablePath(),
+        executablePath: executablePath, // Itt már biztosan string az érték
         headless: true,
       });
       
@@ -88,7 +94,13 @@ class PDFService {
         });
       }
       
-      browser = await puppeteer.launch({ args: ['--no-sandbox'], executablePath: await chromium.executablePath() });
+      // --- JAVÍTÁS ITT IS: Ellenőrizzük az elérési utat ---
+      const executablePath = await chromium.executablePath();
+      if (!executablePath) {
+        throw new Error('Chromium executable not found for error PDF generation.');
+      }
+
+      browser = await puppeteer.launch({ args: ['--no-sandbox'], executablePath: executablePath });
       const page = await browser.newPage();
       await page.setContent(content, { waitUntil: 'networkidle0' });
       const pdfData = await page.pdf({ format: 'A4' });
@@ -103,4 +115,4 @@ class PDFService {
 }
 
 export const pdfService = new PDFService();
-```
+

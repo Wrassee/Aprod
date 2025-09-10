@@ -12,13 +12,14 @@ import {
   Plus,
   Home,
   Settings,
-  ArrowLeft
+  ArrowLeft,
+  Loader2 // Betöltés ikon importálása
 } from 'lucide-react';
 
 interface CompletionProps {
   onEmailPDF: () => void;
   onSaveToCloud: () => void;
-  onDownloadPDF: () => void;
+  // onDownloadPDF prop eltávolítva, mert a logikát helyben kezeljük
   onDownloadExcel: () => void;
   onViewProtocol: () => void;
   onStartNew: () => void;
@@ -32,12 +33,12 @@ interface CompletionProps {
     inspectorName?: string;
     inspectionDate?: string;
   };
+  language: 'hu' | 'de'; // Language prop hozzáadva a típusdefinícióhoz
 }
 
 export function Completion({
   onEmailPDF,
   onSaveToCloud,
-  onDownloadPDF,
   onDownloadExcel,
   onViewProtocol,
   onStartNew,
@@ -46,11 +47,13 @@ export function Completion({
   onBackToSignature,
   errors = [],
   protocolData,
+  language, // Language prop átvétele
 }: CompletionProps) {
   const { t } = useLanguageContext();
   const [emailStatus, setEmailStatus] = useState<string>('');
   const [isEmailSending, setIsEmailSending] = useState(false);
-  
+  const [isPdfDownloading, setIsPdfDownloading] = useState(false); // Új állapot a PDF letöltéshez
+
   const handleEmailClick = async () => {
     setIsEmailSending(true);
     setEmailStatus('Email küldése folyamatban...');
@@ -67,6 +70,58 @@ export function Completion({
     }
   };
 
+  // --- JAVÍTÁS: ÚJ PDF LETÖLTÉSI LOGIKA ---
+  const handleDownloadPDF = async () => {
+    setIsPdfDownloading(true);
+    try {
+      console.log('Starting PDF download from completion page...');
+      
+      // A legfrissebb adatokat a localStorage-ból olvassuk ki
+      const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
+      if (!savedData.answers) {
+        throw new Error('No form data found in localStorage to generate PDF.');
+      }
+
+      // Kérés küldése a HELYES /download-pdf végpontra
+      const response = await fetch('/api/protocols/download-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formData: savedData,
+          language: language,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to generate PDF on the server.');
+      }
+
+      // A válasz feldolgozása és a letöltés elindítása
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      
+      const liftId = savedData.answers?.['7'] ? String(savedData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
+      a.download = `OTIS_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      document.body.appendChild(a);
+      a.click();
+      
+      window.URL.revokeObjectURL(url);
+      a.remove();
+      
+      console.log('PDF download initiated successfully.');
+    } catch (error) {
+      console.error('Error during PDF download:', error);
+      // Ide jöhet egy hibaüzenet a felhasználónak (pl. toast notification)
+    } finally {
+      setIsPdfDownloading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-light-surface">
       {/* Header */}
@@ -74,29 +129,21 @@ export function Completion({
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className="h-8 w-12 bg-otis-blue rounded flex items-center justify-center mr-4">
-                <span className="text-white font-bold text-sm">OTIS</span>
-              </div>
+               <img 
+                src="/otis-elevators-seeklogo_1753525178175.png" 
+                alt="OTIS Logo" 
+                style={{ height: '50px', width: 'auto', marginRight: '16px' }}
+              />
               <span className="text-lg font-medium text-gray-800">{t.completionTitle}</span>
             </div>
             
             {/* Navigation buttons */}
             <div className="flex items-center space-x-2">
-              <Button
-                onClick={onGoHome}
-                variant="outline"
-                size="sm"
-                className="flex items-center"
-              >
+              <Button onClick={onGoHome} variant="outline" size="sm" className="flex items-center">
                 <Home className="h-4 w-4 mr-2" />
                 {t.home}
               </Button>
-              <Button
-                onClick={onSettings}
-                variant="outline"
-                size="sm"
-                className="flex items-center"
-              >
+              <Button onClick={onSettings} variant="outline" size="sm" className="flex items-center">
                 <Settings className="h-4 w-4 mr-2" />
                 {t.settings || 'Beállítások'}
               </Button>
@@ -153,11 +200,16 @@ export function Completion({
             
             {/* Download PDF */}
             <Button
-              onClick={onDownloadPDF}
-              className="bg-gray-600 hover:bg-gray-700 text-white flex items-center justify-center py-4 h-auto"
+              onClick={handleDownloadPDF} // --- JAVÍTÁS ITT ---
+              disabled={isPdfDownloading}
+              className="bg-gray-600 hover:bg-gray-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
             >
-              <Download className="h-5 w-5 mr-3" />
-              {t.downloadPDF}
+              {isPdfDownloading ? (
+                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+              ) : (
+                <Download className="h-5 w-5 mr-3" />
+              )}
+              {isPdfDownloading ? t.generating : t.downloadPDF}
             </Button>
             
             {/* Download Excel */}

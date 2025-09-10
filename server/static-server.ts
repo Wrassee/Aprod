@@ -1,32 +1,37 @@
-// Production static file server - NO Vite dependencies
-import express, { type Express } from "express";
-import fs from "fs";
-import path from "path";
-
-export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit", 
-    second: "2-digit",
-    hour12: true,
-  });
-
-  console.log(`${formattedTime} [${source}] ${message}`);
-}
+import express, { type Express, Request, Response, NextFunction } from "express";
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(process.cwd(), "dist", "public");
+    // Megbízhatóan meghatározzuk a 'dist' mappa abszolút útvonalát.
+    // Ez a módszer független a szerver futtatási környezetétől.
+    const __filename = fileURLToPath(import.meta.url); // pl. /.../dist/server/static-server.js
+    const __dirname = path.dirname(__filename);       // pl. /.../dist/server
+    const distPath = path.resolve(__dirname, '..', '..', 'dist');   // Visszalépünk a projekt gyökeréig, majd a dist-be
 
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
-    );
-  }
+    console.log(`[Static Server] Serving files from root directory: ${distPath}`);
 
-  app.use(express.static(distPath));
+    // Statikus fájlok (CSS, JS, képek) kiszolgálása a 'dist' mappából.
+    // Ez a middleware automatikusan megtalálja pl. a '/logo.png' vagy '/assets/index.css' fájlokat.
+    app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
-  });
+    // "Catch-all" útvonal a kliensoldali routing (React Router) támogatásához.
+    // Ennek az API útvonalak UTÁN kell lennie.
+    app.get('*', (req: Request, res: Response, next: NextFunction) => {
+        // Ha a kérés az API-hoz szól, azt nem itt kezeljük, továbbadjuk.
+        if (req.path.startsWith('/api')) {
+            return next();
+        }
+        
+        // Minden más esetben (pl. egy direkt link egy aloldalra) visszaküldjük a fő index.html fájlt,
+        // hogy a React Router átvehesse az irányítást.
+        const indexPath = path.resolve(distPath, 'index.html');
+        if (fs.existsSync(indexPath)) {
+            res.sendFile(indexPath);
+        } else {
+            res.status(404).send('index.html not found in dist directory');
+        }
+    });
 }
+

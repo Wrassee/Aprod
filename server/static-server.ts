@@ -3,6 +3,18 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 
+// --- JAVÍTÁS: A HIÁNYZÓ LOG FÜGGVÉNY VISSZAILLESZTVE ---
+export function log(message: string, source = "express") {
+  const formattedTime = new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit", 
+    second: "2-digit",
+    hour12: true,
+  });
+
+  console.log(`${formattedTime} [${source}] ${message}`);
+}
+
 export function serveStatic(app: Express) {
     // Megbízhatóan meghatározzuk a 'dist' mappa abszolút útvonalát.
     // Ez a módszer független a szerver futtatási környezetétől.

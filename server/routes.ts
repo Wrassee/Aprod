@@ -108,6 +108,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // --- JAVÍTÁS: ÚJ PDF LETÖLTÉSI VÉGPONT HOZZÁADVA ---
+  app.post("/api/protocols/download-pdf", async (req, res) => {
+    try {
+      console.log("PDF download request received");
+      const { formData, language } = req.body;
+      if (!formData) return res.status(400).json({ message: "Form data is required" });
+
+      // 1. Először legeneráljuk az Excel fájlt ugyanazzal a logikával
+      const { simpleXmlExcelService } = await import('./services/simple-xml-excel.js');
+      const excelBuffer = await simpleXmlExcelService.generateExcelFromTemplate(formData, language || 'hu');
+
+      // 2. Az Excel bufferből legeneráljuk a PDF-et a javított pdfService segítségével
+      console.log("Generating PDF from Excel buffer...");
+      const pdfBuffer = await pdfService.generatePDF(excelBuffer);
+
+      const liftId = formData.answers?.['7'] ? String(formData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
+      const filename = `OTIS_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      console.log(`PDF generated successfully: ${filename} (${pdfBuffer.length} bytes)`);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(pdfBuffer);
+
+    } catch (error) {
+      console.error("Error generating PDF download:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      res.status(500).json({ message: "Failed to generate PDF file", error: errorMessage });
+    }
+  });
+
   // Kérdések lekérése
   app.get("/api/questions/:language", async (req, res) => {
     try {
@@ -323,3 +354,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
   return httpServer;
 }
+

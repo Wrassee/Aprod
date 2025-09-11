@@ -8,8 +8,7 @@ class PDFService {
   async generatePDF(excelBuffer: Buffer): Promise<Buffer> {
     let browser = null;
     try {
-      // --- ÚJ LOG ÜZENET A VERZIÓ AZONOSÍTÁSÁRA ---
-      console.log('🎯 PDF Service v2 (with timeout fix): Starting PDF conversion.');
+      console.log('🎯 PDF Service v3 (with sandbox fix): Starting PDF conversion.');
       
       const workbook = XLSX.read(excelBuffer, { type: 'buffer' });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -22,15 +21,17 @@ class PDFService {
         throw new Error('Chromium executable path not found or invalid. Puppeteer cannot start.');
       }
 
+      // --- JAVÍTÁS ITT: Hozzáadjuk a --no-sandbox argumentumot a biztonságos futáshoz ---
+      const browserArgs = [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'];
+
       browser = await puppeteer.launch({
-        args: chromium.args,
+        args: browserArgs,
         executablePath: executablePath,
         headless: true,
       });
       
       const page = await browser.newPage();
       
-      // A 'timeout: 0' kikapcsolja az időkorlátot a lassú Render szerver miatt.
       await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 0 });
       
       console.log(' generating PDF buffer...');
@@ -38,7 +39,7 @@ class PDFService {
         format: 'A4',
         printBackground: true,
         margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
-        timeout: 0 // A PDF generálásának időkorlátját is kikapcsoljuk
+        timeout: 0
       });
       
       const pdfBuffer = Buffer.from(pdfData);
@@ -100,8 +101,10 @@ class PDFService {
       if (!executablePath) {
         throw new Error('Chromium executable path not found for error PDF generation.');
       }
+      
+      const browserArgs = [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'];
 
-      browser = await puppeteer.launch({ args: ['--no-sandbox'], executablePath: executablePath });
+      browser = await puppeteer.launch({ args: browserArgs, executablePath: executablePath });
       const page = await browser.newPage();
       
       await page.setContent(content, { waitUntil: 'networkidle0', timeout: 0 });

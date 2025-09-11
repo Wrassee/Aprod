@@ -246,23 +246,25 @@ export function Admin({ onBack, onHome }: AdminProps) {
   const filteredTemplates = templates;
 
   return (
-    <div className="min-h-screen bg-light-surface">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="h-8 w-12 bg-otis-blue rounded flex items-center justify-center mr-4">
-                <span className="text-white font-bold text-sm">OTIS</span>
-              </div>
-              {onHome && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={onHome}
-                  className="text-gray-600 hover:text-gray-800 mr-4"
-                  title="Kezdőlap"
-                >
+  <div className="min-h-screen bg-light-surface">
+    {/* Header */}
+    <header className="bg-white shadow-sm border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <img 
+              src="/otis-elevators-seeklogo_1753525178175.png" 
+              alt="OTIS Logo" 
+              className="h-12 w-12 mr-4"
+            />
+            {onHome && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onHome}
+                className="text-gray-600 hover:text-gray-800 mr-4"
+                title="Kezdőlap"
+              >
                   <Home className="h-4 w-4" />
                 </Button>
               )}

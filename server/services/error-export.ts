@@ -1,11 +1,8 @@
 import { ProtocolError } from '../../shared/schema.js';
 import * as XLSX from 'xlsx';
-import * as fs from 'fs';
-import * as path from 'path';
-
-// --- JAVÍTÁS: A megfelelő, szerverbarát csomagok importálása ---
-import puppeteer from 'puppeteer-core';
-import chromium from 'chromium';
+// --- MÓDOSÍTVA: A megfelelő, szerverbarát csomagok importálása ---
+import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium';
 
 
 interface ProtocolData {
@@ -22,7 +19,7 @@ interface ExportData {
 }
 
 export class ErrorExportService {
-  // --- EZ A RÉSZ A TE EREDETI KÓDOD, VÁLTOZATLAN ---
+  // --- Az Excel generáló rész változatlan maradt ---
   static async generateExcel(data: ExportData): Promise<Buffer> {
     const { errors, protocolData, language } = data;
     
@@ -145,7 +142,6 @@ export class ErrorExportService {
 
     const t = translations[language];
 
-    // A te HTML generáló logikád, változatlanul
     const html = `
       <!DOCTYPE html>
       <html>
@@ -205,17 +201,14 @@ export class ErrorExportService {
 
     let browser = null;
     try {
-      console.log('🎯 PDF Generation: Starting Puppeteer with chromium for error list PDF');
-
-      const executablePath = await chromium.executablePath();
-      if (!executablePath) {
-        throw new Error('Chromium executable not found. Cannot generate PDF.');
-      }
+      console.log('🎯 PDF Generation: Starting Puppeteer with @sparticuz/chromium for error list PDF');
       
+      // --- MÓDOSÍTVA: Ugyanazt a stabil, optimalizált indítást használjuk ---
       browser = await puppeteer.launch({
         args: chromium.args,
-        executablePath: executablePath,
-        headless: true
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless
       });
 
       const page = await browser.newPage();
@@ -228,12 +221,11 @@ export class ErrorExportService {
       });
 
       console.log('🎯 PDF Generation: Successfully created error list PDF, size:', pdfBuffer.length);
-      return Buffer.from(pdfBuffer);
+      return pdfBuffer;
       
     } catch (error) {
       console.error('PDF Generation Error:', error);
       const errorMessage = `PDF Generation Failed: ${(error as Error).message}`;
-      // Visszaadunk egy egyszerű szöveges puffert hiba esetén
       return Buffer.from(errorMessage);
     } finally {
         if (browser) {
@@ -242,4 +234,3 @@ export class ErrorExportService {
     }
   }
 }
-

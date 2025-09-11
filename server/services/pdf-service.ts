@@ -1,38 +1,28 @@
 import { ProtocolError } from '../../shared/schema.js';
 import * as XLSX from 'xlsx';
-import puppeteer from 'puppeteer-core';
-import chromium from 'chromium';
+// --- MÓDOSÍTVA: A megfelelő, szerverbarát csomagok importálása ---
+import puppeteer from 'puppeteer';
+import chromium from '@sparticuz/chromium';
 
 class PDFService {
 
   async generatePDF(excelBuffer: Buffer): Promise<Buffer> {
     let browser = null;
     try {
-      console.log('🎯 PDF Service v4 (stable args fix): Starting PDF conversion.');
+      console.log('🎯 PDF Service: Starting PDF conversion with @sparticuz/chromium.');
       
       const workbook = XLSX.read(excelBuffer, { type: 'buffer' });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
       const htmlContent = this.createExcelLikeHTML(worksheet);
 
-      console.log(' launching Puppeteer with bundled Chromium...');
+      console.log(' launching Puppeteer with optimized settings...');
 
-      const executablePath = chromium.path;
-      if (!executablePath || typeof executablePath !== 'string') {
-        throw new Error('Chromium executable path not found or invalid. Puppeteer cannot start.');
-      }
-
-      // --- JAVÍTÁS ITT: A hibát okozó chromium.args helyett egy stabil, fix beállítás listát használunk ---
-      const browserArgs = [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--single-process'
-      ];
-
+      // --- MÓDOSÍTVA: Stabil, szerver-oldali beállítások használata ---
       browser = await puppeteer.launch({
-        args: browserArgs,
-        executablePath: executablePath,
-        headless: true,
+        args: chromium.args,
+        defaultViewport: chromium.defaultViewport,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
       });
       
       const page = await browser.newPage();
@@ -91,42 +81,9 @@ class PDFService {
   }
 
   async generateErrorListPDF(errors: ProtocolError[], language: string): Promise<Buffer> {
-    let browser = null;
-    try {
-      let content = `<h1>OTIS ERROR REPORT</h1><p>${errors.length} Error${errors.length !== 1 ? 's' : ''} Found</p><hr>`;
-      if (errors.length === 0) {
-        content += '<p>No errors reported.</p>';
-      } else {
-        errors.forEach((error, index) => {
-          content += `<div><h3>Error #${index + 1}</h3><p><strong>Title:</strong> ${error.title}</p><p><strong>Severity:</strong> ${error.severity.toUpperCase()}</p>${error.description ? `<p><strong>Description:</strong> ${error.description}</p>` : ''}</div><hr>`;
-        });
-      }
-      
-      const executablePath = chromium.path;
-      if (!executablePath) {
-        throw new Error('Chromium executable path not found for error PDF generation.');
-      }
-      
-      const browserArgs = [
-        '--no-sandbox',
-        '--disable-setuid-sandbox'
-      ];
-
-      browser = await puppeteer.launch({ args: browserArgs, executablePath: executablePath });
-      const page = await browser.newPage();
-      
-      await page.setContent(content, { waitUntil: 'networkidle0', timeout: 0 });
-      
-      const pdfData = await page.pdf({ format: 'A4', timeout: 0 });
-      return Buffer.from(pdfData);
-    } catch (error) {
-      console.error('Error generating error list PDF:', error);
-      throw new Error('Failed to generate error list PDF');
-    } finally {
-      if (browser) await browser.close();
-    }
+     // This function is now handled by ErrorExportService to keep concerns separate.
+     throw new Error("This function is deprecated. Use ErrorExportService.generatePDF instead.");
   }
 }
 
 export const pdfService = new PDFService();
-

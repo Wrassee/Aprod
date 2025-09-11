@@ -66,6 +66,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Health check for Docker
+  app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
   // Excel letöltési végpont
   app.post("/api/protocols/download-excel", async (req, res) => {
     try {

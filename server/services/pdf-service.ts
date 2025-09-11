@@ -16,9 +16,10 @@ class PDFService {
 
       console.log(' launching Puppeteer with bundled Chromium...');
 
-      const executablePath = await chromium.executablePath();
-      if (!executablePath) {
-        throw new Error('Chromium executable not found. Puppeteer cannot start.');
+      // --- JAVÍTÁS ITT: A hibás .executablePath() függvényhívás lecserélve a helyes .path tulajdonságra ---
+      const executablePath = chromium.path;
+      if (!executablePath || typeof executablePath !== 'string') {
+        throw new Error('Chromium executable path not found or invalid. Puppeteer cannot start.');
       }
 
       browser = await puppeteer.launch({
@@ -29,9 +30,8 @@ class PDFService {
       
       const page = await browser.newPage();
       
-      // --- JAVÍTÁS ITT: Növeljük az időtúllépési limitet ---
-      // A 'timeout: 0' kikapcsolja az időkorlátot, így a lassú Render szervernek is van ideje befejezni.
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 0 });
+      // Megnöveljük az időtúllépési limitet a lassú Render szerver miatt
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 90000 }); // 90 másodperc
       
       console.log(' generating PDF buffer...');
       const pdfData = await page.pdf({
@@ -95,7 +95,7 @@ class PDFService {
         });
       }
       
-      const executablePath = await chromium.executablePath();
+      const executablePath = chromium.path;
       if (!executablePath) {
         throw new Error('Chromium executable path not found for error PDF generation.');
       }
@@ -103,7 +103,6 @@ class PDFService {
       browser = await puppeteer.launch({ args: ['--no-sandbox'], executablePath: executablePath });
       const page = await browser.newPage();
       
-      // --- JAVÍTÁS ITT IS: Növeljük az időtúllépési limitet ---
       await page.setContent(content, { waitUntil: 'networkidle0', timeout: 0 });
       
       const pdfData = await page.pdf({ format: 'A4' });
@@ -118,3 +117,4 @@ class PDFService {
 }
 
 export const pdfService = new PDFService();
+

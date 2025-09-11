@@ -1,13 +1,12 @@
 import { ProtocolError } from '../../shared/schema.js';
 import * as XLSX from 'xlsx';
-// --- JAVÍTÁS: Az új, szerverbarát csomagok importálása ---
 import puppeteer from 'puppeteer-core';
 import chromium from 'chromium';
 
 class PDFService {
 
   async generatePDF(excelBuffer: Buffer): Promise<Buffer> {
-    let browser = null; // Deklaráljuk a try blokkon kívül a finally blokk miatt
+    let browser = null;
     try {
       console.log('🎯 PDF Service: Starting PDF conversion with puppeteer-core and chromium.');
       
@@ -17,15 +16,15 @@ class PDFService {
 
       console.log(' launching Puppeteer with bundled Chromium...');
 
-      // --- JAVÍTÁS: Ellenőrizzük, hogy a Chromium elérési útja létezik-e ---
-      const executablePath = await chromium.executablePath();
+      // --- JAVÍTÁS ITT: A hibás .executablePath() függvényhívás lecserélve a helyes .path tulajdonságra ---
+      const executablePath = chromium.path;
       if (!executablePath) {
-        throw new Error('Chromium executable not found. Puppeteer cannot start.');
+        throw new Error('Chromium executable path not found. Puppeteer cannot start.');
       }
 
       browser = await puppeteer.launch({
         args: chromium.args,
-        executablePath: executablePath, // Itt már biztosan string az érték
+        executablePath: executablePath,
         headless: true,
       });
       
@@ -54,7 +53,7 @@ class PDFService {
     }
   }
   
-  private createExcelLikeHTML(worksheet: any): string {
+  private createExcelLikeHTML(worksheet: XLSX.WorkSheet): string {
     const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:Z100');
     let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>OTIS Acceptance Protocol</title><style>body{font-family:'Calibri','Arial',sans-serif;margin:8px;padding:0;background:white;font-size:11px}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:10px;border:1px solid #000}td{border:1px solid #ccc;padding:2px 4px;text-align:left;vertical-align:middle;font-size:10px;white-space:nowrap;overflow:hidden;height:20px;background:white}.header-cell{background-color:#d32f2f !important;color:white !important;font-weight:bold;text-align:center;border:1px solid #000}.data-cell{background-color:white;border:1px solid #ccc}.center{text-align:center}.bold{font-weight:bold}@media print{body{margin:0;padding:5mm}table{page-break-inside:auto}tr{page-break-inside:avoid}}</style></head><body><table>`;
     
@@ -94,10 +93,9 @@ class PDFService {
         });
       }
       
-      // --- JAVÍTÁS ITT IS: Ellenőrizzük az elérési utat ---
-      const executablePath = await chromium.executablePath();
+      const executablePath = chromium.path;
       if (!executablePath) {
-        throw new Error('Chromium executable not found for error PDF generation.');
+        throw new Error('Chromium executable path not found for error PDF generation.');
       }
 
       browser = await puppeteer.launch({ args: ['--no-sandbox'], executablePath: executablePath });
@@ -115,4 +113,3 @@ class PDFService {
 }
 
 export const pdfService = new PDFService();
-

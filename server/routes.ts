@@ -7,7 +7,7 @@ import * as fs from "fs";
 
 import { storage } from "./storage.js";
 import { testConnection } from "./db.js";
-import { insertProtocolSchema } from "../shared/schema.js"; 
+import { insertProtocolSchema } from "../shared/schema.js";
 import { excelService } from "./services/excel-service.js";
 import { pdfService } from "./services/pdf-service.js";
 import { emailService } from "./services/email-service.js";
@@ -91,8 +91,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const liftId = formData.answers && formData.answers['7'] ? 
-                       String(formData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 
-                       'Unknown';
+                      String(formData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 
+                      'Unknown';
       const filename = `OTIS_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
       console.log(`Excel generated successfully: ${filename} (${excelBuffer.length} bytes)`);
@@ -356,7 +356,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // --- IDE KERÜLT AZ ÚJ LETÖLTÉSI VÉGPONT ---
+  // Admin: Sablon letöltése
+  app.get("/api/admin/templates/:id/download", async (req, res) => {
+    try {
+      const templateId = req.params.id;
+      
+      // 1. Sablon adatainak lekérése az adatbázisból, hogy megkapjuk a fájl elérési útját
+      const template = await storage.getTemplate(templateId);
+      if (!template || !template.file_path || !template.file_name) {
+        return res.status(404).json({ message: "Template file not found in database." });
+      }
+
+      const storagePath = template.file_path;
+      const originalFileName = template.file_name;
+      const tempLocalPath = path.join(uploadDir, `download-${Date.now()}-${originalFileName}`);
+
+      // 2. Fájl letöltése a Supabase Storage-ból egy ideiglenes helyi mappába
+      console.log(`Downloading template from Supabase: ${storagePath} to ${tempLocalPath}`);
+      await supabaseStorage.downloadFile(storagePath, tempLocalPath);
+      console.log(`✅ Template successfully downloaded to temporary path.`);
+
+      // 3. Fájl elküldése a felhasználónak, majd az ideiglenes fájl törlése
+      res.download(tempLocalPath, originalFileName, (err) => {
+        if (err) {
+          console.error("Error sending file to client:", err);
+        }
+        
+        // Töröljük az ideiglenes fájlt a letöltés után
+        if (fs.existsSync(tempLocalPath)) {
+          fs.unlinkSync(tempLocalPath);
+          console.log(`✅ Cleaned up temporary file: ${tempLocalPath}`);
+        }
+      });
+
+    } catch (error) {
+      console.error("Error downloading template:", error);
+      res.status(500).json({ message: "Failed to download template" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
-

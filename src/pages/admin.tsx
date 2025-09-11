@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguageContext } from '@/components/language-provider';
 import { formatDate } from '@/lib/utils';
-import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download } from 'lucide-react';
+import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2 } from 'lucide-react'; // <-- MÓDOSÍTVA: Loader2 ikon importálva
 import { useToast } from '@/hooks/use-toast';
 
 interface Template {
@@ -33,6 +33,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
   const { toast } = useToast();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
+  const [activatingId, setActivatingId] = useState<string | null>(null); // <-- MÓDOSÍTVA: Új state az aktiváláshoz
   const [previewData, setPreviewData] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [uploadForm, setUploadForm] = useState({
@@ -115,7 +116,9 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
+  // <-- MÓDOSÍTVA: A teljes handleActivate funkció frissítve
   const handleActivate = async (templateId: string) => {
+    setActivatingId(templateId); // Aktiválás kezdetének jelzése
     try {
       const response = await fetch(`/api/admin/templates/${templateId}/activate`, {
         method: 'POST',
@@ -137,8 +140,11 @@ export function Admin({ onBack, onHome }: AdminProps) {
         description: 'Failed to activate template',
         variant: 'destructive',
       });
+    } finally {
+      setActivatingId(null); // Aktiválás végének jelzése
     }
   };
+
 
   const handlePreview = async (templateId: string) => {
     try {
@@ -452,15 +458,23 @@ export function Admin({ onBack, onHome }: AdminProps) {
                               </div>
                             </DialogContent>
                           </Dialog>
+                          
+                          {/* <-- MÓDOSÍTVA: Az "Aktiválás" gomb frissítve a töltési állapottal */}
                           {!template.isActive && (
                             <Button
                               size="sm"
                               onClick={() => handleActivate(template.id)}
-                              className="bg-otis-blue hover:bg-blue-700"
+                              disabled={activatingId === template.id}
+                              className="bg-otis-blue hover:bg-blue-700 w-[100px]"
                             >
-                              {t.activate}
+                              {activatingId === template.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                t.activate
+                              )}
                             </Button>
                           )}
+
                           <Button
                             variant="ghost"
                             size="sm"

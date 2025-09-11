@@ -4,20 +4,19 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# --- JAVÍTÁS: Telepítjük a buildhez szükséges eszközöket ---
-# A 'better-sqlite3' és más natív modulok fordításához szükségesek.
+# Telepítjük a buildhez szükséges eszközöket
 RUN apt-get update && apt-get install -y --no-install-recommends python3 build-essential
 
 # Csak a receptkönyveket másoljuk be a gyorsítótárazáshoz
 COPY package.json package-lock.json ./
 
-# Telepítjük az ÖSSZES függőséget (fejlesztéshez szükségeseket is)
+# Telepítjük az ÖSSZES függőséget
 RUN npm ci
 
 # Bemásoljuk a teljes forráskódot
 COPY . .
 
-# Lefuttatjuk a build parancsot, ami létrehozza a "dist" mappát
+# Lefuttatjuk a build parancsot
 RUN npm run build
 
 
@@ -27,8 +26,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# --- JAVÍTÁS: Itt is telepítjük a szükséges eszközöket ---
-# A Puppeteer rendszerfüggőségei MELLÉ telepítjük a Python-t és a build eszközöket is.
+# Telepítjük a Puppeteer és a natív modulok futtatásához szükséges rendszerfüggőségeket
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -79,6 +77,11 @@ RUN npm ci --omit=dev
 
 # Átmásoljuk a "builder" fázisban legenerált "dist" mappát
 COPY --from=builder /app/dist ./dist
+
+# --- JAVÍTÁS ITT: Bemásoljuk a hiányzó asset mappákat is ---
+# A sablonok és a publikus fájlok (pl. logó) is kellenek a futtatáshoz.
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/templates ./templates
 
 # Megadjuk a portot, amin a szerver futni fog
 EXPOSE 10000

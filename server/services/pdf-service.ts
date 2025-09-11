@@ -8,7 +8,7 @@ class PDFService {
   async generatePDF(excelBuffer: Buffer): Promise<Buffer> {
     let browser = null;
     try {
-      console.log('🎯 PDF Service v3 (with sandbox fix): Starting PDF conversion.');
+      console.log('🎯 PDF Service v4 (stable args fix): Starting PDF conversion.');
       
       const workbook = XLSX.read(excelBuffer, { type: 'buffer' });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -21,8 +21,13 @@ class PDFService {
         throw new Error('Chromium executable path not found or invalid. Puppeteer cannot start.');
       }
 
-      // --- JAVÍTÁS ITT: Hozzáadjuk a --no-sandbox argumentumot a biztonságos futáshoz ---
-      const browserArgs = [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'];
+      // --- JAVÍTÁS ITT: A hibát okozó chromium.args helyett egy stabil, fix beállítás listát használunk ---
+      const browserArgs = [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--single-process'
+      ];
 
       browser = await puppeteer.launch({
         args: browserArgs,
@@ -102,7 +107,10 @@ class PDFService {
         throw new Error('Chromium executable path not found for error PDF generation.');
       }
       
-      const browserArgs = [...chromium.args, '--no-sandbox', '--disable-setuid-sandbox'];
+      const browserArgs = [
+        '--no-sandbox',
+        '--disable-setuid-sandbox'
+      ];
 
       browser = await puppeteer.launch({ args: browserArgs, executablePath: executablePath });
       const page = await browser.newPage();

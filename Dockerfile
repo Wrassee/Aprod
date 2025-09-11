@@ -78,10 +78,13 @@ RUN npm ci --omit=dev
 # Átmásoljuk a "builder" fázisban legenerált "dist" mappát
 COPY --from=builder /app/dist ./dist
 
-# --- JAVÍTÁS ITT: Bemásoljuk a hiányzó asset mappákat is ---
-# A sablonok és a publikus fájlok (pl. logó) is kellenek a futtatáshoz.
+# A publikus fájlokat (pl. logó) bemásoljuk.
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/templates ./templates
+
+# --- JAVÍTÁS: A dinamikus 'templates' mappa másolása helyett ---
+# Létrehozunk egy írható ideiglenes mappát a futásidejű fájlműveletekhez
+# (pl. a Supabase-ről letöltött sablonok számára).
+RUN mkdir /app/temp && chmod 777 /app/temp
 
 # Megadjuk a portot, amin a szerver futni fog
 EXPOSE 10000

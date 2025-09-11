@@ -8,7 +8,8 @@ class PDFService {
   async generatePDF(excelBuffer: Buffer): Promise<Buffer> {
     let browser = null;
     try {
-      console.log('🎯 PDF Service: Starting PDF conversion with puppeteer-core and chromium.');
+      // --- ÚJ LOG ÜZENET A VERZIÓ AZONOSÍTÁSÁRA ---
+      console.log('🎯 PDF Service v2 (with timeout fix): Starting PDF conversion.');
       
       const workbook = XLSX.read(excelBuffer, { type: 'buffer' });
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -16,7 +17,6 @@ class PDFService {
 
       console.log(' launching Puppeteer with bundled Chromium...');
 
-      // --- JAVÍTÁS ITT: A hibás .executablePath() függvényhívás lecserélve a helyes .path tulajdonságra ---
       const executablePath = chromium.path;
       if (!executablePath || typeof executablePath !== 'string') {
         throw new Error('Chromium executable path not found or invalid. Puppeteer cannot start.');
@@ -30,14 +30,15 @@ class PDFService {
       
       const page = await browser.newPage();
       
-      // Megnöveljük az időtúllépési limitet a lassú Render szerver miatt
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 90000 }); // 90 másodperc
+      // A 'timeout: 0' kikapcsolja az időkorlátot a lassú Render szerver miatt.
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 0 });
       
       console.log(' generating PDF buffer...');
       const pdfData = await page.pdf({
         format: 'A4',
         printBackground: true,
-        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' }
+        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
+        timeout: 0 // A PDF generálásának időkorlátját is kikapcsoljuk
       });
       
       const pdfBuffer = Buffer.from(pdfData);
@@ -105,7 +106,7 @@ class PDFService {
       
       await page.setContent(content, { waitUntil: 'networkidle0', timeout: 0 });
       
-      const pdfData = await page.pdf({ format: 'A4' });
+      const pdfData = await page.pdf({ format: 'A4', timeout: 0 });
       return Buffer.from(pdfData);
     } catch (error) {
       console.error('Error generating error list PDF:', error);

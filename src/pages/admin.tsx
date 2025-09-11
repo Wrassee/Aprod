@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguageContext } from '@/components/language-provider';
 import { formatDate } from '@/lib/utils';
-import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2 } from 'lucide-react'; // <-- MÓDOSÍTVA: Loader2 ikon importálva
+import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Template {
@@ -33,7 +33,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
   const { toast } = useToast();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(false);
-  const [activatingId, setActivatingId] = useState<string | null>(null); // <-- MÓDOSÍTVA: Új state az aktiváláshoz
+  const [activatingId, setActivatingId] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
   const [uploadForm, setUploadForm] = useState({
@@ -116,9 +116,8 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  // <-- MÓDOSÍTVA: A teljes handleActivate funkció frissítve
   const handleActivate = async (templateId: string) => {
-    setActivatingId(templateId); // Aktiválás kezdetének jelzése
+    setActivatingId(templateId);
     try {
       const response = await fetch(`/api/admin/templates/${templateId}/activate`, {
         method: 'POST',
@@ -141,7 +140,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
         variant: 'destructive',
       });
     } finally {
-      setActivatingId(null); // Aktiválás végének jelzése
+      setActivatingId(null);
     }
   };
 
@@ -181,42 +180,9 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  const handleDownload = async (templateId: string, templateName: string) => {
-    try {
-      const response = await fetch(`/api/admin/templates/${templateId}/download`);
-      
-      if (!response.ok) {
-        throw new Error('Download failed');
-      }
-
-      // Get the blob and create download link
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      
-      // Create temporary download link
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = templateName.endsWith('.xlsx') ? templateName : `${templateName}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      
-      // Cleanup
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      
-      toast({
-        title: 'Siker',
-        description: `Sablon sikeresen letöltve: ${templateName}`,
-      });
-      
-    } catch (error) {
-      console.error('Error downloading template:', error);
-      toast({
-        title: 'Hiba',
-        description: 'Sablon letöltése sikertelen',
-        variant: 'destructive',
-      });
-    }
+  // --- MÓDOSÍTVA: A letöltési funkció leegyszerűsítve ---
+  const handleDownload = (templateId: string) => {
+    window.location.href = `/api/admin/templates/${templateId}/download`;
   };
 
   const handleDelete = async (templateId: string, templateName: string) => {
@@ -248,12 +214,10 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  // Show all templates but group by language
   const filteredTemplates = templates;
 
   return (
   <div className="min-h-screen bg-light-surface">
-    {/* Header */}
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
@@ -289,7 +253,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="templates" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
@@ -297,7 +260,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
             <TabsTrigger value="upload">{t.uploadTemplate}</TabsTrigger>
           </TabsList>
 
-          {/* Templates Tab */}
           <TabsContent value="templates" className="space-y-6">
             <Card>
               <CardHeader>
@@ -338,10 +300,11 @@ export function Admin({ onBack, onHome }: AdminProps) {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
+                          {/* --- MÓDOSÍTVA: A gomb onClick eseménye frissítve --- */}
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDownload(template.id, template.fileName)}
+                            onClick={() => handleDownload(template.id)}
                             title="Sablon letöltése"
                             className="text-blue-600 hover:text-blue-800"
                           >
@@ -408,7 +371,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                                       </Card>
                                     </div>
                                     
-                                    {/* Questions and Cell Mappings */}
                                     <Card>
                                       <CardHeader>
                                         <CardTitle className="text-sm">
@@ -459,7 +421,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                             </DialogContent>
                           </Dialog>
                           
-                          {/* <-- MÓDOSÍTVA: Az "Aktiválás" gomb frissítve a töltési állapottal */}
                           {!template.isActive && (
                             <Button
                               size="sm"
@@ -493,7 +454,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
             </Card>
           </TabsContent>
 
-          {/* Upload Tab */}
           <TabsContent value="upload" className="space-y-6">
             <Card>
               <CardHeader>
@@ -503,7 +463,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Template Name */}
                 <div>
                   <Label className="text-sm font-medium text-gray-700">{t.templateName}</Label>
                   <Input
@@ -514,7 +473,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   />
                 </div>
 
-                {/* Template Type */}
                 <div>
                   <Label className="text-sm font-medium text-gray-700">{t.templateType}</Label>
                   <Select 
@@ -534,7 +492,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   </Select>
                 </div>
 
-                {/* Language */}
                 <div>
                   <Label className="text-sm font-medium text-gray-700">
                     {language === 'de' ? 'Sprachen' : 'Nyelvek'}
@@ -560,7 +517,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   </Select>
                 </div>
 
-                {/* File Upload */}
                 <div>
                   <Label className="text-sm font-medium text-gray-700">{t.selectExcelFile}</Label>
                   <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
@@ -588,7 +544,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   </div>
                 </div>
 
-                {/* Upload Button */}
                 <Button
                   onClick={handleUpload}
                   disabled={loading || !uploadForm.file || !uploadForm.name}

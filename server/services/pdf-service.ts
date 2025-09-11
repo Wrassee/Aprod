@@ -16,10 +16,9 @@ class PDFService {
 
       console.log(' launching Puppeteer with bundled Chromium...');
 
-      // --- JAVÍTÁS ITT: A hibás .executablePath() függvényhívás lecserélve a helyes .path tulajdonságra ---
-      const executablePath = chromium.path;
+      const executablePath = await chromium.executablePath();
       if (!executablePath) {
-        throw new Error('Chromium executable path not found. Puppeteer cannot start.');
+        throw new Error('Chromium executable not found. Puppeteer cannot start.');
       }
 
       browser = await puppeteer.launch({
@@ -29,7 +28,10 @@ class PDFService {
       });
       
       const page = await browser.newPage();
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+      
+      // --- JAVÍTÁS ITT: Növeljük az időtúllépési limitet ---
+      // A 'timeout: 0' kikapcsolja az időkorlátot, így a lassú Render szervernek is van ideje befejezni.
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 0 });
       
       console.log(' generating PDF buffer...');
       const pdfData = await page.pdf({
@@ -93,14 +95,17 @@ class PDFService {
         });
       }
       
-      const executablePath = chromium.path;
+      const executablePath = await chromium.executablePath();
       if (!executablePath) {
         throw new Error('Chromium executable path not found for error PDF generation.');
       }
 
       browser = await puppeteer.launch({ args: ['--no-sandbox'], executablePath: executablePath });
       const page = await browser.newPage();
-      await page.setContent(content, { waitUntil: 'networkidle0' });
+      
+      // --- JAVÍTÁS ITT IS: Növeljük az időtúllépési limitet ---
+      await page.setContent(content, { waitUntil: 'networkidle0', timeout: 0 });
+      
       const pdfData = await page.pdf({ format: 'A4' });
       return Buffer.from(pdfData);
     } catch (error) {

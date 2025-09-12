@@ -16,11 +16,10 @@ class PDFService {
 
       console.log(' launching Puppeteer with optimized settings...');
 
-      // --- MÓDOSÍTVA: A hibás tulajdonságok eltávolítva ---
       browser = await puppeteer.launch({
         args: chromium.args,
         executablePath: await chromium.executablePath(),
-        headless: 'new', // Ajánlott a modern headless mód használata
+        headless: true, // MÓDOSÍTVA: 'new' helyett true
       });
       
       const page = await browser.newPage();
@@ -28,16 +27,16 @@ class PDFService {
       await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 0 });
       
       console.log(' generating PDF buffer...');
-      const pdfBuffer = await page.pdf({
+      const pdfData = await page.pdf({
         format: 'A4',
         printBackground: true,
         margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
         timeout: 0
       });
       
-      console.log('✅ PDF Service: SUCCESS! PDF generated, size:', pdfBuffer.length);
-      // --- MÓDOSÍTVA: Felesleges Buffer.from eltávolítva ---
-      return pdfBuffer;
+      console.log('✅ PDF Service: SUCCESS! PDF generated, size:', pdfData.length);
+      // MÓDOSÍTVA: Biztosítjuk, hogy a visszatérési érték Buffer legyen
+      return Buffer.from(pdfData);
 
     } catch (error) {
       console.error('❌ PDF Service: PDF generation failed:', error);

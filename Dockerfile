@@ -14,7 +14,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# --- MÓDOSÍTVA: Hozzáadtuk a libreoffice-writer csomagot ---
+# --- MÓDOSÍTVA: Hozzáadtuk a default-jre-headless csomagot a Java támogatáshoz ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -56,6 +56,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     xdg-utils \
     libreoffice-writer \
+    default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./

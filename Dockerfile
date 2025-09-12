@@ -10,6 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 build-e
 # Csak a receptkönyveket másoljuk be a gyorsítótárazáshoz
 COPY package.json package-lock.json ./
 
+# --- MÓDOSÍTVA: Megakadályozzuk, hogy a puppeteer letöltse a saját Chrome-ját ---
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 # Telepítjük az ÖSSZES függőséget
 RUN npm ci
 
@@ -27,6 +30,7 @@ FROM node:20-slim
 WORKDIR /app
 
 # Telepítjük a Puppeteer és a natív modulok futtatásához szükséges rendszerfüggőségeket
+# Ez a lista már helyes, nem kell módosítani.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -72,6 +76,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Bemásoljuk a receptkönyveket
 COPY package.json package-lock.json ./
 
+# --- MÓDOSÍTVA: Itt is letiltjuk a felesleges Chrome letöltést ---
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 # CSAK a futtatáshoz szükséges függőségeket telepítjük
 RUN npm ci --omit=dev
 
@@ -81,9 +88,7 @@ COPY --from=builder /app/dist ./dist
 # A publikus fájlokat (pl. logó) bemásoljuk.
 COPY --from=builder /app/public ./public
 
-# --- JAVÍTÁS: A dinamikus 'templates' mappa másolása helyett ---
 # Létrehozunk egy írható ideiglenes mappát a futásidejű fájlműveletekhez
-# (pl. a Supabase-ről letöltött sablonok számára).
 RUN mkdir /app/temp && chmod 777 /app/temp
 
 # Megadjuk a portot, amin a szerver futni fog
@@ -91,4 +96,3 @@ EXPOSE 10000
 
 # Parancs a szerver elindításához
 CMD ["node", "dist/server/prod-server.js"]
-

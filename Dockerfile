@@ -1,36 +1,20 @@
 # 1. FÁZIS: A "BUILDER" KÖRNYEZET
-# Itt rakjuk össze a webalkalmazásunkat.
 FROM node:20-slim AS builder
 
 WORKDIR /app
-
-# Telepítjük a buildhez szükséges eszközöket
 RUN apt-get update && apt-get install -y --no-install-recommends python3 build-essential
-
-# Csak a receptkönyveket másoljuk be a gyorsítótárazáshoz
 COPY package.json package-lock.json ./
-
-# --- MÓDOSÍTVA: Megakadályozzuk, hogy a puppeteer letöltse a saját Chrome-ját ---
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
-# Telepítjük az ÖSSZES függőséget
 RUN npm ci
-
-# Bemásoljuk a teljes forráskódot
 COPY . .
-
-# Lefuttatjuk a build parancsot
 RUN npm run build
 
-
 # 2. FÁZIS: A VÉGLEGES, "PRODUCTION" KÖRNYEZET
-# Ez lesz a karcsú, gyors konténer, ami ténylegesen fut a Renderen.
 FROM node:20-slim
 
 WORKDIR /app
 
-# Telepítjük a Puppeteer és a natív modulok futtatásához szükséges rendszerfüggőségeket
-# Ez a lista már helyes, nem kell módosítani.
+# --- MÓDOSÍTVA: Hozzáadtuk a libreoffice-writer csomagot ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -71,28 +55,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     wget \
     xdg-utils \
+    libreoffice-writer \
     && rm -rf /var/lib/apt/lists/*
 
-# Bemásoljuk a receptkönyveket
 COPY package.json package-lock.json ./
-
-# --- MÓDOSÍTVA: Itt is letiltjuk a felesleges Chrome letöltést ---
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-
-# CSAK a futtatáshoz szükséges függőségeket telepítjük
 RUN npm ci --omit=dev
-
-# Átmásoljuk a "builder" fázisban legenerált "dist" mappát
 COPY --from=builder /app/dist ./dist
-
-# A publikus fájlokat (pl. logó) bemásoljuk.
 COPY --from=builder /app/public ./public
-
-# Létrehozunk egy írható ideiglenes mappát a futásidejű fájlműveletekhez
 RUN mkdir /app/temp && chmod 777 /app/temp
 
-# Megadjuk a portot, amin a szerver futni fog
 EXPOSE 10000
-
-# Parancs a szerver elindításához
 CMD ["node", "dist/server/prod-server.js"]

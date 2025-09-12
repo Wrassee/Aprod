@@ -1,74 +1,57 @@
 import { ProtocolError } from '../../shared/schema.js';
-import * as XLSX from 'xlsx';
-import puppeteer from 'puppeteer';
-import chromium from '@sparticuz/chromium';
+import { promises as fs } from 'fs';
+import path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+
+// A parancssori folyamatok futtatását "Promise" alapúvá alakítjuk
+const execPromise = promisify(exec);
 
 class PDFService {
 
   async generatePDF(excelBuffer: Buffer): Promise<Buffer> {
-    let browser = null;
+    const tempDir = '/app/temp'; // A Dockerfile-ban létrehozott ideiglenes mappa
+    const uniqueId = Date.now();
+    const excelPath = path.join(tempDir, `protocol-${uniqueId}.xlsx`);
+    const pdfPath = path.join(tempDir, `protocol-${uniqueId}.pdf`);
+
     try {
-      console.log('🎯 PDF Service: Starting PDF conversion with @sparticuz/chromium.');
-      
-      const workbook = XLSX.read(excelBuffer, { type: 'buffer' });
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-      const htmlContent = this.createExcelLikeHTML(worksheet);
+      console.log(`🎯 PDF Service (LibreOffice): Writing Excel buffer to ${excelPath}`);
+      // 1. Az Excel puffert kiírjuk egy ideiglenes fájlba
+      await fs.writeFile(excelPath, excelBuffer);
 
-      console.log(' launching Puppeteer with optimized settings...');
+      // 2. A LibreOffice parancs meghívása a konvertáláshoz
+      const command = `soffice --headless --convert-to pdf "${excelPath}" --outdir "${tempDir}"`;
+      console.log(`Executing LibreOffice command: ${command}`);
+      
+      // A parancsnak max 2 percet adunk a futásra
+      const { stdout, stderr } = await execPromise(command, { timeout: 120000 });
+      if (stderr) {
+        console.error('LibreOffice STDERR:', stderr);
+      }
+      console.log('LibreOffice STDOUT:', stdout);
+      console.log(`✅ Conversion complete. PDF should be at ${pdfPath}`);
 
-      browser = await puppeteer.launch({
-        args: chromium.args,
-        executablePath: await chromium.executablePath(),
-        headless: true, // MÓDOSÍTVA: 'new' helyett true
-      });
+      // 3. A legenerált PDF fájl beolvasása bufferbe
+      const pdfBuffer = await fs.readFile(pdfPath);
+      console.log(`✅ PDF Service: SUCCESS! PDF generated, size: ${pdfBuffer.length}`);
       
-      const page = await browser.newPage();
-      
-      await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 0 });
-      
-      console.log(' generating PDF buffer...');
-      const pdfData = await page.pdf({
-        format: 'A4',
-        printBackground: true,
-        margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
-        timeout: 0
-      });
-      
-      console.log('✅ PDF Service: SUCCESS! PDF generated, size:', pdfData.length);
-      // MÓDOSÍTVA: Biztosítjuk, hogy a visszatérési érték Buffer legyen
-      return Buffer.from(pdfData);
+      return pdfBuffer;
 
     } catch (error) {
-      console.error('❌ PDF Service: PDF generation failed:', error);
+      console.error('❌ PDF Service (LibreOffice): PDF generation failed:', error);
+      // Hiba esetén egy egyszerű szöveges hibaoldalt generálunk
       return this.createErrorPDF((error as Error).message);
     } finally {
-      if (browser) {
-        await browser.close();
+      // 4. Mindig letakarítjuk az ideiglenes fájlokat
+      try {
+        await fs.unlink(excelPath);
+        await fs.unlink(pdfPath);
+        console.log('✅ Cleaned up temporary files.');
+      } catch (cleanupError) {
+        console.warn('Could not clean up temporary files:', cleanupError);
       }
     }
-  }
-  
-  private createExcelLikeHTML(worksheet: XLSX.WorkSheet): string {
-    const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1:Z100');
-    let html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>OTIS Acceptance Protocol</title><style>body{font-family:'Calibri','Arial',sans-serif;margin:8px;padding:0;background:white;font-size:11px}table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:10px;border:1px solid #000}td{border:1px solid #ccc;padding:2px 4px;text-align:left;vertical-align:middle;font-size:10px;white-space:nowrap;overflow:hidden;height:20px;background:white}.header-cell{background-color:#d32f2f !important;color:white !important;font-weight:bold;text-align:center;border:1px solid #000}.data-cell{background-color:white;border:1px solid #ccc}.center{text-align:center}.bold{font-weight:bold}@media print{body{margin:0;padding:5mm}table{page-break-inside:auto}tr{page-break-inside:avoid}}</style></head><body><table>`;
-    
-    for (let row = range.s.r; row <= range.e.r; row++) {
-      html += '<tr>';
-      for (let col = range.s.c; col <= range.e.c; col++) {
-        const cellAddress = XLSX.utils.encode_cell({ r: row, c: col });
-        const cell = worksheet[cellAddress];
-        let cellValue = cell?.w || cell?.v || '';
-        let cellClass = 'data-cell';
-        if (cell && cell.v !== undefined && (String(cell.v).includes('OTIS') || row < 3)) {
-          cellClass = 'header-cell';
-        }
-        html += `<td class="${cellClass}">${cellValue}</td>`;
-      }
-      html += '</tr>';
-    }
-    
-    html += `</table><div style="margin-top:20px;font-size:8px;color:#666;text-align:center;">Generated: ${new Date().toLocaleString()} | OTIS Elevator Company | Made to move you</div></body></html>`;
-    return html;
   }
   
   private createErrorPDF(errorMessage: string): Buffer {
@@ -76,7 +59,8 @@ class PDFService {
     return Buffer.from(html, 'utf-8');
   }
 
-  async generateErrorListPDF(errors: ProtocolError[], language: string): Promise<Buffer> {
+  // Ez a funkció már nem releváns, de a hivatkozások miatt a fájlban marad
+  async generateErrorListPDF(): Promise<Buffer> {
      throw new Error("This function is deprecated. Use ErrorExportService.generatePDF instead.");
   }
 }

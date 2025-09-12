@@ -1,6 +1,5 @@
 import { ProtocolError } from '../../shared/schema.js';
 import * as XLSX from 'xlsx';
-// --- MÓDOSÍTVA: A megfelelő, szerverbarát csomagok importálása ---
 import puppeteer from 'puppeteer';
 import chromium from '@sparticuz/chromium';
 
@@ -17,12 +16,11 @@ class PDFService {
 
       console.log(' launching Puppeteer with optimized settings...');
 
-      // --- MÓDOSÍTVA: Stabil, szerver-oldali beállítások használata ---
+      // --- MÓDOSÍTVA: A hibás tulajdonságok eltávolítva ---
       browser = await puppeteer.launch({
         args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
         executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
+        headless: 'new', // Ajánlott a modern headless mód használata
       });
       
       const page = await browser.newPage();
@@ -30,16 +28,15 @@ class PDFService {
       await page.setContent(htmlContent, { waitUntil: 'networkidle0', timeout: 0 });
       
       console.log(' generating PDF buffer...');
-      const pdfData = await page.pdf({
+      const pdfBuffer = await page.pdf({
         format: 'A4',
         printBackground: true,
         margin: { top: '20px', right: '20px', bottom: '20px', left: '20px' },
         timeout: 0
       });
       
-      const pdfBuffer = Buffer.from(pdfData);
-      
       console.log('✅ PDF Service: SUCCESS! PDF generated, size:', pdfBuffer.length);
+      // --- MÓDOSÍTVA: Felesleges Buffer.from eltávolítva ---
       return pdfBuffer;
 
     } catch (error) {
@@ -81,7 +78,6 @@ class PDFService {
   }
 
   async generateErrorListPDF(errors: ProtocolError[], language: string): Promise<Buffer> {
-     // This function is now handled by ErrorExportService to keep concerns separate.
      throw new Error("This function is deprecated. Use ErrorExportService.generatePDF instead.");
   }
 }

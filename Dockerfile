@@ -14,7 +14,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# --- MÓDOSÍTVA: Hozzáadtuk a default-jre-headless csomagot a Java támogatáshoz ---
+# --- MÓDOSÍTVA: A teljes 'libreoffice' csomagot telepítjük a maximális kompatibilitásért ---
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     build-essential \
@@ -55,7 +55,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     wget \
     xdg-utils \
-    libreoffice-writer \
+    libreoffice \
     default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
 

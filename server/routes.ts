@@ -15,6 +15,8 @@ import { excelParserService } from "./services/excel-parser.js";
 import { errorRoutes } from "./routes/error-routes.js";
 import { supabaseStorage } from "./services/supabase-storage.js";
 import { niedervoltService } from "./services/niedervolt-service.js";
+// Gyorsítótár a kérdések tárolására
+let questionsCache: any[] | null = null;
 
 // Feltöltési mappa
 const uploadDir = process.env.NODE_ENV === 'production'
@@ -144,14 +146,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Kérdések lekérése
-  app.get("/api/questions/:language", async (req, res) => {
-    try {
-      const { language } = req.params;
-      if (language !== "hu" && language !== "de") {
-        return res.status(400).json({ message: "Invalid language specified" });
-      }
+  // server/routes.ts
 
+// Kérdések lekérése - GYORSÍTÓTÁRAZOTT VERZIÓ
+app.get("/api/questions/:language", async (req, res) => {
+  try {
+    const { language } = req.params;
+    if (language !== "hu" && language !== "de") {
+      return res.status(400).json({ message: "Invalid language specified" });
+    }
+
+    // 1. LÉPÉS: Ellenőrizzük a gyorsítótárat
+    if (questionsCache) {
+      console.log('✅ Serving questions from cache');
+    } else {
+      // 2. LÉPÉS: Ha a cache üres, betöltjük a fájlból
+      console.log('ℹ️ Cache is empty, parsing questions from template...');
       const questionsTemplate = await storage.getActiveTemplate("unified", "multilingual");
 
       if (!questionsTemplate || !questionsTemplate.file_path) {
@@ -159,61 +169,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const storagePath = questionsTemplate.file_path;
-      const tempPath = path.join("/tmp", `template-${Date.now()}-${questionsTemplate.file_name}`);
+      // Az /app/temp mappát használjuk, ami a konténer része és nem törlődik
+      const tempDir = path.join(process.cwd(), 'temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir, { recursive: true });
+      }
+      const tempPath = path.join(tempDir, `template-${questionsTemplate.file_name}`);
 
-      await supabaseStorage.downloadFile(storagePath, tempPath);
-      console.log(`✅ Template downloaded to ${tempPath}`);
-
+      // Csak akkor töltjük le, ha még nem létezik helyben
+      if (!fs.existsSync(tempPath)) {
+        console.log(`📥 Downloading template to persistent path: ${tempPath}`);
+        await supabaseStorage.downloadFile(storagePath, tempPath);
+      } else {
+        console.log(`📄 Using existing template file from: ${tempPath}`);
+      }
+      
       const questions = await excelParserService.parseQuestionsFromExcel(tempPath);
       console.log(`✅ Parsed ${questions.length} questions.`);
+      
+      // 3. LÉPÉS: Elmentjük a feldolgozott kérdéseket a cache-be
+      questionsCache = questions;
+    }
 
-      if (fs.existsSync(tempPath)) {
-        fs.unlinkSync(tempPath);
+    // 4. LÉPÉS: A cache-ből formázzuk és küldjük a választ
+    const formattedQuestions = questionsCache.map((config) => {
+      let groupName =
+        language === "de" && config.groupNameDe
+          ? config.groupNameDe
+          : config.groupName;
+      const typeStr = config.type as string;
+      if (typeStr === "measurement" || typeStr === "calculated") {
+        groupName = language === "de" ? "Messdaten" : "Mérési adatok";
       }
 
-      const formattedQuestions = questions.map((config) => {
-        let groupName =
-          language === "de" && config.groupNameDe
-            ? config.groupNameDe
-            : config.groupName;
-        const typeStr = config.type as string;
-        if (typeStr === "measurement" || typeStr === "calculated") {
-          groupName = language === "de" ? "Messdaten" : "Mérési adatok";
-        }
+      let correctedType = config.type;
+      if (config.type === 'checkbox' && config.placeholder === 'Válasszon') {
+          correctedType = 'radio';
+      }
 
-        let correctedType = config.type;
-        if (config.type === 'checkbox' && config.placeholder === 'Válasszon') {
-            correctedType = 'radio';
-            console.log(`🔧 Correcting type for question ID: ${config.questionId} from 'checkbox' to 'radio'`);
-        }
+      return {
+        id: config.questionId,
+        title:
+          language === "hu"
+            ? config.titleHu || config.title
+            : config.titleDe || config.title,
+        type: correctedType,
+        required: config.required,
+        placeholder: config.placeholder ?? undefined,
+        cellReference: config.cellReference ?? undefined,
+        sheetName: config.sheetName ?? undefined,
+        groupName: groupName ?? undefined,
+        groupOrder: config.groupOrder ?? 0,
+        unit: config.unit ?? undefined,
+        minValue: config.minValue ?? undefined,
+        maxValue: config.maxValue ?? undefined,
+        calculationFormula: config.calculationFormula ?? undefined,
+        calculationInputs: config.calculationInputs ?? undefined,
+      };
+    });
 
-        return {
-          id: config.questionId,
-          title:
-            language === "hu"
-              ? config.titleHu || config.title
-              : config.titleDe || config.title,
-          type: correctedType,
-          required: config.required,
-          placeholder: config.placeholder ?? undefined,
-          cellReference: config.cellReference ?? undefined,
-          sheetName: config.sheetName ?? undefined,
-          groupName: groupName ?? undefined,
-          groupOrder: config.groupOrder ?? 0,
-          unit: config.unit ?? undefined,
-          minValue: config.minValue ?? undefined,
-          maxValue: config.maxValue ?? undefined,
-          calculationFormula: config.calculationFormula ?? undefined,
-          calculationInputs: config.calculationInputs ?? undefined,
-        };
-      });
-
-      res.json(formattedQuestions);
-    } catch (error) {
-      console.error("❌ Error fetching questions:", error);
-      res.status(500).json({ message: "Failed to fetch questions" });
-    }
-  });
+    res.json(formattedQuestions);
+  } catch (error) {
+    console.error("❌ Error fetching questions:", error);
+    // Hiba esetén töröljük a cache-t, hogy a következő kérés újra próbálkozzon
+    questionsCache = null;
+    res.status(500).json({ message: "Failed to fetch questions" });
+  }
+});
 
   // ====================================================================
   // === MÓDOSÍTOTT RÉSZ KEZDETE ===

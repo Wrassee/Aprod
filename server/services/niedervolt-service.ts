@@ -1,8 +1,6 @@
-// src/services/niedervolt-service.ts
+// server/services/niedervolt-service.ts
 
 import { storage } from "../storage.js";
-// Az XLSX import már nem szükséges, mivel nincs több Excel feldolgozás
-// import * as XLSX from 'xlsx';
 
 // Bővített hardcoded devices - 20 lift specifikus eszköz
 const FALLBACK_GERMAN_DEVICES = [
@@ -68,8 +66,6 @@ export class NiedervoltService {
    */
   async getNiedervoltDevices(): Promise<NiedervoltDevice[]> {
     console.log('📋 Loading hardcoded niedervolt devices (template search disabled)');
-    // Mindig és kizárólag a hardcoded eszközöket adjuk vissza.
-    // A try-catch blokk is felesleges, de a biztonság kedvéért maradhat.
     try {
         return this.getHardcodedDevices();
     } catch (error) {
@@ -77,11 +73,6 @@ export class NiedervoltService {
         return [];
     }
   }
-
-  /**
-   * Az Excel sablonból olvasó metódus teljes egészében eltávolításra került,
-   * hogy a jövőben se okozzon problémát.
-   */
 
   /**
    * Get hardcoded devices - BŐVÍTETT LISTA
@@ -98,16 +89,22 @@ export class NiedervoltService {
     }));
   }
 
+  // ====================================================================
+  // === MÓDOSÍTÁS KEZDETE ===
+  // ====================================================================
   /**
    * Get dropdown options (these remain hardcoded for consistency)
    */
   getDropdownOptions() {
     return {
-      sicherung: ['6A', '10A', '13A', '16A', '20A', '25A', '32A', '40A', '50A', '63A'],
-      ls: ['B6', 'B10', 'B13', 'B16', 'B20', 'B25', 'B32', 'C6', 'C10', 'C13', 'C16', 'C20', 'C25', 'C32'],
+      biztosíték: ['6A', '10A', '13A', '16A', '20A', '25A', '32A', '40A', '50A', '63A'],
+      kismegszakító: ['B6', 'B10', 'B13', 'B16', 'B20', 'B25', 'B32', 'C6', 'C10', 'C13', 'C16', 'C20', 'C25', 'C32'],
       fiTest: ['OK', 'NOK']
     };
   }
+  // ====================================================================
+  // === MÓDOSÍTÁS VÉGE ===
+  // ====================================================================
 }
 
 export const niedervoltService = new NiedervoltService();

@@ -1,30 +1,92 @@
-// Niedervolt device definitions based on the uploaded Excel template
+// src/types/niedervolt-devices.ts
 
+// Ez az interfész változatlan maradt
 export interface NiedervoltDevice {
   id: string;
   nameDE: string;
   nameHU: string;
 }
 
+// ====================================================================
+// === MÓDOSÍTÁS KEZDETE: ÚJ ADATSTRUKTÚRA ===
+// ====================================================================
+
+// A NiedervoltMeasurement interfészt teljesen lecseréljük az újra
 export interface NiedervoltMeasurement {
   deviceId: string;
-  nennstrom?: string;        // Névleges áram / Nennstrom
-  sicherung?: string;        // Olvadóbetét / Sicherung  
-  ls?: string;               // Kismegszakító / LS
-  merkmal?: string;          // Típusjelzés / Merkmal
-  ltv?: string;              // L-T-V..
-  nPe?: string;              // N-PE isolation
-  l1Pe?: string;             // L1-PE isolation
-  l2Pe?: string;             // L2-PE isolation
-  l3Pe?: string;             // L3-PE isolation
-  lN?: string;               // L-N short circuit
-  lPe?: string;              // L-PE short circuit
-  fiIn?: string;             // FI In (mA)
-  fiDin?: string;            // FI DIn (ms)
-  fiTest?: string;           // FI Test result
+  // 1. Névleges áram
+  biztositek?: string;         // 1a - ÚJ (a régi 'sicherung' helyett)
+  kismegszakito?: string;     // 1b - ÚJ (a régi 'ls' helyett)
+  // 2. Típusjelzés
+  tipusjelzes?: string;         // ÚJ (a régi 'merkmal' helyett)
+  // 3. Szigetelés vizsgálat
+  szigetelesNPE?: string;     // 3a - ÚJ
+  szigetelesL1PE?: string;    // 3b - ÚJ
+  szigetelesL2PE?: string;    // 3c - ÚJ
+  szigetelesL3PE?: string;    // 3d - ÚJ
+  // 4. Rövidzárási áram
+  iccLN?: string;             // 4a - ÚJ
+  iccLPE?: string;            // 4b - ÚJ
+  // 5, 6, 7. FI relé
+  fiIn?: string;
+  fiDin?: string;             // A ΔIn tárolására használjuk
+  fiTest?: string;
 }
 
-// German devices from Excel rows 9-21
+// Field labels for the table headers - Teljesen új struktúra
+export interface FieldLabels {
+  // Főcímek
+  nevlegesAram: { de: string; hu: string };
+  tipusjelzes: { de: string; hu: string };
+  szigetelesVizsgalat: { de: string; hu: string };
+  rovidzarasiAram: { de: string; hu: string };
+  // Alcímek és önálló oszlopok
+  biztositek: { de: string; hu: string };
+  kismegszakito: { de: string; hu: string };
+  npe: { de: string; hu: string };
+  l1pe: { de: string; hu: string };
+  l2pe: { de: string; hu: string };
+  l3pe: { de: string; hu: string };
+  ln: { de: string; hu: string };
+  lpe: { de: string; hu: string };
+  fiIn: { de: string; hu: string };
+  fiDin: { de: string; hu: string };
+  fiTest: { de: string; hu: string };
+}
+
+export const FIELD_LABELS: FieldLabels = {
+  // Főcímek
+  nevlegesAram: { de: 'Nennstrom (A)', hu: 'Névleges áram (A)' },
+  tipusjelzes: { de: 'Merkmal', hu: 'Típusjelzés' },
+  szigetelesVizsgalat: { de: 'Isolationsprüfung (MΩ)', hu: 'Szigetelés vizsgálat (MΩ)' },
+  rovidzarasiAram: { de: 'Kurzschlussstrom (Icc)', hu: 'Rövidzárási áram (Icc)' },
+  // Alcímek és önálló oszlopok
+  biztositek: { de: 'Sicherung', hu: 'Biztosíték' },
+  kismegszakito: { de: 'LS-Schalter', hu: 'Kismegszakító' },
+  npe: { de: 'N-PE', hu: 'N-PE' },
+  l1pe: { de: 'L1-PE', hu: 'L1-PE' },
+  l2pe: { de: 'L2-PE', hu: 'L2-PE' },
+  l3pe: { de: 'L3-PE', hu: 'L3-PE' },
+  ln: { de: 'L-N', hu: 'L-N' },
+  lpe: { de: 'L-PE', hu: 'L-PE' },
+  fiIn: { de: 'FI In mA', hu: 'FI In (mA)' },
+  fiDin: { de: 'FI ΔIn ms', hu: 'FI ΔIn (ms)' },
+  fiTest: { de: 'FI Test', hu: 'FI teszt' },
+};
+
+// Dropdown options for common values - A kulcsok átnevezve
+export const DROPDOWN_OPTIONS = {
+  biztositek: ['6A', '10A', '13A', '16A', '20A', '25A', '32A', '40A', '50A', '63A'],
+  kismegszakito: ['B6', 'B10', 'B13', 'B16', 'B20', 'B25', 'B32', 'C6', 'C10', 'C13', 'C16', 'C20', 'C25', 'C32'],
+  fiTest: ['OK', 'NOK']
+};
+
+// ====================================================================
+// === MÓDOSÍTÁS VÉGE ===
+// ====================================================================
+
+
+// Ez a lista változatlan maradt
 export const GERMAN_DEVICES: NiedervoltDevice[] = [
   { id: 'antriebsmotor', nameDE: 'Antriebsmotor', nameHU: 'Motor vagy vezérlés' },
   { id: 'tuerantrieb1', nameDE: 'Türantriebsmotor 1', nameHU: 'Ajtó motor 1' },
@@ -40,45 +102,3 @@ export const GERMAN_DEVICES: NiedervoltDevice[] = [
   { id: 'weitester', nameDE: 'Weitestentfernter Sicherheitskontakt', nameHU: 'Biztonsági kör legtávolabbi pontja' },
   { id: 'andere', nameDE: 'Andere', nameHU: 'Egyéb' }
 ];
-
-// Field labels for the table headers
-export interface FieldLabels {
-  nennstrom: { de: string; hu: string };
-  sicherung: { de: string; hu: string };
-  ls: { de: string; hu: string };
-  merkmal: { de: string; hu: string };
-  ltv: { de: string; hu: string };
-  nPe: { de: string; hu: string };
-  l1Pe: { de: string; hu: string };
-  l2Pe: { de: string; hu: string };
-  l3Pe: { de: string; hu: string };
-  lN: { de: string; hu: string };
-  lPe: { de: string; hu: string };
-  fiIn: { de: string; hu: string };
-  fiDin: { de: string; hu: string };
-  fiTest: { de: string; hu: string };
-}
-
-export const FIELD_LABELS: FieldLabels = {
-  nennstrom: { de: 'Nennstrom (In) A', hu: 'Névleges áram (In) A' },
-  sicherung: { de: 'Sicherung', hu: 'Biztosíték' },
-  ls: { de: 'LS', hu: 'LS-kapcsoló' },
-  merkmal: { de: 'Merkmal', hu: 'Típusjelzés' },
-  ltv: { de: 'L-T-V..', hu: 'L-T-V..' },
-  nPe: { de: 'N-PE Ω', hu: 'N-PE Ω' },
-  l1Pe: { de: 'L1-PE Ω', hu: 'L1-PE Ω' },
-  l2Pe: { de: 'L2-PE Ω', hu: 'L2-PE Ω' },
-  l3Pe: { de: 'L3-PE Ω', hu: 'L3-PE Ω' },
-  lN: { de: 'L-N Ω', hu: 'L-N Ω' },
-  lPe: { de: 'L-PE Ω', hu: 'L-PE Ω' },
-  fiIn: { de: 'FI In mA', hu: 'FI In mA' },
-  fiDin: { de: 'FI DIn ms', hu: 'FI DIn ms' },
-  fiTest: { de: 'FI Test', hu: 'FI Teszt' }
-};
-
-// Dropdown options for common values
-export const DROPDOWN_OPTIONS = {
-  sicherung: ['6A', '10A', '16A', '20A', '25A', '32A', '40A', '50A', '63A'],
-  ls: ['B6', 'B10', 'B16', 'B20', 'B25', 'B32', 'C6', 'C10', 'C16', 'C20', 'C25', 'C32'],
-  fiTest: ['OK', 'NOK', '-']
-};

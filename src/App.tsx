@@ -458,75 +458,52 @@ function App() {
   };
 
   // ====================================================================
-  // === MÓDOSÍTÁS 2: A TELJES handleStartNew FÜGGVÉNY CSERÉJE ===
-  // ====================================================================
-  // A src/app.tsx fájlban
-
-const handleStartNew = async () => {
-  console.log('🧹 === VÉGLEGES, MINDENT TÖRLŐ FUNKCIÓ INDUL ===');
+// === VÉGLEGES, JAVÍTOTT handleStartNew (az eredeti alapján) ===
+// ====================================================================
+const handleStartNew = () => {
+  console.log('🆕 Starting new protocol - clearing all data with page reload...');
   
-  try {
-    // === 1. FÁZIS: GLOBÁLIS GYORSÍTÓTÁRAK TÖRLÉSE ===
-    // Ez a legfontosabb lépés, ami hiányzott!
-    console.log('1. fázis: Globális cache-ek törlése...');
-    if ((window as any).radioCache) (window as any).radioCache.clear();
-    if ((window as any).trueFalseCache) (window as any).trueFalseCache.clear();
-    if ((window as any).stableInputValues) (window as any).stableInputValues = {};
-    if ((window as any).measurementCache) (window as any).measurementCache.clear();
-    if ((window as any).calculatedCache) (window as any).calculatedCache = {};
-    console.log('✅ 1. fázis kész.');
-
-    // === 2. FÁZIS: AZONNALI REACT STATE TÖRLÉS ===
-    console.log('2. fázis: React állapotok törlése...');
-    
-    const initialFormData: FormData = {
-      receptionDate: new Date().toISOString().split('T')[0],
-      answers: {},
-      errors: [],
-      signature: '',
-      signatureName: '',
-      niedervoltMeasurements: [],
-      niedervoltTableMeasurements: {},
-    };
-    setFormData(initialFormData);
-    
-    const newClearTrigger = Date.now();
-    setClearTrigger(newClearTrigger);
-    console.log('✅ 2. fázis kész.');
-    
-    // === 3. FÁZIS: LOCALSTORAGE TELJES TÖRLÉS ===
-    console.log('3. fázis: localStorage teljes törlése...');
-    
-    const localStorageKeysToRemove = [
-      'otis-protocol-form-data',
-      'protocol-errors',
-      'questionnaire-current-page',
-      'niedervolt-table-measurements',
-      'niedervolt-selected-devices',
-      'niedervolt-custom-devices'
-    ];
-    
-    localStorageKeysToRemove.forEach(key => {
-      if (localStorage.getItem(key) !== null) {
-        localStorage.removeItem(key);
-      }
-    });
-    console.log(`✅ 3. fázis kész.`);
-
-    // === 4. FÁZIS: CUSTOM EVENT KÜLDÉSE ===
-    console.log('4. fázis: Custom event küldése...');
-    window.dispatchEvent(new CustomEvent('protocolClear', { detail: { timestamp: newClearTrigger } }));
-    
-    // Visszanavigálás a kezdőképernyőre
-    setCurrentScreen('start');
-    
-    console.log(`🎉 === ÁTFOGÓ ADATTÖRLÉS BEFEJEZVE ===`);
-
-  } catch (error) {
-    console.error('❌ KRITIKUS HIBA az adattörlés során:', error);
-    alert('Hiba történt az adatok törlésekor. A program a biztonság kedvéért újratölti az oldalt.');
-    window.location.reload();
+  // 1. LÉPÉS: Töröljük az összes ismert localStorage kulcsot
+  localStorage.removeItem('otis-protocol-form-data');
+  localStorage.removeItem('protocol-errors');
+  localStorage.removeItem('questionnaire-current-page');
+  // Új Niedervolt kulcsok törlése is
+  localStorage.removeItem('niedervolt-table-measurements');
+  localStorage.removeItem('niedervolt-selected-devices');
+  localStorage.removeItem('niedervolt-custom-devices');
+  
+  // 2. LÉPÉS: Töröljük az összes ismert globális cache-t
+  if ((window as any).radioCache) {
+    console.log('Clearing radio cache...');
+    (window as any).radioCache.clear();
   }
+  if ((window as any).trueFalseCache) {
+    console.log('Clearing true/false cache...');
+    (window as any).trueFalseCache.clear();
+  }
+  if ((window as any).stableInputValues) {
+    console.log('Clearing input values...');
+    (window as any).stableInputValues = {};
+  }
+  if ((window as any).measurementCache) {
+    console.log('Clearing measurement cache...');
+    (window as any).measurementCache.clear();
+  }
+  if ((window as any).calculatedCache) {
+    console.log('Clearing calculated values cache...');
+    (window as any).calculatedCache = {};
+  }
+  
+  // 3. LÉPÉS: Értesítjük a komponenseket (a biztonság kedvéért)
+  window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
+  
+  // 4. LÉPÉS: A "NUKLEÁRIS OPCIÓ" - Oldal újratöltése
+  // Ez a lépés garantálja, hogy minden komponens tiszta lappal indul.
+  setTimeout(() => {
+    window.location.reload();
+  }, 100); // Rövid késleltetés, hogy a törlési műveletek befejeződjenek.
+  
+  console.log('✅ All data cleared - page reload initiated.');
 };
   // ====================================================================
 

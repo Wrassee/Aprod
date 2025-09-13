@@ -463,11 +463,21 @@ function App() {
   // A src/app.tsx fájlban
 
 const handleStartNew = async () => {
-  console.log('🧹 === ÁTFOGÓ ADATTÖRLÉS KEZDŐDIK ===');
+  console.log('🧹 === VÉGLEGES, MINDENT TÖRLŐ FUNKCIÓ INDUL ===');
   
   try {
-    // === 1. FÁZIS: AZONNALI REACT STATE TÖRLÉS ===
-    console.log('1. fázis: React állapotok törlése...');
+    // === 1. FÁZIS: GLOBÁLIS GYORSÍTÓTÁRAK TÖRLÉSE ===
+    // Ez a legfontosabb lépés, ami hiányzott!
+    console.log('1. fázis: Globális cache-ek törlése...');
+    if ((window as any).radioCache) (window as any).radioCache.clear();
+    if ((window as any).trueFalseCache) (window as any).trueFalseCache.clear();
+    if ((window as any).stableInputValues) (window as any).stableInputValues = {};
+    if ((window as any).measurementCache) (window as any).measurementCache.clear();
+    if ((window as any).calculatedCache) (window as any).calculatedCache = {};
+    console.log('✅ 1. fázis kész.');
+
+    // === 2. FÁZIS: AZONNALI REACT STATE TÖRLÉS ===
+    console.log('2. fázis: React állapotok törlése...');
     
     const initialFormData: FormData = {
       receptionDate: new Date().toISOString().split('T')[0],
@@ -482,17 +492,8 @@ const handleStartNew = async () => {
     
     const newClearTrigger = Date.now();
     setClearTrigger(newClearTrigger);
-    console.log('✅ 1. fázis kész.');
-    
-    // === 2. FÁZIS: GLOBÁLIS GYORSÍTÓTÁRAK TÖRLÉSE ===
-    console.log('2. fázis: Globális cache-ek törlése...');
-    if ((window as any).radioCache) (window as any).radioCache.clear();
-    if ((window as any).trueFalseCache) (window as any).trueFalseCache.clear();
-    if ((window as any).stableInputValues) (window as any).stableInputValues = {};
-    if ((window as any).measurementCache) (window as any).measurementCache.clear();
-    if ((window as any).calculatedCache) (window as any).calculatedCache = {};
     console.log('✅ 2. fázis kész.');
-
+    
     // === 3. FÁZIS: LOCALSTORAGE TELJES TÖRLÉS ===
     console.log('3. fázis: localStorage teljes törlése...');
     
@@ -505,15 +506,12 @@ const handleStartNew = async () => {
       'niedervolt-custom-devices'
     ];
     
-    let clearedKeysCount = 0;
     localStorageKeysToRemove.forEach(key => {
       if (localStorage.getItem(key) !== null) {
         localStorage.removeItem(key);
-        clearedKeysCount++;
-        console.log(`🗑️ Törölve: localStorage.'${key}'`);
       }
     });
-    console.log(`✅ 3. fázis kész - ${clearedKeysCount} localStorage kulcs törölve`);
+    console.log(`✅ 3. fázis kész.`);
 
     // === 4. FÁZIS: CUSTOM EVENT KÜLDÉSE ===
     console.log('4. fázis: Custom event küldése...');

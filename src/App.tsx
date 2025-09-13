@@ -460,73 +460,76 @@ function App() {
   // ====================================================================
   // === MÓDOSÍTÁS 2: A TELJES handleStartNew FÜGGVÉNY CSERÉJE ===
   // ====================================================================
-  const handleStartNew = async () => {
-    console.log('🧹 === ÁTFOGÓ ADATTÖRLÉS KEZDŐDIK ===');
+  // A src/app.tsx fájlban
+
+const handleStartNew = async () => {
+  console.log('🧹 === ÁTFOGÓ ADATTÖRLÉS KEZDŐDIK ===');
+  
+  try {
+    // === 1. FÁZIS: AZONNALI REACT STATE TÖRLÉS ===
+    console.log('1. fázis: React állapotok törlése...');
     
-    try {
-      // === 1. FÁZIS: AZONNALI REACT STATE TÖRLÉS ===
-      console.log('1. fázis: React állapotok törlése...');
-      
-      const initialFormData: FormData = {
-        receptionDate: new Date().toISOString().split('T')[0],
-        answers: {},
-        errors: [],
-        signature: '',
-        signatureName: '',
-        niedervoltMeasurements: [],
-        niedervoltTableMeasurements: {}, // Ez is fontos
-      };
-      setFormData(initialFormData);
-      
-      // Újraindítási trigger beállítása a `key` prop-hoz
-      const newClearTrigger = Date.now();
-      setClearTrigger(newClearTrigger);
-      
-      console.log('✅ 1. fázis kész.');
-      
-      // === 2. FÁZIS: RÖVID VÁRAKOZÁS AZ ÁLLAPOT FRISSÜLÉSÉRE ===
-      await new Promise(resolve => setTimeout(resolve, 50));
-      
-      // === 3. FÁZIS: LOCALSTORAGE TELJES TÖRLÉS ===
-      console.log('3. fázis: localStorage teljes törlése...');
-      
-      const localStorageKeysToRemove = [
-        'otis-protocol-form-data',
-        'protocol-errors',
-        'questionnaire-current-page',
-        // Niedervolt kulcsok, a biztonság kedvéért
-        'niedervolt-table-measurements',
-        'niedervolt-selected-devices',
-        'niedervolt-custom-devices'
-      ];
-      
-      let clearedKeysCount = 0;
-      localStorageKeysToRemove.forEach(key => {
-        if (localStorage.getItem(key) !== null) {
-          localStorage.removeItem(key);
-          clearedKeysCount++;
-          console.log(`🗑️ Törölve: localStorage.'${key}'`);
-        }
-      });
-      
-      console.log(`✅ 3. fázis kész - ${clearedKeysCount} localStorage kulcs törölve`);
-  
-      // === 4. FÁZIS: CUSTOM EVENT KÜLDÉSE (EXTRA BIZTONSÁG) ===
-      console.log('4. fázis: Custom event küldése a komponenseknek...');
-      window.dispatchEvent(new CustomEvent('protocolClear', { detail: { timestamp: newClearTrigger } }));
-      
-      // Visszanavigálás a kezdőképernyőre
-      setCurrentScreen('start');
-      
-      console.log(`🎉 === ÁTFOGÓ ADATTÖRLÉS BEFEJEZVE ===`);
-  
-    } catch (error) {
-      console.error('❌ KRITIKUS HIBA az adattörlés során:', error);
-      console.log('🚨 NUKLEÁRIS OPCIÓ: Teljes oldal újratöltés hiba miatt');
-      alert('Hiba történt az adatok törlésekor. A program a biztonság kedvéért újratölti az oldalt.');
-      window.location.reload();
-    }
-  };
+    const initialFormData: FormData = {
+      receptionDate: new Date().toISOString().split('T')[0],
+      answers: {},
+      errors: [],
+      signature: '',
+      signatureName: '',
+      niedervoltMeasurements: [],
+      niedervoltTableMeasurements: {},
+    };
+    setFormData(initialFormData);
+    
+    const newClearTrigger = Date.now();
+    setClearTrigger(newClearTrigger);
+    console.log('✅ 1. fázis kész.');
+    
+    // === 2. FÁZIS: GLOBÁLIS GYORSÍTÓTÁRAK TÖRLÉSE ===
+    console.log('2. fázis: Globális cache-ek törlése...');
+    if ((window as any).radioCache) (window as any).radioCache.clear();
+    if ((window as any).trueFalseCache) (window as any).trueFalseCache.clear();
+    if ((window as any).stableInputValues) (window as any).stableInputValues = {};
+    if ((window as any).measurementCache) (window as any).measurementCache.clear();
+    if ((window as any).calculatedCache) (window as any).calculatedCache = {};
+    console.log('✅ 2. fázis kész.');
+
+    // === 3. FÁZIS: LOCALSTORAGE TELJES TÖRLÉS ===
+    console.log('3. fázis: localStorage teljes törlése...');
+    
+    const localStorageKeysToRemove = [
+      'otis-protocol-form-data',
+      'protocol-errors',
+      'questionnaire-current-page',
+      'niedervolt-table-measurements',
+      'niedervolt-selected-devices',
+      'niedervolt-custom-devices'
+    ];
+    
+    let clearedKeysCount = 0;
+    localStorageKeysToRemove.forEach(key => {
+      if (localStorage.getItem(key) !== null) {
+        localStorage.removeItem(key);
+        clearedKeysCount++;
+        console.log(`🗑️ Törölve: localStorage.'${key}'`);
+      }
+    });
+    console.log(`✅ 3. fázis kész - ${clearedKeysCount} localStorage kulcs törölve`);
+
+    // === 4. FÁZIS: CUSTOM EVENT KÜLDÉSE ===
+    console.log('4. fázis: Custom event küldése...');
+    window.dispatchEvent(new CustomEvent('protocolClear', { detail: { timestamp: newClearTrigger } }));
+    
+    // Visszanavigálás a kezdőképernyőre
+    setCurrentScreen('start');
+    
+    console.log(`🎉 === ÁTFOGÓ ADATTÖRLÉS BEFEJEZVE ===`);
+
+  } catch (error) {
+    console.error('❌ KRITIKUS HIBA az adattörlés során:', error);
+    alert('Hiba történt az adatok törlésekor. A program a biztonság kedvéért újratölti az oldalt.');
+    window.location.reload();
+  }
+};
   // ====================================================================
 
   const handleGoHome = () => {

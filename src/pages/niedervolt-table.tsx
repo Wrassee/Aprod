@@ -107,28 +107,38 @@ export function NiedervoltTable({
       if (savedMeasurements && Object.keys(measurements).length === 0) {
         try {
           onMeasurementsChange(JSON.parse(savedMeasurements));
-        } catch (e) { console.error('Error loading measurements:', e); }
+        } catch (e) {
+          console.error('Error loading measurements:', e);
+        }
       }
       
       if (savedDeviceSelection) {
         try {
           const savedSet = new Set(JSON.parse(savedDeviceSelection));
+          console.log('Loading saved device selection:', Array.from(savedSet));
           setSelectedDevices(savedSet);
         } catch (e) {
-          setSelectedDevices(new Set(devices.map((d: any) => d.id)));
+          // Ha a mentett adat hibás, akkor is a 7 alapértelmezettet töltjük be
+          console.error('Error loading saved selection, defaulting to first 7:', e);
+          setSelectedDevices(new Set(devices.slice(0, 7).map((d: any) => d.id)));
         }
       } else {
-        setSelectedDevices(new Set(devices.map((d: any) => d.id)));
+        // Ha nincs mentett adat (pl. új protokollnál), itt az új logika
+        console.log('No saved selection found. Defaulting to the first 7 devices.');
+        setSelectedDevices(new Set(devices.slice(0, 7).map((d: any) => d.id)));
       }
       
       if (savedCustomDevices) {
         try {
           setCustomDevices(JSON.parse(savedCustomDevices));
-        } catch (e) { console.error('Error loading custom devices:', e); }
+        } catch (e) {
+          console.error('Error loading custom devices:', e);
+        }
       }
       
       setIsInitialized(true);
     }
+  }, [devices.length, isInitialized, measurements, onMeasurementsChange]);
   }, [devices.length, isInitialized, measurements, onMeasurementsChange]);
 
   useEffect(() => {

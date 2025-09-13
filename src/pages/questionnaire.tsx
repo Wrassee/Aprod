@@ -399,9 +399,9 @@ const Questionnaire = memo(function Questionnaire({
                   </span>
                 )}
               </div>
-              <span className="text-sm font-medium text-otis-blue">
-                {currentPage + 1} / {totalPages} {t.groupOf}
-              </span>
+              <span className="text-sm font-medium text-blue-700">
+                {currentPage + 1} / {totalPages + 1} csoport
+                  </span>
             </div>
             <Progress value={progress} className="w-full h-2" />
           </div>

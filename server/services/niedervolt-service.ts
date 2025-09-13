@@ -1,4 +1,4 @@
-// server/services/niedervolt-service.ts
+// src/services/niedervolt-service.ts
 
 import { storage } from "../storage.js";
 
@@ -97,8 +97,8 @@ export class NiedervoltService {
    */
   getDropdownOptions() {
     return {
-      biztosíték: ['6A', '10A', '13A', '16A', '20A', '25A', '32A', '40A', '50A', '63A'],
-      kismegszakító: ['B6', 'B10', 'B13', 'B16', 'B20', 'B25', 'B32', 'C6', 'C10', 'C13', 'C16', 'C20', 'C25', 'C32'],
+      biztositek: ['6A', '10A', '13A', '16A', '20A', '25A', '32A', '40A', '50A', '63A'],
+      kismegszakito: ['B6', 'B10', 'B13', 'B16', 'B20', 'B25', 'B32', 'C6', 'C10', 'C13', 'C16', 'C20', 'C25', 'C32'],
       fiTest: ['OK', 'NOK']
     };
   }

@@ -70,31 +70,19 @@ export function NiedervoltTable({
   const [newDeviceName, setNewDeviceName] = useState({ de: '', hu: '' });
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // ====================================================================
-  // === ÚJ, BIZTONSÁGI useEffect A MANUÁLIS TÖRLÉSHEZ ===
-  // ====================================================================
-  // Figyeli a szülőből érkező `protocolClear` eseményt.
-  // Bár a `key` propnak újra kellene indítania a komponenst, ez egy extra
-  // biztonsági réteg, ami garantálja a belső állapotok törlését.
   useEffect(() => {
     const handleClear = () => {
       console.log('🧹 NiedervoltTable (event listener): Clearing internal state...');
       onMeasurementsChange({});
       setSelectedDevices(new Set());
       setCustomDevices([]);
-      setIsInitialized(false); // Lehetővé teszi az újra-inicializálást
+      setIsInitialized(false);
     };
-
     window.addEventListener('protocolClear', handleClear);
-
-    // Tisztítás, amikor a komponens unmount-ol (eltűnik a képernyőről)
     return () => {
       window.removeEventListener('protocolClear', handleClear);
     };
-  }, [onMeasurementsChange]); // Fontos a függőség!
-  // ====================================================================
-  // === MÓDOSÍTÁS VÉGE ===
-  // ====================================================================
+  }, [onMeasurementsChange]);
 
   useEffect(() => {
     if (devices.length > 0 && !isInitialized) {
@@ -107,9 +95,7 @@ export function NiedervoltTable({
       if (savedMeasurements && Object.keys(measurements).length === 0) {
         try {
           onMeasurementsChange(JSON.parse(savedMeasurements));
-        } catch (e) {
-          console.error('Error loading measurements:', e);
-        }
+        } catch (e) { console.error('Error loading measurements:', e); }
       }
       
       if (savedDeviceSelection) {
@@ -118,12 +104,10 @@ export function NiedervoltTable({
           console.log('Loading saved device selection:', Array.from(savedSet));
           setSelectedDevices(savedSet);
         } catch (e) {
-          // Ha a mentett adat hibás, akkor is a 7 alapértelmezettet töltjük be
           console.error('Error loading saved selection, defaulting to first 7:', e);
           setSelectedDevices(new Set(devices.slice(0, 7).map((d: any) => d.id)));
         }
       } else {
-        // Ha nincs mentett adat (pl. új protokollnál), itt az új logika
         console.log('No saved selection found. Defaulting to the first 7 devices.');
         setSelectedDevices(new Set(devices.slice(0, 7).map((d: any) => d.id)));
       }
@@ -131,18 +115,14 @@ export function NiedervoltTable({
       if (savedCustomDevices) {
         try {
           setCustomDevices(JSON.parse(savedCustomDevices));
-        } catch (e) {
-          console.error('Error loading custom devices:', e);
-        }
+        } catch (e) { console.error('Error loading custom devices:', e); }
       }
       
       setIsInitialized(true);
     }
   }, [devices.length, isInitialized, measurements, onMeasurementsChange]);
-  }, [devices.length, isInitialized, measurements, onMeasurementsChange]);
 
   useEffect(() => {
-    // Csak akkor mentsünk, ha az inicializálás már megtörtént
     if (isInitialized) {
         localStorage.setItem('niedervolt-table-measurements', JSON.stringify(measurements));
     }
@@ -179,9 +159,6 @@ export function NiedervoltTable({
     });
   }, [measurements, onMeasurementsChange]);
     
-  // ... a fájl többi része változatlan marad ...
-  // (a return (...) blokkot nem másolom ide a rövidség kedvéért, az nem változik)
-
   const getFieldLabel = (field: string) => {
     const labels = {
       nennstrom: { hu: 'Névleges áram (A)', de: 'Nennstrom (A)' },

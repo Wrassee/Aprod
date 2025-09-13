@@ -578,7 +578,7 @@ const handleStartNew = async () => {
       case 'questionnaire':
         return (
           <Questionnaire
-            key="stable-questionnaire"
+            key={`questionnaire-${clearTrigger}`}
             receptionDate={formData.receptionDate}
             onReceptionDateChange={handleReceptionDateChange}
             answers={formData.answers}

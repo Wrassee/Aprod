@@ -1,7 +1,10 @@
-import { storage } from "../storage.js";
-import * as XLSX from 'xlsx';
+// src/services/niedervolt-service.ts
 
-// Hardcoded fallback devices
+import { storage } from "../storage.js";
+// Az XLSX import már nem szükséges, mivel nincs több Excel feldolgozás
+// import * as XLSX from 'xlsx';
+
+// Bővített hardcoded devices - 20 lift specifikus eszköz
 const FALLBACK_GERMAN_DEVICES = [
   { id: 'device-1', name: 'Antriebsmotor' },
   { id: 'device-2', name: 'Türantriebsmotor' },
@@ -15,7 +18,15 @@ const FALLBACK_GERMAN_DEVICES = [
   { id: 'device-10', name: 'Bremse' },
   { id: 'device-11', name: 'Encoder' },
   { id: 'device-12', name: 'Sicherheitskette' },
-  { id: 'device-13', name: 'Netzanschluss' }
+  { id: 'device-13', name: 'Netzanschluss' },
+  // Új eszközök hozzáadása
+  { id: 'device-14', name: 'Positionssensor' },
+  { id: 'device-15', name: 'Übergeschwindigkeitsregler' },
+  { id: 'device-16', name: 'Fangvorrichtung' },
+  { id: 'device-17', name: 'Türkontakte' },
+  { id: 'device-18', name: 'Schachtkopfschalter' },
+  { id: 'device-19', name: 'Pufferkontakte' },
+  { id: 'device-20', name: 'Spannungsüberwachung' }
 ];
 
 const FALLBACK_HUNGARIAN_DEVICES = [
@@ -31,7 +42,15 @@ const FALLBACK_HUNGARIAN_DEVICES = [
   { id: 'device-10', name: 'Fék' },
   { id: 'device-11', name: 'Enkóder' },
   { id: 'device-12', name: 'Biztonsági lánc' },
-  { id: 'device-13', name: 'Hálózati csatlakozás' }
+  { id: 'device-13', name: 'Hálózati csatlakozás' },
+  // Új eszközök magyar megfelelői
+  { id: 'device-14', name: 'Pozíció érzékelő' },
+  { id: 'device-15', name: 'Túlsebesség szabályozó' },
+  { id: 'device-16', name: 'Felfogó berendezés' },
+  { id: 'device-17', name: 'Ajtó kontaktok' },
+  { id: 'device-18', name: 'Aknafej kapcsoló' },
+  { id: 'device-19', name: 'Ütköző kontaktok' },
+  { id: 'device-20', name: 'Feszültség felügyelet' }
 ];
 
 export interface NiedervoltDevice {
@@ -45,103 +64,31 @@ export interface NiedervoltDevice {
 export class NiedervoltService {
   
   /**
-   * Get niedervolt devices from Excel template with hardcoded fallback
+   * Get niedervolt devices - EGYSZERŰSÍTETT: csak hardcoded lista
    */
   async getNiedervoltDevices(): Promise<NiedervoltDevice[]> {
+    console.log('📋 Loading hardcoded niedervolt devices (template search disabled)');
+    // Mindig és kizárólag a hardcoded eszközöket adjuk vissza.
+    // A try-catch blokk is felesleges, de a biztonság kedvéért maradhat.
     try {
-      // Try to get devices from active template
-      const devices = await this.getDevicesFromTemplate();
-      if (devices && devices.length > 0) {
-        console.log('📊 Niedervolt devices loaded from Excel template:', devices.length);
-        return devices;
-      }
+        return this.getHardcodedDevices();
     } catch (error) {
-      console.log('⚠️ Failed to load from Excel template, using hardcoded fallback:', error instanceof Error ? error.message : String(error));
+        console.error('⚠️ Critical error in getHardcodedDevices, returning empty array:', error);
+        return [];
     }
-    
-    // Fallback to hardcoded devices
-    console.log('📋 Using hardcoded niedervolt devices fallback');
-    return this.getHardcodedDevices();
   }
 
   /**
-   * Get devices from active Excel template
+   * Az Excel sablonból olvasó metódus teljes egészében eltávolításra került,
+   * hogy a jövőben se okozzon problémát.
    */
-  private async getDevicesFromTemplate(): Promise<NiedervoltDevice[] | null> {
-    const activeTemplate = await storage.getActiveTemplate('unified', 'multilingual') || 
-                           await storage.getActiveTemplate('questions', 'multilingual');
-    if (!activeTemplate) {
-      return null;
-    }
-
-    // Read template file content
-    const fs = await import('fs/promises');
-    let templateBuffer: Buffer;
-    try {
-      templateBuffer = await fs.readFile(activeTemplate.filePath);
-    } catch (error) {
-      console.error('Failed to read template file:', error);
-      return null;
-    }
-
-    try {
-      const workbook = XLSX.read(templateBuffer, { type: 'buffer' });
-      
-      // Look for "Niedervolt" or "NIV" worksheet
-      const niedervoltSheetName = workbook.SheetNames.find(name => 
-        name.toLowerCase().includes('niedervolt') || 
-        name.toLowerCase().includes('niv') ||
-        name.toLowerCase().includes('messungen')
-      );
-
-      if (!niedervoltSheetName) {
-        console.log('📄 No niedervolt worksheet found in template');
-        return null;
-      }
-
-      const worksheet = workbook.Sheets[niedervoltSheetName];
-      const data = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-      // Parse devices from worksheet
-      const devices: NiedervoltDevice[] = [];
-      let deviceIndex = 1;
-
-      // Look for device data starting from row 2 (skip header)
-      for (let i = 1; i < data.length; i++) {
-        const row = data[i] as any[];
-        if (!row || row.length < 2) continue;
-
-        const germanName = row[0]?.toString()?.trim();
-        const hungarianName = row[1]?.toString()?.trim();
-
-        if (germanName && hungarianName) {
-          devices.push({
-            id: `device-${deviceIndex}`,
-            name: {
-              de: germanName,
-              hu: hungarianName
-            }
-          });
-          deviceIndex++;
-        }
-      }
-
-      if (devices.length > 0) {
-        console.log(`📊 Found ${devices.length} devices in Excel template`);
-        return devices;
-      }
-
-      return null;
-    } catch (error) {
-      console.error('Error parsing niedervolt devices from template:', error);
-      return null;
-    }
-  }
 
   /**
-   * Get hardcoded devices as fallback
+   * Get hardcoded devices - BŐVÍTETT LISTA
    */
   private getHardcodedDevices(): NiedervoltDevice[] {
+    console.log(`✅ Using ${FALLBACK_GERMAN_DEVICES.length} hardcoded niedervolt devices`);
+    
     return FALLBACK_GERMAN_DEVICES.map((germanDevice, index) => ({
       id: germanDevice.id,
       name: {

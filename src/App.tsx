@@ -13,10 +13,10 @@ import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
 import { LanguageProvider } from "./components/language-provider.js";
 
-/* --------------------  PWA  (jelenleg letiltva) -------------------- */
+/* --------------------  PWA  (jelenleg letiltva) -------------------- */
 // import { PWAInstallBanner, OfflineIndicator } from "./components/pwa‑install‑banner";
 
-/* --------------------  Oldalak / Komponensek -------------------- */
+/* --------------------  Oldalak / Komponensek -------------------- */
 import { StartScreen } from "./pages/start-screen.js";
 import Questionnaire from "./pages/questionnaire.js";
 import { NiedervoltTable } from "./pages/niedervolt-table.js";
@@ -27,10 +27,10 @@ import { ProtocolPreview } from "./pages/protocol-preview.js";
 import { SmartHelpWizard } from "./components/smart-help-wizard.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
-/* --------------------  Shared schema -------------------- */
+/* --------------------  Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema.js";
 
-/* --------------------  404  -------------------- */
+/* --------------------  404  -------------------- */
 import NotFound from "./pages/not-found.js";
 
 function App() {
@@ -38,6 +38,13 @@ function App() {
   const [currentQuestionnaireePage, setCurrentQuestionnairePage] = useState(0);
   const [currentQuestionId, setCurrentQuestionId] = useState<string>('');
   const [language, setLanguage] = useState<'hu' | 'de'>('hu');
+
+  // ====================================================================
+  // === MÓDOSÍTÁS 1: ÚJ clearTrigger ÁLLAPOT HOZZÁADÁSA ===
+  // ====================================================================
+  const [clearTrigger, setClearTrigger] = useState(Date.now());
+  // ====================================================================
+
   const [formData, setFormData] = useState<FormData>({
     receptionDate: new Date().toISOString().split('T')[0], // Always keep as ISO format for HTML date input
     answers: {},
@@ -53,9 +60,6 @@ function App() {
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
-
-  // Disabled auto-save to prevent component re-mounting during manual saves
-  // Manual save through the Save button only
 
   // Load saved form data on initialization
   useEffect(() => {
@@ -169,8 +173,8 @@ function App() {
       
       // Include niedervolt measurements
       const protocolData = {
-        receptionDate,                    // Frontend számára
-        reception_date: receptionDate,    // ⭐ JAVÍTÁS: Backend schema számára
+        receptionDate,
+        reception_date: receptionDate,
         language,
         answers: combinedAnswers,
         errors: formData.errors || [],
@@ -185,7 +189,7 @@ function App() {
         hasSignature: Boolean(protocolData.signature),
         hasSignatureName: Boolean(protocolData.signatureName),
         receptionDate: protocolData.receptionDate,
-        reception_date: protocolData.reception_date,  // ⭐ JAVÍTÁS: Debug log
+        reception_date: protocolData.reception_date,
         language: protocolData.language
       });
       
@@ -453,60 +457,77 @@ function App() {
     setCurrentScreen('protocol-preview');
   };
 
-  const handleStartNew = () => {
-    console.log('🆕 Starting new protocol - clearing all data...');
+  // ====================================================================
+  // === MÓDOSÍTÁS 2: A TELJES handleStartNew FÜGGVÉNY CSERÉJE ===
+  // ====================================================================
+  const handleStartNew = async () => {
+    console.log('🧹 === ÁTFOGÓ ADATTÖRLÉS KEZDŐDIK ===');
     
-    // Clear ALL localStorage data thoroughly
-    localStorage.removeItem('otis-protocol-form-data');
-    localStorage.removeItem('protocol-errors');
-    localStorage.removeItem('niedervolt-measurements');
-    localStorage.removeItem('questionnaire-current-page');
-    
-    // Clear all cached values (radio buttons, inputs, measurements)
-    if ((window as any).radioCache) {
-      console.log('Clearing radio cache...');
-      (window as any).radioCache.clear();
-    }
-    if ((window as any).trueFalseCache) {
-      console.log('Clearing true/false cache...');
-      (window as any).trueFalseCache.clear();
-    }
-    if ((window as any).stableInputValues) {
-      console.log('Clearing input values...');
-      (window as any).stableInputValues = {};
-    }
-    if ((window as any).measurementCache) {
-      console.log('Clearing measurement cache...');
-      (window as any).measurementCache.clear();
-    }
-    if ((window as any).calculatedCache) {
-      console.log('Clearing calculated values cache...');
-      (window as any).calculatedCache = {};
-    }
-    
-    // Reset form data to completely fresh initial state
-    const initialFormData: FormData = {
-      receptionDate: new Date().toISOString().split('T')[0],
-      answers: {},
-      errors: [],
-      signature: '',
-      signatureName: '',
-      niedervoltMeasurements: [],
-    };
-    
-    setFormData(initialFormData);
-    setCurrentScreen('start');
-    
-    // Trigger event to notify error list component of the clear
-    window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
-    
-    // Force complete page refresh to clear any persistent cache
-    setTimeout(() => {
+    try {
+      // === 1. FÁZIS: AZONNALI REACT STATE TÖRLÉS ===
+      console.log('1. fázis: React állapotok törlése...');
+      
+      const initialFormData: FormData = {
+        receptionDate: new Date().toISOString().split('T')[0],
+        answers: {},
+        errors: [],
+        signature: '',
+        signatureName: '',
+        niedervoltMeasurements: [],
+        niedervoltTableMeasurements: {}, // Ez is fontos
+      };
+      setFormData(initialFormData);
+      
+      // Újraindítási trigger beállítása a `key` prop-hoz
+      const newClearTrigger = Date.now();
+      setClearTrigger(newClearTrigger);
+      
+      console.log('✅ 1. fázis kész.');
+      
+      // === 2. FÁZIS: RÖVID VÁRAKOZÁS AZ ÁLLAPOT FRISSÜLÉSÉRE ===
+      await new Promise(resolve => setTimeout(resolve, 50));
+      
+      // === 3. FÁZIS: LOCALSTORAGE TELJES TÖRLÉS ===
+      console.log('3. fázis: localStorage teljes törlése...');
+      
+      const localStorageKeysToRemove = [
+        'otis-protocol-form-data',
+        'protocol-errors',
+        'questionnaire-current-page',
+        // Niedervolt kulcsok, a biztonság kedvéért
+        'niedervolt-table-measurements',
+        'niedervolt-selected-devices',
+        'niedervolt-custom-devices'
+      ];
+      
+      let clearedKeysCount = 0;
+      localStorageKeysToRemove.forEach(key => {
+        if (localStorage.getItem(key) !== null) {
+          localStorage.removeItem(key);
+          clearedKeysCount++;
+          console.log(`🗑️ Törölve: localStorage.'${key}'`);
+        }
+      });
+      
+      console.log(`✅ 3. fázis kész - ${clearedKeysCount} localStorage kulcs törölve`);
+  
+      // === 4. FÁZIS: CUSTOM EVENT KÜLDÉSE (EXTRA BIZTONSÁG) ===
+      console.log('4. fázis: Custom event küldése a komponenseknek...');
+      window.dispatchEvent(new CustomEvent('protocolClear', { detail: { timestamp: newClearTrigger } }));
+      
+      // Visszanavigálás a kezdőképernyőre
+      setCurrentScreen('start');
+      
+      console.log(`🎉 === ÁTFOGÓ ADATTÖRLÉS BEFEJEZVE ===`);
+  
+    } catch (error) {
+      console.error('❌ KRITIKUS HIBA az adattörlés során:', error);
+      console.log('🚨 NUKLEÁRIS OPCIÓ: Teljes oldal újratöltés hiba miatt');
+      alert('Hiba történt az adatok törlésekor. A program a biztonság kedvéért újratölti az oldalt.');
       window.location.reload();
-    }, 100);
-    
-    console.log('✅ All data cleared - new protocol ready');
+    }
   };
+  // ====================================================================
 
   const handleGoHome = () => {
     setCurrentScreen('start');
@@ -574,7 +595,11 @@ function App() {
       case 'niedervolt':
         return (
           <NiedervoltTable
-            key="stable-niedervolt-table"
+            // ====================================================================
+            // === MÓDOSÍTÁS 3: A KEY PROP DINAMIKUSSÁ TÉTELE ===
+            // ====================================================================
+            key={`niedervolt-table-${clearTrigger}`}
+            // ====================================================================
             measurements={formData.niedervoltTableMeasurements || {}}
             onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
             onBack={handleNiedervoltBack}
@@ -642,8 +667,8 @@ function App() {
           {(currentScreen === 'questionnaire' || currentScreen === 'niedervolt' || currentScreen === 'signature') && (
             <SmartHelpWizard
               currentPage={currentScreen === 'questionnaire' ? currentQuestionnaireePage + 1 : 
-                          currentScreen === 'niedervolt' ? 5 : 
-                          currentScreen === 'signature' ? 6 : 1}
+                           currentScreen === 'niedervolt' ? 5 : 
+                           currentScreen === 'signature' ? 6 : 1}
               formData={formData}
               currentQuestionId={currentQuestionId}
               errors={formData.errors}

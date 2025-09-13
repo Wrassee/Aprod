@@ -215,21 +215,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Niedervolt eszközök lekérése
+  // ====================================================================
+  // === MÓDOSÍTOTT RÉSZ KEZDETE ===
+  // ====================================================================
+  // Niedervolt eszközök lekérése - JAVÍTOTT VERZIÓ
   app.get("/api/niedervolt/devices", async (req, res) => {
     try {
+      console.log('📋 Fetching niedervolt devices (hardcoded mode)');
+      
       const devices = await niedervoltService.getNiedervoltDevices();
       const dropdownOptions = niedervoltService.getDropdownOptions();
+      
+      console.log(`✅ Returned ${devices.length} niedervolt devices successfully`);
       
       res.json({
         devices,
         dropdownOptions
       });
+      
     } catch (error) {
-      console.error("Error fetching niedervolt devices:", error);
-      res.status(500).json({ message: "Failed to fetch niedervolt devices" });
+      console.error("❌ Error fetching niedervolt devices:", error);
+      
+      // Emergency fallback - ha a hardcoded logika valamiért mégis hibát dobna
+      console.log('🚨 Using emergency fallback devices due to an unexpected error');
+      
+      res.status(500).json({
+        devices: [
+          {
+            id: "emergency-device-1",
+            name: {
+              de: "Antriebsmotor (Fallback)",
+              hu: "Motor (Tartalék)"
+            }
+          }
+        ],
+        dropdownOptions: niedervoltService.getDropdownOptions() // Próbáljuk meg az alap opciókat visszaadni
+      });
     }
   });
+  // ====================================================================
+  // === MÓDOSÍTOTT RÉSZ VÉGE ===
+  // ====================================================================
 
   // Admin: Sablonok listázása
   app.get("/api/admin/templates", async (_req, res) => {

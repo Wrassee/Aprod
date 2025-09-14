@@ -18,20 +18,30 @@ import { CalculatedResult } from '@/components/calculated-result';
 import { MeasurementBlock, getAllCalculatedValues } from '@/components/measurement-block';
 
 interface QuestionnaireProps {
+  // Meglévő props
   receptionDate: string;
   onReceptionDateChange: (date: string) => void;
   answers: Record<string, AnswerValue>;
   onAnswerChange: (questionId: string, value: AnswerValue) => void;
   errors: ProtocolError[];
   onErrorsChange: (errors: ProtocolError[]) => void;
-  onNext: () => void;
   onSave: () => void;
   language: 'hu' | 'de';
   onAdminAccess?: () => void;
   onHome?: () => void;
   onStartNew?: () => void;
-  onPageChange?: (page: number) => void;
   onQuestionChange?: (questionId: string) => void;
+
+  // ÚJ, KÖZPONTI VEZÉRLŐ PROPS-OK
+  globalCurrentStep: number;
+  totalSteps: number;
+  globalProgress: number;
+  onStepChange: (step: number) => void;
+  onNext: () => void;
+  onPrevious: () => void;
+
+  // EZT A PROPOT MÁR NEM HASZNÁLJUK, MERT A GLOBALCURRENTSTEP ÁTVESZI A SZEREPÉT
+  // onPageChange?: (page: number) => void; 
 }
 
 const Questionnaire = memo(function Questionnaire({

@@ -27,6 +27,7 @@ interface CustomDevice {
 }
 
 interface NiedervoltTableProps {
+  // Meglévő props
   measurements: Record<string, NiedervoltMeasurement>;
   onMeasurementsChange: (measurements: Record<string, NiedervoltMeasurement>) => void;
   onBack: () => void;
@@ -36,6 +37,12 @@ interface NiedervoltTableProps {
   onAdminAccess?: () => void;
   onHome?: () => void;
   onStartNew?: () => void;
+
+  // ÚJ, KÖZPONTI VEZÉRLŐ PROPS-OK
+  globalCurrentStep: number;
+  totalSteps: number;
+  globalProgress: number;
+  isLastStep: boolean;
 }
 
 export function NiedervoltTable({

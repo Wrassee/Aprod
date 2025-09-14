@@ -381,7 +381,7 @@ const Questionnaire = memo(function Questionnaire({
                   {currentPage + 1} / {totalPages + 1} {t.groupOf}
                 </span>
               </div>
-              <Progress value={progress} className="w-full h-2.5" />
+              <Progress value={globalProgress} className="w-full h-2.5" />
             </div>
           </div>
         </div>

@@ -49,7 +49,7 @@ export function NiedervoltTable({
   onHome,
   onStartNew,
 }: NiedervoltTableProps) {
-  const { language } = useLanguageContext();
+  const { t, language } = useLanguageContext();
 
   const { data: niedervoltData, isLoading } = useQuery({
     queryKey: ['/api/niedervolt/devices'],
@@ -242,7 +242,7 @@ export function NiedervoltTable({
       <div className="w-full">
         <div className="flex justify-between mb-1">
           <span className="text-base font-medium text-blue-700">
-            {language === 'hu' ? 'Niedervolt Installációk Mérései' : 'Niedervolt Installationen Messungen'}
+            {t.progress}
           </span>
           <span className="text-sm font-medium text-blue-700">
             {language === 'hu' ? 'Oldal 5 / 5' : 'Seite 5 / 5'}

@@ -125,32 +125,83 @@ export function Completion({
   return (
     <div className="min-h-screen bg-light-surface">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-               <img 
-                src="/otis-elevators-seeklogo_1753525178175.png" 
-                alt="OTIS Logo" 
-                style={{ height: '50px', width: 'auto', marginRight: '16px' }}
-              />
-              <span className="text-lg font-medium text-gray-800">{t.completionTitle}</span>
-            </div>
-            
-            {/* Navigation buttons */}
-            <div className="flex items-center space-x-2">
-              <Button onClick={onGoHome} variant="outline" size="sm" className="flex items-center">
-                <Home className="h-4 w-4 mr-2" />
-                {t.home}
-              </Button>
-              <Button onClick={onSettings} variant="outline" size="sm" className="flex items-center">
-                <Settings className="h-4 w-4 mr-2" />
-                {t.settings || 'Beállítások'}
-              </Button>
-            </div>
-          </div>
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
+  <div className="max-w-7xl mx-auto px-6 py-4">
+    {/* Felső sor: Főcím és gombok */}
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center">
+        <img 
+          src="/otis-elevators-seeklogo_1753525178175.png" 
+          alt="OTIS Logo" 
+          className="h-12 w-12 mr-4"
+        />
+        {onHome && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onHome}
+            className="text-gray-600 hover:text-gray-800 mr-4"
+            title={language === 'de' ? 'Startseite' : 'Kezdőlap'}
+          >
+            <Home className="h-4 w-4" />
+          </Button>
+        )}
+        {/* MÓDOSÍTÁS: A főcím egységesítve */}
+        <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - Átvételi Protokoll</h1>
+      </div>
+      
+      <div className="flex items-center space-x-4">
+        <Label className="text-sm font-medium text-gray-600">{t.receptionDate}</Label>
+        <Input
+          type="date"
+          value={receptionDate}
+          onChange={(e) => onReceptionDateChange(e.target.value)}
+          className="w-auto"
+        />
+        {onStartNew && (
+          <Button
+            onClick={onStartNew}
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center"
+            size="sm"
+            title={t.startNew || 'Új protokoll indítása'}
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            {t.startNew || 'Új protokoll indítása'}
+          </Button>
+        )}
+        {onAdminAccess && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onAdminAccess}
+            className="text-gray-600 hover:text-gray-800"
+            title={t.admin}
+          >
+            <Settings className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </div>
+    
+    {/* Alsó sor: Folyamatjelző */}
+    <div className="flex items-center justify-between">
+      <div className="w-full">
+        <div className="flex justify-between mb-1">
+          <span className="text-base font-medium text-blue-700">
+            {/* MÓDOSÍTÁS: Az aktuális csoport nevét írja ki alcímként */}
+            {currentGroup?.name || t.progress}
+          </span>
+          <span className="text-sm font-medium text-blue-700">
+            {/* MÓDOSÍTÁS: Megtartottuk a helyes, +1-es számozást */}
+            {currentPage + 1} / {totalPages + 1} {t.groupOf}
+          </span>
         </div>
-      </header>
+        {/* MÓDOSÍTÁS: A meglévő Progress komponenst használjuk a kék csíkhoz */}
+        <Progress value={progress} className="w-full h-2.5" />
+      </div>
+    </div>
+  </div>
+</header>
 
       {/* Completion Content */}
       <main className="max-w-4xl mx-auto px-6 py-8">

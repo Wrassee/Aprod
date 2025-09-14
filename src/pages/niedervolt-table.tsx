@@ -225,7 +225,13 @@ export function NiedervoltTable({
         {onStartNew && (
           <Button onClick={onStartNew} className="bg-green-600 hover:bg-green-700 text-white flex items-center" size="sm" title={language === 'hu' ? 'Új protokoll indítása' : 'Neues Protokoll starten'}>
             <RotateCcw className="h-4 w-4 mr-2" />
-            {language === 'hu' ? 'Új protokoll' : 'Neues Protokoll'}
+            {language === 'hu' ? 'Új protokoll indítása' : 'Neues Protokoll starten'}
+          </Button>
+        )}
+        {/* === HOZZÁADVA: A HIÁNYZÓ ADMIN GOMB === */}
+        {onAdminAccess && (
+          <Button variant="outline" size="sm" onClick={onAdminAccess} className="text-gray-600 hover:text-gray-800">
+            <Settings className="h-4 w-4" />
           </Button>
         )}
       </div>

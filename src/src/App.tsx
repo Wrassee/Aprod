@@ -616,59 +616,52 @@ function App() {
       case 'start':
         return <StartScreen onLanguageSelect={handleLanguageSelect} />;
       case 'questionnaire':
-        return (
-          <Questionnaire
-            key={`questionnaire-${clearTrigger}`}
-            // Meglévő props
-            receptionDate={formData.receptionDate}
-            onReceptionDateChange={handleReceptionDateChange}
-            answers={formData.answers}
-            onAnswerChange={handleAnswerChange}
-            errors={formData.errors}
-            onErrorsChange={handleErrorsChange}
-            onSave={handleSaveProgress}
-            language={language}
-            onAdminAccess={handleAdminAccess}
-            onHome={handleHome}
-            onStartNew={handleStartNew}
-            onPageChange={setCurrentQuestionnairePage}
-            onQuestionChange={setCurrentQuestionId}
-            
-            // ÚJ: Global progress props
-            globalCurrentStep={globalCurrentStep}
-            totalSteps={TOTAL_PROTOCOL_STEPS}
-            globalProgress={globalProgress}
-            onStepChange={handleStepChange}
-            onNext={handleQuestionnaireNext}
-            onPrevious={handleQuestionnairePrevious}
-          />
-        );
+  return (
+    <Questionnaire
+      key={`questionnaire-${clearTrigger}`}
+      receptionDate={formData.receptionDate}
+      onReceptionDateChange={handleReceptionDateChange}
+      answers={formData.answers}
+      onAnswerChange={handleAnswerChange}
+      errors={formData.errors}
+      onErrorsChange={handleErrorsChange}
+      onSave={handleSaveProgress}
+      language={language}
+      onAdminAccess={handleAdminAccess}
+      onHome={handleGoHome}
+      onStartNew={handleStartNew}
+      onQuestionChange={setCurrentQuestionId}
+
+      // === HIÁNYZÓ GLOBÁLIS PROPS-OK HOZZÁADVA ===
+      globalCurrentStep={globalCurrentStep}
+      totalSteps={TOTAL_PROTOCOL_STEPS}
+      globalProgress={globalProgress}
+      onStepChange={handleStepChange}
+      onNext={handleQuestionnaireNext}
+      onPrevious={handleQuestionnairePrevious}
+    />
+  );
       case 'niedervolt':
-        return (
-          <NiedervoltTable
-            // ====================================================================
-            // === MÃ"DOSÃTÃS 3: A KEY PROP DINAMIKUSSÃ TÃ‰TELE ===
-            // ====================================================================
-            key={`niedervolt-table-${clearTrigger}`}
-            // ====================================================================
-            // Meglévő props
-            measurements={formData.niedervoltTableMeasurements || {}}
-            onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
-            onBack={handleNiedervoltBack}
-            onNext={handleNiedervoltNext}
-            receptionDate={formData.receptionDate}
-            onReceptionDateChange={handleReceptionDateChange}
-            onAdminAccess={handleAdminAccess}
-            onHome={handleGoHome}
-            onStartNew={handleStartNew}
-            
-            // ÚJ: Global progress props
-            globalCurrentStep={globalCurrentStep}
-            totalSteps={TOTAL_PROTOCOL_STEPS}
-            globalProgress={globalProgress}
-            isLastStep={globalCurrentStep === TOTAL_PROTOCOL_STEPS}
-          />
-        );
+  return (
+    <NiedervoltTable
+      key={`niedervolt-table-${clearTrigger}`}
+      measurements={formData.niedervoltTableMeasurements || {}}
+      onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
+      onBack={handleNiedervoltBack}
+      onNext={handleNiedervoltNext}
+      receptionDate={formData.receptionDate}
+      onReceptionDateChange={handleReceptionDateChange}
+      onAdminAccess={handleAdminAccess}
+      onHome={handleGoHome}
+      onStartNew={handleStartNew}
+
+      // === HIÁNYZÓ GLOBÁLIS PROPS-OK HOZZÁADVA ===
+      globalCurrentStep={globalCurrentStep}
+      totalSteps={TOTAL_PROTOCOL_STEPS}
+      globalProgress={globalProgress}
+      isLastStep={globalCurrentStep === TOTAL_PROTOCOL_STEPS}
+    />
+  );
       case 'signature':
         return (
           <Signature

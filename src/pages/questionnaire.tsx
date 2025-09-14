@@ -74,7 +74,7 @@ const Questionnaire = memo(function Questionnaire({
     return initialPage;
   });
   
-  console.log('📁 Current page:', currentPage);
+  console.log('📄 Current page:', currentPage);
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);

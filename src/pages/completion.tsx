@@ -13,12 +13,13 @@ import {
   Home,
   Settings,
   ArrowLeft,
-  Loader2
+  Loader2 // BetÃ¶ltÃ©s ikon importÃ¡lÃ¡sa
 } from 'lucide-react';
 
 interface CompletionProps {
   onEmailPDF: () => void;
   onSaveToCloud: () => void;
+  // onDownloadPDF prop eltÃ¡volÃ­tva, mert a logikÃ¡t helyben kezeljÃ¼k
   onDownloadExcel: () => void;
   onViewProtocol: () => void;
   onStartNew: () => void;
@@ -32,7 +33,7 @@ interface CompletionProps {
     inspectorName?: string;
     inspectionDate?: string;
   };
-  language: 'hu' | 'de';
+  language: 'hu' | 'de'; // Language prop hozzÃ¡adva a tÃ­pusdefinÃ­ciÃ³hoz
 }
 
 export function Completion({
@@ -46,39 +47,42 @@ export function Completion({
   onBackToSignature,
   errors = [],
   protocolData,
-  language,
+  language, // Language prop Ã¡tvÃ©tele
 }: CompletionProps) {
   const { t } = useLanguageContext();
   const [emailStatus, setEmailStatus] = useState<string>('');
   const [isEmailSending, setIsEmailSending] = useState(false);
-  const [isPdfDownloading, setIsPdfDownloading] = useState(false);
+  const [isPdfDownloading, setIsPdfDownloading] = useState(false); // Ãšj Ã¡llapot a PDF letÃ¶ltÃ©shez
 
   const handleEmailClick = async () => {
     setIsEmailSending(true);
-    setEmailStatus('Email küldése folyamatban...');
+    setEmailStatus('Email kÃ¼ldÃ©se folyamatban...');
     
     try {
       await onEmailPDF();
-      setEmailStatus('✅ Email sikeresen elküldve!');
+      setEmailStatus('âœ… Email sikeresen elkÃ¼ldve!');
       setTimeout(() => setEmailStatus(''), 5000);
     } catch (error) {
-      setEmailStatus('❌ Email küldése sikertelen!');
+      setEmailStatus('âŒ Email kÃ¼ldÃ©se sikertelen!');
       setTimeout(() => setEmailStatus(''), 5000);
     } finally {
       setIsEmailSending(false);
     }
   };
 
+  // --- JAVÃTÃS: ÃšJ PDF LETÃ–LTÃ‰SI LOGIKA ---
   const handleDownloadPDF = async () => {
     setIsPdfDownloading(true);
     try {
       console.log('Starting PDF download from completion page...');
       
+      // A legfrissebb adatokat a localStorage-bÃ³l olvassuk ki
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.answers) {
         throw new Error('No form data found in localStorage to generate PDF.');
       }
 
+      // KÃ©rÃ©s kÃ¼ldÃ©se a HELYES /download-pdf vÃ©gpontra
       const response = await fetch('/api/protocols/download-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -93,6 +97,7 @@ export function Completion({
         throw new Error(errorData.message || 'Failed to generate PDF on the server.');
       }
 
+      // A vÃ¡lasz feldolgozÃ¡sa Ã©s a letÃ¶ltÃ©s elindÃ­tÃ¡sa
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -111,6 +116,7 @@ export function Completion({
       console.log('PDF download initiated successfully.');
     } catch (error) {
       console.error('Error during PDF download:', error);
+      // Ide jÃ¶het egy hibaÃ¼zenet a felhasznÃ¡lÃ³nak (pl. toast notification)
     } finally {
       setIsPdfDownloading(false);
     }
@@ -127,7 +133,47 @@ export function Completion({
                 alt="OTIS Logo" 
                 className="h-12 w-12 mr-4"
               />
-              <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - Átvételi Protokoll</h1>
+              {onHome && (
+                <Button variant="ghost" size="sm" onClick={onHome} className="text-gray-600 hover:text-gray-800 mr-4" title={language === 'de' ? 'Startseite' : 'KezdÅ‘lap'}>
+                  <Home className="h-4 w-4" />
+                </Button>
+              )}
+              <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - ÃtvÃ©teli Protokoll</h1>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <Label className="text-sm font-medium text-gray-600">{t.receptionDate}</Label>
+              <Input
+                type="date"
+                value={receptionDate}
+                onChange={(e) => onReceptionDateChange(e.target.value)}
+                className="w-auto"
+              />
+              {onStartNew && (
+                <Button onClick={onStartNew} className="bg-green-600 hover:bg-green-700 text-white flex items-center" size="sm" title={t.startNew || 'Ãšj protokoll indÃ­tÃ¡sa'}>
+                  <RotateCcw className="h-4 w-4 mr-2" />
+                  {t.startNew || 'Ãšj protokoll indÃ­tÃ¡sa'}
+                </Button>
+              )}
+              {onAdminAccess && (
+                <Button variant="ghost" size="sm" onClick={onAdminAccess} className="text-gray-600 hover:text-gray-800" title={t.admin}>
+                  <Settings className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex items-center justify-between">
+            <div className="w-full">
+              <div className="flex justify-between mb-1">
+                <span className="text-base font-medium text-blue-700">
+                  {currentGroup?.name || t.progress}
+                </span>
+                <span className="text-sm font-medium text-blue-700">
+                  {currentPage + 1} / {totalPages + 1} {t.groupOf}
+                </span>
+              </div>
+              <Progress value={progress} className="w-full h-2.5" />
             </div>
           </div>
         </div>
@@ -156,12 +202,12 @@ export function Completion({
                 className="bg-otis-blue hover:bg-blue-700 text-white flex items-center justify-center py-4 h-auto w-full disabled:opacity-50"
               >
                 <Mail className="h-5 w-5 mr-3" />
-                {isEmailSending ? 'Küldés...' : t.emailPDF}
+                {isEmailSending ? 'KÃ¼ldÃ©s...' : t.emailPDF}
               </Button>
               
               {emailStatus && (
                 <div className={`absolute top-full mt-2 left-0 right-0 text-sm px-3 py-2 rounded text-center ${
-                  emailStatus.includes('✅') ? 'bg-green-100 text-green-700' : 
+                  emailStatus.includes('âœ…') ? 'bg-green-100 text-green-700' : 
                   emailStatus.includes('folyamatban') ? 'bg-blue-100 text-blue-700' :
                   'bg-red-100 text-red-700'
                 }`}>
@@ -181,7 +227,7 @@ export function Completion({
             
             {/* Download PDF */}
             <Button
-              onClick={handleDownloadPDF}
+              onClick={handleDownloadPDF} // --- JAVÃTÃS ITT ---
               disabled={isPdfDownloading}
               className="bg-gray-600 hover:bg-gray-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
             >

@@ -365,7 +365,7 @@ const Questionnaire = memo(function Questionnaire({
             <div className="w-full">
               <div className="flex justify-between mb-1">
                 <span className="text-base font-medium text-blue-700">
-                  {currentGroup?.name || t.progress}
+                  {t.progress}
                 </span>
                 <span className="text-sm font-medium text-blue-700">
                   {currentPage + 1} / {totalPages + 1} {t.groupOf}

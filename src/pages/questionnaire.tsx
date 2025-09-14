@@ -58,6 +58,7 @@ const Questionnaire = memo(function Questionnaire({
   onHome,
   onStartNew,
   onPageChange,
+  globalProgress,
   onQuestionChange,
 }: QuestionnaireProps) {
   const { t, language: contextLanguage } = useLanguageContext();

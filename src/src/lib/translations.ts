@@ -122,7 +122,7 @@ export const translations: Record<string, Translation> = {
     
     // Header
     title: "OTIS APROD - Átvételi Protokoll",
-    receptionDate: "Átvételi dátum:",
+    receptionDate: "Átvétel dátuma:",
     progress: "Folyamat",
     
     // Navigation

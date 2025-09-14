@@ -209,52 +209,26 @@ export function NiedervoltTable({
 
   return (
     <div className="min-h-screen bg-light-surface">
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-  <div className="max-w-7xl mx-auto px-6 py-4">
-    {/* Felső sor: Főcím és gombok */}
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center">
-        <img src="/otis-elevators-seeklogo_1753525178175.png" alt="OTIS Logo" className="h-12 w-12 mr-4"/>
-        <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - Átvételi Protokoll</h1>
-      </div>
-      <div className="flex items-center space-x-4">
-        <Label className="text-sm font-medium text-gray-600">
-          {language === 'hu' ? 'Átvétel dátuma' : 'Übernahmedatum'}
-        </Label>
-        <Input type="date" value={receptionDate} onChange={(e) => onReceptionDateChange(e.target.value)} className="w-auto"/>
-        {onStartNew && (
-          <Button onClick={onStartNew} className="bg-green-600 hover:bg-green-700 text-white flex items-center" size="sm" title={language === 'hu' ? 'Új protokoll indítása' : 'Neues Protokoll starten'}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            {language === 'hu' ? 'Új protokoll indítása' : 'Neues Protokoll starten'}
-          </Button>
-        )}
-        {/* === HOZZÁADVA: A HIÁNYZÓ ADMIN GOMB === */}
-        {onAdminAccess && (
-          <Button variant="outline" size="sm" onClick={onAdminAccess} className="text-gray-600 hover:text-gray-800">
-            <Settings className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-    </div>
-    
-    {/* Alsó sor: Folyamatjelző */}
-    <div className="flex items-center justify-between">
-      <div className="w-full">
-        <div className="flex justify-between mb-1">
-          <span className="text-base font-medium text-blue-700">
-                  {t.progress}
-                </span>
-          <span className="text-sm font-medium text-blue-700">
-            {language === 'hu' ? 'Oldal 5 / 5' : 'Seite 5 / 5'}
-          </span>
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <img src="/otis-elevators-seeklogo_1753525178175.png" alt="OTIS Logo" className="h-12 w-12 mr-4"/>
+              {onHome && (<Button variant="ghost" size="sm" onClick={onHome} className="text-gray-600 hover:text-gray-800 mr-4" title={language === 'de' ? 'Startseite' : 'Kezdőlap'}><Home className="h-4 w-4" /></Button>)}
+              <div className="flex items-center space-x-4">
+                <span className="text-lg font-medium text-gray-800">{language === 'hu' ? 'Niedervolt Installációk Mérései' : 'Niedervolt Installationen Messungen'}</span>
+                <span className="text-sm text-gray-500">{language === 'hu' ? 'Oldal 5/5' : 'Seite 5/5'}</span>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Label className="text-sm font-medium text-gray-600">{language === 'hu' ? 'Átvétel dátuma' : 'Übernahmedatum'}</Label>
+              <Input type="date" value={receptionDate} onChange={(e) => onReceptionDateChange(e.target.value)} className="w-auto"/>
+              {onStartNew && (<Button onClick={onStartNew} className="bg-green-600 hover:bg-green-700 text-white flex items-center" size="sm" title={language === 'hu' ? 'Új protokoll indítása' : 'Neues Protokoll starten'}><RotateCcw className="h-4 w-4 mr-2" />{language === 'hu' ? 'Új protokoll' : 'Neues Protokoll'}</Button>)}
+              {onAdminAccess && (<Button variant="outline" size="sm" onClick={onAdminAccess} className="text-gray-600 hover:text-gray-800"><Settings className="h-4 w-4" /></Button>)}
+            </div>
+          </div>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '100%' }}></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
+      </header>
       
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

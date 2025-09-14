@@ -67,7 +67,7 @@ class EmailService {
           Tisztelt Címzett,
           
           Csatolva találja az OTIS lift átvételi protokollt.
-          Átvételi dátum: ${receptionDate}
+          Átvétel dátuma: ${receptionDate}
           
           Üdvözlettel,
           OTIS Csapat

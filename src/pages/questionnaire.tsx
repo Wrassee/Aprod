@@ -496,147 +496,59 @@ const Questionnaire = memo(function Questionnaire({
         e.preventDefault();
         setSaveStatus('saving');
         try {
-                  
-                  const currentFormData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{"answers":{}}');
-                  const updatedFormData = {
-                    ...currentFormData,
-                    answers: {
-                      ...currentFormData.answers,
-                      ...cachedRadioValues,
-                      ...cachedTrueFalseValues,
-                      ...cachedInputValues,
-                      ...cachedMeasurementValues,
-                      ...cachedCalculatedValues,
-                    }
-                  };
-                  
-                  localStorage.setItem('otis-protocol-form-data', JSON.stringify(updatedFormData));
-                  console.log('Save: Data saved directly to localStorage - NO React state updates');
-                  setSaveStatus('saved');
-                  setLastSaved(new Date());
-                  
-                  setTimeout(() => setSaveStatus('idle'), 3000);
-                  
-                } catch (error) {
-                  console.error('Save: Failed with error:', error);
-                  setSaveStatus('error');
-                  setTimeout(() => setSaveStatus('idle'), 3000);
-                }
-              }}
-              disabled={saveStatus === 'saving'}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input h-10 px-4 py-2 ${
-                saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
-                saveStatus === 'error' ? 'bg-red-100 border-red-300 text-red-700' :
-                'bg-background hover:bg-accent hover:text-accent-foreground'
-              }`}
-            >
-              {saveStatus === 'saving' ? (
-                <>
-                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
-                  {t.saving}
-                </>
-              ) : saveStatus === 'saved' ? (
-                <>
-                  <Check className="h-4 w-4 mr-2 text-green-600" />
-                  {t.saved}
-                </>
-              ) : saveStatus === 'error' ? (
-                <>
-                  <X className="h-4 w-4 mr-2 text-red-600" />
-                  {t.error}
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {t.save}
-                </>
-              )}
-            </button>
-            
-            {isLastPage ? (
-              <Button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  // Sync all cached values before completing
-                  const cachedRadioValues = getAllCachedValues();
-                  const cachedTrueFalseValues = getAllTrueFalseValues();
-                  const cachedInputValues = getAllStableInputValues();
-                  const cachedMeasurementValues = getAllMeasurementValues();
-                  const cachedCalculatedValues = getAllCalculatedValues();
-                  
-                  console.log('Complete button: Syncing cached values...');
-                  
-                  Object.entries(cachedRadioValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedTrueFalseValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedInputValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedCalculatedValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as number);
-                  });
-                  
-                  // Small delay to ensure state updates before proceeding
-                  setTimeout(() => {
-                    onNext();
-                  }, 100);
-                }}
-                disabled={!canProceedState}
-                className={`flex items-center text-white ${
-                  canProceedState 
-                    ? 'bg-otis-blue hover:bg-blue-700 cursor-pointer' 
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {t.next}
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('Next button clicked, canProceedState:', canProceedState);
-                  
-                  // Sync cached values before moving to next page
-                  const cachedRadioValues = getAllCachedValues();
-                  const cachedTrueFalseValues = getAllTrueFalseValues();
-                  const cachedInputValues = getAllStableInputValues();
-                  
-                  Object.entries(cachedRadioValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedTrueFalseValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedInputValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  
-                  const nextPage = currentPage + 1;
-                  console.log('Setting next page from', currentPage, 'to', nextPage);
-                  setCurrentPage(nextPage);
-                  localStorage.setItem('questionnaire-current-page', nextPage.toString());
-                }}
-                disabled={!canProceedState}
-                className={`flex items-center text-white ${
-                  canProceedState 
-                    ? 'bg-otis-blue hover:bg-blue-700 cursor-pointer' 
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {t.next} {canProceedState ? '✓' : '✗'}
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            )}
-          </div>
-        </div>
+          const cachedRadioValues = getAllCachedValues();
+          const cachedTrueFalseValues = getAllTrueFalseValues();
+          const cachedInputValues = getAllStableInputValues();
+          const cachedMeasurementValues = getAllMeasurementValues();
+          const cachedCalculatedValues = getAllCalculatedValues();
+          
+          const currentFormData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{"answers":{}}');
+          const updatedFormData = {
+            ...currentFormData,
+            answers: {
+              ...currentFormData.answers,
+              ...cachedRadioValues,
+              ...cachedTrueFalseValues,
+              ...cachedInputValues,
+              ...cachedMeasurementValues,
+              ...cachedCalculatedValues,
+            }
+          };
+          localStorage.setItem('otis-protocol-form-data', JSON.stringify(updatedFormData));
+          setSaveStatus('saved');
+          setLastSaved(new Date());
+          setTimeout(() => setSaveStatus('idle'), 3000);
+        } catch (error) {
+          console.error('Save failed:', error);
+          setSaveStatus('error');
+          setTimeout(() => setSaveStatus('idle'), 3000);
+        }
+      }}
+      disabled={saveStatus === 'saving'}
+      className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input h-10 px-4 py-2 ${
+        saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
+        saveStatus === 'error' ? 'bg-red-100 border-red-300 text-red-700' :
+        'bg-background hover:bg-accent hover:text-accent-foreground'
+      }`}
+    >
+      {saveStatus === 'saving' ? (<><div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>{t.saving}</>) 
+      : saveStatus === 'saved' ? (<><Check className="h-4 w-4 mr-2 text-green-600" />{t.saved}</>) 
+      : saveStatus === 'error' ? (<><X className="h-4 w-4 mr-2 text-red-600" />{t.error}</>) 
+      : (<><Save className="h-4 w-4 mr-2" />{t.save}</>)}
+    </button>
+    
+    {/* A "Tovább" gomb most már egységesen az onNext prop-ot hívja */}
+    <Button
+      type="button"
+      onClick={onNext}
+      disabled={!canProceedState}
+      className={`flex items-center text-white ${canProceedState ? 'bg-otis-blue hover:bg-blue-700 cursor-pointer' : 'bg-gray-400 cursor-not-allowed'}`}
+    >
+      {t.next}
+      <ArrowRight className="h-4 w-4 ml-2" />
+    </Button>
+  </div>
+</div>
       </main>
     </div>
   );

@@ -6,17 +6,17 @@ import React, {
   useMemo,
 } from "react";
 
-/* -------------------- 3rdâ€'party -------------------- */
+/* -------------------- 3rd‑party -------------------- */
 import { queryClient } from "./lib/queryClient.js";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
 import { LanguageProvider } from "./components/language-provider.js";
 
-/* -------------------- Â PWA Â (jelenleg letiltva) -------------------- */
-// import { PWAInstallBanner, OfflineIndicator } from "./components/pwaâ€'installâ€'banner";
+/* --------------------  PWA  (jelenleg letiltva) -------------------- */
+// import { PWAInstallBanner, OfflineIndicator } from "./components/pwa‑install‑banner";
 
-/* -------------------- Â Oldalak / Komponensek -------------------- */
+/* --------------------  Oldalak / Komponensek -------------------- */
 import { StartScreen } from "./pages/start-screen.js";
 import Questionnaire from "./pages/questionnaire.js";
 import { NiedervoltTable } from "./pages/niedervolt-table.js";
@@ -27,10 +27,10 @@ import { ProtocolPreview } from "./pages/protocol-preview.js";
 import { SmartHelpWizard } from "./components/smart-help-wizard.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
-/* -------------------- Â Shared schema -------------------- */
+/* --------------------  Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema.js";
 
-/* -------------------- Â 404 Â -------------------- */
+/* --------------------  404  -------------------- */
 import NotFound from "./pages/not-found.js";
 
 function App() {
@@ -40,36 +40,7 @@ function App() {
   const [language, setLanguage] = useState<'hu' | 'de'>('hu');
 
   // ====================================================================
-  // === ÚJ: GLOBÁLIS PROGRESS TRACKING ===
-  // ====================================================================
-  const [globalCurrentStep, setGlobalCurrentStep] = useState(1);
-  const TOTAL_PROTOCOL_STEPS = 5; // 4 questionnaire + 1 niedervolt
-  
-  // Progress számítás
-  const globalProgress = useMemo(() => {
-    return Math.min((globalCurrentStep / TOTAL_PROTOCOL_STEPS) * 100, 100);
-  }, [globalCurrentStep]);
-
-  // ÚJ: Unified step handler
-  const handleStepChange = useCallback((step: number) => {
-    console.log('🔄 Global step change:', step);
-    setGlobalCurrentStep(step);
-    
-    // Automatikus screen váltás a step alapján
-    if (step <= 4) {
-      setCurrentScreen('questionnaire');
-      setCurrentQuestionnairePage(step - 1); // 0-indexált
-    } else if (step === 5) {
-      setCurrentScreen('niedervolt');
-    }
-    
-    // Progress mentése localStorage-ba
-    localStorage.setItem('global-protocol-step', step.toString());
-  }, []);
-  // ====================================================================
-
-  // ====================================================================
-  // === MÃ"DOSÃTÃS 1: ÃšJ clearTrigger ÃLLAPOT HOZZÃADÃSA ===
+  // === MÓDOSÍTÁS 1: ÚJ clearTrigger ÁLLAPOT HOZZÁADÁSA ===
   // ====================================================================
   const [clearTrigger, setClearTrigger] = useState(Date.now());
   // ====================================================================
@@ -105,33 +76,15 @@ function App() {
         console.error('Error loading saved form data:', e);
       }
     }
-
-    // ÚJ: Global step restoration
-    const savedStep = localStorage.getItem('global-protocol-step');
-    if (savedStep) {
-      const step = parseInt(savedStep);
-      setGlobalCurrentStep(step);
-      
-      // Screen beállítása a mentett step alapján
-      if (step <= 4) {
-        setCurrentScreen('questionnaire');
-        setCurrentQuestionnairePage(step - 1);
-      } else if (step === 5) {
-        setCurrentScreen('niedervolt');
-      }
-    }
   }, []);
 
   const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
-    console.log('ðŸŒ App.tsx - Language selected:', selectedLanguage);
+    console.log('🌍 App.tsx - Language selected:', selectedLanguage);
     setLanguage(selectedLanguage);
     // Save language to localStorage so LanguageProvider can use it
     localStorage.setItem('otis-protocol-language', selectedLanguage);
-    console.log('ðŸŒ App.tsx - Language saved to localStorage:', localStorage.getItem('otis-protocol-language'));
-    
-    // ÚJ: Global step alapú navigáció
-    handleStepChange(1); // Start from step 1
-    
+    console.log('🌍 App.tsx - Language saved to localStorage:', localStorage.getItem('otis-protocol-language'));
+    setCurrentScreen('questionnaire');
     // Clear navigation state for new session - reset to page 0
     localStorage.setItem('questionnaire-current-page', '0');
     
@@ -144,56 +97,45 @@ function App() {
   };
 
   const handleSaveProgress = useCallback(() => {
-    console.log('ðŸ"§ ISOLATED save - no form data access');
+    console.log('🔧 ISOLATED save - no form data access');
     // Do absolutely nothing that could trigger re-renders
     // Save functionality is handled directly in questionnaire component
   }, []);
 
-  // ====================================================================
-  // === MÓDOSÍTOTT EVENT HANDLEREK - GLOBAL STEP ALAPÚ ===
-  // ====================================================================
   const handleQuestionnaireNext = () => {
-    const nextStep = globalCurrentStep + 1;
-    if (nextStep <= 4) {
-      // Még a questionnaire-n belül vagyunk
-      console.log('📄 Moving to next questionnaire page:', nextStep);
-      handleStepChange(nextStep);
-    } else {
-      // Niedervolt-ra váltunk
-      console.log('📄 Questionnaire completed - showing Niedervolt UI as step 5');
-      handleStepChange(5);
-    }
-  };
-
-  const handleQuestionnairePrevious = () => {
-    if (globalCurrentStep > 1) {
-      console.log('📙 Moving to previous step:', globalCurrentStep - 1);
-      handleStepChange(globalCurrentStep - 1);
-    }
+    // After completing all template questions, show the beautiful Niedervolt UI
+    console.log('🔄 Questionnaire completed - showing Niedervolt UI as final step');
+    setCurrentScreen('niedervolt');
   };
 
   const handleNiedervoltBack = () => {
-    console.log('ðŸ"™ Niedervolt Back button clicked - returning to questionnaire step 4');
-    handleStepChange(4); // Visszamegyünk a questionnaire utolsó oldalára
+    console.log('🔙 Niedervolt Back button clicked - returning to questionnaire');
+    
+    // Restore questionnaire page to the last page
+    const lastPage = localStorage.getItem('questionnaire-current-page');
+    if (lastPage) {
+      console.log('🔙 Restoring questionnaire page:', lastPage);
+    }
+    
+    setCurrentScreen('questionnaire');
   };
-  // ====================================================================
 
   const handleNiedervoltNext = () => {
     setCurrentScreen('signature');
   };
 
   const handleSignatureBack = () => {
-    console.log('ðŸ"™ Signature Back button clicked - returning to niedervolt');
+    console.log('🔙 Signature Back button clicked - returning to niedervolt');
     setCurrentScreen('niedervolt');
   };
 
   const handleSignatureComplete = async () => {
-    console.log('ðŸ"„ Starting protocol completion process...');
+    console.log('🔄 Starting protocol completion process...');
     
     // Prevent multiple clicks
     const currentTime = Date.now();
     if ((window as any).lastCompleteAttempt && currentTime - (window as any).lastCompleteAttempt < 3000) {
-      console.log('âš ï¸ Multiple clicks prevented - waiting for previous attempt to complete');
+      console.log('⚠️ Multiple clicks prevented - waiting for previous attempt to complete');
       return;
     }
     (window as any).lastCompleteAttempt = currentTime;
@@ -241,7 +183,7 @@ function App() {
         completed: true,
       };
       
-      console.log('âœ… Protocol data prepared:', {
+      console.log('✅ Protocol data prepared:', {
         answerCount: Object.keys(combinedAnswers).length,
         errorCount: protocolData.errors.length,
         hasSignature: Boolean(protocolData.signature),
@@ -252,18 +194,18 @@ function App() {
       });
       
       // Submit the protocol data to backend
-      console.log('ðŸ"¤ Sending protocol to backend...');
+      console.log('📤 Sending protocol to backend...');
       const response = await fetch('/api/protocols', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(protocolData),
       });
 
-      console.log('ðŸ"¥ Backend response status:', response.status);
+      console.log('📥 Backend response status:', response.status);
 
       if (response.ok) {
         const result = await response.json();
-        console.log('âœ… Protocol saved successfully:', result.id);
+        console.log('✅ Protocol saved successfully:', result.id);
         
         // Save the final form data to localStorage before navigating
         const finalFormData = {
@@ -275,21 +217,21 @@ function App() {
         localStorage.setItem('otis-protocol-form-data', JSON.stringify(finalFormData));
         
         setCurrentScreen('completion');
-        console.log('ðŸŽ‰ Protocol completion successful - navigating to completion screen');
+        console.log('🎉 Protocol completion successful - navigating to completion screen');
       } else {
         const errorText = await response.text();
-        console.error('âŒ Protocol creation failed:', errorText);
-        alert(`Protokoll mentÃ©si hiba: ${errorText}\n\nKÃ©rjÃ¼k prÃ³bÃ¡lja Ãºjra vagy lÃ©pjen kapcsolatba a tÃ¡mogatÃ¡ssal.`);
+        console.error('❌ Protocol creation failed:', errorText);
+        alert(`Protokoll mentési hiba: ${errorText}\n\nKérjük próbálja újra vagy lépjen kapcsolatba a támogatással.`);
         
         // Reset completion lock
         delete (window as any).lastCompleteAttempt;
       }
     } catch (error) {
-      console.error('âŒ Error completing protocol:', error);
+      console.error('❌ Error completing protocol:', error);
       
       // User-friendly error message
-      const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba tÃ¶rtÃ©nt';
-      alert(`Protokoll befejezÃ©si hiba: ${errorMessage}\n\nKÃ©rjÃ¼k ellenÅ'rizze az internetkapcsolatot Ã©s prÃ³bÃ¡lja Ãºjra.`);
+      const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba történt';
+      alert(`Protokoll befejezési hiba: ${errorMessage}\n\nKérjük ellenőrizze az internetkapcsolatot és próbálja újra.`);
       
       // Reset completion lock
       delete (window as any).lastCompleteAttempt;
@@ -474,7 +416,7 @@ function App() {
           console.log('Excel download completed successfully (Window open)');
         } catch (fallbackError) {
           console.error('All download methods failed:', fallbackError);
-          throw new Error('Excel letÃ¶ltÃ©s sikertelen. KÃ©rjÃ¼k prÃ³bÃ¡lja Ãºjra.');
+          throw new Error('Excel letöltés sikertelen. Kérjük próbálja újra.');
         }
       }
       
@@ -507,7 +449,7 @@ function App() {
       
       // User-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      alert(`Excel letÃ¶ltÃ©si hiba: ${errorMessage}\n\nKÃ©rjÃ¼k, prÃ³bÃ¡lja Ãºjra vagy lÃ©pjen kapcsolatba a tÃ¡mogatÃ¡ssal.`);
+      alert(`Excel letöltési hiba: ${errorMessage}\n\nKérjük, próbálja újra vagy lépjen kapcsolatba a támogatással.`);
     }
   };
 
@@ -516,58 +458,53 @@ function App() {
   };
 
   // ====================================================================
-  // === MÓDOSÍTOTT handleStartNew - GLOBAL STEP RESET ===
-  // ====================================================================
-  const handleStartNew = () => {
-    console.log('ðŸ†• Starting new protocol - clearing all data with page reload...');
-    
-    // 1. LÃ‰PÃ‰S: TÃ¶rÃ¶ljÃ¼k az Ã¶sszes ismert localStorage kulcsot
-    localStorage.removeItem('otis-protocol-form-data');
-    localStorage.removeItem('protocol-errors');
-    localStorage.removeItem('questionnaire-current-page');
-    // ÚJ: Global step reset
-    localStorage.removeItem('global-protocol-step');
-    // Ãšj Niedervolt kulcsok tÃ¶rlÃ©se is
-    localStorage.removeItem('niedervolt-table-measurements');
-    localStorage.removeItem('niedervolt-selected-devices');
-    localStorage.removeItem('niedervolt-custom-devices');
-    
-    // 2. LÃ‰PÃ‰S: TÃ¶rÃ¶ljÃ¼k az Ã¶sszes ismert globÃ¡lis cache-t
-    if ((window as any).radioCache) {
-      console.log('Clearing radio cache...');
-      (window as any).radioCache.clear();
-    }
-    if ((window as any).trueFalseCache) {
-      console.log('Clearing true/false cache...');
-      (window as any).trueFalseCache.clear();
-    }
-    if ((window as any).stableInputValues) {
-      console.log('Clearing input values...');
-      (window as any).stableInputValues = {};
-    }
-    if ((window as any).measurementCache) {
-      console.log('Clearing measurement cache...');
-      (window as any).measurementCache.clear();
-    }
-    if ((window as any).calculatedCache) {
-      console.log('Clearing calculated values cache...');
-      (window as any).calculatedCache = {};
-    }
-    
-    // 3. LÃ‰PÃ‰S: State reset
-    setGlobalCurrentStep(1);
-    
-    // 4. LÃ‰PÃ‰S: Ã‰rtesÃ­tjÃ¼k a komponenseket (a biztonsÃ¡g kedvÃ©Ã©rt)
-    window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
-    
-    // 5. LÃ‰PÃ‰S: A "NUKLEÃRIS OPCIÃ"" - Oldal ÃºjratÃ¶ltÃ©se
-    // Ez a lÃ©pÃ©s garantÃ¡lja, hogy minden komponens tiszta lappal indul.
-    setTimeout(() => {
-      window.location.reload();
-    }, 100); // RÃ¶vid kÃ©sleltetÃ©s, hogy a tÃ¶rlÃ©si mÅ±veletek befejezÅ'djenek.
-    
-    console.log('âœ… All data cleared - page reload initiated.');
-  };
+// === VÉGLEGES, JAVÍTOTT handleStartNew (az eredeti alapján) ===
+// ====================================================================
+const handleStartNew = () => {
+  console.log('🆕 Starting new protocol - clearing all data with page reload...');
+  
+  // 1. LÉPÉS: Töröljük az összes ismert localStorage kulcsot
+  localStorage.removeItem('otis-protocol-form-data');
+  localStorage.removeItem('protocol-errors');
+  localStorage.removeItem('questionnaire-current-page');
+  // Új Niedervolt kulcsok törlése is
+  localStorage.removeItem('niedervolt-table-measurements');
+  localStorage.removeItem('niedervolt-selected-devices');
+  localStorage.removeItem('niedervolt-custom-devices');
+  
+  // 2. LÉPÉS: Töröljük az összes ismert globális cache-t
+  if ((window as any).radioCache) {
+    console.log('Clearing radio cache...');
+    (window as any).radioCache.clear();
+  }
+  if ((window as any).trueFalseCache) {
+    console.log('Clearing true/false cache...');
+    (window as any).trueFalseCache.clear();
+  }
+  if ((window as any).stableInputValues) {
+    console.log('Clearing input values...');
+    (window as any).stableInputValues = {};
+  }
+  if ((window as any).measurementCache) {
+    console.log('Clearing measurement cache...');
+    (window as any).measurementCache.clear();
+  }
+  if ((window as any).calculatedCache) {
+    console.log('Clearing calculated values cache...');
+    (window as any).calculatedCache = {};
+  }
+  
+  // 3. LÉPÉS: Értesítjük a komponenseket (a biztonság kedvéért)
+  window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
+  
+  // 4. LÉPÉS: A "NUKLEÁRIS OPCIÓ" - Oldal újratöltése
+  // Ez a lépés garantálja, hogy minden komponens tiszta lappal indul.
+  setTimeout(() => {
+    window.location.reload();
+  }, 100); // Rövid késleltetés, hogy a törlési műveletek befejeződjenek.
+  
+  console.log('✅ All data cleared - page reload initiated.');
+};
   // ====================================================================
 
   const handleGoHome = () => {
@@ -606,62 +543,52 @@ function App() {
     setFormData(prev => ({ ...prev, niedervoltMeasurements: measurements }));
   }, []);
 
-  // ====================================================================
-  // === MÓDOSÍTOTT renderCurrentScreen - GLOBAL PROGRESS PROPS ===
-  // ====================================================================
+  // Conditional render without Wouter to prevent re-mounting
   const renderCurrentScreen = () => {
-    console.log('ðŸ  Route component function called - currentScreen:', currentScreen, 'globalStep:', globalCurrentStep);
+    console.log('🏠 Route component function called - currentScreen:', currentScreen);
     
     switch (currentScreen) {
       case 'start':
         return <StartScreen onLanguageSelect={handleLanguageSelect} />;
       case 'questionnaire':
-  return (
-    <Questionnaire
-      key={`questionnaire-${clearTrigger}`}
-      receptionDate={formData.receptionDate}
-      onReceptionDateChange={handleReceptionDateChange}
-      answers={formData.answers}
-      onAnswerChange={handleAnswerChange}
-      errors={formData.errors}
-      onErrorsChange={handleErrorsChange}
-      onSave={handleSaveProgress}
-      language={language}
-      onAdminAccess={handleAdminAccess}
-      onHome={handleGoHome}
-      onStartNew={handleStartNew}
-      onQuestionChange={setCurrentQuestionId}
-
-      // === HIÁNYZÓ GLOBÁLIS PROPS-OK HOZZÁADVA ===
-      globalCurrentStep={globalCurrentStep}
-      totalSteps={TOTAL_PROTOCOL_STEPS}
-      globalProgress={globalProgress}
-      onStepChange={handleStepChange}
-      onNext={handleQuestionnaireNext}
-      onPrevious={handleQuestionnairePrevious}
-    />
-  );
+        return (
+          <Questionnaire
+            key={`questionnaire-${clearTrigger}`}
+            receptionDate={formData.receptionDate}
+            onReceptionDateChange={handleReceptionDateChange}
+            answers={formData.answers}
+            onAnswerChange={handleAnswerChange}
+            errors={formData.errors}
+            onErrorsChange={handleErrorsChange}
+            onNext={handleQuestionnaireNext}
+            onSave={handleSaveProgress}
+            language={language}
+            onAdminAccess={handleAdminAccess}
+            onHome={handleHome}
+            onStartNew={handleStartNew}
+            onPageChange={setCurrentQuestionnairePage}
+            onQuestionChange={setCurrentQuestionId}
+          />
+        );
       case 'niedervolt':
-  return (
-    <NiedervoltTable
-      key={`niedervolt-table-${clearTrigger}`}
-      measurements={formData.niedervoltTableMeasurements || {}}
-      onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
-      onBack={handleNiedervoltBack}
-      onNext={handleNiedervoltNext}
-      receptionDate={formData.receptionDate}
-      onReceptionDateChange={handleReceptionDateChange}
-      onAdminAccess={handleAdminAccess}
-      onHome={handleGoHome}
-      onStartNew={handleStartNew}
-
-      // === HIÁNYZÓ GLOBÁLIS PROPS-OK HOZZÁADVA ===
-      globalCurrentStep={globalCurrentStep}
-      totalSteps={TOTAL_PROTOCOL_STEPS}
-      globalProgress={globalProgress}
-      isLastStep={globalCurrentStep === TOTAL_PROTOCOL_STEPS}
-    />
-  );
+        return (
+          <NiedervoltTable
+            // ====================================================================
+            // === MÓDOSÍTÁS 3: A KEY PROP DINAMIKUSSÁ TÉTELE ===
+            // ====================================================================
+            key={`niedervolt-table-${clearTrigger}`}
+            // ====================================================================
+            measurements={formData.niedervoltTableMeasurements || {}}
+            onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
+            onBack={handleNiedervoltBack}
+            onNext={handleNiedervoltNext}
+            receptionDate={formData.receptionDate}
+            onReceptionDateChange={handleReceptionDateChange}
+            onAdminAccess={handleAdminAccess}
+            onHome={handleGoHome}
+            onStartNew={handleStartNew}
+          />
+        );
       case 'signature':
         return (
           <Signature
@@ -714,15 +641,15 @@ function App() {
           {/* PWA components temporarily disabled for stability */}
           {renderCurrentScreen()}
           
-          {/* ÚJ: Smart Help Wizard - módosított props */}
+          {/* Smart Help Wizard - Show on protocol screens */}
           {(currentScreen === 'questionnaire' || currentScreen === 'niedervolt' || currentScreen === 'signature') && (
             <SmartHelpWizard
-              currentPage={globalCurrentStep} // ÚJ: unified step használata
-              totalPages={TOTAL_PROTOCOL_STEPS}
+              currentPage={currentScreen === 'questionnaire' ? currentQuestionnaireePage + 1 : 
+                           currentScreen === 'niedervolt' ? 5 : 
+                           currentScreen === 'signature' ? 6 : 1}
               formData={formData}
               currentQuestionId={currentQuestionId}
               errors={formData.errors}
-              globalProgress={globalProgress}
             />
           )}
         </TooltipProvider>

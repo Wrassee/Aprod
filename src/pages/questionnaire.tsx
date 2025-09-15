@@ -37,7 +37,6 @@ interface QuestionnaireProps {
   totalSteps: number;
   globalProgress: number;
   onStepChange: (step: number) => void;
-  onNext: () => void;
   onPrevious: () => void;
 
   // EZT A PROPOT MÁR NEM HASZNÁLJUK, MERT A GLOBALCURRENTSTEP ÁTVESZI A SZEREPÉT
@@ -379,7 +378,7 @@ const Questionnaire = memo(function Questionnaire({
                   {t.progress}
                 </span>
                 <span className="text-sm font-medium text-blue-700">
-                  {currentPage + 1} / {totalPages + 1} {t.groupOf}
+                  {globalCurrentStep} / {totalSteps} {t.groupOf || 'lépés'}
                 </span>
               </div>
               <Progress value={globalProgress} className="w-full h-2.5" />

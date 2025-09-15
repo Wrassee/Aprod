@@ -18,7 +18,7 @@ import {
   Filter
 } from 'lucide-react';
 import type { NiedervoltMeasurement } from '@/types/niedervolt-devices';
-import ProtocolHeader from '@/components/ProtocolHeader'; // ⬅️ közös komponens import
+import { ProtocolHeader } from '@/components/ProtocolHeader';
 
 interface CustomDevice {
   id: string;

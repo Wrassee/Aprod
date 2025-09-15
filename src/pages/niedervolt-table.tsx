@@ -5,12 +5,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguageContext } from '@/components/language-provider';
 import {
   ArrowLeft,
   ArrowRight,
   Save,
   Settings,
+  Home,
   Check,
   RotateCcw,
   Plus,
@@ -18,6 +20,7 @@ import {
   Filter
 } from 'lucide-react';
 import type { NiedervoltMeasurement } from '@/types/niedervolt-devices';
+import PageHeader from '../components/PageHeader'; // <-- 1. VÁLTOZÁS
 
 interface CustomDevice {
   id: string;
@@ -34,23 +37,10 @@ interface NiedervoltTableProps {
   onAdminAccess?: () => void;
   onHome?: () => void;
   onStartNew?: () => void;
+  // -- 2. VÁLTOZÁS --
+  currentStep: number;
+  totalSteps: number;
 }
-
-// Hardcoded eszközök és dropdown opciók
-const devicesData = {
-  devices: [
-    { id: 'device-1', name: { de: 'Antriebsmotor', hu: 'Hajtómotor' } },
-    { id: 'device-2', name: { de: 'Türantriebsmotor', hu: 'Ajtóhajtómotor' } },
-    { id: 'device-3', name: { de: 'Lichtschranke', hu: 'Fénysorompó' } },
-    { id: 'device-4', name: { de: 'Not-Aus Schalter', hu: 'Vészleállító' } },
-    { id: 'device-5', name: { de: 'Steuerungseinheit', hu: 'Vezérlőegység' } }
-  ],
-  dropdownOptions: {
-    biztositek: ['10A', '16A', '20A'],
-    kismegszakito: ['B10', 'B16', 'C10', 'C16'],
-    fiTest: ['OK', 'Hiba']
-  }
-};
 
 export function NiedervoltTable({
   measurements,
@@ -62,13 +52,16 @@ export function NiedervoltTable({
   onAdminAccess,
   onHome,
   onStartNew,
+  currentStep,
+  totalSteps,
 }: NiedervoltTableProps) {
   const { t, language } = useLanguageContext();
 
-  // API helyett közvetlen hardcoded adatok
-  const niedervoltData = devicesData;
-  const isLoading = false;
-
+  const { data: niedervoltData, isLoading } = useQuery({
+    queryKey: ['/api/niedervolt/devices'],
+    retry: 1,
+  });
+  
   const devices = niedervoltData?.devices || [];
   const dropdownOptions = niedervoltData?.dropdownOptions || {
     biztositek: [],
@@ -222,52 +215,17 @@ export function NiedervoltTable({
 
   return (
     <div className="min-h-screen bg-light-surface">
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
-  <div className="max-w-7xl mx-auto px-6 py-4">
-    {/* Felső sor: Főcím és gombok */}
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center">
-        <img src="/otis-elevators-seeklogo_1753525178175.png" alt="OTIS Logo" className="h-12 w-12 mr-4"/>
-        <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - Átvételi Protokoll</h1>
-      </div>
-      <div className="flex items-center space-x-4">
-        <Label className="text-sm font-medium text-gray-600">
-          {language === 'hu' ? 'Átvétel dátuma' : 'Übernahmedatum'}
-        </Label>
-        <Input type="date" value={receptionDate} onChange={(e) => onReceptionDateChange(e.target.value)} className="w-auto"/>
-        {onStartNew && (
-          <Button onClick={onStartNew} className="bg-green-600 hover:bg-green-700 text-white flex items-center" size="sm" title={language === 'hu' ? 'Új protokoll indítása' : 'Neues Protokoll starten'}>
-            <RotateCcw className="h-4 w-4 mr-2" />
-            {language === 'hu' ? 'Új protokoll indítása' : 'Neues Protokoll starten'}
-          </Button>
-        )}
-        {/* === HOZZÁADVA: A HIÁNYZÓ ADMIN GOMB === */}
-        {onAdminAccess && (
-          <Button variant="outline" size="sm" onClick={onAdminAccess} className="text-gray-600 hover:text-gray-800">
-            <Settings className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
-    </div>
-    
-    {/* Alsó sor: Folyamatjelző */}
-    <div className="flex items-center justify-between">
-      <div className="w-full">
-        <div className="flex justify-between mb-1">
-          <span className="text-base font-medium text-blue-700">
-            {t.progress}
-          </span>
-          <span className="text-sm font-medium text-blue-700">
-            {language === 'hu' ? 'Oldal 5 / 5' : 'Seite 5 / 5'}
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
-          <div className="bg-blue-600 h-2.5 rounded-full" style={{ width: '100%' }}></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
+      
+      {/* 3. VÁLTOZÁS: A régi header cseréje */}
+      <PageHeader
+        receptionDate={receptionDate}
+        onReceptionDateChange={onReceptionDateChange}
+        onHome={onHome}
+        onStartNew={onStartNew}
+        onAdminAccess={onAdminAccess}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
+      />
       
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

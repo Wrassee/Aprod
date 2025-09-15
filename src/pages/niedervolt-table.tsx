@@ -53,10 +53,14 @@ export function NiedervoltTable({
   onNext,
   receptionDate,
   onReceptionDateChange,
-  globalProgress,
   onAdminAccess,
   onHome,
   onStartNew,
+  // === EZ A 4 SOR A HELYES, TELJES LISTA ===
+  globalCurrentStep,
+  totalSteps,
+  globalProgress,
+  isLastStep,
 }: NiedervoltTableProps) {
   const { t, language } = useLanguageContext();
 

@@ -478,35 +478,24 @@ const Questionnaire = memo(function Questionnaire({
 
         {/* Navigation */}
         <div className="flex justify-between items-center" onSubmit={(e) => e.preventDefault()}>
-          <Button
-            variant="outline"
-            onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-            disabled={currentPage === 0}
-            className="flex items-center"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t.previous}
-          </Button>
-          
-          <div className="flex space-x-4">
-            <button
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onTouchStart={(e) => e.preventDefault()}
-              onClick={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('Save button clicked on page:', currentPage);
-                setSaveStatus('saving');
-                try {
-                  const cachedRadioValues = getAllCachedValues();
-                  const cachedTrueFalseValues = getAllTrueFalseValues();
-                  const cachedInputValues = getAllStableInputValues();
-                  const cachedMeasurementValues = getAllMeasurementValues();
-                  const cachedCalculatedValues = getAllCalculatedValues();
-                  
-                  console.log('Save: Syncing cached values on page', currentPage);
+  {/* A "Vissza" gomb most már az onPrevious prop-ot hívja */}
+  <Button
+    variant="outline"
+    onClick={onPrevious}
+    disabled={globalCurrentStep <= 1}
+    className="flex items-center"
+  >
+    <ArrowLeft className="h-4 w-4 mr-2" />
+    {t.previous}
+  </Button>
+  
+  <div className="flex space-x-4">
+    <button
+      type="button"
+      onClick={async (e) => {
+        e.preventDefault();
+        setSaveStatus('saving');
+        try {
                   
                   const currentFormData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{"answers":{}}');
                   const updatedFormData = {

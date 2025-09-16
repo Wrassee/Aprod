@@ -1,92 +1,93 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
-import { Label } from '@/components/ui/label';
-import { useLanguageContext } from '@/components/language-provider';
-import { ArrowLeft, ArrowRight, Save, Settings, Home, Check, X, RotateCcw } from 'lucide-react';
+// src/components/PageHeader.tsx
+import { FC } from "react";
+import { Button } from "@/components/ui/button";
+import { RotateCcw, Settings, Home } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
-// Definiáljuk a szükséges prop-okat. Szinte mindent átadunk a szülőtől.
 interface PageHeaderProps {
-  receptionDate: string;
-  onReceptionDateChange: (date: string) => void;
+  title?: string;
   onHome?: () => void;
-  onStartNew?: () => void;
   onAdminAccess?: () => void;
-  
-  // A legfontosabb új prop-ok a folyamatkezeléshez!
-  currentStep: number;
-  totalSteps: number;
+  onStartNew?: () => void;
+  progressPercent?: number; // 0-100
+  language?: 'hu' | 'de';
+  receptionDate?: string;
+  onReceptionDateChange?: (date: string) => void;
 }
 
-const PageHeader: React.FC<PageHeaderProps> = ({
+const PageHeader: FC<PageHeaderProps> = ({
+  title = "OTIS APROD - Átvételi Protokoll",
+  onHome,
+  onAdminAccess,
+  onStartNew,
+  progressPercent = 0,
+  language = 'hu',
   receptionDate,
   onReceptionDateChange,
-  onHome,
-  onStartNew,
-  onAdminAccess,
-  currentStep,
-  totalSteps,
 }) => {
-  const { t } = useLanguageContext();
-  const progressPercentage = totalSteps > 0 ? (currentStep / totalSteps) * 100 : 0;
-
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-6 py-4">
-        {/* Felső sor: logó, gombok, dátum */}
+        {/* Felső sor: Logo + Home + Cím + Gombok */}
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center">
-            <img 
-              src="/otis-elevators-seeklogo_1753525178175.png" 
-              alt="OTIS Logo" 
-              className="h-12 w-12 mr-4"
+          <div className="flex items-center space-x-2">
+            <img
+              src="/otis-elevators-seeklogo_1753525178175.png"
+              alt="OTIS Logo"
+              className="h-12 w-12"
             />
             {onHome && (
-              <Button variant="ghost" size="sm" onClick={onHome} className="text-gray-600 hover:text-gray-800 mr-4" title={t.home || 'Kezdőlap'}>
-                <Home className="h-4 w-4" />
-              </Button>
+              <Home
+                className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600"
+                onClick={onHome}
+              />
             )}
-            <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - Átvételi Protokoll</h1>
+            <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
           </div>
-          
           <div className="flex items-center space-x-4">
-            <Label className="text-sm font-medium text-gray-600">{t.receptionDate}</Label>
-            <Input
-              type="date"
-              value={receptionDate}
-              onChange={(e) => onReceptionDateChange(e.target.value)}
-              className="w-auto"
-            />
+            {receptionDate !== undefined && onReceptionDateChange && (
+              <div className="flex items-center space-x-2">
+                <Label className="text-sm font-medium text-gray-600">
+                  {language === 'hu' ? 'Átvétel dátuma' : 'Übernahmedatum'}
+                </Label>
+                <Input
+                  type="date"
+                  value={receptionDate}
+                  onChange={(e) => onReceptionDateChange(e.target.value)}
+                  className="w-auto"
+                />
+              </div>
+            )}
             {onStartNew && (
-              <Button onClick={onStartNew} className="bg-green-600 hover:bg-green-700 text-white flex items-center" size="sm" title={t.startNew || 'Új protokoll indítása'}>
-                <RotateCcw className="h-4 w-4 mr-2" />
-                {t.startNew || 'Új protokoll indítása'}
+              <Button
+                onClick={onStartNew}
+                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white"
+                size="sm"
+              >
+                <RotateCcw className="h-4 w-4" />
+                <span>Új protokoll</span>
               </Button>
             )}
             {onAdminAccess && (
-              <Button variant="ghost" size="sm" onClick={onAdminAccess} className="text-gray-600 hover:text-gray-800" title={t.admin}>
-                <Settings className="h-4 w-4" />
-              </Button>
+              <Settings
+                className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600"
+                onClick={onAdminAccess}
+              />
             )}
           </div>
         </div>
-        
-        {/* Alsó sor: folyamatjelző */}
+
+        {/* Alsó sor: Folyamatjelző */}
         <div className="flex items-center justify-between">
-          <div className="w-full">
-            <div className="flex justify-between mb-1">
-              <span className="text-base font-medium text-blue-700">
-                {t.progress}
-              </span>
-              <span className="text-sm font-medium text-blue-700">
-                {/* A megbízható, prop-ként kapott értékeket használjuk */}
-                {currentStep} / {totalSteps}
-              </span>
-            </div>
-            {/* A százalékot is az új értékekből számoljuk */}
-            <Progress value={progressPercentage} className="w-full h-2.5" />
-          </div>
+          <span className="text-base font-medium text-blue-700">Folyamat</span>
+          <span className="text-base font-medium text-blue-700">{progressPercent}%</span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
+          <div
+            className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
     </header>

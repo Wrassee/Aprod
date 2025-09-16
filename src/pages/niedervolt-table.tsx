@@ -7,20 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguageContext } from '@/components/language-provider';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Save,
-  Settings,
-  Home,
-  Check,
-  RotateCcw,
-  Plus,
-  Trash2,
-  Filter
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Settings, Home, Check, RotateCcw, Plus, Trash2, Filter } from 'lucide-react';
+import PageHeader from '@/components/PageHeader';
 import type { NiedervoltMeasurement } from '@/types/niedervolt-devices';
-import PageHeader from '../components/PageHeader'; // <-- 1. VÁLTOZÁS
 
 interface CustomDevice {
   id: string;
@@ -37,9 +26,6 @@ interface NiedervoltTableProps {
   onAdminAccess?: () => void;
   onHome?: () => void;
   onStartNew?: () => void;
-  // -- 2. VÁLTOZÁS --
-  currentStep: number;
-  totalSteps: number;
 }
 
 export function NiedervoltTable({
@@ -52,8 +38,6 @@ export function NiedervoltTable({
   onAdminAccess,
   onHome,
   onStartNew,
-  currentStep,
-  totalSteps,
 }: NiedervoltTableProps) {
   const { t, language } = useLanguageContext();
 
@@ -61,7 +45,7 @@ export function NiedervoltTable({
     queryKey: ['/api/niedervolt/devices'],
     retry: 1,
   });
-  
+
   const devices = niedervoltData?.devices || [];
   const dropdownOptions = niedervoltData?.dropdownOptions || {
     biztositek: [],
@@ -195,7 +179,7 @@ export function NiedervoltTable({
     return measurement && selectedDevices.has(deviceId) && 
            Object.values(measurement).some(value => value && value !== deviceId);
   }).length;
-
+  const progressPercent = totalDevices > 0 ? Math.round((filledDevices / totalDevices) * 100) : 0;
   const handleManualSave = () => {
     setSaveStatus('saving');
     setTimeout(() => {
@@ -214,19 +198,17 @@ export function NiedervoltTable({
   }
 
   return (
-    <div className="min-h-screen bg-light-surface">
-      
-      {/* 3. VÁLTOZÁS: A régi header cseréje */}
-      <PageHeader
-        receptionDate={receptionDate}
-        onReceptionDateChange={onReceptionDateChange}
-        onHome={onHome}
-        onStartNew={onStartNew}
-        onAdminAccess={onAdminAccess}
-        currentStep={currentStep}
-        totalSteps={totalSteps}
-      />
-      
+  <div className="min-h-screen bg-light-surface">
+    <PageHeader
+      language={language}
+      receptionDate={receptionDate}
+      onReceptionDateChange={onReceptionDateChange}
+      onStartNew={onStartNew}
+      onHome={onHome}
+      onAdminAccess={onAdminAccess}
+      progressPercent={progressPercent}
+      progressText={language === 'hu' ? `Kitöltött ${filledDevices} / ${totalDevices}` : `Ausgefüllt ${filledDevices} / ${totalDevices}`}
+    />
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white"><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-blue-100">{language === 'hu' ? 'Összes Eszköz' : 'Gesamte Geräte'}</p><p className="text-3xl font-bold">{totalDevices}</p></div><Settings className="h-8 w-8 text-blue-200" /></div></CardContent></Card>

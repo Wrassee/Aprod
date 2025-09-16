@@ -13,10 +13,10 @@ import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
 import { LanguageProvider } from "./components/language-provider.js";
 
-/* --------------------  PWA  (jelenleg letiltva) -------------------- */
+/* --------------------  PWA  (jelenleg letiltva) -------------------- */
 // import { PWAInstallBanner, OfflineIndicator } from "./components/pwa‑install‑banner";
 
-/* --------------------  Oldalak / Komponensek -------------------- */
+/* --------------------  Oldalak / Komponensek -------------------- */
 import { StartScreen } from "./pages/start-screen.js";
 import Questionnaire from "./pages/questionnaire.js";
 import { NiedervoltTable } from "./pages/niedervolt-table.js";
@@ -27,10 +27,10 @@ import { ProtocolPreview } from "./pages/protocol-preview.js";
 import { SmartHelpWizard } from "./components/smart-help-wizard.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
-/* --------------------  Shared schema -------------------- */
+/* --------------------  Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema.js";
 
-/* --------------------  404  -------------------- */
+/* --------------------  404  -------------------- */
 import NotFound from "./pages/not-found.js";
 
 function App() {
@@ -38,9 +38,15 @@ function App() {
   const [currentQuestionnaireePage, setCurrentQuestionnairePage] = useState(0);
   const [currentQuestionId, setCurrentQuestionId] = useState<string>('');
   const [language, setLanguage] = useState<'hu' | 'de'>('hu');
+
+  // ====================================================================
+  // === MÓDOSÍTÁS 1: ÚJ clearTrigger ÁLLAPOT HOZZÁADÁSA ===
+  // ====================================================================
   const [clearTrigger, setClearTrigger] = useState(Date.now());
+  // ====================================================================
+
   const [formData, setFormData] = useState<FormData>({
-    receptionDate: new Date().toISOString().split('T')[0],
+    receptionDate: new Date().toISOString().split('T')[0], // Always keep as ISO format for HTML date input
     answers: {},
     errors: [],
     signature: '',
@@ -49,16 +55,19 @@ function App() {
     niedervoltTableMeasurements: {},
   });
   const formDataRef = useRef(formData);
-
+  
+  // Keep ref updated with latest formData
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
 
+  // Load saved form data on initialization
   useEffect(() => {
     const saved = localStorage.getItem('otis-protocol-form-data');
     if (saved) {
       try {
         const parsedData = JSON.parse(saved);
+        // If no receptionDate is saved or it's empty, use today's date
         if (!parsedData.receptionDate || parsedData.receptionDate === '') {
           parsedData.receptionDate = new Date().toISOString().split('T')[0];
         }
@@ -69,48 +78,45 @@ function App() {
     }
   }, []);
 
-  const totalSteps = 6;
-
-  const currentStep = useMemo(() => {
-    switch (currentScreen) {
-      case 'questionnaire':
-        return currentQuestionnaireePage + 1;
-      case 'niedervolt':
-        return 5;
-      case 'signature':
-        return 6;
-      default:
-        return 1;
-    }
-  }, [currentScreen, currentQuestionnaireePage]);
-
   const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
     setLanguage(selectedLanguage);
+    // Save language to localStorage so LanguageProvider can use it
     localStorage.setItem('otis-protocol-language', selectedLanguage);
     console.log('🌍 App.tsx - Language saved to localStorage:', localStorage.getItem('otis-protocol-language'));
     setCurrentScreen('questionnaire');
+    // Clear navigation state for new session - reset to page 0
     localStorage.setItem('questionnaire-current-page', '0');
+    
+    // Clear error list when starting new protocol
     localStorage.removeItem('protocol-errors');
     window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
+    
+    // Force LanguageProvider to update by triggering a manual check
     window.dispatchEvent(new Event('storage'));
   };
 
   const handleSaveProgress = useCallback(() => {
     console.log('🔧 ISOLATED save - no form data access');
+    // Do absolutely nothing that could trigger re-renders
+    // Save functionality is handled directly in questionnaire component
   }, []);
 
   const handleQuestionnaireNext = () => {
+    // After completing all template questions, show the beautiful Niedervolt UI
     console.log('🔄 Questionnaire completed - showing Niedervolt UI as final step');
     setCurrentScreen('niedervolt');
   };
 
   const handleNiedervoltBack = () => {
     console.log('🔙 Niedervolt Back button clicked - returning to questionnaire');
+    
+    // Restore questionnaire page to the last page
     const lastPage = localStorage.getItem('questionnaire-current-page');
     if (lastPage) {
       console.log('🔙 Restoring questionnaire page:', lastPage);
     }
+    
     setCurrentScreen('questionnaire');
   };
 
@@ -125,18 +131,24 @@ function App() {
 
   const handleSignatureComplete = async () => {
     console.log('🔄 Starting protocol completion process...');
+    
+    // Prevent multiple clicks
     const currentTime = Date.now();
     if ((window as any).lastCompleteAttempt && currentTime - (window as any).lastCompleteAttempt < 3000) {
       console.log('⚠️ Multiple clicks prevented - waiting for previous attempt to complete');
       return;
     }
     (window as any).lastCompleteAttempt = currentTime;
+    
     try {
+      // Sync all cached values before creating protocol
       const cachedRadioValues = (window as any).radioCache?.getAll?.() || {};
       const cachedTrueFalseValues = (window as any).trueFalseCache || new Map();
       const cachedInputValues = (window as any).stableInputValues || {};
       const cachedMeasurementValues = (window as any).measurementCache?.getAll?.() || {};
       const cachedCalculatedValues = (window as any).calculatedCache?.getAll?.() || {};
+      
+      // Convert Map to object if needed
       const trueFalseAnswers: Record<string, string> = {};
       if (cachedTrueFalseValues instanceof Map) {
         cachedTrueFalseValues.forEach((value, key) => {
@@ -145,6 +157,8 @@ function App() {
       } else {
         Object.assign(trueFalseAnswers, cachedTrueFalseValues);
       }
+      
+      // Combine all answers including measurements
       const combinedAnswers = {
         ...formData.answers,
         ...cachedRadioValues,
@@ -153,7 +167,11 @@ function App() {
         ...cachedMeasurementValues,
         ...cachedCalculatedValues,
       };
+      
+      // Ensure we have a valid receptionDate
       const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
+      
+      // Include niedervolt measurements
       const protocolData = {
         receptionDate,
         reception_date: receptionDate,
@@ -164,6 +182,7 @@ function App() {
         signatureName: formData.signatureName || (window as any).signatureNameValue || '',
         completed: true,
       };
+      
       console.log('✅ Protocol data prepared:', {
         answerCount: Object.keys(combinedAnswers).length,
         errorCount: protocolData.errors.length,
@@ -173,16 +192,22 @@ function App() {
         reception_date: protocolData.reception_date,
         language: protocolData.language
       });
+      
+      // Submit the protocol data to backend
       console.log('📤 Sending protocol to backend...');
       const response = await fetch('/api/protocols', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(protocolData),
       });
+
       console.log('📥 Backend response status:', response.status);
+
       if (response.ok) {
         const result = await response.json();
         console.log('✅ Protocol saved successfully:', result.id);
+        
+        // Save the final form data to localStorage before navigating
         const finalFormData = {
           ...formData,
           answers: combinedAnswers,
@@ -190,18 +215,25 @@ function App() {
           completed: true
         };
         localStorage.setItem('otis-protocol-form-data', JSON.stringify(finalFormData));
+        
         setCurrentScreen('completion');
         console.log('🎉 Protocol completion successful - navigating to completion screen');
       } else {
         const errorText = await response.text();
         console.error('❌ Protocol creation failed:', errorText);
         alert(`Protokoll mentési hiba: ${errorText}\n\nKérjük próbálja újra vagy lépjen kapcsolatba a támogatással.`);
+        
+        // Reset completion lock
         delete (window as any).lastCompleteAttempt;
       }
     } catch (error) {
       console.error('❌ Error completing protocol:', error);
+      
+      // User-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba történt';
       alert(`Protokoll befejezési hiba: ${errorMessage}\n\nKérjük ellenőrizze az internetkapcsolatot és próbálja újra.`);
+      
+      // Reset completion lock
       delete (window as any).lastCompleteAttempt;
     }
   };
@@ -213,6 +245,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ formData, language }),
       });
+      
       if (response.ok) {
         console.log('PDF emailed successfully');
       }
@@ -228,6 +261,7 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ formData, language }),
       });
+      
       if (response.ok) {
         console.log('Saved to cloud successfully');
       }
@@ -243,15 +277,20 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ formData, language }),
       });
+      
       if (response.ok) {
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
+        
+        // Get Otis Lift ID from all sources (cache + formData)
         const cachedInputValues = (window as any).stableInputValues || {};
         const otisLiftId = cachedInputValues['7'] || formData.answers['7'] || 'Unknown';
         a.download = `AP_${otisLiftId}.pdf`;
+        
         console.log('PDF download filename:', `AP_${otisLiftId}.pdf`);
+        
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -265,11 +304,15 @@ function App() {
   const handleDownloadExcel = async () => {
     try {
       console.log('Starting Excel download...');
+      
+      // Sync all cached values before sending data
       const cachedRadioValues = (window as any).radioCache?.getAll?.() || {};
       const cachedTrueFalseValues = (window as any).trueFalseCache || new Map();
       const cachedInputValues = (window as any).stableInputValues || {};
       const cachedMeasurementValues = (window as any).measurementCache?.getAll?.() || {};
       const cachedCalculatedValues = (window as any).calculatedCache?.getAll?.() || {};
+      
+      // Convert Map to object if needed
       const trueFalseAnswers: Record<string, string> = {};
       if (cachedTrueFalseValues instanceof Map) {
         cachedTrueFalseValues.forEach((value, key) => {
@@ -278,6 +321,8 @@ function App() {
       } else {
         Object.assign(trueFalseAnswers, cachedTrueFalseValues);
       }
+      
+      // Combine all answers including measurements
       const combinedAnswers = {
         ...formData.answers,
         ...cachedRadioValues,
@@ -286,30 +331,41 @@ function App() {
         ...cachedMeasurementValues,
         ...cachedCalculatedValues,
       };
+      
       const fullFormData = {
         ...formData,
         answers: combinedAnswers,
       };
+      
       console.log('Sending Excel generation request with', Object.keys(combinedAnswers).length, 'answers');
+      
       const response = await fetch('/api/protocols/download-excel', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ formData: fullFormData, language }),
       });
+      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Excel generation failed:', response.status, errorText);
         throw new Error(`Excel generation failed: ${response.status} - ${errorText}`);
       }
+      
       const blob = await response.blob();
       if (blob.size === 0) {
         throw new Error('Generated Excel file is empty');
       }
+      
+      // Get Otis Lift ID from all sources (cache + formData)
       const otisLiftId = cachedInputValues['7'] || formData.answers['7'] || 'Unknown';
       const filename = `AP_${otisLiftId}.xlsx`;
+      
       console.log('Excel download filename:', filename);
       console.log('Excel file size:', blob.size, 'bytes');
+      
+      // More robust download approach using different methods
       try {
+        // Method 1: Try modern download API
         if ('showSaveFilePicker' in window) {
           const fileHandle = await (window as any).showSaveFilePicker({
             suggestedName: filename,
@@ -327,23 +383,33 @@ function App() {
       } catch (fileApiError) {
         console.log('File API not available, falling back to blob URL');
       }
+      
+      // Method 2: Traditional blob URL approach with better error handling
       let url: string | null = null;
       let a: HTMLAnchorElement | null = null;
+      
       try {
         url = URL.createObjectURL(blob);
         a = document.createElement('a');
         a.href = url;
         a.download = filename;
         a.style.display = 'none';
+        
+        // Add to DOM, click, and immediately remove
         document.body.appendChild(a);
+        
+        // Use setTimeout to ensure DOM is ready
         setTimeout(() => {
           if (a) {
             a.click();
             console.log('Excel download completed successfully (Blob URL)');
           }
         }, 10);
+        
       } catch (downloadError) {
         console.error('Error during blob download:', downloadError);
+        
+        // Method 3: Fallback - direct blob download
         try {
           const blobUrl = URL.createObjectURL(blob);
           window.open(blobUrl, '_blank');
@@ -353,6 +419,8 @@ function App() {
           throw new Error('Excel letöltés sikertelen. Kérjük próbálja újra.');
         }
       }
+      
+      // Clean up - delayed to ensure download completes
       setTimeout(() => {
         try {
           if (url) {
@@ -362,17 +430,24 @@ function App() {
             document.body.removeChild(a);
           }
         } catch (cleanupError) {
+          // Silent cleanup - not critical
           console.warn('Cleanup warning:', cleanupError);
         }
       }, 2000);
+      
       console.log('Excel download completed successfully');
+      
     } catch (error) {
       console.error('Error downloading Excel:', error);
+      
+      // Detailed error logging for debugging
       if (error instanceof Error) {
         console.error('Error name:', error.name);
         console.error('Error message:', error.message);
         console.error('Error stack:', error.stack);
       }
+      
+      // User-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       alert(`Excel letöltési hiba: ${errorMessage}\n\nKérjük, próbálja újra vagy lépjen kapcsolatba a támogatással.`);
     }
@@ -382,40 +457,55 @@ function App() {
     setCurrentScreen('protocol-preview');
   };
 
-  const handleStartNew = () => {
-    console.log('🆕 Starting new protocol - clearing all data with page reload...');
-    localStorage.removeItem('otis-protocol-form-data');
-    localStorage.removeItem('protocol-errors');
-    localStorage.removeItem('questionnaire-current-page');
-    localStorage.removeItem('niedervolt-table-measurements');
-    localStorage.removeItem('niedervolt-selected-devices');
-    localStorage.removeItem('niedervolt-custom-devices');
-    if ((window as any).radioCache) {
-      console.log('Clearing radio cache...');
-      (window as any).radioCache.clear();
-    }
-    if ((window as any).trueFalseCache) {
-      console.log('Clearing true/false cache...');
-      (window as any).trueFalseCache.clear();
-    }
-    if ((window as any).stableInputValues) {
-      console.log('Clearing input values...');
-      (window as any).stableInputValues = {};
-    }
-    if ((window as any).measurementCache) {
-      console.log('Clearing measurement cache...');
-      (window as any).measurementCache.clear();
-    }
-    if ((window as any).calculatedCache) {
-      console.log('Clearing calculated values cache...');
-      (window as any).calculatedCache = {};
-    }
-    window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
-    setTimeout(() => {
-      window.location.reload();
-    }, 100);
-    console.log('✅ All data cleared - page reload initiated.');
-  };
+  // ====================================================================
+// === VÉGLEGES, JAVÍTOTT handleStartNew (az eredeti alapján) ===
+// ====================================================================
+const handleStartNew = () => {
+  console.log('🆕 Starting new protocol - clearing all data with page reload...');
+  
+  // 1. LÉPÉS: Töröljük az összes ismert localStorage kulcsot
+  localStorage.removeItem('otis-protocol-form-data');
+  localStorage.removeItem('protocol-errors');
+  localStorage.removeItem('questionnaire-current-page');
+  // Új Niedervolt kulcsok törlése is
+  localStorage.removeItem('niedervolt-table-measurements');
+  localStorage.removeItem('niedervolt-selected-devices');
+  localStorage.removeItem('niedervolt-custom-devices');
+  
+  // 2. LÉPÉS: Töröljük az összes ismert globális cache-t
+  if ((window as any).radioCache) {
+    console.log('Clearing radio cache...');
+    (window as any).radioCache.clear();
+  }
+  if ((window as any).trueFalseCache) {
+    console.log('Clearing true/false cache...');
+    (window as any).trueFalseCache.clear();
+  }
+  if ((window as any).stableInputValues) {
+    console.log('Clearing input values...');
+    (window as any).stableInputValues = {};
+  }
+  if ((window as any).measurementCache) {
+    console.log('Clearing measurement cache...');
+    (window as any).measurementCache.clear();
+  }
+  if ((window as any).calculatedCache) {
+    console.log('Clearing calculated values cache...');
+    (window as any).calculatedCache = {};
+  }
+  
+  // 3. LÉPÉS: Értesítjük a komponenseket (a biztonság kedvéért)
+  window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
+  
+  // 4. LÉPÉS: A "NUKLEÁRIS OPCIÓ" - Oldal újratöltése
+  // Ez a lépés garantálja, hogy minden komponens tiszta lappal indul.
+  setTimeout(() => {
+    window.location.reload();
+  }, 100); // Rövid késleltetés, hogy a törlési műveletek befejeződjenek.
+  
+  console.log('✅ All data cleared - page reload initiated.');
+};
+  // ====================================================================
 
   const handleGoHome = () => {
     setCurrentScreen('start');
@@ -429,6 +519,7 @@ function App() {
     setCurrentScreen('signature');
   };
 
+  // Stable callbacks defined outside Router to prevent recreation
   const handleAnswerChange = useCallback((questionId: string, value: AnswerValue) => {
     setFormData(prev => ({
       ...prev,
@@ -447,18 +538,20 @@ function App() {
   const handleAdminAccess = useCallback(() => setCurrentScreen('admin'), []);
   const handleHome = useCallback(() => setCurrentScreen('start'), []);
 
+  // Memoized measurement change handler to prevent re-renders
   const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
     setFormData(prev => ({ ...prev, niedervoltMeasurements: measurements }));
   }, []);
 
+  // Conditional render without Wouter to prevent re-mounting
   const renderCurrentScreen = () => {
-    console.log('🏠 Route component function called - currentScreen:', currentScreen, `step: ${currentStep}/${totalSteps}`);
-
-    return (
-      <>
-        {currentScreen === 'start' && <StartScreen onLanguageSelect={handleLanguageSelect} />}
-
-        <div style={{ display: currentScreen === 'questionnaire' ? 'block' : 'none' }}>
+    console.log('🏠 Route component function called - currentScreen:', currentScreen);
+    
+    switch (currentScreen) {
+      case 'start':
+        return <StartScreen onLanguageSelect={handleLanguageSelect} />;
+      case 'questionnaire':
+        return (
           <Questionnaire
             key={`questionnaire-${clearTrigger}`}
             receptionDate={formData.receptionDate}
@@ -475,14 +568,16 @@ function App() {
             onStartNew={handleStartNew}
             onPageChange={setCurrentQuestionnairePage}
             onQuestionChange={setCurrentQuestionId}
-            currentStep={currentStep}
-            totalSteps={totalSteps}
           />
-        </div>
-
-        <div style={{ display: currentScreen === 'niedervolt' ? 'block' : 'none' }}>
+        );
+      case 'niedervolt':
+        return (
           <NiedervoltTable
+            // ====================================================================
+            // === MÓDOSÍTÁS 3: A KEY PROP DINAMIKUSSÁ TÉTELE ===
+            // ====================================================================
             key={`niedervolt-table-${clearTrigger}`}
+            // ====================================================================
             measurements={formData.niedervoltTableMeasurements || {}}
             onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
             onBack={handleNiedervoltBack}
@@ -492,12 +587,10 @@ function App() {
             onAdminAccess={handleAdminAccess}
             onHome={handleGoHome}
             onStartNew={handleStartNew}
-            currentStep={currentStep}
-            totalSteps={totalSteps}
           />
-        </div>
-
-        {currentScreen === 'signature' && (
+        );
+      case 'signature':
+        return (
           <Signature
             signature={formData.signature || ''}
             onSignatureChange={(signature) => setFormData(prev => ({ ...prev, signature }))}
@@ -506,9 +599,9 @@ function App() {
             onBack={handleSignatureBack}
             onComplete={handleSignatureComplete}
           />
-        )}
-
-        {currentScreen === 'completion' && (
+        );
+      case 'completion':
+        return (
           <Completion
             onEmailPDF={handleEmailPDF}
             onSaveToCloud={handleSaveToCloud}
@@ -527,18 +620,17 @@ function App() {
               inspectionDate: formData.receptionDate
             }}
           />
-        )}
-
-        {currentScreen === 'admin' && (
-          <Admin
-            onBack={() => setCurrentScreen('questionnaire')}
-            onHome={() => setCurrentScreen('start')}
-          />
-        )}
-
-        {currentScreen === 'protocol-preview' && <ProtocolPreview onBack={() => setCurrentScreen('completion')} />}
-      </>
-    );
+        );
+      case 'admin':
+        return <Admin 
+          onBack={() => setCurrentScreen('questionnaire')} 
+          onHome={() => setCurrentScreen('start')} 
+        />;
+      case 'protocol-preview':
+        return <ProtocolPreview onBack={() => setCurrentScreen('completion')} />;
+      default:
+        return <StartScreen onLanguageSelect={handleLanguageSelect} />;
+    }
   };
 
   return (
@@ -546,10 +638,15 @@ function App() {
       <LanguageProvider>
         <TooltipProvider>
           <Toaster />
+          {/* PWA components temporarily disabled for stability */}
           {renderCurrentScreen()}
+          
+          {/* Smart Help Wizard - Show on protocol screens */}
           {(currentScreen === 'questionnaire' || currentScreen === 'niedervolt' || currentScreen === 'signature') && (
             <SmartHelpWizard
-              currentPage={currentStep}
+              currentPage={currentScreen === 'questionnaire' ? currentQuestionnaireePage + 1 : 
+                           currentScreen === 'niedervolt' ? 5 : 
+                           currentScreen === 'signature' ? 6 : 1}
               formData={formData}
               currentQuestionId={currentQuestionId}
               errors={formData.errors}

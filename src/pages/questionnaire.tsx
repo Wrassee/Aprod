@@ -325,14 +325,17 @@ const Questionnaire = memo(function Questionnaire({
   return (
     <div className="min-h-screen bg-light-surface" onSubmit={(e) => e.preventDefault()}>
       <PageHeader
-  progressPercent={progressPercent}       // Javított: most a számított progressPercent-et adja
-  onHome={onHome}                         // Javított: a prop-ot adja át
-  onStartNew={onStartNew}                 // Javított: a prop-ot adja át
-  onAdminAccess={onAdminAccess}           // Javított: a prop-ot adja át
+  onHome={onHome}
+  onStartNew={onStartNew}
+  onAdminAccess={onAdminAccess}
   title="OTIS APROD - Átvételi Protokoll"
-  receptionDate={receptionDate}           // Javított: prop-ot adja át
-  onReceptionDateChange={onReceptionDateChange} // Javított: prop-ot adja át
+  receptionDate={receptionDate}
+  onReceptionDateChange={onReceptionDateChange}
   language={language}
+  // ÚJ PROPOK az egységes progress-hez:
+  totalSteps={totalPages + 1} // +1 a Niedervolt lépésért
+  currentStep={currentPage}   // Jelenlegi kérdés oldal
+  stepType="questionnaire"    // Jelzi, hogy kérdés oldalon vagyunk
 />
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8" onSubmit={(e) => e.preventDefault()}>

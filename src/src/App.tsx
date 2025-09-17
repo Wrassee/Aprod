@@ -571,24 +571,27 @@ const handleStartNew = () => {
           />
         );
       case 'niedervolt':
-        return (
-          <NiedervoltTable
-            // ====================================================================
-            // === MÓDOSÍTÁS 3: A KEY PROP DINAMIKUSSÁ TÉTELE ===
-            // ====================================================================
-            key={`niedervolt-table-${clearTrigger}`}
-            // ====================================================================
-            measurements={formData.niedervoltTableMeasurements || {}}
-            onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
-            onBack={handleNiedervoltBack}
-            onNext={handleNiedervoltNext}
-            receptionDate={formData.receptionDate}
-            onReceptionDateChange={handleReceptionDateChange}
-            onAdminAccess={handleAdminAccess}
-            onHome={handleGoHome}
-            onStartNew={handleStartNew}
-          />
-        );
+  return (
+    <NiedervoltTable
+      // ====================================================================
+      // === MÓDOSÍTÁS 3: A KEY PROP DINAMIKUSSÁ TÉTELE ===
+      // ====================================================================
+      key={`niedervolt-table-${clearTrigger}`}
+      // ====================================================================
+      measurements={formData.niedervoltTableMeasurements || {}}
+      onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
+      onBack={handleNiedervoltBack}
+      onNext={handleNiedervoltNext}
+      receptionDate={formData.receptionDate}
+      onReceptionDateChange={handleReceptionDateChange}
+      onAdminAccess={handleAdminAccess}
+      onHome={handleGoHome}
+      onStartNew={handleStartNew}
+      // ÚJ PROPOK az egységes progress-hez:
+      totalProtocolSteps={6} // 5 kérdőív oldal + 1 Niedervolt oldal
+      currentProtocolStep={5} // A Niedervolt az 5. indexű lépés (0-based)
+    />
+  );
       case 'signature':
         return (
           <Signature

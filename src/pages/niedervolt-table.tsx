@@ -220,17 +220,7 @@ export function NiedervoltTable({
 />
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-  <CardContent className="p-6">
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-purple-100">{language === 'hu' ? 'Kitöltöttség' : 'Fortschritt'}</p>
-        <p className="text-3xl font-bold">{totalDevices > 0 ? Math.round((filledDevices / totalDevices) * 100) : 0}%</p>
-      </div>
-      <ArrowRight className="h-8 w-8 text-purple-200" />
-    </div>
-  </CardContent>
-</Card>
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white"><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-blue-100">{language === 'hu' ? 'Összes Eszköz' : 'Gesamte Geräte'}</p><p className="text-3xl font-bold">{totalDevices}</p></div><Settings className="h-8 w-8 text-blue-200" /></div></CardContent></Card>
           <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white"><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-green-100">{language === 'hu' ? 'Kitöltött' : 'Ausgefüllt'}</p><p className="text-3xl font-bold">{filledDevices}</p></div><Check className="h-8 w-8 text-green-200" /></div></CardContent></Card>
           <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white"><CardContent className="p-6"><div className="flex items-center justify-between"><div><p className="text-purple-100">{language === 'hu' ? 'Kitöltöttség' : 'Fortschritt'}</p><p className="text-3xl font-bold">{totalDevices > 0 ? Math.round((filledDevices / totalDevices) * 100) : 0}%</p></div><ArrowRight className="h-8 w-8 text-purple-200" /></div></CardContent></Card>
         </div>

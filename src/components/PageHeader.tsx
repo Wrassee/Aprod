@@ -64,14 +64,10 @@ const PageHeader: FC<PageHeaderProps> = ({
 
     if (totalSteps && currentStep !== undefined) {
       if (stepType === 'questionnaire') {
-        return language === 'hu' 
-          ? `Kérdések: ${currentStep + 1}. oldal / ${totalSteps} lépés` 
-          : `Fragen: Seite ${currentStep + 1} / ${totalSteps} Schritte`;
-      } else if (stepType === 'niedervolt') {
-        return language === 'hu' 
-          ? `Utolsó lépés: Niedervolt táblázat` 
-          : `Letzter Schritt: Niedervolt Tabelle`;
-      }
+  return language === 'hu' 
+    ? `Folyamat: ${currentStep + 1} / ${totalSteps}` 
+    : `Fortschritt: ${currentStep + 1} / ${totalSteps}`;
+}
     }
 
     return language === 'hu' ? 'Folyamat' : 'Fortschritt';

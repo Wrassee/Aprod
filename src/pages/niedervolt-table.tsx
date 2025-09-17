@@ -224,8 +224,8 @@ export function NiedervoltTable({
   <CardContent className="p-6">
     <div className="flex items-center justify-between">
       <div>
-        <p className="text-purple-100">{language === 'hu' ? 'Táblázat Kitöltöttség' : 'Tabelle Fortschritt'}</p>
-        <p className="text-3xl font-bold">{tableProgressPercent}%</p>
+        <p className="text-purple-100">{language === 'hu' ? 'Kitöltöttség' : 'Fortschritt'}</p>
+        <p className="text-3xl font-bold">{totalDevices > 0 ? Math.round((filledDevices / totalDevices) * 100) : 0}%</p>
       </div>
       <ArrowRight className="h-8 w-8 text-purple-200" />
     </div>

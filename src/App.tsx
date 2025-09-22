@@ -601,27 +601,26 @@ const handleStartNew = () => {
           />
         );
       case 'completion':
-  return (
-    <Completion
-      onEmailPDF={handleEmailPDF}
-      onSaveToCloud={handleSaveToCloud}
-      onDownloadPDF={handleDownloadPDF}
-      onDownloadExcel={handleDownloadExcel}
-      onViewProtocol={handleViewProtocol}
-      onStartNew={handleStartNew}
-      onGoHome={handleGoHome}
-      onSettings={handleSettings}
-      onBackToSignature={handleBackToSignature}
-      onHome={handleHome}  // <-- ADD EZT HOZZÁ!
-      errors={formData.errors}
-      protocolData={{
-        buildingAddress: formData.answers['1'] as string || '',
-        liftId: formData.answers['7'] as string || '',
-        inspectorName: formData.answers['4'] as string || '',
-        inspectionDate: formData.receptionDate
-      }}
-    />
-  );
+        return (
+          <Completion
+            onEmailPDF={handleEmailPDF}
+            onSaveToCloud={handleSaveToCloud}
+            onDownloadPDF={handleDownloadPDF}
+            onDownloadExcel={handleDownloadExcel}
+            onViewProtocol={handleViewProtocol}
+            onStartNew={handleStartNew}
+            onGoHome={handleGoHome}
+            onSettings={handleSettings}
+            onBackToSignature={handleBackToSignature}
+            errors={formData.errors}
+            protocolData={{
+              buildingAddress: formData.answers['1'] as string || '',
+              liftId: formData.answers['7'] as string || '',
+              inspectorName: formData.answers['4'] as string || '',
+              inspectionDate: formData.receptionDate
+            }}
+          />
+        );
       case 'admin':
         return <Admin 
           onBack={() => setCurrentScreen('questionnaire')} 

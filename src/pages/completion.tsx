@@ -133,11 +133,11 @@ export function Completion({
                 alt="OTIS Logo" 
                 className="h-12 w-12 mr-4"
               />
-              {onHome && (
-                <Button variant="ghost" size="sm" onClick={onHome} className="text-gray-600 hover:text-gray-800 mr-4" title={language === 'de' ? 'Startseite' : 'KezdÅ‘lap'}>
-                  <Home className="h-4 w-4" />
-                </Button>
-              )}
+              {onGoHome && (
+  <Button variant="ghost" size="sm" onClick={onGoHome} className="text-gray-600 hover:text-gray-800 mr-4" title={language === 'de' ? 'Startseite' : 'Kezdőlap'}>
+    <Home className="h-4 w-4" />
+  </Button>
+)}
               <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - ÃtvÃ©teli Protokoll</h1>
             </div>
             

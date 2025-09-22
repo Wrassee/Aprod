@@ -146,13 +146,6 @@ export function Completion({
             </div>
             
             <div className="flex items-center space-x-4">
-              <Label className="text-sm font-medium text-gray-600">{t.receptionDate}</Label>
-              <Input
-                type="date"
-                value={receptionDate}
-                onChange={(e) => onReceptionDateChange(e.target.value)}
-                className="w-auto"
-              />
               {onStartNew && (
                 <Button onClick={onStartNew} className="bg-green-600 hover:bg-green-700 text-white flex items-center" size="sm" title={t.startNew || 'Ãšj protokoll indÃ­tÃ¡sa'}>
                   <RotateCcw className="h-4 w-4 mr-2" />

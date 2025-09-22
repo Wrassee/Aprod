@@ -26,6 +26,7 @@ interface CompletionProps {
   onGoHome: () => void;
   onSettings: () => void;
   onBackToSignature: () => void;
+  onHome?: () => void;
   errors?: ProtocolError[];
   protocolData?: {
     buildingAddress?: string;
@@ -45,6 +46,7 @@ export function Completion({
   onGoHome,
   onSettings,
   onBackToSignature,
+  onHome,
   errors = [],
   protocolData,
   language, // Language prop Ã¡tvÃ©tele

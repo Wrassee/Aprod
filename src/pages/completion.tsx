@@ -1,27 +1,23 @@
 import PageHeader from '@/components/PageHeader';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { useLanguageContext } from '@/components/language-provider';
 import { ErrorExport } from '@/components/error-export';
 import { ProtocolError } from '@shared/schema';
-import { 
-  CheckCircle, 
-  Mail, 
-  Cloud, 
-  Download, 
-  Eye, 
+import {
+  CheckCircle,
+  Mail,
+  Cloud,
+  Download,
+  Eye,
   Plus,
-  Home,
-  Settings,
   ArrowLeft,
-  Loader2 // BetÃ¶ltÃ©s ikon importÃ¡lÃ¡sa
+  Loader2,
 } from 'lucide-react';
 
 interface CompletionProps {
   onEmailPDF: () => void;
   onSaveToCloud: () => void;
-  // onDownloadPDF prop eltÃ¡volÃ­tva, mert a logikÃ¡t helyben kezeljÃ¼k
   onDownloadExcel: () => void;
   onViewProtocol: () => void;
   onStartNew: () => void;
@@ -35,7 +31,7 @@ interface CompletionProps {
     inspectorName?: string;
     inspectionDate?: string;
   };
-  language: 'hu' | 'de'; // Language prop hozzÃ¡adva a tÃ­pusdefinÃ­ciÃ³hoz
+  language: 'hu' | 'de';
 }
 
 export function Completion({
@@ -49,42 +45,39 @@ export function Completion({
   onBackToSignature,
   errors = [],
   protocolData,
-  language, // Language prop Ã¡tvÃ©tele
+  language,
 }: CompletionProps) {
   const { t } = useLanguageContext();
   const [emailStatus, setEmailStatus] = useState<string>('');
   const [isEmailSending, setIsEmailSending] = useState(false);
-  const [isPdfDownloading, setIsPdfDownloading] = useState(false); // Ãšj Ã¡llapot a PDF letÃ¶ltÃ©shez
+  const [isPdfDownloading, setIsPdfDownloading] = useState(false);
 
   const handleEmailClick = async () => {
     setIsEmailSending(true);
-    setEmailStatus('Email kÃ¼ldÃ©se folyamatban...');
-    
+    setEmailStatus('Email küldése folyamatban...');
+
     try {
       await onEmailPDF();
-      setEmailStatus('âœ… Email sikeresen elkÃ¼ldve!');
+      setEmailStatus('✅ Email sikeresen elküldve!');
       setTimeout(() => setEmailStatus(''), 5000);
     } catch (error) {
-      setEmailStatus('âŒ Email kÃ¼ldÃ©se sikertelen!');
+      setEmailStatus('❌ Email küldése sikertelen!');
       setTimeout(() => setEmailStatus(''), 5000);
     } finally {
       setIsEmailSending(false);
     }
   };
 
-  // --- JAVÃTÃS: ÃšJ PDF LETÃ–LTÃ‰SI LOGIKA ---
   const handleDownloadPDF = async () => {
     setIsPdfDownloading(true);
     try {
       console.log('Starting PDF download from completion page...');
       
-      // A legfrissebb adatokat a localStorage-bÃ³l olvassuk ki
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.answers) {
         throw new Error('No form data found in localStorage to generate PDF.');
       }
 
-      // KÃ©rÃ©s kÃ¼ldÃ©se a HELYES /download-pdf vÃ©gpontra
       const response = await fetch('/api/protocols/download-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -99,7 +92,6 @@ export function Completion({
         throw new Error(errorData.message || 'Failed to generate PDF on the server.');
       }
 
-      // A vÃ¡lasz feldolgozÃ¡sa Ã©s a letÃ¶ltÃ©s elindÃ­tÃ¡sa
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -118,150 +110,146 @@ export function Completion({
       console.log('PDF download initiated successfully.');
     } catch (error) {
       console.error('Error during PDF download:', error);
-      // Ide jÃ¶het egy hibaÃ¼zenet a felhasznÃ¡lÃ³nak (pl. toast notification)
     } finally {
       setIsPdfDownloading(false);
     }
   };
 
   return (
-  <div className="min-h-screen bg-light-surface">
-    {/* Itt van az új, egységes fejléc */}
-    <PageHeader
-      onHome={onGoHome}
-      onStartNew={onStartNew}
-      onAdminAccess={onSettings}
-      progressPercent={100}
-      progressText={t.protocolComplete}
-      language={language}
-      receptionDate={undefined}
-      onReceptionDateChange={undefined}
-    />
+    <div className="min-h-screen bg-light-surface">
+      {/* Itt van az új, egységes fejléc, a progress bar nélkül */}
+      <PageHeader
+        onHome={onGoHome}
+        onStartNew={onStartNew}
+        onAdminAccess={onSettings}
+        language={language}
+        showProgress={false} // <-- A LÉNYEGI VÁLTOZTATÁS
+      />
 
-    {/* A régi header teljesen eltűnt, és rögtön a main rész következik */}
-    <main className="max-w-4xl mx-auto px-6 py-8">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
-        <div className="mb-8">
-          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-3xl font-semibold text-gray-800 mb-4">
-            {t.protocolComplete}
-          </h2>
-          <p className="text-gray-600">
-            {t.completionMessage}
-          </p>
-        </div>
+      {/* A main rész és a tartalma változatlan */}
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+          <div className="mb-8">
+            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+            <h2 className="text-3xl font-semibold text-gray-800 mb-4">
+              {t.protocolComplete}
+            </h2>
+            <p className="text-gray-600">
+              {t.completionMessage}
+            </p>
+          </div>
 
-        {/* Action Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-          {/* Email PDF */}
-          <div className="relative">
+          {/* Action Buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {/* Email PDF */}
+            <div className="relative">
+              <Button
+                onClick={handleEmailClick}
+                disabled={isEmailSending}
+                className="bg-otis-blue hover:bg-blue-700 text-white flex items-center justify-center py-4 h-auto w-full disabled:opacity-50"
+              >
+                <Mail className="h-5 w-5 mr-3" />
+                {isEmailSending ? 'Küldés...' : t.emailPDF}
+              </Button>
+              
+              {emailStatus && (
+                <div className={`absolute top-full mt-2 left-0 right-0 text-sm px-3 py-2 rounded text-center ${
+                  emailStatus.includes('✅') ? 'bg-green-100 text-green-700' : 
+                  emailStatus.includes('folyamatban') ? 'bg-blue-100 text-blue-700' :
+                  'bg-red-100 text-red-700'
+                }`}>
+                  {emailStatus}
+                </div>
+              )}
+            </div>
+            
+            {/* Save to Cloud */}
             <Button
-              onClick={handleEmailClick}
-              disabled={isEmailSending}
-              className="bg-otis-blue hover:bg-blue-700 text-white flex items-center justify-center py-4 h-auto w-full disabled:opacity-50"
+              onClick={onSaveToCloud}
+              className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center py-4 h-auto"
             >
-              <Mail className="h-5 w-5 mr-3" />
-              {isEmailSending ? 'Küldés...' : t.emailPDF}
+              <Cloud className="h-5 w-5 mr-3" />
+              {t.saveToCloud}
             </Button>
             
-            {emailStatus && (
-              <div className={`absolute top-full mt-2 left-0 right-0 text-sm px-3 py-2 rounded text-center ${
-                emailStatus.includes('✅') ? 'bg-green-100 text-green-700' : 
-                emailStatus.includes('folyamatban') ? 'bg-blue-100 text-blue-700' :
-                'bg-red-100 text-red-700'
-              }`}>
-                {emailStatus}
-              </div>
-            )}
+            {/* Download PDF */}
+            <Button
+              onClick={handleDownloadPDF}
+              disabled={isPdfDownloading}
+              className="bg-gray-600 hover:bg-gray-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
+            >
+              {isPdfDownloading ? (
+                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+              ) : (
+                <Download className="h-5 w-5 mr-3" />
+              )}
+              {isPdfDownloading ? t.generating : t.downloadPDF}
+            </Button>
+            
+            {/* Download Excel */}
+            <Button
+              onMouseDown={(e) => e.preventDefault()}
+              onTouchStart={(e) => e.preventDefault()}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDownloadExcel();
+              }}
+              className="bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center py-4 h-auto"
+            >
+              <Download className="h-5 w-5 mr-3" />
+              {t.downloadExcel}
+            </Button>
+            
+            {/* View Protocol */}
+            <Button
+              onClick={onViewProtocol}
+              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center py-4 h-auto"
+            >
+              <Eye className="h-5 w-5 mr-3" />
+              {t.viewProtocol}
+            </Button>
           </div>
           
-          {/* Save to Cloud */}
-          <Button
-            onClick={onSaveToCloud}
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center py-4 h-auto"
-          >
-            <Cloud className="h-5 w-5 mr-3" />
-            {t.saveToCloud}
-          </Button>
-          
-          {/* Download PDF */}
-          <Button
-            onClick={handleDownloadPDF}
-            disabled={isPdfDownloading}
-            className="bg-gray-600 hover:bg-gray-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
-          >
-            {isPdfDownloading ? (
-              <Loader2 className="h-5 w-5 mr-3 animate-spin" />
-            ) : (
-              <Download className="h-5 w-5 mr-3" />
-            )}
-            {isPdfDownloading ? t.generating : t.downloadPDF}
-          </Button>
-          
-          {/* Download Excel */}
-          <Button
-            onMouseDown={(e) => e.preventDefault()}
-            onTouchStart={(e) => e.preventDefault()}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onDownloadExcel();
-            }}
-            className="bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center py-4 h-auto"
-          >
-            <Download className="h-5 w-5 mr-3" />
-            {t.downloadExcel}
-          </Button>
-          
-          {/* View Protocol */}
-          <Button
-            onClick={onViewProtocol}
-            className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center py-4 h-auto"
-          >
-            <Eye className="h-5 w-5 mr-3" />
-            {t.viewProtocol}
-          </Button>
+          {/* Navigation buttons */}
+          <div className="flex gap-4 justify-center">
+            {/* Back to Signature */}
+            <Button
+              onClick={onBackToSignature}
+              variant="outline"
+              className="text-gray-600 border-2 border-gray-300 hover:bg-gray-50 px-6 py-3"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {t.back}
+            </Button>
+            
+            {/* Start New Protocol */}
+            <Button
+              onClick={onStartNew}
+              variant="outline"
+              className="text-otis-blue border-2 border-otis-blue hover:bg-otis-light-blue px-8 py-3"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              {t.startNew}
+            </Button>
+          </div>
         </div>
-        
-        {/* Navigation buttons */}
-        <div className="flex gap-4 justify-center">
-          {/* Back to Signature */}
-          <Button
-            onClick={onBackToSignature}
-            variant="outline"
-            className="text-gray-600 border-2 border-gray-300 hover:bg-gray-50 px-6 py-3"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t.back}
-          </Button>
-          
-          {/* Start New Protocol */}
-          <Button
-            onClick={onStartNew}
-            variant="outline"
-            className="text-otis-blue border-2 border-otis-blue hover:bg-otis-light-blue px-8 py-3"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            {t.startNew}
-          </Button>
-        </div>
-      </div>
 
-      {/* Error Export Section - only show if there are errors */}
-      {(errors.length > 0 || JSON.parse(localStorage.getItem('protocol-errors') || '[]').length > 0) && (
-        <div className="mt-8">
-          <ErrorExport 
-            errors={errors.length > 0 ? errors : JSON.parse(localStorage.getItem('protocol-errors') || '[]')}
-            protocolData={protocolData || {
-              buildingAddress: '',
-              liftId: '',
-              inspectorName: '',
-              inspectionDate: new Date().toISOString().split('T')[0]
-            }}
-          />
-        </div>
-      )}
-    </main>
-  </div>
-);
+        {/* Error Export Section - only show if there are errors */}
+        {(errors.length > 0 || JSON.parse(localStorage.getItem('protocol-errors') || '[]').length > 0) && (
+          <div className="mt-8">
+            <ErrorExport 
+              errors={errors.length > 0 ? errors : JSON.parse(localStorage.getItem('protocol-errors') || '[]')}
+              protocolData={protocolData || {
+                buildingAddress: '',
+                liftId: '',
+                inspectorName: '',
+                inspectionDate: new Date().toISOString().split('T')[0]
+              }}
+            />
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }

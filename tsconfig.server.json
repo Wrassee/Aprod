@@ -12,7 +12,13 @@
     "rootDir": ".",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "noEmit": false
+    "noEmit": false,
+    // ===== EZ A RÉSZ KERÜLT HOZZÁADÁSRA =====
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+    // =======================================
   },
   "include": [
     "server/**/*.ts",
@@ -20,7 +26,9 @@
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "src"
+    "dist"
+    // ===== EZ A SOR LETT KITÖRÖLVE =====
+    // "src" 
+    // ===================================
   ]
 }

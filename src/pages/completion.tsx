@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useLanguageContext } from '@/components/language-provider';
 import { ErrorExport } from '@/components/error-export';
 import { ProtocolError } from '@shared/schema';
+import { useToast } from '@/hooks/use-toast';
 import {
   CheckCircle,
   Mail,
@@ -48,9 +49,11 @@ export function Completion({
   language,
 }: CompletionProps) {
   const { t } = useLanguageContext();
+  const { toast } = useToast();
   const [emailStatus, setEmailStatus] = useState<string>('');
   const [isEmailSending, setIsEmailSending] = useState(false);
   const [isPdfDownloading, setIsPdfDownloading] = useState(false);
+  const [isGroundingPdfDownloading, setIsGroundingPdfDownloading] = useState(false);
 
   const handleEmailClick = async () => {
     setIsEmailSending(true);
@@ -72,7 +75,7 @@ export function Completion({
     setIsPdfDownloading(true);
     try {
       console.log('Starting PDF download from completion page...');
-      
+
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.answers) {
         throw new Error('No form data found in localStorage to generate PDF.');
@@ -97,21 +100,81 @@ export function Completion({
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-      
+
       const liftId = savedData.answers?.['7'] ? String(savedData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
       a.download = `OTIS_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
-      
+
       document.body.appendChild(a);
       a.click();
-      
+
       window.URL.revokeObjectURL(url);
       a.remove();
-      
+
       console.log('PDF download initiated successfully.');
     } catch (error) {
       console.error('Error during PDF download:', error);
     } finally {
       setIsPdfDownloading(false);
+    }
+  };
+
+  const handleDownloadGroundingPDF = async () => {
+    setIsGroundingPdfDownloading(true);
+    try {
+      console.log('Starting grounding PDF download from completion page...');
+
+      const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
+      if (!savedData.groundingCheckAnswers) {
+        throw new Error('No grounding data found in localStorage to generate PDF.');
+      }
+
+      const response = await fetch('/api/protocols/download-grounding-pdf', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          formData: savedData,
+          language: language,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to generate grounding PDF on the server.');
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+
+      const liftId = savedData.answers?.['7'] ? String(savedData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
+      a.download = `OTIS_Grounding_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+      document.body.appendChild(a);
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+      a.remove();
+
+      console.log('Grounding PDF download initiated successfully.');
+      toast({
+        title: language === 'hu' ? 'Sikeres letöltés' : 'Download erfolgreich',
+        description: language === 'hu' ? 'A földelési jegyzőkönyv sikeresen letöltve.' : 'Das Erdungsprotokoll wurde erfolgreich heruntergeladen.',
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error('Error during grounding PDF download:', error);
+      toast({
+        title: language === 'hu' ? 'Letöltési hiba' : 'Download Fehler',
+        description: language === 'hu' 
+          ? 'A földelési jegyzőkönyv letöltése sikertelen. Kérjük próbálja újra.' 
+          : 'Das Erdungsprotokoll konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.',
+        variant: 'destructive',
+        duration: 5000,
+      });
+    } finally {
+      setIsGroundingPdfDownloading(false);
     }
   };
 
@@ -151,7 +214,7 @@ export function Completion({
                 <Mail className="h-5 w-5 mr-3" />
                 {isEmailSending ? 'Küldés...' : t.emailPDF}
               </Button>
-              
+
               {emailStatus && (
                 <div className={`absolute top-full mt-2 left-0 right-0 text-sm px-3 py-2 rounded text-center ${
                   emailStatus.includes('✅') ? 'bg-green-100 text-green-700' : 
@@ -162,7 +225,7 @@ export function Completion({
                 </div>
               )}
             </div>
-            
+
             {/* Save to Cloud */}
             <Button
               onClick={onSaveToCloud}
@@ -171,7 +234,7 @@ export function Completion({
               <Cloud className="h-5 w-5 mr-3" />
               {t.saveToCloud}
             </Button>
-            
+
             {/* Download PDF */}
             <Button
               onClick={handleDownloadPDF}
@@ -185,7 +248,7 @@ export function Completion({
               )}
               {isPdfDownloading ? t.generating : t.downloadPDF}
             </Button>
-            
+
             {/* Download Excel */}
             <Button
               onMouseDown={(e) => e.preventDefault()}
@@ -200,7 +263,24 @@ export function Completion({
               <Download className="h-5 w-5 mr-3" />
               {t.downloadExcel}
             </Button>
-            
+
+            {/* Download Grounding PDF */}
+            <Button
+              onClick={handleDownloadGroundingPDF}
+              disabled={isGroundingPdfDownloading}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
+            >
+              {isGroundingPdfDownloading ? (
+                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+              ) : (
+                <Download className="h-5 w-5 mr-3" />
+              )}
+              {isGroundingPdfDownloading ? 
+                (language === 'hu' ? 'Generálás...' : 'Generieren...') : 
+                (language === 'hu' ? 'Földelési Jegyzőkönyv' : 'Erdungsprotokoll')
+              }
+            </Button>
+
             {/* View Protocol */}
             <Button
               onClick={onViewProtocol}
@@ -210,7 +290,7 @@ export function Completion({
               {t.viewProtocol}
             </Button>
           </div>
-          
+
           {/* Navigation buttons */}
           <div className="flex gap-4 justify-center">
             {/* Back to Signature */}
@@ -222,7 +302,7 @@ export function Completion({
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t.back}
             </Button>
-            
+
             {/* Start New Protocol */}
             <Button
               onClick={onStartNew}

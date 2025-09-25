@@ -1,0 +1,59 @@
+{
+  "groups": [
+    {
+      "id": "maschinenraum",
+      "title": "1. Ellenőrzés a gépházban",
+      "questions": [
+        { "id": "grd_mr_ref", "text": "Referencia földelés meglétele" },
+        { "id": "grd_mr_controller", "text": "Vezérlő burkolata és ajtói" },
+        { "id": "grd_mr_motor", "text": "A motor" },
+        { "id": "grd_mr_bremse", "text": "A fék háza" },
+        { "id": "grd_mr_seil", "text": "Kötél rögzítő pont" },
+        { "id": "grd_mr_fuehrung", "text": "Vezetősín konzol" }
+      ]
+    },
+    {
+      "id": "kabinendach",
+      "title": "2. Ellenőrzés a kabin tetején",
+      "questions": [
+        { "id": "grd_kd_jbox", "text": "Csatlakozó doboz/földelő kapocs burkolata (J-Box), kapocssín" },
+        { "id": "grd_kd_prs", "text": "PRS burkolat" },
+        { "id": "grd_kd_notschalter", "text": "Vészkapcsoló" },
+        { "id": "grd_kd_inspektion", "text": "Vizsgálati doboz" }
+      ]
+    },
+    {
+      "id": "schacht",
+      "title": "3. Ellenőrzés az aknában",
+      "questions": [
+        { "id": "grd_sch_fuehrung", "text": "Vezetősín" },
+        { "id": "grd_sch_konsole", "text": "Konzolos rögzítés" },
+        { "id": "grd_sch_tuer", "text": "Ajtó zárszerkezet" },
+        { "id": "grd_sch_rahmen", "text": "Ajtókeret" },
+        { "id": "grd_sch_etagen", "text": "Szintkijelző" }
+      ]
+    },
+    {
+      "id": "schachtgrube",
+      "title": "4. Ellenőrzés az aknagödörben",
+      "questions": [
+        { "id": "grd_sg_puffer", "text": "Ütköző/puffer" },
+        { "id": "grd_sg_spannrolle", "text": "Feszítőgörgő" },
+        { "id": "grd_sg_fuehrung", "text": "Vezetősín végi rögzítés" },
+        { "id": "grd_sg_grube", "text": "Gödör földelési kapcsolat" }
+      ]
+    },
+    {
+      "id": "kabine",
+      "title": "5. Ellenőrzés a kabinban",
+      "questions": [
+        { "id": "grd_kb_rahmen", "text": "Kabinváz" },
+        { "id": "grd_kb_tuer", "text": "Kabinajtó" },
+        { "id": "grd_kb_bedienung", "text": "Kezelőpanel" },
+        { "id": "grd_kb_beleuchtung", "text": "Világítás" },
+        { "id": "grd_kb_luefter", "text": "Szellőztetés" },
+        { "id": "grd_kb_handlauf", "text": "Korlát (ha van)" }
+      ]
+    }
+  ]
+}

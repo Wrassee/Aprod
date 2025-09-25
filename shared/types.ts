@@ -150,6 +150,9 @@ export interface FormData {
 
   /** Optional list of low‑voltage measurements */
   niedervoltMeasurements?: NiedervoltMeasurement[];
+
+  /** Grounding check answers - OK/NOT OK for each question */
+  groundingCheckAnswers?: Record<string, boolean>;
 }
 
 // ------------------------------------------------------------

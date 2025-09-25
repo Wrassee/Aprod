@@ -1,33 +1,36 @@
 import { relations } from "drizzle-orm";
 import {
-  pgTable,
+  sqliteTable,
   text,
-  timestamp,
-  boolean,
-  jsonb,
   integer,
-  uuid, // FONTOS: uuid importálása
-} from "drizzle-orm/pg-core";
+  real,
+} from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 /* -------------------------------------------------------------------------
- * Protocols
+ * Protocols - SQLite compatible schema
  * ----------------------------------------------------------------------- */
-export const protocols = pgTable("protocols", {
-  id: uuid("id") // JAVÍTVA: text -> uuid
+export const protocols = sqliteTable("protocols", {
+  id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   reception_date: text("reception_date"),
   language: text("language").notNull(),
-  answers: jsonb("answers")
+  answers: text("answers", { mode: "json" }) // JSON as text
     .notNull()
-    .default({} as Record<string, unknown>),
-  errors: jsonb("errors").notNull().default([] as unknown[]),
+    .$type<Record<string, unknown>>()
+    .$defaultFn(() => ({})),
+  errors: text("errors", { mode: "json" }) // JSON as text
+    .notNull()
+    .$type<unknown[]>()
+    .$defaultFn(() => []),
   signature: text("signature"),
   signature_name: text("signature_name"),
-  completed: boolean("completed").notNull().default(false),
-  created_at: timestamp("created_at").defaultNow().notNull(),
+  completed: integer("completed", { mode: "boolean" }).notNull().default(false),
+  created_at: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
+    .notNull(),
 });
 
 export const insertProtocolSchema = createInsertSchema(protocols);
@@ -50,10 +53,10 @@ export const ProtocolErrorSchema = z.object({
 export type ProtocolError = z.infer<typeof ProtocolErrorSchema>;
 
 /* -------------------------------------------------------------------------
- * Templates
+ * Templates - SQLite compatible schema
  * ----------------------------------------------------------------------- */
-export const templates = pgTable("templates", {
-  id: uuid("id") // JAVÍTVA: text -> uuid
+export const templates = sqliteTable("templates", {
+  id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
@@ -63,8 +66,10 @@ export const templates = pgTable("templates", {
   language: text("language")
     .notNull()
     .default("multilingual"),
-  uploaded_at: timestamp("uploaded_at").defaultNow().notNull(),
-  is_active: boolean("is_active").notNull().default(false),
+  uploaded_at: integer("uploaded_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
+    .notNull(),
+  is_active: integer("is_active", { mode: "boolean" }).notNull().default(false),
 });
 
 export const insertTemplateSchema = createInsertSchema(templates);
@@ -77,11 +82,11 @@ export type InsertTemplate = typeof templates.$inferInsert;
 export const QuestionTypeEnum = z.enum(["text", "number", "date", "select", "checkbox"]);
 export type QuestionType = "number" | "date" | "select" | "text" | "checkbox" | "radio" | "measurement" | "calculated" | "true_false" | "yes_no_na";
 
-export const questionConfigs = pgTable("question_configs", {
-  id: uuid("id") // JAVÍTVA: text -> uuid
+export const questionConfigs = sqliteTable("question_configs", {
+  id: text("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  template_id: uuid("template_id") // JAVÍTVA: text -> uuid
+  template_id: text("template_id")
     .notNull()
     .references(() => templates.id, { onDelete: 'cascade' }),
   question_id: text("question_id").notNull(),
@@ -89,11 +94,11 @@ export const questionConfigs = pgTable("question_configs", {
   title_hu: text("title_hu"),
   title_de: text("title_de"),
   type: text("type").notNull(),
-  required: boolean("required").notNull().default(true),
+  required: integer("required", { mode: "boolean" }).notNull().default(true),
   placeholder: text("placeholder"),
   cell_reference: text("cell_reference"),
   sheet_name: text("sheet_name").default("Sheet1"),
-  multi_cell: boolean("multi_cell").notNull().default(false),
+  multi_cell: integer("multi_cell", { mode: "boolean" }).notNull().default(false),
   group_name: text("group_name"),
   group_name_de: text("group_name_de"),
   group_order: integer("group_order").default(0),
@@ -102,8 +107,10 @@ export const questionConfigs = pgTable("question_configs", {
   min_value: integer("min_value"),
   max_value: integer("max_value"),
   calculation_formula: text("calculation_formula"),
-  calculation_inputs: jsonb("calculation_inputs"), // Ezt hagyjuk jsonb-n, a Drizzle helyesen fogja kezelni a migrációt
-  created_at: timestamp("created_at").defaultNow().notNull(),
+  calculation_inputs: text("calculation_inputs", { mode: "json" }).$type<unknown>(), // JSON as text
+  created_at: integer("created_at", { mode: "timestamp" })
+    .$defaultFn(() => new Date())
+    .notNull(),
 });
 
 export const insertQuestionConfigSchema = createInsertSchema(questionConfigs);

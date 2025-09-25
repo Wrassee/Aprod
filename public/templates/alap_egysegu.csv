@@ -1,0 +1,12 @@
+ID,title,titleHu,titleDe,Type,required,placeholder,cellReference,sheetName,multiCell,groupName,groupNameDe,groupOrder,conditional_group_key,unit,min_value,max_value,calculation_formula,calculation_inputs
+1,Átvevő neve,Átvevő neve,Name des Empfängers,text,true,Adja meg az átvevő nevét,B2,Sheet1,false,Alapadatok,Grunddaten,1,,,,,
+2,Lift telepítés befejezve?,Lift telepítés befejezve?,Aufzuginstallation abgeschlossen?,radio,true,Válasszon,B3,Sheet1,false,Telepítés,Installation,2,,,,,
+3,Biztonsági rendszerek működnek?,Biztonsági rendszerek működnek?,Sicherheitssysteme funktionsfähig?,radio,true,Válasszon,B4,Sheet1,false,Biztonság,Sicherheit,3,2,,,,
+4,Vészhelyzeti funkciók tesztelve?,Vészhelyzeti funkciók tesztelve?,Notfallfunktionen getestet?,checkbox,true,Válasszon,B5,Sheet1,false,Biztonság,Sicherheit,4,2,,,,
+5,Teherbírás (kg),Teherbírás (kg),Tragfähigkeit (kg),number,true,Adja meg a teherbírást,B6,Sheet1,false,Műszaki adatok,Technische Daten,5,,kg,100,3000,,
+6,Maximális sebesség (m/s),Maximális sebesség (m/s),Höchstgeschwindigkeit (m/s),number,true,Adja meg a sebességet,B7,Sheet1,false,Műszaki adatok,Technische Daten,6,,m/s,0.1,3.0,,
+7,Emeletszám,Emeletszám,Anzahl Stockwerke,number,true,Adja meg az emeletszámot,B8,Sheet1,false,Műszaki adatok,Technische Daten,7,,,2,50,,
+8,Ajtónyitási idő (s),Ajtónyitási idő (s),Türöffnungszeit (s),measurement,true,Mérje meg az ajtónyitási időt,B9,Sheet1,false,Mérések,Messungen,8,,s,1,10,,
+9,Zajszint (dB),Zajszint (dB),Geräuschpegel (dB),measurement,true,Mérje meg a zajszintet,B10,Sheet1,false,Mérések,Messungen,9,,dB,30,70,,
+10,Teljesítményfelvétel (kW),Teljesítményfelvétel (kW),Leistungsaufnahme (kW),calculated,false,Automatikusan számítva,B11,Sheet1,false,Számítások,Berechnungen,10,,kW,,,=B6*B7*0.001,"{""inputs"": [""5"", ""7""]}"
+11,Megjegyzések,Megjegyzések,Zusätzliche Kommentare,text,false,További megjegyzések,B12,Sheet1,false,Egyéb,Sonstiges,11,,,,,

@@ -17,6 +17,7 @@ import { getAllStableInputValues } from '@/components/stable-input';
 import { getAllMeasurementValues } from '@/components/measurement-question';
 import { CalculatedResult } from '@/components/calculated-result';
 import { MeasurementBlock, getAllCalculatedValues } from '@/components/measurement-block';
+import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
 
 interface QuestionnaireProps {
   receptionDate: string;
@@ -83,6 +84,37 @@ const Questionnaire = memo(function Questionnaire({
   const [measurementValues, setMeasurementValues] = useState<Record<string, number>>({});
   const [calculatedResults, setCalculatedResults] = useState<Record<string, any>>({});
   const [measurementErrors, setMeasurementErrors] = useState<ProtocolError[]>([]);
+
+  // Apply conditional filtering to questions
+  const { filteredQuestions, activeConditions, totalQuestions, filteredCount } = 
+    useConditionalQuestionFilter(allQuestions, answers);
+
+  // Automatically set disabled questions to "n.a."
+  useEffect(() => {
+    if (allQuestions.length > 0 && filteredQuestions.length > 0) {
+      const updatedAnswers = updateAnswersWithDisabled(answers, allQuestions, filteredQuestions);
+      
+      // Only update if there are actual changes
+      const hasChanges = Object.keys(updatedAnswers).some(key => 
+        updatedAnswers[key] !== answers[key]
+      );
+      
+      if (hasChanges) {
+        console.log('🎯 Auto-setting disabled questions to "n.a."', {
+          totalQuestions: allQuestions.length,
+          visibleQuestions: filteredQuestions.length,
+          disabledCount: allQuestions.length - filteredQuestions.length
+        });
+        
+        // Update answers through the parent component using question_id as key
+        Object.entries(updatedAnswers).forEach(([questionKey, value]) => {
+          if (value !== answers[questionKey]) {
+            onAnswerChange(questionKey, value);
+          }
+        });
+      }
+    }
+  }, [filteredQuestions, allQuestions, answers, onAnswerChange]);
 
   // Save current page to localStorage and notify parent component
   useEffect(() => {
@@ -160,8 +192,8 @@ const Questionnaire = memo(function Questionnaire({
 
   // Group questions by groupName and organize by groups
   const { questionGroups, totalPages, currentQuestions, progress, currentGroup } = useMemo(() => {
-    // Group questions by groupName
-    const groups = allQuestions.reduce((acc: Record<string, Question[]>, question: Question) => {
+    // Group questions by groupName - use filteredQuestions for dynamic filtering
+    const groups = filteredQuestions.reduce((acc: Record<string, Question[]>, question: Question) => {
       const groupName = question.groupName;
       
       // Skip questions without groupName (don't create empty groups)
@@ -204,7 +236,7 @@ const Questionnaire = memo(function Questionnaire({
       progress: prog,
       currentGroup: currentGroupData
     };
-  }, [allQuestions, currentPage]);
+  }, [filteredQuestions, currentPage, filteredCount]); // Use filteredQuestions and filteredCount for dynamic updates
 
   // Listen for cache changes to trigger re-calculation
   useEffect(() => {
@@ -336,6 +368,11 @@ const Questionnaire = memo(function Questionnaire({
   totalSteps={totalPages + 1} // +1 a Niedervolt lépésért
   currentStep={currentPage}   // Jelenlegi kérdés oldal
   stepType="questionnaire"    // Jelzi, hogy kérdés oldalon vagyunk
+  // AI Segítő props:
+  currentPage={currentPage + 1}
+  formData={{ answers, receptionDate, errors }}
+  currentQuestionId={currentGroup?.questions?.[0]?.id || ''}
+  errors={errors}
 />
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8" onSubmit={(e) => e.preventDefault()}>

@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, queryClient } from '@tanstack/react-query';
 import { useLanguageContext } from '@/components/language-provider';
+import { useToast } from '@/hooks/use-toast';
+import { mappingService } from '@/services/mappingService';
 import { ArrowLeft, ArrowRight, Save, Settings, Home, Check, RotateCcw, Plus, Trash2, Filter } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import type { NiedervoltMeasurement } from '@/types/niedervolt-devices';
@@ -51,14 +53,16 @@ export function NiedervoltTable({
     retry: 1,
   });
 
-  const devices = niedervoltData?.devices || [];
-  const dropdownOptions = niedervoltData?.dropdownOptions || {
+  const devices = (niedervoltData as any)?.devices || [];
+  const dropdownOptions = (niedervoltData as any)?.dropdownOptions || {
     biztositek: [],
     kismegszakito: [],
     fiTest: []
   };
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
+  const [otisStatus, setOtisStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const { toast } = useToast();
   const [selectedDevices, setSelectedDevices] = useState<Set<string>>(new Set());
   const [customDevices, setCustomDevices] = useState<CustomDevice[]>([]);
   const [showDeviceSelector, setShowDeviceSelector] = useState(false);
@@ -90,7 +94,8 @@ export function NiedervoltTable({
       
       if (savedDeviceSelection) {
         try {
-          const savedSet = new Set(JSON.parse(savedDeviceSelection));
+          const savedArray = JSON.parse(savedDeviceSelection) as string[];
+          const savedSet = new Set(savedArray);
           setSelectedDevices(savedSet);
         } catch (e) {
           setSelectedDevices(new Set(devices.slice(0, 7).map((d: any) => d.id)));
@@ -164,6 +169,63 @@ export function NiedervoltTable({
     }
   };
 
+  const handleSaveToOtis = async () => {
+    setOtisStatus('saving');
+    
+    try {
+      console.log('🔄 Starting Otis Excel mapping...');
+      
+      // Niedervolt mérések összegyűjtése mapping-hez alkalmas formátumban
+      const niedervoltMappings = Object.entries(measurements).map(([deviceId, measurement]) => {
+        const device = [...devices, ...customDevices].find(d => d.id === deviceId);
+        const deviceName = device ? getDeviceName(device) : deviceId;
+        
+        return {
+          deviceId,
+          deviceName,
+          measurements: measurement
+        };
+      });
+      
+      // Protocol mapping API hívás
+      const result = await mappingService.mapToOtisProtocol({
+        protocolId: 'current-protocol', // TODO: Valódi protokoll ID használata
+        niedervoltData: niedervoltMappings,
+        receptionDate
+      });
+      
+      if (result.success) {
+        setOtisStatus('saved');
+        toast({
+          title: language === 'hu' ? '✅ Sikeres Otis mentés' : '✅ Otis Speicherung erfolgreich',
+          description: language === 'hu' 
+            ? `${result.modifiedCells} cella frissítve az Otis protokollban.`
+            : `${result.modifiedCells} Zellen im Otis-Protokoll aktualisiert.`,
+        });
+        
+        // Status visszaállítása 5 másodperc után
+        setTimeout(() => setOtisStatus('idle'), 5000);
+      } else {
+        throw new Error(result.errors?.join(', ') || 'Ismeretlen hiba');
+      }
+      
+    } catch (error) {
+      console.error('❌ Otis Excel mapping error:', error);
+      setOtisStatus('error');
+      
+      toast({
+        title: language === 'hu' ? '❌ Otis mentés sikertelen' : '❌ Otis Speicherung fehlgeschlagen',
+        description: language === 'hu' 
+          ? `Hiba történt: ${error}`
+          : `Fehler aufgetreten: ${error}`,
+        variant: 'destructive',
+      });
+      
+      // Status visszaállítása 5 másodperc után
+      setTimeout(() => setOtisStatus('idle'), 5000);
+    }
+  };
+
   const removeCustomDevice = (deviceId: string) => {
     setCustomDevices(prev => prev.filter(d => d.id !== deviceId));
     setSelectedDevices(prev => {
@@ -217,6 +279,11 @@ export function NiedervoltTable({
   currentStep={currentProtocolStep}
   stepType="niedervolt"
   progressPercent={tableProgressPercent} // A táblázat kitöltöttségének a százaléka
+  // AI Segítő props:
+  currentPage={5}
+  formData={{ measurements }}
+  currentQuestionId="niedervolt-table"
+  errors={[]}
 />
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -257,34 +324,130 @@ export function NiedervoltTable({
                   </tr>
                 </thead>
                 <tbody>
-                  {activeDevices.map((device) => {
+                  {activeDevices.map((device, rowIndex) => {
                     const measurement = measurements[device.id] || {};
+                    // Niedervolt Question ID generálás: Q_NID_{row}_{field}
+                    const getQuestionId = (field: string) => `Q_NID_${rowIndex + 1}_${field}`;
+                    
                     return (
                       <tr key={device.id} className="hover:bg-gray-50">
                         <td className="border border-gray-300 p-3 font-medium">{getDeviceName(device)}</td>
                         <td className="border border-gray-300 p-2">
-                          <Select value={measurement.biztositek || ''} onValueChange={(v) => updateMeasurement(device.id, 'biztositek', v)}>
+                          <Select 
+                            value={measurement.biztositek || ''} 
+                            onValueChange={(v) => updateMeasurement(device.id, 'biztositek', v)}
+                            data-question-id={getQuestionId('biztositek')}
+                          >
                             <SelectTrigger className="w-full"><SelectValue placeholder="-" /></SelectTrigger>
                             <SelectContent>{(dropdownOptions.biztositek || []).map((o: string) => (<SelectItem key={o} value={o}>{o}</SelectItem>))}</SelectContent>
                           </Select>
                         </td>
                         <td className="border border-gray-300 p-2">
-                          <Select value={measurement.kismegszakito || ''} onValueChange={(v) => updateMeasurement(device.id, 'kismegszakito', v)}>
+                          <Select 
+                            value={measurement.kismegszakito || ''} 
+                            onValueChange={(v) => updateMeasurement(device.id, 'kismegszakito', v)}
+                            data-question-id={getQuestionId('kismegszakito')}
+                          >
                             <SelectTrigger className="w-full"><SelectValue placeholder="-" /></SelectTrigger>
                             <SelectContent>{(dropdownOptions.kismegszakito || []).map((o: string) => (<SelectItem key={o} value={o}>{o}</SelectItem>))}</SelectContent>
                           </Select>
                         </td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center" type="text" placeholder="-" value={measurement.tipusjelzes || ''} onChange={(e) => updateMeasurement(device.id, 'tipusjelzes', e.target.value)} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center" type="text" placeholder="-" value={measurement.szigetelesNPE || ''} onChange={(e) => updateMeasurement(device.id, 'szigetelesNPE', e.target.value)} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center" type="text" placeholder="-" value={measurement.szigetelesL1PE || ''} onChange={(e) => updateMeasurement(device.id, 'szigetelesL1PE', e.target.value)} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center" type="text" placeholder="-" value={measurement.szigetelesL2PE || ''} onChange={(e) => updateMeasurement(device.id, 'szigetelesL2PE', e.target.value)} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center" type="text" placeholder="-" value={measurement.szigetelesL3PE || ''} onChange={(e) => updateMeasurement(device.id, 'szigetelesL3PE', e.target.value)} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center" type="text" placeholder="-" value={measurement.iccLN || ''} onChange={(e) => updateMeasurement(device.id, 'iccLN', e.target.value)} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center" type="text" placeholder="-" value={measurement.iccLPE || ''} onChange={(e) => updateMeasurement(device.id, 'iccLPE', e.target.value)} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center bg-blue-50" type="text" placeholder="-" value={measurement.fiIn || ''} onChange={(e) => updateMeasurement(device.id, 'fiIn', e.target.value.replace(/[^0-9.,\-]/g, ''))} /></td>
-                        <td className="border border-gray-300 p-2"><Input className="w-full text-center bg-blue-50" type="text" placeholder="-" value={measurement.fiDin || ''} onChange={(e) => updateMeasurement(device.id, 'fiDin', e.target.value.replace(/[^0-9.,\-]/g, ''))} /></td>
                         <td className="border border-gray-300 p-2">
-                          <Select value={measurement.fiTest || ''} onValueChange={(v) => updateMeasurement(device.id, 'fiTest', v)}>
+                          <Input 
+                            className="w-full text-center" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.tipusjelzes || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'tipusjelzes', e.target.value)}
+                            data-question-id={getQuestionId('tipusjelzes')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.szigetelesNPE || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'szigetelesNPE', e.target.value)}
+                            data-question-id={getQuestionId('szigetelesNPE')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.szigetelesL1PE || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'szigetelesL1PE', e.target.value)}
+                            data-question-id={getQuestionId('szigetelesL1PE')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.szigetelesL2PE || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'szigetelesL2PE', e.target.value)}
+                            data-question-id={getQuestionId('szigetelesL2PE')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.szigetelesL3PE || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'szigetelesL3PE', e.target.value)}
+                            data-question-id={getQuestionId('szigetelesL3PE')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.iccLN || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'iccLN', e.target.value)}
+                            data-question-id={getQuestionId('iccLN')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.iccLPE || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'iccLPE', e.target.value)}
+                            data-question-id={getQuestionId('iccLPE')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center bg-blue-50" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.fiIn || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'fiIn', e.target.value.replace(/[^0-9.,\-]/g, ''))}
+                            data-question-id={getQuestionId('fiIn')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Input 
+                            className="w-full text-center bg-blue-50" 
+                            type="text" 
+                            placeholder="-" 
+                            value={measurement.fiDin || ''} 
+                            onChange={(e) => updateMeasurement(device.id, 'fiDin', e.target.value.replace(/[^0-9.,\-]/g, ''))}
+                            data-question-id={getQuestionId('fiDin')}
+                          />
+                        </td>
+                        <td className="border border-gray-300 p-2">
+                          <Select 
+                            value={measurement.fiTest || ''} 
+                            onValueChange={(v) => updateMeasurement(device.id, 'fiTest', v)}
+                            data-question-id={getQuestionId('fiTest')}
+                          >
                             <SelectTrigger className="w-full"><SelectValue placeholder="-" /></SelectTrigger>
                             <SelectContent>{(dropdownOptions.fiTest || []).map((o: string) => (<SelectItem key={o} value={o}>{o}</SelectItem>))}</SelectContent>
                           </Select>
@@ -305,6 +468,26 @@ export function NiedervoltTable({
               {saveStatus === 'saved' && <Check className="h-4 w-4 mr-2" />}
               {saveStatus !== 'saving' && saveStatus !== 'saved' && <Save className="h-4 w-4 mr-2" />}
               {saveStatus === 'saving' ? (language === 'hu' ? 'Mentés...' : 'Speichern...') : saveStatus === 'saved' ? (language === 'hu' ? 'Mentve' : 'Gespeichert') : (language === 'hu' ? 'Mentés' : 'Speichern')}
+            </Button>
+            <Button 
+              onClick={handleSaveToOtis} 
+              className={`transition-all duration-300 ${
+                otisStatus === 'saved' ? 'bg-green-100 text-green-700 border-green-300' : 
+                otisStatus === 'error' ? 'bg-red-100 text-red-700 border-red-300' : 
+                'bg-blue-50 hover:bg-blue-100 text-blue-700 border-blue-300'
+              }`} 
+              variant="outline" 
+              disabled={otisStatus === 'saving' || Object.keys(measurements).length === 0}
+              data-testid="button-save-otis"
+            >
+              {otisStatus === 'saving' && (<div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />)}
+              {otisStatus === 'saved' && <Check className="h-4 w-4 mr-2" />}
+              {otisStatus === 'error' && <span className="mr-2">❌</span>}
+              {otisStatus === 'idle' && <Save className="h-4 w-4 mr-2" />}
+              {otisStatus === 'saving' ? (language === 'hu' ? 'Otis mentés...' : 'Otis speichern...') : 
+               otisStatus === 'saved' ? (language === 'hu' ? 'Otis mentve' : 'Otis gespeichert') :
+               otisStatus === 'error' ? (language === 'hu' ? 'Hiba' : 'Fehler') :
+               (language === 'hu' ? 'Mentés Otis Excel-be' : 'In Otis Excel speichern')}
             </Button>
             <Button onClick={onNext} className="flex items-center">{language === 'hu' ? 'Következő' : 'Weiter'}<ArrowRight className="h-4 w-4 ml-2" /></Button>
           </div>

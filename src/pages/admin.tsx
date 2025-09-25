@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -19,8 +19,28 @@ interface Template {
   type: string;
   language: string;
   fileName: string;
-  isActive: boolean;
-  uploadedAt: string;
+  is_active: boolean;
+  uploaded_at: string;
+}
+
+interface LocalTemplate {
+  id: string;
+  name: string;
+  name_de: string;
+  type: string;
+  language: string;
+  path: string;
+  description?: string;
+  description_de?: string;
+}
+
+interface HybridTemplateData {
+  local: LocalTemplate[];
+  remote: Template[];
+  current: {
+    templateId: string;
+    loadStrategy: string;
+  };
 }
 
 interface AdminProps {
@@ -42,9 +62,13 @@ export function Admin({ onBack, onHome }: AdminProps) {
     language: 'multilingual',
     file: null as File | null,
   });
+  const [hybridTemplates, setHybridTemplates] = useState<HybridTemplateData | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [loadStrategy, setLoadStrategy] = useState<string>('local_first');
 
   useEffect(() => {
     fetchTemplates();
+    fetchHybridTemplates();
   }, []);
 
   const fetchTemplates = async () => {
@@ -61,6 +85,58 @@ export function Admin({ onBack, onHome }: AdminProps) {
         description: 'Failed to fetch templates',
         variant: 'destructive',
       });
+    }
+  };
+
+  const fetchHybridTemplates = async () => {
+    try {
+      const response = await fetch('/api/admin/templates/available');
+      if (response.ok) {
+        const data = await response.json();
+        setHybridTemplates(data);
+        setSelectedTemplate(data.current.templateId);
+        setLoadStrategy(data.current.loadStrategy);
+      }
+    } catch (error) {
+      console.error('Error fetching hybrid templates:', error);
+    }
+  };
+
+  const handleTemplateSelect = async () => {
+    if (!selectedTemplate) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/templates/select', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          templateId: selectedTemplate,
+          loadStrategy: loadStrategy
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        toast({
+          title: t.success,
+          description: `Template váltás sikeres: ${result.template.name}`,
+        });
+        fetchHybridTemplates();
+      } else {
+        throw new Error('Template selection failed');
+      }
+    } catch (error) {
+      console.error('Error selecting template:', error);
+      toast({
+        title: t.error,
+        description: 'Template váltás sikertelen',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -255,8 +331,9 @@ export function Admin({ onBack, onHome }: AdminProps) {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="templates" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="templates">{t.templates}</TabsTrigger>
+            <TabsTrigger value="hybrid">Hibrid Sablonok</TabsTrigger>
             <TabsTrigger value="upload">{t.uploadTemplate}</TabsTrigger>
           </TabsList>
 
@@ -281,8 +358,8 @@ export function Admin({ onBack, onHome }: AdminProps) {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <h3 className="font-medium text-gray-800">{template.name}</h3>
-                            <Badge variant={template.isActive ? "default" : "secondary"}>
-                              {template.isActive ? t.active : t.inactive}
+                            <Badge variant={template.is_active ? "default" : "secondary"}>
+                              {template.is_active ? t.active : t.inactive}
                             </Badge>
                             <Badge variant="outline">
                               {template.type === 'unified' ? 
@@ -296,7 +373,18 @@ export function Admin({ onBack, onHome }: AdminProps) {
                           </div>
                           <p className="text-sm text-gray-600">{template.fileName}</p>
                           <p className="text-xs text-gray-500">
-                            {formatDate(new Date(template.uploadedAt), language)}
+                            {(() => {
+                              try {
+                                const date = new Date(template.uploaded_at);
+                                // Ellenőrizzük, hogy valid dátum-e és nem túl nagy az évszám
+                                if (isNaN(date.getTime()) || date.getFullYear() > 2030) {
+                                  return 'Ismeretlen dátum';
+                                }
+                                return formatDate(date, language);
+                              } catch {
+                                return 'Ismeretlen dátum';
+                              }
+                            })()}
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
@@ -421,7 +509,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                             </DialogContent>
                           </Dialog>
                           
-                          {!template.isActive && (
+                          {!template.is_active && (
                             <Button
                               size="sm"
                               onClick={() => handleActivate(template.id)}
@@ -551,6 +639,62 @@ export function Admin({ onBack, onHome }: AdminProps) {
                 >
                   {loading ? t.loading : t.upload}
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="hybrid" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Hibrid Template Kezelés</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {hybridTemplates && (
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Helyi Sablonok ({hybridTemplates.local.length})</Label>
+                      <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Válassz sablont" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {hybridTemplates.local.map((template) => (
+                            <SelectItem key={template.id} value={template.id}>
+                              {template.name} (helyi)
+                            </SelectItem>
+                          ))}
+                          {hybridTemplates.remote.map((template) => (
+                            <SelectItem key={template.id} value={template.id}>
+                              {template.name} (távoli)
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label>Betöltési Stratégia</Label>
+                      <Select value={loadStrategy} onValueChange={setLoadStrategy}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="local_first">Helyi Először</SelectItem>
+                          <SelectItem value="cache_first">Cache Először</SelectItem>
+                          <SelectItem value="remote_only">Csak Távoli</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleTemplateSelect} 
+                      disabled={loading || !selectedTemplate}
+                      className="w-full"
+                    >
+                      {loading ? 'Váltás...' : 'Sablon Váltás'}
+                    </Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

@@ -17,6 +17,7 @@ export interface ParsedQuestion {
   groupName?: string;
   groupNameDe?: string;
   groupOrder?: number;
+  conditionalGroupKey?: string; // For dynamic question filtering
   unit?: string;
   minValue?: number;
   maxValue?: number;
@@ -46,6 +47,7 @@ const COLUMN_ALIASES = {
     GROUP_NAME: ["blokknevehu", "blokkneve", "group_name", "group"],
     GROUP_NAME_DE: ["blokknevede", "group_name_de"],
     GROUP_ORDER: ["order"],
+    CONDITIONAL_GROUP_KEY: ["conditional_group_key", "feltételcsoport", "cond_group", "condition_key"],
     UNIT: ["unit"],
     MIN_VALUE: ["min_value", "min"],
     MAX_VALUE: ["max_value", "max"],
@@ -62,7 +64,13 @@ export class ExcelParserService {
       console.log(`🔍 Parsing questions from: ${filePath}`);
 
       const fileBuffer = await fs.readFile(filePath);
-      const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+      // UTF-8 karakterkódolás explicit megadása
+      const workbook = XLSX.read(fileBuffer, { 
+        type: "buffer",
+        codepage: 65001, // UTF-8 kódlap
+        cellText: false,
+        cellDates: true
+      });
 
       const firstSheetName = workbook.SheetNames[0];
       if (!firstSheetName) throw new Error("Excel file contains no sheets.");
@@ -107,6 +115,7 @@ export class ExcelParserService {
           groupName: colIndices.GROUP_NAME !== -1 ? row[colIndices.GROUP_NAME]?.toString() : undefined,
           groupNameDe: colIndices.GROUP_NAME_DE !== -1 ? row[colIndices.GROUP_NAME_DE]?.toString() : undefined,
           groupOrder: colIndices.GROUP_ORDER !== -1 ? parseInt(row[colIndices.GROUP_ORDER]?.toString() ?? "0", 10) : 0,
+          conditionalGroupKey: colIndices.CONDITIONAL_GROUP_KEY !== -1 ? row[colIndices.CONDITIONAL_GROUP_KEY]?.toString() : undefined,
           unit: colIndices.UNIT !== -1 ? row[colIndices.UNIT]?.toString() : undefined,
           minValue: colIndices.MIN_VALUE !== -1 ? parseFloat(row[colIndices.MIN_VALUE]?.toString()) : undefined,
           maxValue: colIndices.MAX_VALUE !== -1 ? parseFloat(row[colIndices.MAX_VALUE]?.toString()) : undefined,
@@ -130,7 +139,10 @@ export class ExcelParserService {
   async extractTemplateInfo(filePath: string): Promise<TemplateInfo> {
     try {
         const fileBuffer = await fs.readFile(filePath);
-        const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+        const workbook = XLSX.read(fileBuffer, { 
+          type: 'buffer',
+          codepage: 65001 // UTF-8 kódlap
+        });
         const sheetName = workbook.SheetNames[0];
         if (!sheetName) throw new Error("Sheet not found");
 
@@ -155,7 +167,10 @@ export class ExcelParserService {
   async populateTemplate(templatePath: string, answers: Record<string, any>, questions: ParsedQuestion[]): Promise<Buffer> {
     try {
       const templateBuffer = await fs.readFile(templatePath);
-      const workbook = XLSX.read(templateBuffer, { type: 'buffer' });
+      const workbook = XLSX.read(templateBuffer, { 
+        type: 'buffer',
+        codepage: 65001 // UTF-8 kódlap
+      });
       
       questions.forEach(question => {
         const answer = answers[question.questionId];

@@ -1,0 +1,59 @@
+{
+  "groups": [
+    {
+      "id": "maschinenraum",
+      "title": "1. Prüfung im Maschinenraum",
+      "questions": [
+        { "id": "grd_mr_ref", "text": "Referenz-Erdung vorhanden" },
+        { "id": "grd_mr_controller", "text": "Kontroller-Gehäuse und Türen" },
+        { "id": "grd_mr_motor", "text": "der Motor" },
+        { "id": "grd_mr_bremse", "text": "das Bremsengehäuse" },
+        { "id": "grd_mr_seil", "text": "Seilbefestigungspunkt" },
+        { "id": "grd_mr_fuehrung", "text": "Führungsschienen-Konsole" }
+      ]
+    },
+    {
+      "id": "kabinendach",
+      "title": "2. Prüfung auf Kabinendach",
+      "questions": [
+        { "id": "grd_kd_jbox", "text": "Gehäuse/Erdungsklemme der Verbindungen (J-Box), Klemmsteg" },
+        { "id": "grd_kd_prs", "text": "PRS-Gehäuse" },
+        { "id": "grd_kd_notschalter", "text": "Not-Schalter" },
+        { "id": "grd_kd_inspektion", "text": "Inspektionskasten" }
+      ]
+    },
+    {
+      "id": "schacht",
+      "title": "3. Prüfung im Schacht",
+      "questions": [
+        { "id": "grd_sch_fuehrung", "text": "Führungsschienen" },
+        { "id": "grd_sch_konsole", "text": "Konsolen-Befestigung" },
+        { "id": "grd_sch_tuer", "text": "Türverschluss" },
+        { "id": "grd_sch_rahmen", "text": "Türrahmen" },
+        { "id": "grd_sch_etagen", "text": "Etagenanzeige" }
+      ]
+    },
+    {
+      "id": "schachtgrube",
+      "title": "4. Prüfung in der Schachtgrube",
+      "questions": [
+        { "id": "grd_sg_puffer", "text": "Puffer/Stoßdämpfer" },
+        { "id": "grd_sg_spannrolle", "text": "Spannrolle" },
+        { "id": "grd_sg_fuehrung", "text": "Führungsschienen-Endverbindung" },
+        { "id": "grd_sg_grube", "text": "Gruben-Erdungsanschluss" }
+      ]
+    },
+    {
+      "id": "kabine",
+      "title": "5. Prüfung in der Kabine",
+      "questions": [
+        { "id": "grd_kb_rahmen", "text": "Kabinrahmen" },
+        { "id": "grd_kb_tuer", "text": "Kabintür" },
+        { "id": "grd_kb_bedienung", "text": "Bedienfeld" },
+        { "id": "grd_kb_beleuchtung", "text": "Beleuchtung" },
+        { "id": "grd_kb_luefter", "text": "Lüftung" },
+        { "id": "grd_kb_handlauf", "text": "Handlauf (falls vorhanden)" }
+      ]
+    }
+  ]
+}

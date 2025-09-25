@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { RotateCcw, Settings, Home } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { SmartHelpWizard } from "@/components/smart-help-wizard";
 
 interface PageHeaderProps {
   title?: string;
@@ -19,6 +20,11 @@ interface PageHeaderProps {
   stepType?: 'questionnaire' | 'niedervolt';
   progressText?: string; // Custom progress text (optional)
   showProgress?: boolean; // <-- 1. MÓDOSÍTÁS: Új prop hozzáadva
+  // AI Segítő props
+  currentPage?: number;
+  formData?: any;
+  currentQuestionId?: string;
+  errors?: any[];
 }
 
 const PageHeader: FC<PageHeaderProps> = ({
@@ -35,6 +41,11 @@ const PageHeader: FC<PageHeaderProps> = ({
   stepType = 'questionnaire',
   progressText,
   showProgress = true, // <-- 2. MÓDOSÍTÁS: Új prop alapértelmezett értékkel
+  // AI Segítő props
+  currentPage = 1,
+  formData = {},
+  currentQuestionId,
+  errors = [],
 }) => {
   // Számítsd ki az egységes progress százalékot
   const calculateUnifiedProgress = (): number => {
@@ -48,7 +59,7 @@ const PageHeader: FC<PageHeaderProps> = ({
         return Math.round(niedervoltProgress);
       }
     }
-    
+
     return Math.round(progressPercent);
   };
 
@@ -91,6 +102,13 @@ const PageHeader: FC<PageHeaderProps> = ({
             <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
           </div>
           <div className="flex items-center space-x-4">
+            {/* AI Segítő gomb - az OTIS átvételi protokoll és a dátumválasztó közé */}
+            <SmartHelpWizard 
+              currentPage={currentPage}
+              formData={formData}
+              currentQuestionId={currentQuestionId}
+              errors={errors}
+            />
             {receptionDate !== undefined && onReceptionDateChange && (
               <div className="flex items-center space-x-2">
                 <Label className="text-sm font-medium text-gray-600">

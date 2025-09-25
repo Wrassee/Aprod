@@ -15,8 +15,25 @@ import { excelParserService } from "./services/excel-parser.js";
 import { errorRoutes } from "./routes/error-routes.js";
 import { supabaseStorage } from "./services/supabase-storage.js";
 import { niedervoltService } from "./services/niedervolt-service.js";
+import { hybridTemplateLoader } from "./services/hybrid-template-loader.js";
+import { protocolMappingRoutes } from "./routes/protocol-mapping.js";
 // Gyorsítótár a kérdések tárolására
 let questionsCache: any[] | null = null;
+
+// Helper function for dynamic question filtering
+function filterQuestionsByConditions(questions: any[], truthyConditions: string[]): any[] {
+  return questions.filter(question => {
+    // If no conditional group key is set, always include the question
+    if (!question.conditionalGroupKey && !question.conditional_group_key) {
+      return true;
+    }
+    
+    // Include question only if its conditional group key is in the truthy conditions
+    // Support both camelCase (from parser) and snake_case (from schema)
+    const conditionalKey = question.conditionalGroupKey || question.conditional_group_key;
+    return truthyConditions.includes(conditionalKey);
+  });
+}
 
 // Feltöltési mappa
 const uploadDir = process.env.NODE_ENV === 'production'
@@ -55,6 +72,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Error routes
   app.use("/api/errors", errorRoutes);
+  
+  // Protocol mapping routes
+  app.use("/api/protocols", protocolMappingRoutes);
+  
+  // Cache management route
+  app.post("/api/admin/cache/clear", (req, res) => {
+    questionsCache = null;
+    console.log("✅ Questions cache cleared");
+    res.json({ success: true, message: "Cache cleared" });
+  });
 
   // Protocol létrehozása
   app.post("/api/protocols", async (req, res) => {
@@ -146,6 +173,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // --- NEW GROUNDING PDF ENDPOINT ---
+  app.post("/api/protocols/download-grounding-pdf", async (req, res) => {
+    try {
+      console.log("Grounding PDF download request received");
+      const { formData, language } = req.body;
+      if (!formData) return res.status(400).json({ message: "Form data is required" });
+
+      // 1. Generate Excel with grounding-specific data using the specialized service
+      const { groundingExcelService } = await import('./services/grounding-excel-service.js');
+      console.log("Generating grounding Excel buffer...");
+      const excelBuffer = await groundingExcelService.generateGroundingExcel(formData, language || 'hu');
+
+      if (!excelBuffer || excelBuffer.length < 1000) {
+        throw new Error('Generated grounding Excel buffer is invalid or too small');
+      }
+      console.log(`Grounding Excel buffer generated: ${excelBuffer.length} bytes`);
+
+      // 2. Convert Excel buffer to PDF using the PDF service
+      console.log("Converting grounding Excel to PDF...");
+      const pdfBuffer = await pdfService.generatePDF(excelBuffer);
+
+      if (!pdfBuffer || pdfBuffer.length < 100) {
+        throw new Error('Generated grounding PDF buffer is invalid or too small');
+      }
+
+      const liftId = formData.answers?.['7'] ? String(formData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
+      const filename = `OTIS_Grounding_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      console.log(`Grounding PDF generated successfully: ${filename} (${pdfBuffer.length} bytes)`);
+
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(pdfBuffer);
+
+    } catch (error) {
+      console.error("Error generating grounding PDF download:", error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      res.status(500).json({ 
+        message: "Failed to generate grounding PDF file", 
+        error: process.env.NODE_ENV === 'development' ? errorMessage : undefined 
+      });
+    }
+  });
+
   // server/routes.ts
 
 // Kérdések lekérése - GYORSÍTÓTÁRAZOTT VERZIÓ
@@ -160,31 +231,23 @@ app.get("/api/questions/:language", async (req, res) => {
     if (questionsCache) {
       console.log('✅ Serving questions from cache');
     } else {
-      // 2. LÉPÉS: Ha a cache üres, betöltjük a fájlból
-      console.log('ℹ️ Cache is empty, parsing questions from template...');
-      const questionsTemplate = await storage.getActiveTemplate("unified", "multilingual");
-
-      if (!questionsTemplate || !questionsTemplate.file_path) {
-        return res.status(404).json({ message: "No active questions template found" });
-      }
-
-      const storagePath = questionsTemplate.file_path;
-      // Az /app/temp mappát használjuk, ami a konténer része és nem törlődik
-      const tempDir = path.join(process.cwd(), 'temp');
-      if (!fs.existsSync(tempDir)) {
-        fs.mkdirSync(tempDir, { recursive: true });
-      }
-      const tempPath = path.join(tempDir, `template-${questionsTemplate.file_name}`);
-
-      // Csak akkor töltjük le, ha még nem létezik helyben
-      if (!fs.existsSync(tempPath)) {
-        console.log(`📥 Downloading template to persistent path: ${tempPath}`);
-        await supabaseStorage.downloadFile(storagePath, tempPath);
-      } else {
-        console.log(`📄 Using existing template file from: ${tempPath}`);
-      }
+      // 2. LÉPÉS: Ha a cache üres, betöltjük a hibrid template loader-rel
+      console.log('ℹ️ Cache is empty, loading template with hybrid loader...');
       
-      const questions = await excelParserService.parseQuestionsFromExcel(tempPath);
+      // Próbáljuk megszerezni az aktív template ID-t
+      const activeTemplate = await storage.getActiveTemplate("unified", "multilingual");
+      const templateId = activeTemplate?.id || 'alap_egysegu'; // Fallback helyi template
+      
+      // Hibrid betöltés: Helyi -> Cache -> Supabase
+      const templateResult = await hybridTemplateLoader.loadTemplate(
+        templateId, 
+        "unified", 
+        "multilingual"
+      );
+      
+      console.log(`📋 Template loaded from: ${templateResult.loadedFrom} (${templateResult.templateInfo.name || templateResult.templateInfo.file_name})`);
+      
+      const questions = await excelParserService.parseQuestionsFromExcel(templateResult.filePath);
       console.log(`✅ Parsed ${questions.length} questions.`);
       
       // 3. LÉPÉS: Elmentjük a feldolgozott kérdéseket a cache-be
@@ -213,6 +276,7 @@ app.get("/api/questions/:language", async (req, res) => {
           language === "hu"
             ? config.titleHu || config.title
             : config.titleDe || config.title,
+        conditional_group_key: config.conditionalGroupKey, // Normalize to snake_case for frontend consistency
         type: correctedType,
         required: config.required,
         placeholder: config.placeholder ?? undefined,
@@ -234,6 +298,88 @@ app.get("/api/questions/:language", async (req, res) => {
     // Hiba esetén töröljük a cache-t, hogy a következő kérés újra próbálkozzon
     questionsCache = null;
     res.status(500).json({ message: "Failed to fetch questions" });
+  }
+});
+
+// Filtered questions endpoint for dynamic question display
+app.post("/api/questions/filter", async (req, res) => {
+  try {
+    const { language, conditions } = req.body;
+    
+    if (language !== "hu" && language !== "de") {
+      return res.status(400).json({ message: "Invalid language specified" });
+    }
+    
+    if (!Array.isArray(conditions)) {
+      return res.status(400).json({ message: "Conditions must be an array of strings" });
+    }
+
+    // Use the same hybrid loading logic for filtering
+    if (!questionsCache) {
+      console.log('ℹ️ Cache is empty, loading template with hybrid loader for filtering...');
+      
+      const activeTemplate = await storage.getActiveTemplate("unified", "multilingual");
+      const templateId = activeTemplate?.id || 'alap_egysegu';
+      
+      const templateResult = await hybridTemplateLoader.loadTemplate(
+        templateId, 
+        "unified", 
+        "multilingual"
+      );
+      
+      const questions = await excelParserService.parseQuestionsFromExcel(templateResult.filePath);
+      questionsCache = questions;
+    }
+
+    // Format questions similarly to the main endpoint
+    const allFormattedQuestions = questionsCache.map((config) => {
+      let groupName =
+        language === "de" && config.groupNameDe
+          ? config.groupNameDe
+          : config.groupName;
+      const typeStr = config.type as string;
+      if (typeStr === "measurement" || typeStr === "calculated") {
+        groupName = language === "de" ? "Messdaten" : "Mérési adatok";
+      }
+
+      let correctedType = config.type;
+      if (config.type === 'checkbox' && config.placeholder === 'Válasszon') {
+          correctedType = 'radio';
+      }
+
+      return {
+        id: config.questionId,
+        title:
+          language === "hu"
+            ? config.titleHu || config.title
+            : config.titleDe || config.title,
+        conditional_group_key: config.conditionalGroupKey, // Normalize to snake_case
+        type: correctedType,
+        required: config.required,
+        placeholder: config.placeholder ?? undefined,
+        cellReference: config.cellReference ?? undefined,
+        sheetName: config.sheetName,
+        multiCell: config.multiCell,
+        groupName,
+        groupOrder: config.groupOrder || 0,
+        unit: config.unit,
+        minValue: config.minValue,
+        maxValue: config.maxValue,
+        calculationFormula: config.calculationFormula,
+        calculationInputs: config.calculationInputs,
+      };
+    });
+
+    // Apply conditional filtering
+    const filteredQuestions = filterQuestionsByConditions(allFormattedQuestions, conditions);
+    
+    console.log(`🎯 Filtered ${filteredQuestions.length} questions from ${allFormattedQuestions.length} total questions based on ${conditions.length} conditions`);
+    
+    res.json(filteredQuestions);
+
+  } catch (error) {
+    console.error("❌ Error fetching filtered questions:", error);
+    res.status(500).json({ message: "Failed to fetch filtered questions" });
   }
 });
 
@@ -278,6 +424,75 @@ app.get("/api/questions/:language", async (req, res) => {
   // ====================================================================
   // === MÓDOSÍTOTT RÉSZ VÉGE ===
   // ====================================================================
+
+  // ====================================================================
+  // === HIBRID TEMPLATE KEZELÉS API ===
+  // ====================================================================
+  
+  // Elérhető template-ek listázása (helyi + remote)
+  app.get("/api/admin/templates/available", async (req, res) => {
+    try {
+      console.log('📋 Fetching all available templates (local + remote)');
+      
+      const allTemplates = await hybridTemplateLoader.getAllAvailableTemplates();
+      
+      const response = {
+        local: allTemplates.local,
+        remote: allTemplates.remote,
+        current: {
+          templateId: 'alap_egysegu', // TODO: localStorage-ből olvasni
+          loadStrategy: 'local_first'
+        }
+      };
+      
+      console.log(`✅ Found ${allTemplates.local.length} local and ${allTemplates.remote.length} remote templates`);
+      res.json(response);
+      
+    } catch (error) {
+      console.error("❌ Error fetching available templates:", error);
+      res.status(500).json({ message: "Failed to fetch available templates" });
+    }
+  });
+
+  // Template választás beállítása
+  app.post("/api/admin/templates/select", async (req, res) => {
+    try {
+      const { templateId, loadStrategy } = req.body;
+      
+      if (!templateId) {
+        return res.status(400).json({ message: "Template ID is required" });
+      }
+      
+      console.log(`🔄 Selecting template: ${templateId} with strategy: ${loadStrategy || 'local_first'}`);
+      
+      // Teszteljük, hogy betölthető-e a template
+      const templateResult = await hybridTemplateLoader.loadTemplate(
+        templateId, 
+        "unified", 
+        "multilingual"
+      );
+      
+      // Cache törlése, hogy újra betöltse az új template-et
+      questionsCache = null;
+      
+      console.log(`✅ Template selected successfully: ${templateResult.templateInfo.name || templateResult.templateInfo.file_name}`);
+      console.log(`📋 Loaded from: ${templateResult.loadedFrom}`);
+      
+      res.json({
+        success: true,
+        template: {
+          id: templateId,
+          name: templateResult.templateInfo.name || templateResult.templateInfo.file_name,
+          loadedFrom: templateResult.loadedFrom,
+          isLocal: templateResult.isLocal
+        }
+      });
+      
+    } catch (error) {
+      console.error("❌ Error selecting template:", error);
+      res.status(500).json({ message: "Failed to select template" });
+    }
+  });
 
   // Admin: Sablonok listázása
   app.get("/api/admin/templates", async (_req, res) => {
@@ -371,6 +586,11 @@ app.get("/api/questions/:language", async (req, res) => {
   app.post("/api/admin/templates/:id/activate", async (req, res) => {
     try {
       await storage.setActiveTemplate(req.params.id);
+      
+      // ✅ JAVÍTÁS: Cache törlése az aktiválás után
+      questionsCache = null;
+      console.log("✅ Questions cache cleared after template activation");
+      
       res.json({ success: true });
     } catch (error) {
       console.error("Error activating template:", error);
@@ -389,8 +609,22 @@ app.get("/api/questions/:language", async (req, res) => {
       await storage.deleteQuestionConfigsByTemplate(templateId);
       console.log(`✅ Deleted question configs for template: ${templateId}`);
 
+      // Fájl törlése Supabase-ből multi-tier stratégiával
       if (template?.file_path) {
-        await supabaseStorage.deleteFile(template.file_path);
+        try {
+          const { executeWithFilenameStrategies } = await import('./utils/filename-corrections.js');
+          
+          console.log(`🗑️ Attempting to delete file from Supabase: ${template.file_path}`);
+          await executeWithFilenameStrategies(
+            template.file_path,
+            (path) => supabaseStorage.deleteFile(path),
+            'delete'
+          );
+          
+        } catch (error: any) {
+          console.warn(`⚠️ Could not delete file from storage. Continuing with database cleanup. Error:`, error?.message);
+          // Ne blokkoljuk a törlést, ha a fájl törlése nem sikerül
+        }
       }
       
       // Csak ezután töröljük magát a sablont.
@@ -405,6 +639,40 @@ app.get("/api/questions/:language", async (req, res) => {
   });
 
   // --- IDE KERÜLT AZ ÚJ LETÖLTÉSI VÉGPONT ---
+  // Debug: Supabase storage tartalom megjelenítése
+  app.get("/api/admin/debug/storage", async (req, res) => {
+    try {
+      console.log(`🔍 Debugging Supabase storage contents...`);
+      
+      // Próbáljuk meg listázni a templates mappát
+      const { supabaseStorage } = await import('./services/supabase-storage.js');
+      const bucketName = process.env.SUPABASE_BUCKET || 'aprod-templates';
+      
+      // Egyszerűsített debug - csak a template fájlok listázása  
+      console.log(`📁 Debug: checking storage bucket: ${bucketName}`);
+      
+      // Próbáljuk meg ellenőrizni, hogy van-e hozzáférésünk
+      const debugInfo = {
+        bucket: bucketName,
+        message: "Storage debug endpoint is working",
+        environment: {
+          VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL ? "SET" : "NOT SET",
+          SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY ? "SET" : "NOT SET", 
+          SUPABASE_BUCKET: process.env.SUPABASE_BUCKET ? "SET" : "NOT SET"
+        }
+      };
+
+      res.json({
+        success: true,
+        debug: debugInfo
+      });
+
+    } catch (error: any) {
+      console.error("Error debugging storage:", error);
+      res.status(500).json({ message: "Failed to debug storage", error: error?.message || 'Unknown error' });
+    }
+  });
+
   // Admin: Sablon letöltése
   app.get("/api/admin/templates/:id/download", async (req, res) => {
     try {
@@ -416,14 +684,75 @@ app.get("/api/questions/:language", async (req, res) => {
         return res.status(404).json({ message: "Template file not found in database." });
       }
 
-      const storagePath = template.file_path;
-      const originalFileName = template.file_name;
-      const tempLocalPath = path.join(uploadDir, `download-${Date.now()}-${originalFileName}`);
+      let storagePath = template.file_path;
+      let originalFileName = template.file_name;
+      
+      // Fix karakterkódolási problémák
+      const fixCorruptedString = (str: string): string => {
+        // Javítás: KÃÂ©rdÃÂ©ssor -> Kérdéssor
+        return str
+          .replace(/KÃÂ©rdÃÂ©ssor/g, 'Kérdéssor')
+          .replace(/KÃ¢â‚¬Â/g, 'é')
+          .replace(/KÃÂ/g, 'K')
+          .replace(/Ã©/g, 'é')
+          .replace(/Ã¡/g, 'á')
+          .replace(/Ã­/g, 'í')
+          .replace(/Ã³/g, 'ó')
+          .replace(/Ã¶/g, 'ö')
+          .replace(/Ã¼/g, 'ü')
+          .replace(/Ã¸/g, 'ő')
+          .replace(/Ã¤/g, 'ä');
+      };
+      
+      // Próbáljunk meg javítani a fájlnevet
+      const originalStoragePath = storagePath;
+      const originalOriginalFileName = originalFileName;
+      
+      console.log(`📁 Original storage path: ${originalStoragePath}`);
+      console.log(`📁 Original file name: ${originalOriginalFileName}`);
+      
+      const tempLocalPath = path.join(uploadDir, `download-${Date.now()}-${originalFileName.replace(/[^a-zA-Z0-9.-]/g, '_')}`);
 
       // 2. Fájl letöltése a Supabase Storage-ból egy ideiglenes helyi mappába
       console.log(`Downloading template from Supabase: ${storagePath} to ${tempLocalPath}`);
-      await supabaseStorage.downloadFile(storagePath, tempLocalPath);
-      console.log(`✅ Template successfully downloaded to temporary path.`);
+      
+      // Többféle letöltési stratégia próbálása
+      const downloadStrategies = [
+        // 1. Eredeti fájlnév
+        { path: originalStoragePath, description: "original path" },
+        // 2. URL encoded verzió
+        { path: originalStoragePath.split('/').map((part: string) => encodeURIComponent(part)).join('/'), description: "URL encoded path" },
+        // 3. Karakterkódolás javítása
+        { path: fixCorruptedString(originalStoragePath), description: "character-fixed path" },
+        // 4. Dupla encoding javítás
+        { path: originalStoragePath.replace(/KÃÂ©rdÃÂ©ssor/g, 'Kerdessor'), description: "ASCII-safe path" },
+        // 5. Csak ASCII karakterek
+        { path: originalStoragePath.replace(/[^\x00-\x7F]/g, ""), description: "ASCII-only path" }
+      ];
+
+      let downloadSuccess = false;
+      let lastError: any = null;
+
+      for (const strategy of downloadStrategies) {
+        try {
+          console.log(`🔄 Trying download strategy: ${strategy.description}`);
+          console.log(`📁 Path: ${strategy.path}`);
+          
+          await supabaseStorage.downloadFile(strategy.path, tempLocalPath);
+          console.log(`✅ Download successful with strategy: ${strategy.description}`);
+          downloadSuccess = true;
+          break;
+        } catch (error: any) {
+          console.log(`❌ Strategy "${strategy.description}" failed:`, error?.message || error);
+          lastError = error;
+          continue;
+        }
+      }
+
+      if (!downloadSuccess) {
+        console.error(`💥 ALL download strategies failed. Last error:`, lastError);
+        throw new Error(`Unable to download template file using any strategy. Last error: ${lastError?.message || 'Unknown error'}`);
+      }
 
       // 3. Fájl elküldése a felhasználónak, majd az ideiglenes fájl törlése
       res.download(tempLocalPath, originalFileName, (err) => {

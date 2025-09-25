@@ -24,7 +24,7 @@ import { Signature } from "./pages/signature.js";
 import { Completion } from "./pages/completion.js";
 import { Admin } from "./pages/admin.js";
 import { ProtocolPreview } from "./pages/protocol-preview.js";
-import { SmartHelpWizard } from "./components/smart-help-wizard.js";
+import { Erdungskontrolle } from "./pages/erdungskontrolle.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
 /* --------------------  Shared schema -------------------- */
@@ -34,7 +34,7 @@ import { AnswerValue, ProtocolError } from "../shared/schema.js";
 import NotFound from "./pages/not-found.js";
 
 function App() {
-  const [currentScreen, setCurrentScreen] = useState<'start' | 'questionnaire' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview'>('start');
+  const [currentScreen, setCurrentScreen] = useState<'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview'>('start');
   const [currentQuestionnaireePage, setCurrentQuestionnairePage] = useState(0);
   const [currentQuestionId, setCurrentQuestionId] = useState<string>('');
   const [language, setLanguage] = useState<'hu' | 'de'>('hu');
@@ -103,21 +103,14 @@ function App() {
   }, []);
 
   const handleQuestionnaireNext = () => {
-    // After completing all template questions, show the beautiful Niedervolt UI
-    console.log('🔄 Questionnaire completed - showing Niedervolt UI as final step');
-    setCurrentScreen('niedervolt');
+    // After completing all template questions, show the Erdungskontrolle page
+    console.log('🔄 Questionnaire completed - showing Erdungskontrolle page');
+    setCurrentScreen('erdungskontrolle');
   };
 
   const handleNiedervoltBack = () => {
-    console.log('🔙 Niedervolt Back button clicked - returning to questionnaire');
-    
-    // Restore questionnaire page to the last page
-    const lastPage = localStorage.getItem('questionnaire-current-page');
-    if (lastPage) {
-      console.log('🔙 Restoring questionnaire page:', lastPage);
-    }
-    
-    setCurrentScreen('questionnaire');
+    console.log('🔙 Niedervolt Back button clicked - returning to erdungskontrolle');
+    setCurrentScreen('erdungskontrolle');
   };
 
   const handleNiedervoltNext = () => {
@@ -570,6 +563,21 @@ const handleStartNew = () => {
             onQuestionChange={setCurrentQuestionId}
           />
         );
+      case 'erdungskontrolle':
+        return (
+          <Erdungskontrolle
+            formData={formData}
+            setFormData={setFormData}
+            onNext={() => setCurrentScreen('niedervolt')}
+            onBack={() => setCurrentScreen('questionnaire')}
+            onHome={handleGoHome}
+            onAdminAccess={handleAdminAccess}
+            onStartNew={handleStartNew}
+            language={language}
+            receptionDate={formData.receptionDate}
+            onReceptionDateChange={handleReceptionDateChange}
+          />
+        );
       case 'niedervolt':
         return (
           <NiedervoltTable
@@ -641,17 +649,6 @@ const handleStartNew = () => {
           {/* PWA components temporarily disabled for stability */}
           {renderCurrentScreen()}
           
-          {/* Smart Help Wizard - Show on protocol screens */}
-          {(currentScreen === 'questionnaire' || currentScreen === 'niedervolt' || currentScreen === 'signature') && (
-            <SmartHelpWizard
-              currentPage={currentScreen === 'questionnaire' ? currentQuestionnaireePage + 1 : 
-                           currentScreen === 'niedervolt' ? 5 : 
-                           currentScreen === 'signature' ? 6 : 1}
-              formData={formData}
-              currentQuestionId={currentQuestionId}
-              errors={formData.errors}
-            />
-          )}
         </TooltipProvider>
       </LanguageProvider>
     </QueryClientProvider>

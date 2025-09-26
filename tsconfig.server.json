@@ -1,11 +1,17 @@
 {
-  "extends": "./tsconfig.json", // <-- ÖRÖKLI A KÖZÖS BEÁLLÍTÁSOKAT (ÉS AZ ALIASOKAT IS!)
+  "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "NodeNext",        // Felülírja a modult Node.js-re
-    "moduleResolution": "NodeNext", // Felülírja a modul feloldást
-    "noEmit": false,             // ENGEDÉLYEZI a .js fájlok generálását a szerverhez
-    "outDir": "dist-server"      // Megadja a szerver kimeneti mappáját
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "noEmit": false,
+    "outDir": "dist-server"
   },
-  "include": ["server", "shared", "src"], // A szerver fordító láthatja az összes releváns mappát
-  "exclude": ["node_modules", "dist"] // A kizárások maradnak
+  "include": [
+    "server/**/*.ts",
+    "shared/**/*.ts",
+    "src/lib/**/*.ts",
+    "src/services/**/*.ts",
+    "src/types/**/*.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
 }

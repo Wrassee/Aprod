@@ -1,27 +1,22 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["esnext", "dom", "dom.iterable"],
-    "jsx": "react-jsx",
-    "module": "esnext",
-    "moduleResolution": "bundler", // Ajánlott 'bundler'-re váltani Vite projekteknél
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "target": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "module": "ESNext",
     "skipLibCheck": true,
-    "noEmit": true, // A kliensoldali buildet a Vite végzi, a tsc-nek nem kell .js fájlt generálnia
-
-    /* ===== A KÖZÖS ALIASOK MEGADÁSA ===== */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@shared/*": ["./shared/*"]
+      "@/*": ["src/*"],
+      "@shared/*": ["shared/*"]
     }
   },
   "include": ["src", "shared"],
-  "exclude": ["node_modules", "dist", "dist-server", "server"]
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

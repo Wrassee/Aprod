@@ -1,35 +1,11 @@
 {
+  "extends": "./tsconfig.json", // <-- ÖRÖKLI A KÖZÖS BEÁLLÍTÁSOKAT (ÉS AZ ALIASOKAT IS!)
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2023", "DOM"],
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "outDir": "./dist",
-    "rootDir": ".",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "noEmit": false,
-    // ===== EZ A RÉSZ KERÜLT HOZZÁADÁSRA =====
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
-    // =======================================
+    "module": "NodeNext",        // Felülírja a modult Node.js-re
+    "moduleResolution": "NodeNext", // Felülírja a modul feloldást
+    "noEmit": false,             // ENGEDÉLYEZI a .js fájlok generálását a szerverhez
+    "outDir": "dist-server"      // Megadja a szerver kimeneti mappáját
   },
-  "include": [
-  "server/**/*.ts",
-  "shared/**/*.ts",
-  "src/**/*.ts" // <-- EZ A SOR A MEGOLDÁS
-],
-  "exclude": [
-    "node_modules",
-    "dist"
-    // ===== EZ A SOR LETT KITÖRÖLVE =====
-    // "src" 
-    // ===================================
-  ]
+  "include": ["server", "shared", "src"], // A szerver fordító láthatja az összes releváns mappát
+  "exclude": ["node_modules", "dist"] // A kizárások maradnak
 }

@@ -1,28 +1,27 @@
 {
-  "include": ["shared/**/*", "src/**/*"],
-  "exclude": ["node_modules", "build", "dist", "**/*.test.ts"],
   "compilerOptions": {
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
-    "strict": true,
+    "target": "ES2022",
     "lib": ["esnext", "dom", "dom.iterable"],
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
     "jsx": "react-jsx",
     "module": "esnext",
-    "moduleResolution": "node",
-    "noEmit": true,
+    "moduleResolution": "bundler", // Ajánlott 'bundler'-re váltani Vite projekteknél
     "resolveJsonModule": true,
+    "allowJs": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
     "skipLibCheck": true,
-    "target": "es5",
+    "noEmit": true, // A kliensoldali buildet a Vite végzi, a tsc-nek nem kell .js fájlt generálnia
+
+    /* ===== A KÖZÖS ALIASOK MEGADÁSA ===== */
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["./shared/*"],
-      "@/*": ["./src/*"]
-    },
-    "types": ["node"]
-  }
+      "@/*": ["./src/*"],
+      "@shared/*": ["./shared/*"]
+    }
+  },
+  "include": ["src", "shared"],
+  "exclude": ["node_modules", "dist", "dist-server", "server"]
 }

@@ -21,9 +21,10 @@
     // =======================================
   },
   "include": [
-    "server/**/*.ts",
-    "shared/**/*.ts"
-  ],
+  "server/**/*.ts",
+  "shared/**/*.ts",
+  "src/**/*.ts" // <-- EZ A SOR A MEGOLDÁS
+],
   "exclude": [
     "node_modules",
     "dist"

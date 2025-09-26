@@ -1,6 +1,6 @@
 // Excel író szolgáltatás - ExcelJS használatával, formázás megőrzés
 import ExcelJS from 'exceljs';
-import { CellWrite } from '@/types/mapping';
+import { CellWrite } from '../types/mapping';
 
 interface ExcelWriteConfig {
   protocolBuffer: ArrayBuffer;

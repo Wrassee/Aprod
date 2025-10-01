@@ -1,4 +1,6 @@
-import { relations } from "drizzle-orm";
+// shared/schema.ts - JAVÍTOTT VERZIÓ
+
+import { relations, sql } from "drizzle-orm"; // FONTOS: Az `sql` importálása
 import {
   pgTable,
   text,
@@ -6,7 +8,7 @@ import {
   boolean,
   jsonb,
   integer,
-  uuid, // FONTOS: uuid importálása
+  uuid,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -15,7 +17,7 @@ import { z } from "zod";
  * Protocols
  * ----------------------------------------------------------------------- */
 export const protocols = pgTable("protocols", {
-  id: uuid("id") // JAVÍTVA: text -> uuid
+  id: uuid("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   reception_date: text("reception_date"),
@@ -27,7 +29,8 @@ export const protocols = pgTable("protocols", {
   signature: text("signature"),
   signature_name: text("signature_name"),
   completed: boolean("completed").notNull().default(false),
-  created_at: timestamp("created_at").defaultNow().notNull(),
+  // JAVÍTVA: .defaultNow() -> .default(sql`CURRENT_TIMESTAMP`)
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(), 
 });
 
 export const insertProtocolSchema = createInsertSchema(protocols);
@@ -53,7 +56,7 @@ export type ProtocolError = z.infer<typeof ProtocolErrorSchema>;
  * Templates
  * ----------------------------------------------------------------------- */
 export const templates = pgTable("templates", {
-  id: uuid("id") // JAVÍTVA: text -> uuid
+  id: uuid("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
@@ -63,7 +66,8 @@ export const templates = pgTable("templates", {
   language: text("language")
     .notNull()
     .default("multilingual"),
-  uploaded_at: timestamp("uploaded_at").defaultNow().notNull(),
+  // JAVÍTVA: .defaultNow() -> .default(sql`CURRENT_TIMESTAMP`)
+  uploaded_at: timestamp("uploaded_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   is_active: boolean("is_active").notNull().default(false),
 });
 
@@ -78,10 +82,10 @@ export const QuestionTypeEnum = z.enum(["text", "number", "date", "select", "che
 export type QuestionType = "number" | "date" | "select" | "text" | "checkbox" | "radio" | "measurement" | "calculated" | "true_false" | "yes_no_na";
 
 export const questionConfigs = pgTable("question_configs", {
-  id: uuid("id") // JAVÍTVA: text -> uuid
+  id: uuid("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  template_id: uuid("template_id") // JAVÍTVA: text -> uuid
+  template_id: uuid("template_id")
     .notNull()
     .references(() => templates.id, { onDelete: 'cascade' }),
   question_id: text("question_id").notNull(),
@@ -97,13 +101,14 @@ export const questionConfigs = pgTable("question_configs", {
   group_name: text("group_name"),
   group_name_de: text("group_name_de"),
   group_order: integer("group_order").default(0),
-  conditional_group_key: text("conditional_group_key"), // Dynamic question filtering
+  conditional_group_key: text("conditional_group_key"),
   unit: text("unit"),
   min_value: integer("min_value"),
   max_value: integer("max_value"),
   calculation_formula: text("calculation_formula"),
-  calculation_inputs: jsonb("calculation_inputs"), // Ezt hagyjuk jsonb-n, a Drizzle helyesen fogja kezelni a migrációt
-  created_at: timestamp("created_at").defaultNow().notNull(),
+  calculation_inputs: jsonb("calculation_inputs"),
+  // JAVÍTVA: .defaultNow() -> .default(sql`CURRENT_TIMESTAMP`)
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
 export const insertQuestionConfigSchema = createInsertSchema(questionConfigs);

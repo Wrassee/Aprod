@@ -19,7 +19,7 @@ interface PageHeaderProps {
   currentStep?: number;
   stepType?: 'questionnaire' | 'niedervolt';
   progressText?: string; // Custom progress text (optional)
-  showProgress?: boolean; // <-- 1. MÓDOSÍTÁS: Új prop hozzáadva
+  showProgress?: boolean;
   // AI Segítő props
   currentPage?: number;
   formData?: any;
@@ -40,14 +40,14 @@ const PageHeader: FC<PageHeaderProps> = ({
   currentStep,
   stepType = 'questionnaire',
   progressText,
-  showProgress = true, // <-- 2. MÓDOSÍTÁS: Új prop alapértelmezett értékkel
+  showProgress = true,
   // AI Segítő props
   currentPage = 1,
   formData = {},
   currentQuestionId,
   errors = [],
 }) => {
-  // Számítsd ki az egységes progress százalékot
+  // A komponens logikája (calculateUnifiedProgress, getProgressText) változatlan marad...
   const calculateUnifiedProgress = (): number => {
     if (totalSteps && currentStep !== undefined) {
       if (stepType === 'questionnaire') {
@@ -59,18 +59,15 @@ const PageHeader: FC<PageHeaderProps> = ({
         return Math.round(niedervoltProgress);
       }
     }
-
     return Math.round(progressPercent);
   };
 
   const unifiedProgress = calculateUnifiedProgress();
 
-  // Progress text logika
   const getProgressText = (): string => {
     if (progressText) {
       return progressText;
     }
-
     if (totalSteps && currentStep !== undefined) {
       if (stepType === 'questionnaire') {
         return language === 'hu' 
@@ -78,16 +75,18 @@ const PageHeader: FC<PageHeaderProps> = ({
           : `Fortschritt: ${currentStep + 1} / ${totalSteps}`;
       }
     }
-
     return language === 'hu' ? 'Folyamat' : 'Fortschritt';
   };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-6 py-4">
-        {/* Felső sor: Logo + Home + Cím + Gombok (VÁLTOZATLAN) */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
+        
+        {/* ===== FELSŐ SOR: HÁROMRÉSZES, KÖZÉPRE IGAZÍTOTT ELRENDEZÉS ===== */}
+        <div className="flex items-center justify-between mb-4 w-full">
+
+          {/* ----- 1. BAL OLDAL ----- */}
+          <div className="flex-1 flex justify-start items-center space-x-2">
             <img
               src="/otis-elevators-seeklogo_1753525178175.png"
               alt="OTIS Logo"
@@ -99,19 +98,24 @@ const PageHeader: FC<PageHeaderProps> = ({
                 onClick={onHome}
               />
             )}
-            <h1 className="text-xl font-semibold text-gray-800">{title}</h1>
+            <h1 className="text-xl font-semibold text-gray-800 whitespace-nowrap">{title}</h1>
           </div>
-          <div className="flex items-center space-x-4">
-            {/* AI Segítő gomb - az OTIS átvételi protokoll és a dátumválasztó közé */}
+
+          {/* ----- 2. KÖZÉPSŐ RÉSZ (AI GOMB) ----- */}
+          <div className="flex-1 flex justify-center items-center">
             <SmartHelpWizard 
               currentPage={currentPage}
               formData={formData}
               currentQuestionId={currentQuestionId}
               errors={errors}
             />
+          </div>
+
+          {/* ----- 3. JOBB OLDAL ----- */}
+          <div className="flex-1 flex justify-end items-center space-x-4">
             {receptionDate !== undefined && onReceptionDateChange && (
               <div className="flex items-center space-x-2">
-                <Label className="text-sm font-medium text-gray-600">
+                <Label className="text-sm font-medium text-gray-600 whitespace-nowrap">
                   {language === 'hu' ? 'Átvétel dátuma' : 'Übernahmedatum'}
                 </Label>
                 <Input
@@ -125,7 +129,7 @@ const PageHeader: FC<PageHeaderProps> = ({
             {onStartNew && (
               <Button
                 onClick={onStartNew}
-                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white"
+                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white whitespace-nowrap"
                 size="sm"
               >
                 <RotateCcw className="h-4 w-4" />
@@ -140,11 +144,10 @@ const PageHeader: FC<PageHeaderProps> = ({
             )}
           </div>
         </div>
-
-        {/* <-- 3. MÓDOSÍTÁS: A teljes alsó rész feltételes megjelenítése --> */}
+        
+        {/* ALSÓ SOR: PROGRESS BAR (VÁLTOZATLAN) */}
         {showProgress && (
           <>
-            {/* Alsó sor: Egységes Folyamatjelző */}
             <div className="flex items-center justify-between">
               <span className="text-base font-medium text-blue-700">{getProgressText()}</span>
               <span className="text-base font-medium text-blue-700">{unifiedProgress}%</span>

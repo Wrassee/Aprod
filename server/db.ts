@@ -1,4 +1,5 @@
-// server/db.ts
+// server/db.ts - VÉGLEGES, TELJES VERZIÓ
+
 // ------------------------------------------------------------
 // 1️⃣ Imports
 // ------------------------------------------------------------
@@ -7,60 +8,39 @@ import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
 import { Pool, neonConfig } from "@neondatabase/serverless";
 import Database from "better-sqlite3";
 import ws from "ws";
-import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
-
-import * as schema from "../shared/schema.js";
-
 import path from "node:path";
 import fs from "node:fs";
+import { pathToFileURL } from 'node:url';
+import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 
 // ------------------------------------------------------------
-// 2️⃣ Re-export schema tables and types
+// 3️⃣ DB típusdefiníciók és változók
 // ------------------------------------------------------------
-
-// Táblák exportálása
-export const { protocols, templates, questionConfigs } = schema;
-
-// Típusok exportálása - ezeket hiányolta a storage.ts
-export type Protocol = InferSelectModel<typeof protocols>;
-export type InsertProtocol = InferInsertModel<typeof protocols>;
-export type Template = InferSelectModel<typeof templates>;
-export type InsertTemplate = InferInsertModel<typeof templates>;
-export type QuestionConfig = InferSelectModel<typeof questionConfigs>;
-export type InsertQuestionConfig = InferInsertModel<typeof questionConfigs>;
-
-// ------------------------------------------------------------
-// 3️⃣ DB típusdefiníciók és inicializálás
-// ------------------------------------------------------------
-
 type SqliteDb = ReturnType<typeof drizzleSqlite>;
 type NeonDb = ReturnType<typeof drizzleNeon>;
 type DbType = SqliteDb | NeonDb;
 
 let db: DbType;
+let schema: any;
 let testConnectionFn: () => Promise<boolean>;
 
 // ------------------------------------------------------------
-// 4️⃣ Production – Neon PostgreSQL (Render / Vercel / Railway)
+// 4️⃣ Production – Neon PostgreSQL
 // ------------------------------------------------------------
 if (process.env.NODE_ENV === "production") {
   console.log("🔧 Initializing Neon (PostgreSQL) connection – production mode");
-
   if (!process.env.DATABASE_URL) {
-    throw new Error(
-      "DATABASE_URL environment variable is required in production."
-    );
+    throw new Error("DATABASE_URL environment variable is required in production.");
   }
+  
+  const schemaPath = path.resolve(process.cwd(), 'shared/schema.js');
+  schema = await import(pathToFileURL(schemaPath).href);
 
-  // Neon‑driver WebSocket‑megoldás (Supabase‑barát)
   neonConfig.webSocketConstructor = ws;
-
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-
-  // Drizzle‑Postgres‑adapter
   db = drizzleNeon(pool, { schema });
 
-  // egyszerű "SELECT 1" health‑check
+  // Itt van a "production" függvény törzse
   testConnectionFn = async () => {
     try {
       await pool.query("SELECT 1");
@@ -72,30 +52,25 @@ if (process.env.NODE_ENV === "production") {
     }
   };
 }
-
 // ------------------------------------------------------------
 // 5️⃣ Development – SQLite (local)
 // ------------------------------------------------------------
 else {
   console.log("🔧 Initializing SQLite – development mode");
-
-  // adatbázis‑fájl helye: <projectRoot>/data/otis_aprod.db
   const dbPath = path.join(process.cwd(), "data", "otis_aprod.db");
   const dataDir = path.dirname(dbPath);
-
-  // biztosítjuk, hogy a `data` mappa létezik
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
   }
 
-  const sqlite = new Database(dbPath);
-  // write‑ahead‑logging – a SQLite‑t gyorsabbá és biztonságosabbá teszi
-  sqlite.pragma("journal_mode = WAL");
+  const schemaPath = path.resolve(process.cwd(), 'shared/schema-sqlite.js');
+  schema = await import(pathToFileURL(schemaPath).href);
 
-  // Drizzle‑SQLite‑adapter
+  const sqlite = new Database(dbPath);
+  sqlite.pragma("journal_mode = WAL");
   db = drizzleSqlite(sqlite, { schema });
 
-  // egyszerű "SELECT 1" health‑check
+  // Itt van a "development" függvény törzse
   testConnectionFn = async () => {
     try {
       sqlite.prepare("SELECT 1").get();
@@ -109,22 +84,16 @@ else {
 }
 
 // ------------------------------------------------------------
-// 6️⃣ Database utilities
+// 6️⃣ Re-export schema tables and types
 // ------------------------------------------------------------
+export const { protocols, templates, questionConfigs } = schema;
 
-/**
- * Type guard to check if db is PostgreSQL
- */
-export function isPostgresDb(database: DbType): database is NeonDb {
-  return process.env.NODE_ENV === "production";
-}
-
-/**
- * Type guard to check if db is SQLite
- */
-export function isSqliteDb(database: DbType): database is SqliteDb {
-  return process.env.NODE_ENV !== "production";
-}
+export type Protocol = InferSelectModel<typeof protocols>;
+export type InsertProtocol = InferInsertModel<typeof protocols>;
+export type Template = InferSelectModel<typeof templates>;
+export type InsertTemplate = InferInsertModel<typeof templates>;
+export type QuestionConfig = InferSelectModel<typeof questionConfigs>;
+export type InsertQuestionConfig = InferInsertModel<typeof questionConfigs>;
 
 // ------------------------------------------------------------
 // 7️⃣ Exportálás

@@ -1,136 +1,119 @@
+// excel-service.ts
 import * as XLSX from 'xlsx';
 import type { FormData } from '../../shared/types.js';
 import { storage } from '../storage.js';
-import { excelParserService } from './excel-parser.js';
 import { simpleXmlExcelService } from './simple-xml-excel.js';
 import { templateLoader } from './template-loader.js';
-import fs from 'fs';
 
 class ExcelService {
   async generateExcel(formData: FormData, language: string): Promise<Buffer> {
     try {
-      // Try XML-based approach first for better formatting preservation
       console.log('Using XML-based Excel manipulation for perfect formatting preservation');
       return await simpleXmlExcelService.generateExcelFromTemplate(formData, language);
     } catch (xmlError) {
       console.error('XML-based approach failed, falling back to XLSX library:', xmlError);
       
-      // Fallback to original XLSX approach
       try {
-        try {
-          console.log('Loading template via Supabase Storage...');
-          const templateBuffer = await templateLoader.loadTemplateBuffer('protocol', language);
-          console.log(`Using XLSX fallback with loaded template (${templateBuffer.length} bytes)`);
-          return await this.populateProtocolTemplate(templateBuffer, formData, language);
-        } catch (templateError) {
-          console.log('No protocol template found, using basic Excel creation');
-          return await this.createBasicExcel(formData, language);
-        }
-      } catch (fallbackError) {
-        console.error('Fallback also failed, using basic Excel:', fallbackError);
+        console.log('Loading template via Supabase Storage...');
+        const templateBuffer = await templateLoader.loadTemplateBuffer('protocol', language);
+        console.log(`Using XLSX fallback with loaded template (${templateBuffer.length} bytes)`);
+        return await this.populateProtocolTemplate(templateBuffer, formData, language);
+      } catch (templateError) {
+        console.log('No protocol template found, using basic Excel creation');
         return await this.createBasicExcel(formData, language);
       }
     }
   }
 
   private async populateProtocolTemplate(templateBuffer: Buffer, formData: FormData, language: string): Promise<Buffer> {
+  try {
+    const workbook = XLSX.read(templateBuffer, { 
+      type: 'buffer',
+      cellStyles: true,
+      cellHTML: false,
+      sheetStubs: true
+    });
+    
+    const sheetName = workbook.SheetNames[0];
+    let worksheet = workbook.Sheets[sheetName];
+    
+    // 1. LÉPÉS: Kérdéskonfigok betöltése
+    let questionConfigs: any[] = [];
     try {
-      // Read with full formatting preservation
-      const workbook = XLSX.read(templateBuffer, { 
-        type: 'buffer',
-        cellStyles: true,
-        cellHTML: false,
-        sheetStubs: true
-      });
+      const questionsTemplate = await storage.getActiveTemplate('questions', language);
+      if (questionsTemplate) {
+        questionConfigs = await storage.getQuestionConfigsByTemplate(questionsTemplate.id);
+        console.log('Loaded question configs:', questionConfigs.length);
+      }
+    } catch (error) {
+      console.log('Could not load question configs:', error);
+    }
+    
+    // 2. LÉPÉS: Most már futtathatjuk a hibakeresést és a feldolgozást
+    console.log('BACKEND: Megkapott formData.answers kulcsok:', Object.keys(formData.answers)); // Log #1
+    
+    const cellMappings: Array<{cell: string, value: any, label: string}> = [];
+
+    Object.entries(formData.answers).forEach(([questionId, answer]) => {
+      const config = questionConfigs.find(q => q.questionId === questionId);
       
-      // Log template info
-      console.log('Template sheet names:', workbook.SheetNames);
-      
-      // Get the first worksheet - work directly with original
-      const sheetName = workbook.SheetNames[0];
-      let worksheet = workbook.Sheets[sheetName];
-      
-      console.log('Original worksheet range:', worksheet['!ref']);
-      
-      // Try to get question titles from questions template
-      let questionConfigs: any[] = [];
-      try {
-        const questionsTemplate = await storage.getActiveTemplate('questions', language);
-        if (questionsTemplate) {
-          questionConfigs = await storage.getQuestionConfigsByTemplate(questionsTemplate.id);
-          console.log('Loaded question configs:', questionConfigs.length);
+      // *** A HIBAKERESŐ LOGIKA HELYES HELYE ITT VAN ***
+      // A ciklusban, miután már van `config` változónk
+      if (questionId.startsWith('Q_NID_')) {
+        console.log(`BACKEND: NIV adat feldolgozása: ID=${questionId}, Érték=${answer}`); // Log #2
+        if (config) {
+          console.log(`BACKEND: TALÁLAT! Ehhez a NIV adathoz van konfiguráció:`, config); // Log #3
+        } else {
+          console.log(`BACKEND: HIBA! Nincs konfiguráció a(z) "${questionId}" ID-hoz. Ellenőrizd az Excel template-et!`); // Log #4
         }
-      } catch (error) {
-        console.log('Could not load question configs:', error);
       }
       
-      // CELL MAPPING FROM QUESTIONS TEMPLATE
-      // Use question configs to get the exact cell references for each answer
-      
-      console.log('Using question configs for precise cell mapping...');
-      let filledCells = 0;
-      
-      // Create cell mappings based on question configs
-      const cellMappings: Array<{cell: string, value: any, label: string}> = [];
-      
-      // Add answers based on question configs
-      Object.entries(formData.answers).forEach(([questionId, answer]) => {
-        const config = questionConfigs.find(q => q.questionId === questionId);
-        
-        if (config && config.cellReference && answer !== '' && answer !== null && answer !== undefined) {
-          cellMappings.push({
-            cell: config.cellReference,
-            value: answer,
-            label: config.title || `Question ${questionId}`
-          });
-        }
-      });
-      
-      // Add signature name to a suitable location 
-      if (formData.signatureName && !cellMappings.find(m => m.cell === 'F9')) {
+      if (config && config.cellReference && answer !== '' && answer !== null && answer !== undefined) {
         cellMappings.push({
-          cell: 'F9',
-          value: formData.signatureName,
-          label: 'Signature name'
+          cell: config.cellReference,
+          value: answer,
+          label: config.title || `Question ${questionId}`
         });
       }
-      
-      cellMappings.forEach(mapping => {
-        if (mapping.value !== null && mapping.value !== undefined && mapping.value !== '') {
-          const newValue = this.formatAnswer(mapping.value, language);
-          const existingCell = worksheet[mapping.cell];
-          
-          // Set cell data while preserving template structure
-          worksheet[mapping.cell] = { 
-            v: newValue,
-            t: typeof newValue === 'number' ? 'n' : 's'
-          };
-          
-          // If there was existing formatting, preserve it
-          if (existingCell && existingCell.s) {
-            worksheet[mapping.cell].s = existingCell.s;
-          }
-          
-          filledCells++;
-        }
+    });
+    
+    // Aláírás mező
+    if (formData.signatureName && !cellMappings.find(m => m.cell === 'F9')) {
+      cellMappings.push({
+        cell: 'F9',
+        value: formData.signatureName,
+        label: 'Signature name'
+      });
+    }
+    
+    // Cellák kitöltése
+    let filledCells = 0;
+    cellMappings.forEach(mapping => {
+      const newValue = this.formatAnswer(mapping.value, language);
+      const existingCell = worksheet[mapping.cell];
+
+      worksheet[mapping.cell] = { 
+        v: newValue,
+        t: typeof newValue === 'number' ? 'n' : 's'
+      };
+
+      if (existingCell && existingCell.s) {
+        worksheet[mapping.cell].s = existingCell.s;
+      }
+
+      filledCells++;
+    });
+    
+    workbook.Sheets[sheetName] = worksheet;
+    console.log(`Successfully filled ${filledCells} cells in the OTIS protocol template`);
+    
+    const buffer = XLSX.write(workbook, { 
+      type: 'buffer', 
+      bookType: 'xlsx',
+      compression: true,
+      cellStyles: true
       });
       
-      // Force update the workbook with our modified worksheet
-      workbook.Sheets[sheetName] = worksheet;
-      
-      // All cells successfully filled and verified
-      
-      console.log(`Successfully filled ${filledCells} cells in the OTIS protocol template`);
-      
-      // Generate buffer preserving ALL original formatting
-      const buffer = XLSX.write(workbook, { 
-        type: 'buffer', 
-        bookType: 'xlsx',
-        compression: true,  // Use compression for smaller files
-        cellStyles: true    // Preserve cell styles
-      });
-      
-      console.log('Successfully populated protocol template preserving original format');
       return buffer;
     } catch (error) {
       console.error('Error populating protocol template:', error);
@@ -140,10 +123,7 @@ class ExcelService {
 
   private async createBasicExcel(formData: FormData, language: string): Promise<Buffer> {
     try {
-      // Create a new workbook
       const workbook = XLSX.utils.book_new();
-      
-      // Create worksheet data based on OTIS template structure
       const worksheetData = [
         ['OTIS Acceptance Protocol', '', '', ''],
         ['', '', '', ''],
@@ -154,13 +134,11 @@ class ExcelService {
         ['', '', '', ''],
       ];
 
-      // Get question configs to show proper question titles
       try {
         const questionsTemplate = await storage.getActiveTemplate('questions', language);
         if (questionsTemplate) {
           const questionConfigs = await storage.getQuestionConfigsByTemplate(questionsTemplate.id);
           
-          // Add answers with proper question titles
           Object.entries(formData.answers).forEach(([questionId, answer]) => {
             const config = questionConfigs.find((q: any) => q.questionId === questionId);
             const questionText = config ? 
@@ -177,7 +155,6 @@ class ExcelService {
             ]);
           });
         } else {
-          // Fallback if no questions template
           Object.entries(formData.answers).forEach(([questionId, answer], index) => {
             const questionText = this.getQuestionText(questionId, language);
             worksheetData.push([
@@ -190,7 +167,6 @@ class ExcelService {
         }
       } catch (error) {
         console.error('Error getting question configs:', error);
-        // Basic fallback
         Object.entries(formData.answers).forEach(([questionId, answer], index) => {
           worksheetData.push([
             `Question ${questionId}`,
@@ -201,7 +177,6 @@ class ExcelService {
         });
       }
 
-      // Add errors section
       if (formData.errors && formData.errors.length > 0) {
         worksheetData.push(['', '', '', '']);
         worksheetData.push(['Error List:', '', '', '']);
@@ -224,7 +199,6 @@ class ExcelService {
         });
       }
 
-      // Add signature section
       worksheetData.push(['', '', '', '']);
       worksheetData.push(['Signature:', '', '', '']);
       if (formData.signatureName) {
@@ -232,10 +206,7 @@ class ExcelService {
       }
       worksheetData.push(['Date:', new Date().toLocaleDateString(), '', '']);
 
-      // Create worksheet
       const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-      
-      // Set column widths
       worksheet['!cols'] = [
         { wch: 30 },
         { wch: 30 },
@@ -243,10 +214,8 @@ class ExcelService {
         { wch: 15 }
       ];
 
-      // Add worksheet to workbook
       XLSX.utils.book_append_sheet(workbook, worksheet, 'Acceptance Protocol');
 
-      // Generate buffer
       const buffer = XLSX.write(workbook, { 
         type: 'buffer', 
         bookType: 'xlsx',
@@ -261,7 +230,6 @@ class ExcelService {
   }
 
   private getQuestionText(questionId: string, language: string): string {
-    // This would normally come from a translation service or database
     const questions: Record<string, Record<string, string>> = {
       q1: {
         hu: 'Lift telepítés kész?',

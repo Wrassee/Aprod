@@ -9,14 +9,14 @@ import {
   type InsertTemplate,
   type QuestionConfig,
   type InsertQuestionConfig,
-  // Re‑exported table definitions from the db module – this guarantees
+  // Re-exported table definitions from the db module – this guarantees
   // the exact same type instances the DB was initialised with.
   protocols,
   templates,
   questionConfigs,
 } from "./db.js";
 
-import { db } from "./db.js";                // Drizzle connection
+import { db } from "./db.js";              // Drizzle connection
 import { eq, and, desc } from "drizzle-orm"; // Drizzle helpers
 
 // ------------------------------------------------------------
@@ -52,7 +52,7 @@ export interface IStorage {
 }
 
 // ------------------------------------------------------------
-// 3️⃣ DatabaseStorage – concrete implementation (type‑safe)
+// 3️⃣ DatabaseStorage – concrete implementation (type-safe)
 // ------------------------------------------------------------
 export class DatabaseStorage implements IStorage {
   /* ---------- Protocols ---------- */
@@ -105,39 +105,42 @@ export class DatabaseStorage implements IStorage {
 
   async getActiveTemplate(type: string, language: string) {
     console.log(`🔍 Looking for active template – type=${type}, language=${language}`);
-
-    // 1️⃣ Exact language match
+    
+    const isActiveCondition = eq(templates.is_active, 1);
+  
     let [tpl] = await (db as any)
       .select()
       .from(templates)
-      .where(and(eq(templates.type, type), eq(templates.language, language), eq(templates.is_active, true)));
-
-    // 2️⃣ Fallback to multilingual
+      .where(and(eq(templates.type, type), eq(templates.language, language), isActiveCondition));
+  
     if (!tpl) {
       console.log(`🔍 No exact match – trying multilingual`);
       [tpl] = await (db as any)
         .select()
         .from(templates)
-        .where(and(eq(templates.type, type), eq(templates.language, "multilingual"), eq(templates.is_active, true)));
+        .where(and(eq(templates.type, type), eq(templates.language, "multilingual"), isActiveCondition));
     }
-
+  
     console.log(`📋 Result: ${tpl ? `${tpl.name} (${tpl.language})` : "none"}`);
     return tpl ?? undefined;
   }
 
+  // JAVÍTVA: Az SQLite hibát okozó tranzakció helyett két külön műveletet használunk
   async setActiveTemplate(id: string) {
     const target = await this.getTemplate(id);
     if (!target) throw new Error("Template not found");
 
-    // Use a transaction to keep the two updates atomic
-    await (db as any).transaction(async (tx: any) => {
-      await tx
+    console.log(`Deactivating other templates of type=${target.type}, language=${target.language}`);
+    await (db as any)
         .update(templates)
         .set({ is_active: false })
         .where(and(eq(templates.type, target.type), eq(templates.language, target.language)));
 
-      await tx.update(templates).set({ is_active: true }).where(eq(templates.id, id));
-    });
+    console.log(`Activating template id=${id}`);
+    await (db as any)
+        .update(templates)
+        .set({ is_active: true })
+        .where(eq(templates.id, id));
 
     console.log(`✅ Activated template ${target.name}`);
   }
@@ -172,9 +175,6 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
-  // --- JAVÍTOTT RÉSZ KEZDETE ---
-
-  // VÉGLEGES, JAVÍTOTT FÜGGVÉNY a snake_case -> camelCase konverzióhoz
   async getQuestionConfigsByTemplate(templateId: string) {
     const rawConfigs = await (db as any)
         .select()
@@ -182,10 +182,8 @@ export class DatabaseStorage implements IStorage {
         .where(eq(questionConfigs.template_id, templateId))
         .orderBy(questionConfigs.created_at);
 
-    // 🛠️ Snake_case -> camelCase konverzió
     const configs = rawConfigs.map((config: any) => ({
-        ...config, // Először másoljuk az összes eredeti property-t
-        // Majd felülírjuk/létrehozzuk a camelCase verziókat
+        ...config,
         questionId: config.question_id || config.questionId,
         cellReference: config.cell_reference || config.cellReference,
         multiCell: config.multi_cell || config.multiCell || false,
@@ -203,13 +201,7 @@ export class DatabaseStorage implements IStorage {
     return result.length > 0;
   }
 
-  // --- JAVÍTOTT RÉSZ VÉGE ---
-
-  /* ---------- Supplementary method ---------- */
   async getQuestions(lang: string) {
-    // If the underlying table has a `language` column we filter on it.
-    // We check the property existence at runtime – this keeps the compile‑time
-    // type safe while still being schema‑agnostic.
     const hasLanguageColumn = "language" in questionConfigs;
     if (hasLanguageColumn) {
       return await (db as any)
@@ -225,3 +217,4 @@ export class DatabaseStorage implements IStorage {
 // 4️⃣ Exported singleton for convenient imports elsewhere
 // ------------------------------------------------------------
 export const storage = new DatabaseStorage();
+

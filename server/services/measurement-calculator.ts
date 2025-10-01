@@ -214,7 +214,7 @@ export class MeasurementCalculator {
       return `Value ${value}${u} exceeds the maximum limit ${maxValue}${u}`;
     }
 
-    return "Value is out of limits";
+    return "Value is out of lim.js";
   }
 
   // -----------------------------------------------------------------

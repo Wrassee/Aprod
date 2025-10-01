@@ -1,57 +1,34 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes.js";
+// server/app.ts - JAVASOLT, VÉGLEGES VERZIÓ
 
-const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+import express from 'express';
+import 'dotenv/config'; // Fontos, hogy ez legyen az egyik első import
+import { registerRoutes } from './routes.js';
 
-app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+export async function createApp() {
+  const app = express();
+  app.use(express.json());
 
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      console.log(logLine);
+  // Loggoló middleware a bejövő kérésekhez
+  app.use((req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      console.log(`[API Request] ${req.method} ${req.path}`);
     }
+    next();
   });
+  
+  // Route-ok regisztrálása, megvárjuk, amíg befejeződik
+  await registerRoutes(app);
+  
+  // === JAVASOLT KIEGÉSZÍTÉS ===
+  // Globális hibakezelő middleware, ami elkap minden nem lekezelt hibát a route-okból.
+  // Ezt mindig a route-ok regisztrálása UTÁN kell elhelyezni.
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error(`[Global Error Handler] Unhandled error on path: ${req.path}`, err);
+    const status = err.status || 500;
+    const message = err.message || 'Internal Server Error';
+    res.status(status).json({ message });
+  });
+  // ============================
 
-  next();
-});
-
-// Initialize routes
-(async () => {
-  try {
-    console.log('Initializing routes...');
-    await registerRoutes(app);
-    console.log('Routes registered successfully');
-
-    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
-
-      console.error('Express error:', err);
-      res.status(status).json({ message });
-    });
-  } catch (error) {
-    console.error('Failed to initialize routes:', error);
-  }
-})();
-
-export default app;
+  return app;
+}

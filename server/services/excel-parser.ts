@@ -52,7 +52,7 @@ const COLUMN_ALIASES = {
     MIN_VALUE: ["min_value", "min"],
     MAX_VALUE: ["max_value", "max"],
     CALC_FORMULA: ["calculation_formula", "formula"],
-    CALC_INPUTS: ["calculation_inputs", "inputs"],
+    CALC_INPUTS: ["calculation_inputs", "inputs", "calc_inputs"],
 };
 
 export class ExcelParserService {
@@ -226,16 +226,16 @@ export class ExcelParserService {
     const t = raw.toLowerCase().trim();
 
     // Checkbox típusú kérdések aliasai
-    const checkboxAliases = ['yes_no', 'yes_no_na', 'yesno', 'boolean', 'bool', 'checkbox'];
-    if (checkboxAliases.includes(t)) {
-      return 'checkbox';
-    }
+    const checkboxAliases = ['yes_no', 'yesno', 'boolean', 'bool', 'checkbox']; // 'yes_no_na' eltávolítva innen
+    if (checkboxAliases.includes(t)) {
+      return 'checkbox';
+    }
 
-    // Radio button típusú kérdések aliasai
-    const radioAliases = ['true_false', 'truefalse', 'true/false', 'binary', 'radio'];
-    if (radioAliases.includes(t)) {
-      return 'radio';
-    }
+    // Radio button típusú kérdések aliasai
+    const radioAliases = ['true_false', 'truefalse', 'true/false', 'binary', 'radio', 'yes_no_na']; // 'yes_no_na' hozzáadva ide
+    if (radioAliases.includes(t)) {
+      return 'radio';
+    }
     
     // Egyéb típusok aliasai a nagyobb rugalmasságért
     if (['measurement', 'measure', 'mérés', 'messung', 'numeric_with_unit'].includes(t)) return 'measurement';

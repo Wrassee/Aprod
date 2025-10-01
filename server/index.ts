@@ -1,20 +1,21 @@
-import app from './app.js';
+import { createApp } from './app.js';
+import ViteExpress from 'vite-express';
 
 const PORT = Number(process.env.PORT) || 5000;
 
-const server = app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    const app = await createApp();
+    
+    ViteExpress.listen(app, PORT, () => {
+      console.log(`🚀 Server listening on http://localhost:${PORT}`);
+      console.log(`🔧 Vite-Express is running in development mode.`);
+    });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  server.close(() => console.log('Process terminated'));
-});
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+    process.exit(1);
+  }
+}
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
-  server.close(() => console.log('Process terminated'));
-});
-
-export default app;
+startServer();

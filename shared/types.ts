@@ -74,6 +74,8 @@ export const TemplateTypeEnum = [
   "unified",
 ] as const;
 export type TemplateType = typeof TemplateTypeEnum[number];
+export type GroundingAnswer = 'ok' | 'not_ok' | 'not_applicable';
+
 
 // ------------------------------------------------------------
 // 2️⃣ Errors & measurement data
@@ -126,11 +128,13 @@ export interface NiedervoltMeasurement {
 // 3️⃣ Form data (the JSON payload stored in `protocols.form_data`)
 // ------------------------------------------------------------
 
+/** Grounding check answers - OK/NOT OK/N.A. for each question */
+
 export interface FormData {
-  /** Arbitrary question‑answer map */
+  /** Arbitrary question-answer map */
   answers: Record<string, unknown>;
 
-  /** Optional reception date (ISO‑8601) */
+  /** Optional reception date (ISO-8601) */
   receptionDate?: ISODateString;
 
   /** Language code – e.g. "hu", "de" */
@@ -139,7 +143,7 @@ export interface FormData {
   /** Base64 or URL representation of the signature */
   signature?: string;
 
-  /** Human‑readable name of the signer */
+  /** Human-readable name of the signer */
   signatureName?: string;
 
   /** Flag indicating whether the protocol is completed */
@@ -148,11 +152,11 @@ export interface FormData {
   /** List of errors attached to the form */
   errors?: ErrorItem[];
 
-  /** Optional list of low‑voltage measurements */
+  /** Optional list of low-voltage measurements */
   niedervoltMeasurements?: NiedervoltMeasurement[];
 
-  /** Grounding check answers - OK/NOT OK for each question */
-  groundingCheckAnswers?: Record<string, boolean>;
+  /** Grounding check answers - OK / NOT OK / Not Applicable */
+  groundingCheckAnswers?: Record<string, GroundingAnswer>;
 }
 
 // ------------------------------------------------------------

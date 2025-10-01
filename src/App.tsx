@@ -25,6 +25,7 @@ import { Completion } from "./pages/completion.js";
 import { Admin } from "./pages/admin.js";
 import { ProtocolPreview } from "./pages/protocol-preview.js";
 import { Erdungskontrolle } from "./pages/erdungskontrolle.js";
+import { SmartHelpWizard } from "./components/smart-help-wizard.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
 /* --------------------  Shared schema -------------------- */
@@ -561,6 +562,9 @@ const handleStartNew = () => {
             onStartNew={handleStartNew}
             onPageChange={setCurrentQuestionnairePage}
             onQuestionChange={setCurrentQuestionId}
+            formData={formData}
+            currentPage={currentQuestionnaireePage}
+            currentQuestionId={currentQuestionId}
           />
         );
       case 'erdungskontrolle':
@@ -595,6 +599,8 @@ const handleStartNew = () => {
             onAdminAccess={handleAdminAccess}
             onHome={handleGoHome}
             onStartNew={handleStartNew}
+            formData={formData}
+            setFormData={setFormData}
           />
         );
       case 'signature':
@@ -642,17 +648,15 @@ const handleStartNew = () => {
   };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <LanguageProvider>
-        <TooltipProvider>
-          <Toaster />
-          {/* PWA components temporarily disabled for stability */}
-          {renderCurrentScreen()}
-          
-        </TooltipProvider>
-      </LanguageProvider>
-    </QueryClientProvider>
-  );
+  <QueryClientProvider client={queryClient}>
+    <LanguageProvider>
+      <TooltipProvider>
+        <Toaster />
+        {renderCurrentScreen()}
+      </TooltipProvider>
+    </LanguageProvider>
+  </QueryClientProvider>
+);
 }
 
 export default App;

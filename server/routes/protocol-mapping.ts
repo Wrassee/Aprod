@@ -1,7 +1,6 @@
 // server/routes/protocol-mapping.ts
 import { Router } from 'express';
 import { z } from 'zod';
-import { excelWriteService } from '../../src/services/excelWriteService.js';
 import { supabaseStorage } from '../services/supabase-storage.js';
 import { storage } from '../storage.js';
 import { insertProtocolSchema } from '../../shared/schema.js';
@@ -130,13 +129,6 @@ router.post('/download-grounding-pdf', async (req, res) => {
     res.status(500).json({ message: 'Szerverhiba a PDF generálása közben.' });
   }
 });
-
-// ALTERNATÍV FÖLDELÉSI PDF LETÖLTÉS (új megközelítés)
-router.post('/download-grounding-pdf-alt', async (req, res) => {
-  try {
-    console.log("Alternative grounding PDF download request received");
-    const { formData, language } = req.body;
-    if (!formData) return res.status(400).json({ message: "Form data is required" });
 
     // 1. Generate Excel with grounding-specific data using the specialized service
     const { groundingExcelService } = await import('../services/grounding-excel-service.js');

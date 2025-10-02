@@ -51,9 +51,10 @@ export class GroundingPdfService {
         }
 
         // Bemerkunghoz hozzáadás
-        const punkt = okFieldName.replace('OK', ''); // pl. OK2/4 → 2/4
-        const bemerkung = formData.questionTexts?.[questionId] ?? questionId;
-        remarks.push({ punkt, bemerkung });
+const punkt = okFieldName.replace('OK', ''); // pl. OK2/4 → 2/4
+// Mivel a questionTexts nem létezik, egy általánosabb leírást használunk
+const bemerkung = `Hiba a ${punkt} pontnál.`; 
+remarks.push({ punkt, bemerkung });
       } else if (answer === 'not_applicable') {
         // Nem alkalmazható → "-" az OK mezőbe
         try {

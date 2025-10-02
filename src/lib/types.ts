@@ -1,5 +1,6 @@
-import { Question, AnswerValue, ProtocolError, ErrorSeverity } from "../../shared/schema.js";
+import { Question, ProtocolError, ErrorSeverity } from "../../shared/schema.js";
 
+export type AnswerValue = string | number | boolean | null;
 export interface MeasurementRow {
   id: string;
   measurementType: string;

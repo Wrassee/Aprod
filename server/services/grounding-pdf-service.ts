@@ -31,7 +31,7 @@ export class GroundingPdfService {
     const remarks: { punkt: string; bemerkung: string }[] = [];
 
     // 3. Válaszok feldolgozása (háromállapotú logika)
-    groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
+    groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }: { questionId: string; okFieldName: string; notOkFieldName: string }) => {
       const answer = formData.groundingCheckAnswers?.[questionId] as GroundingAnswer | undefined;
       if (!answer) return;
 
@@ -65,7 +65,7 @@ export class GroundingPdfService {
     });
 
     // 4. Bemerkung mezők kitöltése a gyűjtött hibák alapján
-    groundingPdfMapping.remarks.forEach((row, index) => {
+    groundingPdfMapping.remarks.forEach((row: { punktField: string; bemerkungField: string }, index: number) => {
       if (remarks[index]) {
         try {
           form.getTextField(row.punktField).setText(remarks[index].punkt);

@@ -87,4 +87,4 @@ COPY --from=builder /app/public ./public
 RUN mkdir /app/temp && chmod 777 /app/temp
 
 EXPOSE 10000
-CMD ["node", "dist/server/prod-server.js"]
+CMD ["node", "dist-server/index.js"]

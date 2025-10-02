@@ -1,8 +1,8 @@
 import { PDFDocument } from 'pdf-lib';
 import fs from 'fs';
 import path from 'path';
-import { groundingPdfMapping } from '../config/grounding-pdf-mapping';
-import { GroundingAnswer, FormData } from '../../shared/types'; // új típusokat importálunk
+import { groundingPdfMapping } from '../config/grounding-pdf-mapping.js';
+import { GroundingAnswer, FormData } from '../../shared/types.js';
 
 export class GroundingPdfService {
   static async generateFilledPdf(formData: FormData): Promise<Buffer> {
@@ -16,7 +16,7 @@ export class GroundingPdfService {
     const form = pdfDoc.getForm();
 
     // 1. Fejléc mezők kitöltése
-    groundingPdfMapping.metadata.forEach(({ appDataKey, pdfFieldName }) => {
+    groundingPdfMapping.metadata.forEach(({ appDataKey, pdfFieldName }: { appDataKey: string, pdfFieldName: string }) => {
       const value = (formData as any)[appDataKey];
       if (value !== undefined) {
         try {

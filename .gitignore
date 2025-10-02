@@ -120,3 +120,6 @@ Test files
 Local development
 .replit
 replit.nix
+
+# Ignore local development database files and folder
+/data/

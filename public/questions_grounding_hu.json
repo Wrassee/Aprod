@@ -1,58 +1,298 @@
 {
   "groups": [
     {
+      "id": "Check",
+      "title": "Eredmény",
+      "questions": [
+        {
+          "id": "X1",
+          "text": "Hibás földelés a gépházban"
+        },
+        {
+          "id": "X2",
+          "text": "Hibás vezetékelés"
+        },
+        {
+          "id": "X3",
+          "text": "Lift leállítva mindkét ok miatt"
+        },
+        {
+          "id": "X4",
+          "text": "Hibás vezetőképesség"
+        },
+        {
+          "id": "X5",
+          "text": "Vezetőképesség helyreállítva:"
+        }
+      ]
+    },
+    {
       "id": "maschinenraum",
-      "title": "1. Ellenőrzés a gépházban",
+      "title": "1. Mérés a gépházban ",
       "questions": [
-        { "id": "grd_mr_ref", "text": "Referencia földelés meglétele" },
-        { "id": "grd_mr_controller", "text": "Vezérlő burkolata és ajtói" },
-        { "id": "grd_mr_motor", "text": "A motor" },
-        { "id": "grd_mr_bremse", "text": "A fék háza" },
-        { "id": "grd_mr_seil", "text": "Kötél rögzítő pont" },
-        { "id": "grd_mr_fuehrung", "text": "Vezetősín konzol" }
+        {
+          "id": "OK1/1",
+          "text": "Referencia földelési pont elérhető "
+        },
+        {
+          "id": "OK1/2",
+          "text": "Vezérlőszekrény és az ajtók"
+        },
+        {
+          "id": "OK1/3",
+          "text": "A földelési kapcsok a vezérlésben a betápnál"
+        },
+        {
+          "id": "OK1/4",
+          "text": "Elektromos készülékek burkolata/földelési pontja"
+        },
+        {
+          "id": "OK1/5",
+          "text": "A motor"
+        },
+        {
+          "id": "OK1/6",
+          "text": "A fékház"
+        },
+        {
+          "id": "OK1/7",
+          "text": "A motor és a féktekercs sorkapcsai"
+        },
+        {
+          "id": "OK1/8",
+          "text": "A forgókerék"
+        },
+        {
+          "id": "OK1/9",
+          "text": "Drótkötelek"
+        },
+        {
+          "id": "OK1/10",
+          "text": "Fékellenállás burkolata"
+        },
+        {
+          "id": "OK1/11",
+          "text": "A fém kábelcsatornák"
+        },
+        {
+          "id": "OK1/12",
+          "text": "Sebességhatároló"
+        },
+        {
+          "id": "OKRow13"
+        },
+        {
+          "id": "OK1/14",
+          "text": "Vezetékek és kábelek vizuális ellenőrzése"
+        }
       ]
     },
     {
-      "id": "kabinendach",
-      "title": "2. Ellenőrzés a kabin tetején",
+      "id": "Kabinendach",
+      "title": "2. Mérés a kabintetőn ",
       "questions": [
-        { "id": "grd_kd_jbox", "text": "Csatlakozó doboz/földelő kapocs burkolata (J-Box), kapocssín" },
-        { "id": "grd_kd_prs", "text": "PRS burkolat" },
-        { "id": "grd_kd_notschalter", "text": "Vészkapcsoló" },
-        { "id": "grd_kd_inspektion", "text": "Vizsgálati doboz" }
+        {
+          "id": "OK2/1",
+          "text": "Referencia földelési pont elérhető "
+        },
+        {
+          "id": "OK2/2",
+          "text": "Drótkötelek"
+        },
+        {
+          "id": "OK2/3",
+          "text": "Burkolat / földelési pont az inspekció dobozban"
+        },
+        {
+          "id": "OK2/4",
+          "text": "Mágnesjeladók és impulzkapcsolók"
+        },
+        {
+          "id": "OK2/5",
+          "text": "A kabinon lévő végálláskapcsolók"
+        },
+        {
+          "id": "OK2/6",
+          "text": "Tetőkijárat kontaktja"
+        },
+        {
+          "id": "OK2/7",
+          "text": "Pozíció olvasófej burkolata"
+        },
+        {
+          "id": "OK2/8",
+          "text": "Fém Pozíció olvasó szalag"
+        },
+        {
+          "id": "OK2/9",
+          "text": "Ajtóvezérlés"
+        },
+        {
+          "id": "OK2/10",
+          "text": "Kabinajtó szárny"
+        },
+        {
+          "id": "OK2/11",
+          "text": "Fék kontakt"
+        },
+        {
+          "id": "OK2/12",
+          "text": "Fénykapu vezérlődoboz"
+        },
+        {
+          "id": "OK2/13",
+          "text": "Inspekciódoboz és tartó"
+        },
+        {
+          "id": "OK2/14",
+          "text": "Fém kábelcsatornák"
+        },
+        {
+          "id": "OKRow15"
+        },
+        {
+          "id": "OKRow16"
+        },
+        {
+          "id": "OK2/17",
+          "text": "Vezetékek és kábelek vizuális ellenőrzése"
+        }
       ]
     },
     {
-      "id": "schacht",
-      "title": "3. Ellenőrzés az aknában",
+      "id": "Schacht",
+      "title": "3. Mérés a liftaknában ",
       "questions": [
-        { "id": "grd_sch_fuehrung", "text": "Vezetősín" },
-        { "id": "grd_sch_konsole", "text": "Konzolos rögzítés" },
-        { "id": "grd_sch_tuer", "text": "Ajtó zárszerkezet" },
-        { "id": "grd_sch_rahmen", "text": "Ajtókeret" },
-        { "id": "grd_sch_etagen", "text": "Szintkijelző" }
+        {
+          "id": "OK3/1",
+          "text": "Referencia földelési pont elérhető "
+        },
+        {
+          "id": "OK3/2",
+          "text": "Aknaajtók"
+        },
+        {
+          "id": "OK3/3",
+          "text": "Fém kábelcsatornák"
+        },
+        {
+          "id": "OK3/4",
+          "text": "Kábel tartó szerkezetek"
+        },
+        {
+          "id": "OK3/5",
+          "text": "Aknaajtók érintkezői és ezek burkolata"
+        },
+        {
+          "id": "OK3/6",
+          "text": "Minden kontakttal ellátott ajtószárny (központi nyílású)"
+        },
+        {
+          "id": "OK3/7",
+          "text": "Aknaajtók görgősínei"
+        },
+        {
+          "id": "OK3/8",
+          "text": "Aknavilágítás földelése és burkolata"
+        },
+        {
+          "id": "OK3/9",
+          "text": "Kabin vezetősínei"
+        },
+        {
+          "id": "OKRow10"
+        },
+        {
+          "id": "OKRow11"
+        },
+        {
+          "id": "OK3/12",
+          "text": "Vezetékek és kábelek vizuális ellenőrzése"
+        }
       ]
     },
     {
-      "id": "schachtgrube",
-      "title": "4. Ellenőrzés az aknagödörben",
+      "id": "Schachtgrube",
+      "title": "4. Mérés a süllyesztékben",
       "questions": [
-        { "id": "grd_sg_puffer", "text": "Ütköző/puffer" },
-        { "id": "grd_sg_spannrolle", "text": "Feszítőgörgő" },
-        { "id": "grd_sg_fuehrung", "text": "Vezetősín végi rögzítés" },
-        { "id": "grd_sg_grube", "text": "Gödör földelési kapcsolat" }
+        {
+          "id": "OK4/1",
+          "text": "Referencia földelési pont elérhető "
+        },
+        {
+          "id": "OK4/2",
+          "text": "Kontaktal ellátott puffer"
+        },
+        {
+          "id": "OK4/3",
+          "text": "A sebességhatároló feszítősúlya"
+        },
+        {
+          "id": "OK4/4",
+          "text": "Stop kapcsoló"
+        },
+        {
+          "id": "OK4/5",
+          "text": "Aknavilágítás földelése és burkolata"
+        },
+        {
+          "id": "OK4/6",
+          "text": "Egyéb végálláskapcsolók"
+        },
+        {
+          "id": "OK4/7",
+          "text": "Fém kábelcsatornák"
+        },
+        {
+          "id": "OKRow8"
+        },
+        {
+          "id": "OKRow9"
+        },
+        {
+          "id": "OK4/10",
+          "text": "Vezetékek és kábelek vizuális ellenőrzése"
+        }
       ]
     },
     {
-      "id": "kabine",
-      "title": "5. Ellenőrzés a kabinban",
+      "id": "Kabine",
+      "title": "5. Mérés a kabinban",
       "questions": [
-        { "id": "grd_kb_rahmen", "text": "Kabinváz" },
-        { "id": "grd_kb_tuer", "text": "Kabinajtó" },
-        { "id": "grd_kb_bedienung", "text": "Kezelőpanel" },
-        { "id": "grd_kb_beleuchtung", "text": "Világítás" },
-        { "id": "grd_kb_luefter", "text": "Szellőztetés" },
-        { "id": "grd_kb_handlauf", "text": "Korlát (ha van)" }
+        {
+          "id": "OK5/1",
+          "text": "Referencia földelési pont elérhető "
+        },
+        {
+          "id": "OK5/2",
+          "text": "Kabintabló és burkolata"
+        },
+        {
+          "id": "OK5/3",
+          "text": "Burkolat / földelési pont az inspekció dobozban"
+        },
+        {
+          "id": "OK5/4",
+          "text": "Kabintető világítás típusa szerint"
+        },
+        {
+          "id": "OK5/5",
+          "text": "Kabinajtó kerete"
+        },
+        {
+          "id": "OK5/6",
+          "text": "Kabinküszöb"
+        },
+        {
+          "id": "OKRow5/7"
+        },
+        {
+          "id": "OKRow5/8"
+        },
+        {
+          "id": "OK5/9",
+          "text": "Vezetékek és kábelek vizuális ellenőrzése"
+        }
       ]
     }
   ]

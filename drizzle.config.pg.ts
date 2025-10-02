@@ -1,3 +1,4 @@
+// drizzle.config.pg.ts
 import { defineConfig } from "drizzle-kit";
 
 if (!process.env.DATABASE_URL) {
@@ -5,10 +6,12 @@ if (!process.env.DATABASE_URL) {
 }
 
 export default defineConfig({
-  out: "./migrations",
+  out: "./migrations/pg", // Külön mappa a PG migrációknak
   schema: "./shared/schema.ts",
   dialect: "postgresql",
   dbCredentials: {
     url: process.env.DATABASE_URL,
   },
+  verbose: true,
+  strict: true,
 });

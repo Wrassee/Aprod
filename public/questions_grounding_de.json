@@ -1,58 +1,298 @@
 {
   "groups": [
     {
+      "id": "Check",
+      "title": "Bilanz",
+      "questions": [
+        {
+          "id": "X1",
+          "text": "Defekte Erdung im Maschinenraum"
+        },
+        {
+          "id": "X2",
+          "text": "Defekte verdrahtung"
+        },
+        {
+          "id": "X3",
+          "text": "Anlage abgestelt bei beiden Gründe"
+        },
+        {
+          "id": "X4",
+          "text": "Leitfähigkeit fehlerhaft"
+        },
+        {
+          "id": "X5",
+          "text": "Leitfähigkeit in Ordnung gebracht am:"
+        }
+      ]
+    },
+    {
       "id": "maschinenraum",
       "title": "1. Prüfung im Maschinenraum",
       "questions": [
-        { "id": "grd_mr_ref", "text": "Referenz-Erdung vorhanden" },
-        { "id": "grd_mr_controller", "text": "Kontroller-Gehäuse und Türen" },
-        { "id": "grd_mr_motor", "text": "der Motor" },
-        { "id": "grd_mr_bremse", "text": "das Bremsengehäuse" },
-        { "id": "grd_mr_seil", "text": "Seilbefestigungspunkt" },
-        { "id": "grd_mr_fuehrung", "text": "Führungsschienen-Konsole" }
+        {
+          "id": "OK1/1",
+          "text": "Referenz-Erdung vorhanden"
+        },
+        {
+          "id": "OK1/2",
+          "text": "Kontroller -Gehäuse und -Türen"
+        },
+        {
+          "id": "OK1/3",
+          "text": "Die Erdungsklemme der Hauptspeisung im Kontroller"
+        },
+        {
+          "id": "OK1/4",
+          "text": "Gehäuse/Erdungsklemme der elektronischen Geräte"
+        },
+        {
+          "id": "OK1/5",
+          "text": "Der Motor"
+        },
+        {
+          "id": "OK1/6",
+          "text": "Das Bremsengehäuse"
+        },
+        {
+          "id": "OK1/7",
+          "text": "Der Klemmbrett des Motors und der Bremsspule"
+        },
+        {
+          "id": "OK1/8",
+          "text": "Die Treibscheibe"
+        },
+        {
+          "id": "OK1/9",
+          "text": "Die Tragseilen"
+        },
+        {
+          "id": "OK1/10",
+          "text": "Das Widerstandsgehäuse"
+        },
+        {
+          "id": "OK1/11",
+          "text": "Die metallische Kabelkanäle"
+        },
+        {
+          "id": "OK1/12",
+          "text": "Geschwindigkeitsbegrenzer"
+        },
+        {
+          "id": "OKRow13"
+        },
+        {
+          "id": "OK1/14",
+          "text": "Sichtkontrolle der Drähte/Kabel"
+        }
       ]
     },
     {
-      "id": "kabinendach",
+      "id": "Kabinendach",
       "title": "2. Prüfung auf Kabinendach",
       "questions": [
-        { "id": "grd_kd_jbox", "text": "Gehäuse/Erdungsklemme der Verbindungen (J-Box), Klemmsteg" },
-        { "id": "grd_kd_prs", "text": "PRS-Gehäuse" },
-        { "id": "grd_kd_notschalter", "text": "Not-Schalter" },
-        { "id": "grd_kd_inspektion", "text": "Inspektionskasten" }
+        {
+          "id": "OK2/1",
+          "text": "Referenz-Erdung vorhanden"
+        },
+        {
+          "id": "OK2/2",
+          "text": "Tragseile"
+        },
+        {
+          "id": "OK2/3",
+          "text": "Gehäuse/Erdungsklemme der Verbindungen (J-Box), Klemmsteg"
+        },
+        {
+          "id": "OK2/4",
+          "text": "Metallische Impulsgeber/Magnetschalter"
+        },
+        {
+          "id": "OK2/5",
+          "text": "Sicherheits-Endschalter auf Kabine "
+        },
+        {
+          "id": "OK2/6",
+          "text": "Kontakt der Ausstiegsklappe "
+        },
+        {
+          "id": "OK2/7",
+          "text": "PRS-Gehäuse "
+        },
+        {
+          "id": "OK2/8",
+          "text": "Metallischer PRS-Band "
+        },
+        {
+          "id": "OK2/9",
+          "text": "Türantriebsbox"
+        },
+        {
+          "id": "OK2/10",
+          "text": "Kabinentür-Flügel "
+        },
+        {
+          "id": "OK2/11",
+          "text": "Fangkontakt "
+        },
+        {
+          "id": "OK2/12",
+          "text": "Lichtgitter-Kontrollbox "
+        },
+        {
+          "id": "OK2/13",
+          "text": "Inspektionsbox / Inspektionsbox-Träger "
+        },
+        {
+          "id": "OK2/14",
+          "text": "Die metallische Kabelkanäle "
+        },
+        {
+          "id": "OKRow15"
+        },
+        {
+          "id": "OKRow16"
+        },
+        {
+          "id": "OK2/17",
+          "text": "Sichtkontrolle der Drähte/Kabel "
+        }
       ]
     },
     {
-      "id": "schacht",
+      "id": "Schacht",
       "title": "3. Prüfung im Schacht",
       "questions": [
-        { "id": "grd_sch_fuehrung", "text": "Führungsschienen" },
-        { "id": "grd_sch_konsole", "text": "Konsolen-Befestigung" },
-        { "id": "grd_sch_tuer", "text": "Türverschluss" },
-        { "id": "grd_sch_rahmen", "text": "Türrahmen" },
-        { "id": "grd_sch_etagen", "text": "Etagenanzeige" }
+        {
+          "id": "OK3/1",
+          "text": "Referenz-Erdung vorhanden "
+        },
+        {
+          "id": "OK3/2",
+          "text": "Kabelträger, Schachttür-Rahmen "
+        },
+        {
+          "id": "OK3/3",
+          "text": "Die metallische Kabelkanäle "
+        },
+        {
+          "id": "OK3/4",
+          "text": "Kabel-Halterung"
+        },
+        {
+          "id": "OK3/5",
+          "text": "Gehäuse/Träger der elektrische Kontakte auf Schachttüren"
+        },
+        {
+          "id": "OK3/6",
+          "text": "Jeder mit einem Kontakt ausgerüsteter Türflügel (zentral öffnend)"
+        },
+        {
+          "id": "OK3/7",
+          "text": "Schachttür-Wagen"
+        },
+        {
+          "id": "OK3/8",
+          "text": "Gehäuse/Erdungsklemme der Schachtbeleuchtung"
+        },
+        {
+          "id": "OK3/9",
+          "text": "Führungsschienen der Kabine"
+        },
+        {
+          "id": "OKRow10"
+        },
+        {
+          "id": "OKRow11"
+        },
+        {
+          "id": "OK3/12",
+          "text": "Sichtkontrolle der Drähte/Kabel"
+        }
       ]
     },
     {
-      "id": "schachtgrube",
-      "title": "4. Prüfung in der Schachtgrube",
+      "id": "Schachtgrube",
+      "title": "4. Prüfung  in der Schachtgrube",
       "questions": [
-        { "id": "grd_sg_puffer", "text": "Puffer/Stoßdämpfer" },
-        { "id": "grd_sg_spannrolle", "text": "Spannrolle" },
-        { "id": "grd_sg_fuehrung", "text": "Führungsschienen-Endverbindung" },
-        { "id": "grd_sg_grube", "text": "Gruben-Erdungsanschluss" }
+        {
+          "id": "OK4/1",
+          "text": "Referenz-Erdung vorhanden"
+        },
+        {
+          "id": "OK4/2",
+          "text": "Die mit einem Kontakt ausgerüstete Puffer"
+        },
+        {
+          "id": "OK4/3",
+          "text": "Die Spannrolle"
+        },
+        {
+          "id": "OK4/4",
+          "text": "Der STOP-Schalter"
+        },
+        {
+          "id": "OK4/5",
+          "text": "Gehäuse/Erdungsklemme der Schachtbeleuchtung"
+        },
+        {
+          "id": "OK4/6",
+          "text": "Die diverse Schacht-Endschalter"
+        },
+        {
+          "id": "OK4/7",
+          "text": "Die metallische Kabelkanäle"
+        },
+        {
+          "id": "OKRow8"
+        },
+        {
+          "id": "OKRow9"
+        },
+        {
+          "id": "OK4/10",
+          "text": "Sichtkontrolle der Drähte/Kabel"
+        }
       ]
     },
     {
-      "id": "kabine",
+      "id": "Kabine",
       "title": "5. Prüfung in der Kabine",
       "questions": [
-        { "id": "grd_kb_rahmen", "text": "Kabinrahmen" },
-        { "id": "grd_kb_tuer", "text": "Kabintür" },
-        { "id": "grd_kb_bedienung", "text": "Bedienfeld" },
-        { "id": "grd_kb_beleuchtung", "text": "Beleuchtung" },
-        { "id": "grd_kb_luefter", "text": "Lüftung" },
-        { "id": "grd_kb_handlauf", "text": "Handlauf (falls vorhanden)" }
+        {
+          "id": "OK5/1",
+          "text": "Referenz-Erdung vorhanden"
+        },
+        {
+          "id": "OK5/2",
+          "text": "Der COP, als Gehäuse"
+        },
+        {
+          "id": "OK5/3",
+          "text": "Gehäuse/Erdungsklemme der Verbindungen (J-Box), Klemmsteg"
+        },
+        {
+          "id": "OK5/4",
+          "text": "Die Kabinendecke, je nach Beleuchtung"
+        },
+        {
+          "id": "OK5/5",
+          "text": "Der Kabinentür-Rahmen"
+        },
+        {
+          "id": "OK5/6",
+          "text": "Die Kabinentür-Schwelle "
+        },
+        {
+          "id": "OKRow5/7"
+        },
+        {
+          "id": "OKRow5/8"
+        },
+        {
+          "id": "OK5/9",
+          "text": "Sichtkontrolle der Drähte/Kabel"
+        }
       ]
     }
   ]

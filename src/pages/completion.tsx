@@ -268,17 +268,14 @@ export function Completion({
             <Button
               onClick={handleDownloadGroundingPDF}
               disabled={isGroundingPdfDownloading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
+              className="bg-yellow-500 hover:bg-yellow-600 text-black flex items-center justify-center py-4 h-auto disabled:opacity-50"
             >
               {isGroundingPdfDownloading ? (
                 <Loader2 className="h-5 w-5 mr-3 animate-spin" />
               ) : (
                 <Download className="h-5 w-5 mr-3" />
               )}
-              {isGroundingPdfDownloading ? 
-                (language === 'hu' ? 'Generálás...' : 'Generieren...') : 
-                (language === 'hu' ? 'Földelési Jegyzőkönyv' : 'Erdungsprotokoll')
-              }
+              {isGroundingPdfDownloading ? t.generating : t.downloadGroundingPDF}
             </Button>
 
             {/* View Protocol */}

@@ -65,6 +65,8 @@ export interface Translation {
   downloadExcel: string;
   viewProtocol: string;
   home: string;
+  downloadGroundingPDF: string;
+  generating: string;
   
   // Validation
   requiredField: string;
@@ -166,7 +168,7 @@ export const translations: Record<string, Translation> = {
     // Signature
     signatureTitle: "Digitális aláírás",
     signatureInstruction: "Kérjük, adja meg az aláírását",
-    signaturePrompt: "Írjon alá itt ujjával vagy stylus-szal",
+    signaturePrompt: "Írjon alá itt az ujjával vagy stylus-szal",
     clear: "Törlés",
     printedName: "Nyomtatott név (opcionális)",
     signatureDate: "Aláírás dátuma: ",
@@ -181,6 +183,8 @@ export const translations: Record<string, Translation> = {
     downloadExcel: "Excel letöltése",
     viewProtocol: "Protokoll előnézete",
     home: "Kezdőlap",
+    downloadGroundingPDF: "Földelésmérési jegyzőkönyv",
+    generating: "Generálás...",
     
     // Validation
     requiredField: "Ez a mező kötelező",
@@ -209,8 +213,8 @@ export const translations: Record<string, Translation> = {
     cellReference: "Cella hivatkozás",
     sheetName: "Munkalap neve",
     questionConfiguration: "Kérdés konfiguráció",
-    uploadExcelFile: "Excel fájl feltöltése",
-    selectExcelFile: "Excel fájl kiválasztása",
+    uploadExcelFile: "Fájl feltöltése",
+    selectExcelFile: "Fájl kiválasztása",
     
     // Page specific translations
     generalData: "Általános adatok",
@@ -219,7 +223,7 @@ export const translations: Record<string, Translation> = {
     measurementData: "Mérési adatok",
     questionsInGroup: "kérdés ebben a csoportban",
     groupOf: "csoport",
-    calculatedValuesValidated: "A számított értékek automatikusan validálva vannak. A határértéken kívüli értékek pirossal jelennek meg.",
+    calculatedValuesValidated: "A számított értékek automatikusan kiszámításra kerülnek. A határértéken kívüli értékek pirossal jelennek meg.",
     calculatedValues: "Számított értékek",
     errorRecordingRequired: "Hiba rögzítése szükséges",
     outOfRange: "Határértéken kívül (700-9000 mm)",
@@ -293,6 +297,8 @@ export const translations: Record<string, Translation> = {
     downloadExcel: "Excel herunterladen",
     viewProtocol: "Protokoll-Vorschau",
     home: "Startseite",
+    downloadGroundingPDF: "Erdungsprotokoll",
+    generating: "Generieren...",
     
     // Validation
     requiredField: "Dieses Feld ist erforderlich",
@@ -321,8 +327,8 @@ export const translations: Record<string, Translation> = {
     cellReference: "Zellreferenz",
     sheetName: "Arbeitsblattname",
     questionConfiguration: "Fragenkonfiguration",
-    uploadExcelFile: "Excel-Datei hochladen",
-    selectExcelFile: "Excel-Datei auswählen",
+    uploadExcelFile: "Datei hochladen",
+    selectExcelFile: "Datei auswählen",
     
     // Page specific translations
     generalData: "Allgemeine Daten",
@@ -331,7 +337,7 @@ export const translations: Record<string, Translation> = {
     measurementData: "Messdaten",
     questionsInGroup: "Fragen in dieser Gruppe",
     groupOf: "Gruppe",
-    calculatedValuesValidated: "Die berechneten Werte werden automatisch validiert. Werte außerhalb der Grenzwerte werden rot angezeigt.",
+    calculatedValuesValidated: "Die berechneten Werte werden automatisch berechnet. Werte außerhalb der Grenzwerte werden rot angezeigt.",
     calculatedValues: "Berechnete Werte",
     errorRecordingRequired: "Dokumentation erforderlich",
     outOfRange: "Außerhalb der Grenzwerte (700-9000 mm)",

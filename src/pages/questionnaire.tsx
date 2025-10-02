@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
+import { create, all } from 'mathjs';
 import { Question, AnswerValue, ProtocolError, QuestionType } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import PageHeader from '@/components/PageHeader';
@@ -18,6 +19,7 @@ import { getAllMeasurementValues } from '@/components/measurement-question';
 import { CalculatedResult } from '@/components/calculated-result';
 import { MeasurementBlock, getAllCalculatedValues } from '@/components/measurement-block';
 import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
+import { FormData } from '@/lib/types';
 
 interface QuestionnaireProps {
   receptionDate: string;
@@ -34,8 +36,11 @@ interface QuestionnaireProps {
   onStartNew?: () => void;
   onPageChange?: (page: number) => void;
   onQuestionChange?: (questionId: string) => void;
+  formData: FormData;
+  currentPage: number;
+  currentQuestionId: string;
 }
-
+const math = create(all);
 const Questionnaire = memo(function Questionnaire({
   receptionDate,
   onReceptionDateChange,
@@ -51,6 +56,9 @@ const Questionnaire = memo(function Questionnaire({
   onStartNew,
   onPageChange,
   onQuestionChange,
+  formData,
+  currentPage: pageFromApp, // Átnevezzük, hogy ne ütközzön a belső 'currentPage' állapottal
+  currentQuestionId,
 }: QuestionnaireProps) {
   const { t, language: contextLanguage } = useLanguageContext();
   
@@ -256,6 +264,41 @@ const Questionnaire = memo(function Questionnaire({
     };
   }, []);
 
+// ✅ ÚJ, REAKTÍV KALKULÁCIÓS LOGIKA
+  useEffect(() => {
+    // 1. Gyűjtsük össze az összes jelenlegi bemeneti értéket a különböző cache-ekből
+    const allInputValues = {
+      ...getAllStableInputValues(),
+      ...getAllMeasurementValues(),
+    };
+
+    // 2. Keressük meg az összes "calculated" típusú kérdést
+    const calculatedQuestions = allQuestions.filter(q => q.type === 'calculated');
+
+    // 3. Végezzük el a számításokat
+    calculatedQuestions.forEach(q => {
+      if (q.calculationFormula && q.calculationInputs) {
+        try {
+          // A math.js scope objektumát használjuk a biztonságos behelyettesítéshez
+          const result = math.evaluate(q.calculationFormula, allInputValues);
+
+          if (typeof result === 'number' && !isNaN(result)) {
+            const roundedResult = Math.round(result * 100) / 100;
+            // Frissítsük a szülő komponenst az új értékkel, de csak ha változott
+            if (answers[q.id] !== roundedResult) {
+              onAnswerChange(q.id, roundedResult);
+            }
+          }
+        } catch (error) {
+          // Ha a formula hibás, biztosítjuk, hogy ne legyen régi, hibás érték az állapotban.
+          if (answers[q.id] !== undefined) {
+            onAnswerChange(q.id, undefined);
+          }
+        }
+      }
+    });
+  // A függőségi tömb: lefut, ha a kérdések betöltődtek, vagy ha bármelyik bemeneti mező változik (cacheUpdateTrigger)
+  }, [allQuestions, cacheUpdateTrigger, onAnswerChange, answers]);
   // Ultra-stable error handlers with proper typing
   const handleAddError = useCallback((error: Omit<ProtocolError, 'id'>) => {
     const newError: ProtocolError = {
@@ -283,73 +326,21 @@ const Questionnaire = memo(function Questionnaire({
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   
+  // ✅ ÁTÍRT, LEEGYSZERŰSÍTETT FÜGGVÉNY
   const checkCanProceed = () => {
-    const requiredQuestions = (currentQuestions as Question[]).filter((q: Question) => q.required);
-    
-    if (requiredQuestions.length === 0) return true;
-    
-    const cachedRadioValues = getAllCachedValues();
-    const cachedTrueFalseValues = getAllTrueFalseValues();
-    const cachedInputValues = getAllStableInputValues();
-    const cachedMeasurementValues = getAllMeasurementValues();
-    
-    const savedFormData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{"answers":{}}');
-    
-    const calculatedValues = getAllCalculatedValues();
-    
-    const calculatedQuestions = (currentQuestions as Question[]).filter((q: Question) => q.type === 'calculated');
-    calculatedQuestions.forEach(question => {
-      if (question.calculationFormula && question.calculationInputs) {
-        const inputIds = question.calculationInputs.split(',').map(id => id.trim());
-        let formula = question.calculationFormula;
-        let hasAllInputs = true;
-        
-        const allInputValues = { ...cachedMeasurementValues, ...cachedInputValues };
-        
-        inputIds.forEach(inputId => {
-          const value = allInputValues[inputId];
-          if (value === undefined || value === null || isNaN(parseFloat(value.toString()))) {
-            hasAllInputs = false;
-            return;
-          }
-          formula = formula.replace(new RegExp(`\\b${inputId}\\b`, 'g'), value.toString());
-        });
-        
-        if (hasAllInputs) {
-          try {
-            const result = Function(`"use strict"; return (${formula})`)();
-            if (!isNaN(result)) {
-              calculatedValues[question.id] = Math.round(result * 100) / 100;
-            }
-          } catch (error) {
-            console.error(`Calculation error for ${question.id}:`, error);
-          }
-        }
-      }
-    });
+    const requiredQuestionsOnPage = (currentQuestions as Question[]).filter(q => q.required);
+    if (requiredQuestionsOnPage.length === 0) return true;
 
-    const combinedAnswers = {
-      ...answers,
-      ...savedFormData.answers,
-      ...cachedRadioValues,
-      ...cachedTrueFalseValues,
-      ...cachedInputValues,
-      ...cachedMeasurementValues,
-      ...calculatedValues,
-    };
-    
-    const result = requiredQuestions.every((q: Question) => {
-      const answer = combinedAnswers[q.id];
-      const hasAnswer = answer !== undefined && answer !== null && answer !== '';
-      return hasAnswer;
+    return requiredQuestionsOnPage.every(q => {
+      const answer = answers[q.id];
+      return answer !== undefined && answer !== null && answer !== '';
     });
-    
-    return result;
   };
   
+  // ✅ ÁTÍRT, LEEGYSZERŰSÍTETT FÜGGŐSÉGI TÖMB
   const canProceedState = useMemo(() => {
     return checkCanProceed();
-  }, [currentQuestions, answers, cacheUpdateTrigger]);
+  }, [currentQuestions, answers]);
 
   const isLastPage = currentPage === totalPages - 1;
   const progressPercent = totalPages > 0 ? Math.round(((currentPage + 1) / totalPages) * 100) : 0;
@@ -364,15 +355,15 @@ const Questionnaire = memo(function Questionnaire({
   receptionDate={receptionDate}
   onReceptionDateChange={onReceptionDateChange}
   language={language}
-  // ÚJ PROPOK az egységes progress-hez:
-  totalSteps={totalPages + 1} // +1 a Niedervolt lépésért
-  currentStep={currentPage}   // Jelenlegi kérdés oldal
-  stepType="questionnaire"    // Jelzi, hogy kérdés oldalon vagyunk
-  // AI Segítő props:
-  currentPage={currentPage + 1}
-  formData={{ answers, receptionDate, errors }}
-  currentQuestionId={currentGroup?.questions?.[0]?.id || ''}
-  errors={errors}
+  totalSteps={totalPages + 1}
+  currentStep={currentPage}
+  stepType="questionnaire"
+  
+  // === AI SEGÍTŐ PROPS A SZÜLŐTŐL ===
+  currentPage={pageFromApp + 1} // A props-ból kapott értéket használjuk (+1, mert nem 0-tól indexelt)
+  formData={formData}           // A props-ból kapott teljes formData objektumot adjuk át
+  currentQuestionId={currentQuestionId} // A props-ból kapott értéket használjuk
+  errors={errors}               // Az `errors` prop már korábban is megvolt
 />
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8" onSubmit={(e) => e.preventDefault()}>

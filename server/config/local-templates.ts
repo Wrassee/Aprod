@@ -1,3 +1,5 @@
+// server/config/local-templates.ts
+
 // Helyi template konfigurációk
 export interface LocalTemplate {
   id: string;
@@ -70,7 +72,20 @@ export const LOCAL_TEMPLATES: LocalTemplate[] = [
     path: '/templates/fejlett_szamitasok.xlsx',
     description: 'Fejlett mérési és számítási funkciókkal',
     description_de: 'Mit erweiterten Mess- und Berechnungsfunktionen'
+  },
+
+  // ===== EZ AZ ÚJ RÉSZ, AMIT HOZZÁADTUNK =====
+  {
+    id: 'alap_erdungskontrolle',
+    name: 'Földelési Jegyzőkönyv Sablon (PDF)',
+    name_de: 'Erdungsprotokoll Vorlage (PDF)',
+    type: 'protocol',
+    language: 'multilingual',
+    path: '/templates/Erdungskontrolle.pdf',
+    description: 'PDF űrlap sablon a kitöltött földelési jegyzőkönyv generálásához.',
+    description_de: 'PDF-Formularvorlage zur Erstellung des ausgefüllten Erdungsprotokolls.'
   }
+  // ==========================================
 ];
 
 // Template prioritási sorrend: helyi -> localStorage cache -> Supabase letöltés

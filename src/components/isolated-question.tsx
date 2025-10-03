@@ -98,7 +98,8 @@ const IsolatedQuestionComponent = memo(({
           <StableInput
             questionId={question.id}
             type="number"
-            initialValue={value?.toString() || ''}
+            value={value?.toString() || ''}
+            onChange={onChange}
             placeholder={question.placeholder || '0'}
             className="w-full"
             onKeyDown={(e) => {
@@ -144,7 +145,8 @@ const IsolatedQuestionComponent = memo(({
           <StableInput
             questionId={question.id}
             type="text"
-            initialValue={value?.toString() || ''}
+            value={value?.toString() || ''}
+            onChange={onChange}
             placeholder={question.placeholder || t.enterText || 'Szöveg megadása'}
             className="w-full"
             onKeyDown={(e) => {

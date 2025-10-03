@@ -9,7 +9,7 @@
     "allowImportingTsExtensions": false,
     // ===================================
     
-    "outDir": "dist-server"
+    "outDir": "./dist"
   },
   "include": [
     "server/**/*.ts",

@@ -8,7 +8,7 @@
     "build": "npm run build:client && npm run build:server",
     "build:client": "vite build",
     "build:server": "tsc --project tsconfig.server.json && tsc-alias -p tsconfig.server.json",
-    "start": "node dist-server/index.js",
+    "start": "node dist/index.js",
     "db:push": "drizzle-kit push --config ./drizzle.config.ts",
     "db:generate:pg": "drizzle-kit generate --config ./drizzle.config.pg.ts",
     "db:studio:pg": "drizzle-kit studio --config ./drizzle.config.pg.ts",

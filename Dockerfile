@@ -84,6 +84,9 @@ COPY --from=builder /app/dist ./dist
 # Átmásoljuk a public mappát.
 COPY --from=builder /app/public ./public
 
+# Átmásoljuk a lefordított 'shared' mappát is a gyökérbe.
+COPY --from=builder /app/dist/shared ./shared
+
 RUN mkdir /app/temp && chmod 777 /app/temp
 
 EXPOSE 10000

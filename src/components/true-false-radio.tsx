@@ -44,6 +44,7 @@ export const TrueFalseRadio = memo(({ questionId, questionTitle, value, onChange
           value={value}
           onChange={onChange}
           options={options}
+          direction="vertical"
         />
       </div>
     </div>

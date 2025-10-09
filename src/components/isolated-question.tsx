@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { CacheRadio } from './cache-radio';
 import { TrueFalseRadio } from './true-false-radio';
+import { StyledRadioGroup } from './StyledRadioGroup'; // ÚJ IMPORT
 import { MeasurementQuestion } from './measurement-question';
 import { Camera, Image } from 'lucide-react';
 import { useLanguageContext } from './language-provider';
@@ -34,54 +35,64 @@ const IsolatedQuestionComponent = memo(({
   }, [onImageUpload]);
 
   const renderInput = useCallback(() => {
-    // A diagnosztikai logot a biztonság kedvéért bent hagyom, de kikommentezem.
-    /*
-    console.log(`🕵️‍♂️ DEBUG ISOLATED QUESTION | ID: ${question.id} | Title: ${question.title}`, {
-        type_received: `"${question.type}"`,
-        type_length: question.type.length,
-        full_question_object: question
-    });
-    */
-
     switch (question.type) {
-      case 'yes_no_na':
+      // ================== JAVÍTOTT RADIO TÍPUS ==================
       case 'radio':
-        const radioOptions = [
-          { value: 'yes', label: t.yes, id: `${question.id}-yes` },
-          { value: 'no', label: t.no, id: `${question.id}-no` },
-          { value: 'na', label: t.notApplicable, id: `${question.id}-na` }
+        // True/False kérdések - 2 gomb (Igen/Nem)
+        const trueFalseOptions = [
+          { value: 'true', label: t.yes || 'Igen' },
+          { value: 'false', label: t.no || 'Nem' }
         ];
         
         return (
-          <CacheRadio
-            questionId={question.id}
-            value={value?.toString() || ''}
-            options={radioOptions}
-            onChange={onChange}
-          />
-        );
-        
-      // ================== HOZZÁADOTT RÉSZ ==================
-      // Ez az ág hiányzott a 'checkbox' típus kezeléséhez.
-      case 'checkbox':
-        return (
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id={question.id}
-              checked={!!value} // Az értéket logikai értékké alakítja
-              onChange={(e) => onChange(e.target.checked)}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+          <div className="flex justify-center py-2">
+            <StyledRadioGroup
+              questionId={question.id}
+              value={value?.toString() || ''}
+              onChange={onChange}
+              options={trueFalseOptions}
             />
-            <label
-              htmlFor={question.id}
-              className="text-sm font-medium text-gray-700 select-none cursor-pointer"
-            >
-              {question.placeholder || t.confirm || 'Megerősítés'}
-            </label>
           </div>
         );
-      // ======================================================
+      
+      // ================== JAVÍTOTT CHECKBOX TÍPUS (yes/no/na) ==================
+      case 'checkbox':
+        // Yes/No/N.A. kérdések - 3 gomb
+        const yesNoNaOptions = [
+          { value: 'yes', label: t.yes || 'Igen' },
+          { value: 'no', label: t.no || 'Nem' },
+          { value: 'na', label: t.notApplicable || 'N.A.' }
+        ];
+        
+        return (
+          <div className="flex justify-center py-2">
+            <StyledRadioGroup
+              questionId={question.id}
+              value={value?.toString() || ''}
+              onChange={onChange}
+              options={yesNoNaOptions}
+            />
+          </div>
+        );
+      
+      // ================== RÉGI yes_no_na TÍPUS (ha még használnád) ==================
+      case 'yes_no_na':
+        const radioOptions = [
+          { value: 'yes', label: t.yes || 'Igen' },
+          { value: 'no', label: t.no || 'Nem' },
+          { value: 'na', label: t.notApplicable || 'N.A.' }
+        ];
+        
+        return (
+          <div className="flex justify-center py-2">
+            <StyledRadioGroup
+              questionId={question.id}
+              value={value?.toString() || ''}
+              onChange={onChange}
+              options={radioOptions}
+            />
+          </div>
+        );
         
       case 'true_false':
         return (

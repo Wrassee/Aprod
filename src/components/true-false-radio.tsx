@@ -1,81 +1,49 @@
-import { memo, useState, useEffect } from 'react';
+// src/components/true-false-radio.tsx - TELJES, ÚJ VERZIÓ
+
+import { memo } from 'react';
+import { Label } from '@/components/ui/label';
+import { StyledRadioGroup } from './StyledRadioGroup'; // Importáljuk az új komponenst
 
 interface TrueFalseRadioProps {
   questionId: string;
   questionTitle: string;
   value: string;
   onChange: (value: string) => void;
+  // Új prop, hogy tudjuk, milyen gombokat kell megjeleníteni
+  questionType: 'radio' | 'checkbox' | string; 
 }
 
-// Global cache for true/false values - exact copy of CacheRadio pattern
-const trueFalseCache = new Map<string, string>();
+// Opciók definiálása a különböző típusokhoz
+const trueFalseOptions = [
+  { value: 'true', label: 'Igen' },
+  { value: 'false', label: 'Nem' },
+];
 
-export const TrueFalseRadio = memo(({ questionId, questionTitle, value, onChange }: TrueFalseRadioProps) => {
-  const [localValue, setLocalValue] = useState(() => {
-    // Get from cache or use initial value
-    return trueFalseCache.get(questionId) || value;
-  });
+const yesNoNaOptions = [
+  { value: 'yes', label: 'Igen' },
+  { value: 'no', label: 'Nem' },
+  { value: 'na', label: 'N.A.' },
+];
 
-  // Sync with initial value only if cache is empty
-  useEffect(() => {
-    if (!trueFalseCache.has(questionId) && value) {
-      setLocalValue(value);
-      trueFalseCache.set(questionId, value);
-    }
-  }, [questionId, value]);
-
-  const handleChange = (newValue: string) => {
-    setLocalValue(newValue);
-    trueFalseCache.set(questionId, newValue);
-    
-    console.log(`True/False changed: ${questionId} = ${newValue}`);
-    
-    // Dispatch custom event for save button to pick up
-    window.dispatchEvent(new CustomEvent('radio-change', {
-      detail: { questionId, value: newValue }
-    }));
-  };
+export const TrueFalseRadio = memo(({ questionId, questionTitle, value, onChange, questionType }: TrueFalseRadioProps) => {
+  // A `parser` a `true_false` kérdéseket `radio`-vá, a `yes_no_na` kérdéseket `checkbox`-szá alakítja.
+  // Ezt a logikát használjuk a megfelelő gombok kiválasztásához.
+  const options = questionType === 'radio' ? trueFalseOptions : yesNoNaOptions;
 
   return (
-    <div className="grid grid-cols-[1fr_100px_100px] gap-4 items-center py-2 border-b border-gray-100 last:border-b-0">
-      {/* Question Title - Left Column */}
-      <div className="text-sm font-medium text-gray-800 pr-4">
+    <div className="grid grid-cols-[1fr_auto] gap-4 items-center py-3 border-b border-gray-100 last:border-b-0">
+      {/* Kérdés Címe */}
+      <Label className="text-sm font-medium text-gray-800 pr-4">
         {questionTitle}
-      </div>
+      </Label>
       
-      {/* True Option - Middle Column */}
+      {/* Új, stílusos rádiógomb csoport */}
       <div className="flex justify-center">
-        <input
-          type="radio"
-          id={`${questionId}-true`}
-          name={questionId}
-          value="true"
-          checked={localValue === 'true'}
-          onChange={(e) => {
-            e.stopPropagation();
-            if (e.target.checked) {
-              handleChange('true');
-            }
-          }}
-          className="w-5 h-5 text-green-600 bg-gray-100 border-gray-300 focus:ring-green-500 focus:ring-2 cursor-pointer"
-        />
-      </div>
-      
-      {/* False Option - Right Column */}
-      <div className="flex justify-center">
-        <input
-          type="radio"
-          id={`${questionId}-false`}
-          name={questionId}
-          value="false"
-          checked={localValue === 'false'}
-          onChange={(e) => {
-            e.stopPropagation();
-            if (e.target.checked) {
-              handleChange('false');
-            }
-          }}
-          className="w-5 h-5 text-red-600 bg-gray-100 border-gray-300 focus:ring-red-500 focus:ring-2 cursor-pointer"
+        <StyledRadioGroup
+          questionId={questionId}
+          value={value}
+          onChange={onChange}
+          options={options}
         />
       </div>
     </div>
@@ -83,12 +51,3 @@ export const TrueFalseRadio = memo(({ questionId, questionTitle, value, onChange
 });
 
 TrueFalseRadio.displayName = 'TrueFalseRadio';
-
-// Export function to get all cached true/false values
-export const getAllTrueFalseValues = (): Record<string, string> => {
-  const result: Record<string, string> = {};
-  trueFalseCache.forEach((value, key) => {
-    result[key] = value;
-  });
-  return result;
-};

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguageContext } from '@/components/language-provider';
 import { formatDate } from '@/lib/utils';
-import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2 } from 'lucide-react';
+import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2, FileText } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Template {
@@ -56,12 +56,18 @@ export function Admin({ onBack, onHome }: AdminProps) {
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [uploadForm, setUploadForm] = useState({
+  
+  // Külön state a két típusú feltöltéshez
+  const [questionsUpload, setQuestionsUpload] = useState({
     name: '',
-    type: 'unified',
-    language: 'multilingual',
     file: null as File | null,
   });
+  
+  const [protocolUpload, setProtocolUpload] = useState({
+    name: '',
+    file: null as File | null,
+  });
+  
   const [hybridTemplates, setHybridTemplates] = useState<HybridTemplateData | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [loadStrategy, setLoadStrategy] = useState<string>('local_first');
@@ -122,7 +128,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
         const result = await response.json();
         toast({
           title: t.success,
-          description: `Template váltás sikeres: ${result.template.name}`,
+          description: `Template váltás sikeres: ${result.template?.name || 'Sablon'}`,
         });
         fetchHybridTemplates();
       } else {
@@ -140,18 +146,28 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Kérdés sablon fájl kiválasztása
+  const handleQuestionsFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setUploadForm({ ...uploadForm, file });
+      setQuestionsUpload({ ...questionsUpload, file });
     }
   };
 
-  const handleUpload = async () => {
-    if (!uploadForm.file || !uploadForm.name) {
+  // Protokoll sablon fájl kiválasztása
+  const handleProtocolFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProtocolUpload({ ...protocolUpload, file });
+    }
+  };
+
+  // Kérdés sablon feltöltése
+  const handleQuestionsUpload = async () => {
+    if (!questionsUpload.file || !questionsUpload.name) {
       toast({
         title: t.error,
-        description: 'Please provide a name and select a file',
+        description: language === 'de' ? 'Bitte Namen und Datei angeben' : 'Kérlek add meg a nevet és válassz fájlt',
         variant: 'destructive',
       });
       return;
@@ -159,10 +175,10 @@ export function Admin({ onBack, onHome }: AdminProps) {
 
     setLoading(true);
     const formData = new FormData();
-    formData.append('file', uploadForm.file);
-    formData.append('name', uploadForm.name);
-    formData.append('type', uploadForm.type);
-    formData.append('language', uploadForm.language);
+    formData.append('file', questionsUpload.file);
+    formData.append('name', questionsUpload.name);
+    formData.append('type', 'unified'); // Mindig unified
+    formData.append('language', 'multilingual'); // Mindig multilingual
 
     try {
       const response = await fetch('/api/admin/templates/upload', {
@@ -173,18 +189,66 @@ export function Admin({ onBack, onHome }: AdminProps) {
       if (response.ok) {
         toast({
           title: t.success,
-          description: 'Template uploaded successfully',
+          description: language === 'de' ? 'Fragenvorlage erfolgreich hochgeladen' : 'Kérdés sablon sikeresen feltöltve',
         });
-        setUploadForm({ name: '', type: 'unified', language: 'multilingual', file: null });
+        setQuestionsUpload({ name: '', file: null });
         fetchTemplates();
       } else {
-        throw new Error('Upload failed');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
       }
-    } catch (error) {
-      console.error('Error uploading template:', error);
+    } catch (error: any) {
+      console.error('Error uploading questions template:', error);
       toast({
         title: t.error,
-        description: 'Failed to upload template',
+        description: error.message || 'Failed to upload template',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Protokoll sablon feltöltése
+  const handleProtocolUpload = async () => {
+    if (!protocolUpload.file || !protocolUpload.name) {
+      toast({
+        title: t.error,
+        description: language === 'de' ? 'Bitte Namen und Datei angeben' : 'Kérlek add meg a nevet és válassz fájlt',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append('file', protocolUpload.file);
+    formData.append('name', protocolUpload.name);
+    formData.append('type', 'protocol'); // Mindig protocol
+    formData.append('language', 'multilingual'); // Mindig multilingual
+
+    try {
+      const response = await fetch('/api/admin/templates/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        toast({
+          title: t.success,
+          description: language === 'de' ? 'Protokollvorlage erfolgreich hochgeladen' : 'Protokoll sablon sikeresen feltöltve',
+        });
+        setProtocolUpload({ name: '', file: null });
+        fetchTemplates();
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Upload failed');
+      }
+    } catch (error: any) {
+      console.error('Error uploading protocol template:', error);
+      toast({
+        title: t.error,
+        description: error.message || 'Failed to upload template',
         variant: 'destructive',
       });
     } finally {
@@ -219,7 +283,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
       setActivatingId(null);
     }
   };
-
 
   const handlePreview = async (templateId: string) => {
     try {
@@ -256,7 +319,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  // --- MÓDOSÍTVA: A letöltési funkció leegyszerűsítve ---
   const handleDownload = (templateId: string) => {
     window.location.href = `/api/admin/templates/${templateId}/download`;
   };
@@ -293,24 +355,24 @@ export function Admin({ onBack, onHome }: AdminProps) {
   const filteredTemplates = templates;
 
   return (
-  <div className="min-h-screen bg-light-surface">
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <img 
-              src="/otis-elevators-seeklogo_1753525178175.png" 
-              alt="OTIS Logo" 
-              className="h-12 w-12 mr-4"
-            />
-            {onHome && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onHome}
-                className="text-gray-600 hover:text-gray-800 mr-4"
-                title="Kezdőlap"
-              >
+    <div className="min-h-screen bg-light-surface">
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <img 
+                src="/otis-elevators-seeklogo_1753525178175.png" 
+                alt="OTIS Logo" 
+                className="h-12 w-12 mr-4"
+              />
+              {onHome && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onHome}
+                  className="text-gray-600 hover:text-gray-800 mr-4"
+                  title="Kezdőlap"
+                >
                   <Home className="h-4 w-4" />
                 </Button>
               )}
@@ -318,7 +380,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
               <div className="flex items-center">
                 <span className="text-lg font-medium text-gray-800 mr-3">{t.admin}</span>
                 <Badge variant="outline" className="bg-gray-50 text-gray-600 font-mono text-xs">
-                  v0.4.8
+                  v0.4.9
                 </Badge>
               </div>
             </div>
@@ -363,12 +425,11 @@ export function Admin({ onBack, onHome }: AdminProps) {
                             </Badge>
                             <Badge variant="outline">
                               {template.type === 'unified' ? 
-                                (language === 'de' ? 'Vereinigt' : 'Egyesített') :
-                                template.type === 'questions' ? t.questionsTemplate : t.protocolTemplate
+                                (language === 'de' ? 'Fragenvorlage' : 'Kérdés Sablon') :
+                                template.type === 'protocol' ? 
+                                (language === 'de' ? 'Protokollvorlage' : 'Protokoll Sablon') :
+                                template.type
                               }
-                            </Badge>
-                            <Badge variant="outline" className="bg-gray-100">
-                              {template.language === 'multilingual' ? 'HU/DE' : template.language.toUpperCase()}
                             </Badge>
                           </div>
                           <p className="text-sm text-gray-600">{template.fileName}</p>
@@ -376,7 +437,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                             {(() => {
                               try {
                                 const date = new Date(template.uploaded_at);
-                                // Ellenőrizzük, hogy valid dátum-e és nem túl nagy az évszám
                                 if (isNaN(date.getTime()) || date.getFullYear() > 2030) {
                                   return 'Ismeretlen dátum';
                                 }
@@ -388,7 +448,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
                           </p>
                         </div>
                         <div className="flex items-center gap-2">
-                          {/* --- MÓDOSÍTVA: A gomb onClick eseménye frissítve --- */}
                           <Button
                             variant="ghost"
                             size="sm"
@@ -543,101 +602,148 @@ export function Admin({ onBack, onHome }: AdminProps) {
           </TabsContent>
 
           <TabsContent value="upload" className="space-y-6">
+            {/* KÉRDÉS SABLON FELTÖLTÉSE */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center">
-                  <Upload className="h-5 w-5 mr-2" />
-                  {t.uploadTemplate}
+                  <FileSpreadsheet className="h-5 w-5 mr-2" />
+                  {language === 'de' ? 'Fragenvorlage hochladen' : 'Kérdés Sablon Feltöltése'}
                 </CardTitle>
+                <CardDescription>
+                  {language === 'de' 
+                    ? 'Mehrsprachige Vorlage (HU/DE) mit allen Fragetypen und Zellzuordnungen'
+                    : 'Többnyelvű sablon (HU/DE) az összes kérdéstípussal és cella hozzárendelésekkel'
+                  }
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">{t.templateName}</Label>
+                  <Label className="text-sm font-medium text-gray-700">
+                    {language === 'de' ? 'Vorlagenname' : 'Sablon neve'}
+                  </Label>
                   <Input
-                    value={uploadForm.name}
-                    onChange={(e) => setUploadForm({ ...uploadForm, name: e.target.value })}
-                    placeholder={language === 'de' ? 'Vorlagenname eingeben' : 'Enter template name'}
+                    value={questionsUpload.name}
+                    onChange={(e) => setQuestionsUpload({ ...questionsUpload, name: e.target.value })}
+                    placeholder={language === 'de' ? 'z.B. OTIS Fragenvorlage 2025' : 'pl. OTIS Kérdés Sablon 2025'}
                     className="mt-2"
                   />
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-gray-700">{t.templateType}</Label>
-                  <Select 
-                    value={uploadForm.type} 
-                    onValueChange={(value) => setUploadForm({ ...uploadForm, type: value })}
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="unified">
-                        {language === 'de' ? 'Vereinigt (Alle Fragetypen)' : 'Egyesített (Minden kérdéstípus)'}
-                      </SelectItem>
-                      <SelectItem value="questions">{t.questionsTemplate}</SelectItem>
-                      <SelectItem value="protocol">{t.protocolTemplate}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
                   <Label className="text-sm font-medium text-gray-700">
-                    {language === 'de' ? 'Sprachen' : 'Nyelvek'}
+                    {language === 'de' ? 'Excel-Datei auswählen' : 'Excel fájl kiválasztása'}
                   </Label>
-                  <Select 
-                    value={uploadForm.language} 
-                    onValueChange={(value) => setUploadForm({ ...uploadForm, language: value as 'multilingual' | 'hu' | 'de' })}
-                  >
-                    <SelectTrigger className="mt-2">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="multilingual">
-                        {language === 'de' ? 'Mehrsprachig (HU/DE)' : 'Multilingual (HU/DE)'}
-                      </SelectItem>
-                      <SelectItem value="hu">
-                        {language === 'de' ? 'Ungarisch' : 'Hungarian'}
-                      </SelectItem>
-                      <SelectItem value="de">
-                        {language === 'de' ? 'Deutsch' : 'German'}
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">{t.selectExcelFile}</Label>
                   <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <FileSpreadsheet className="h-8 w-8 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-600 mb-2">{t.uploadExcelFile}</p>
+                    <p className="text-gray-600 mb-2">
+                      {language === 'de' ? 'Excel-Datei mit Fragen hochladen' : 'Kérdéseket tartalmazó Excel fájl feltöltése'}
+                    </p>
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => document.getElementById('excel-upload')?.click()}
+                      onClick={() => document.getElementById('questions-excel-upload')?.click()}
                     >
-                      {t.selectExcelFile}
+                      {language === 'de' ? 'Datei auswählen' : 'Fájl kiválasztása'}
                     </Button>
                     <input
-                      id="excel-upload"
+                      id="questions-excel-upload"
                       type="file"
                       accept=".xlsx,.xls"
                       className="hidden"
-                      onChange={handleFileUpload}
+                      onChange={handleQuestionsFileUpload}
                     />
-                    {uploadForm.file && (
+                    {questionsUpload.file && (
                       <p className="text-sm text-green-600 mt-2">
-                        Selected: {uploadForm.file.name}
+                        {language === 'de' ? 'Ausgewählt' : 'Kiválasztva'}: {questionsUpload.file.name}
                       </p>
                     )}
                   </div>
                 </div>
 
                 <Button
-                  onClick={handleUpload}
-                  disabled={loading || !uploadForm.file || !uploadForm.name}
+                  onClick={handleQuestionsUpload}
+                  disabled={loading || !questionsUpload.file || !questionsUpload.name}
                   className="w-full bg-otis-blue hover:bg-blue-700"
                 >
-                  {loading ? t.loading : t.upload}
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Upload className="h-4 w-4 mr-2" />
+                  )}
+                  {loading ? t.loading : (language === 'de' ? 'Fragenvorlage hochladen' : 'Kérdés Sablon Feltöltése')}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* PROTOKOLL SABLON FELTÖLTÉSE */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <FileText className="h-5 w-5 mr-2" />
+                  {language === 'de' ? 'Protokollvorlage hochladen' : 'Protokoll Sablon Feltöltése'}
+                </CardTitle>
+                <CardDescription>
+                  {language === 'de' 
+                    ? 'Ausgabe-Formatvorlage für generierte Excel-Protokolle'
+                    : 'Kimeneti formátum sablon a generált Excel protokollokhoz'
+                  }
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    {language === 'de' ? 'Vorlagenname' : 'Sablon neve'}
+                  </Label>
+                  <Input
+                    value={protocolUpload.name}
+                    onChange={(e) => setProtocolUpload({ ...protocolUpload, name: e.target.value })}
+                    placeholder={language === 'de' ? 'z.B. OTIS Protokoll HU' : 'pl. OTIS Protokoll HU'}
+                    className="mt-2"
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-gray-700">
+                    {language === 'de' ? 'Excel-Datei auswählen' : 'Excel fájl kiválasztása'}
+                  </Label>
+                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                    <FileText className="h-8 w-8 mx-auto text-gray-400 mb-4" />
+                    <p className="text-gray-600 mb-2">
+                      {language === 'de' ? 'Protokoll-Formatvorlage hochladen' : 'Protokoll formátum sablon feltöltése'}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => document.getElementById('protocol-excel-upload')?.click()}
+                    >
+                      {language === 'de' ? 'Datei auswählen' : 'Fájl kiválasztása'}
+                    </Button>
+                    <input
+                      id="protocol-excel-upload"
+                      type="file"
+                      accept=".xlsx,.xls"
+                      className="hidden"
+                      onChange={handleProtocolFileUpload}
+                    />
+                    {protocolUpload.file && (
+                      <p className="text-sm text-green-600 mt-2">
+                        {language === 'de' ? 'Ausgewählt' : 'Kiválasztva'}: {protocolUpload.file.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleProtocolUpload}
+                  disabled={loading || !protocolUpload.file || !protocolUpload.name}
+                  className="w-full bg-gray-700 hover:bg-gray-800"
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    <Upload className="h-4 w-4 mr-2" />
+                  )}
+                  {loading ? t.loading : (language === 'de' ? 'Protokollvorlage hochladen' : 'Protokoll Sablon Feltöltése')}
                 </Button>
               </CardContent>
             </Card>

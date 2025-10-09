@@ -1,41 +1,18 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 import { useLanguageContext } from '@/components/language-provider';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Calculator, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Question } from '@shared/schema';
-import { getAllMeasurementValues } from './measurement-question';
 
 interface CalculatedResultProps {
   question: Question; // This should be a 'calculated' type question
-  inputValues: Record<string, number>; // All measurement input values
+  inputValues: Record<string, number | string | undefined>; // All measurement input values from React state
 }
 
 export function CalculatedResult({ question, inputValues }: CalculatedResultProps) {
   const { language } = useLanguageContext();
-  const [measurementTrigger, setMeasurementTrigger] = useState(0);
-
-  // Listen for measurement changes to recalculate
-  useEffect(() => {
-    const handleMeasurementChange = () => {
-      console.log(`[CalculatedResult ${question.id}] Measurement change detected, recalculating...`);
-      setMeasurementTrigger(prev => prev + 1);
-    };
-
-    const handleInputChange = () => {
-      console.log(`[CalculatedResult ${question.id}] Input change detected, recalculating...`);
-      setMeasurementTrigger(prev => prev + 1);
-    };
-
-    window.addEventListener('measurement-change', handleMeasurementChange);
-    window.addEventListener('input-change', handleInputChange);
-    
-    return () => {
-      window.removeEventListener('measurement-change', handleMeasurementChange);
-      window.removeEventListener('input-change', handleInputChange);
-    };
-  }, [question.id]);
 
   const calculationResult = useMemo(() => {
     if (!question.calculationFormula || !question.calculationInputs) {
@@ -47,44 +24,26 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
       let formula = question.calculationFormula;
       let hasAllInputs = true;
 
-      // Get current measurement values from ALL cache sources
-      const cachedMeasurements = getAllMeasurementValues();
-      const stableInputCache = (window as any).stableInputValues || {};
-      
-      // Combine all sources and convert to numbers
-      const allInputValues: Record<string, number> = {};
-      
-      // Add from props
-      Object.entries(inputValues || {}).forEach(([key, value]) => {
-        if (typeof value === 'number' && !isNaN(value)) {
-          allInputValues[key] = value;
-        }
-      });
-      
-      // Add from measurement cache
-      Object.entries(cachedMeasurements).forEach(([key, value]) => {
-        if (typeof value === 'number' && !isNaN(value)) {
-          allInputValues[key] = value;
-        }
-      });
-      
-      // Add from stable input cache (convert strings to numbers)
-      Object.entries(stableInputCache).forEach(([key, value]) => {
-        const numValue = parseFloat(value as string);
-        if (!isNaN(numValue)) {
-          allInputValues[key] = numValue;
+      // Convert all input values to numbers
+      const numericInputs: Record<string, number> = {};
+      Object.entries(inputValues).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          const numValue = typeof value === 'number' ? value : parseFloat(value as string);
+          if (!isNaN(numValue)) {
+            numericInputs[key] = numValue;
+          }
         }
       });
 
-      console.log(`[CalculatedResult ${question.id}] Input IDs:`, inputIds);
-      console.log(`[CalculatedResult ${question.id}] All input values:`, allInputValues);
-      console.log(`[CalculatedResult ${question.id}] Formula:`, formula);
+      console.log(`🧮 [CalculatedResult ${question.id}] Input IDs:`, inputIds);
+      console.log(`🧮 [CalculatedResult ${question.id}] Numeric inputs:`, numericInputs);
+      console.log(`🧮 [CalculatedResult ${question.id}] Original formula:`, formula);
 
       // Replace variable names in formula with actual values
       inputIds.forEach(inputId => {
-        const value = allInputValues[inputId];
+        const value = numericInputs[inputId];
         if (value === undefined || value === null || isNaN(value)) {
-          console.log(`[CalculatedResult ${question.id}] Missing value for ${inputId}:`, value);
+          console.log(`⚠️ [CalculatedResult ${question.id}] Missing value for ${inputId}`);
           hasAllInputs = false;
           return;
         }
@@ -95,7 +54,7 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
         return { value: null, error: 'Missing input values' };
       }
 
-      console.log(`[CalculatedResult ${question.id}] Final formula:`, formula);
+      console.log(`🧮 [CalculatedResult ${question.id}] Substituted formula:`, formula);
 
       // Evaluate the mathematical expression safely
       const result = Function(`"use strict"; return (${formula})`)();
@@ -105,14 +64,14 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
       }
 
       const roundedResult = Math.round(result * 100) / 100;
-      console.log(`[CalculatedResult ${question.id}] Result:`, roundedResult);
+      console.log(`✅ [CalculatedResult ${question.id}] Final result:`, roundedResult);
 
       return { value: roundedResult, error: null };
     } catch (error) {
-      console.error(`[CalculatedResult ${question.id}] Calculation error:`, error);
-      return { value: null, error: 'Calculation error' };
+      console.error(`❌ [CalculatedResult ${question.id}] Calculation error:`, error);
+      return { value: null, error: `Calculation error: ${error instanceof Error ? error.message : 'Unknown'}` };
     }
-  }, [question, inputValues, measurementTrigger]);
+  }, [question, inputValues]);
 
   const getTitle = () => {
     if (language === 'de' && question.titleDe) return question.titleDe;
@@ -132,7 +91,6 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
         <Badge variant="secondary">
           <AlertTriangle className="h-3 w-3 mr-1" />
           {language === 'de' ? 'Berechnung nicht möglich' : 'Számítás nem lehetséges'}
-          <span className="text-xs ml-2">({calculationResult.error})</span>
         </Badge>
       );
     }
@@ -147,7 +105,7 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
     }
 
     return (
-      <Badge variant="default">
+      <Badge variant="default" className="bg-green-600">
         <CheckCircle className="h-3 w-3 mr-1" />
         {language === 'de' ? 'Innerhalb der Grenzwerte' : 'Határértéken belül'}
       </Badge>
@@ -164,16 +122,8 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
           </div>
           {getStatusBadge()}
         </div>
-        
-        {/* Debug information */}
-        <div className="text-xs text-gray-400 mb-2 border-l-2 border-gray-200 pl-2">
-          <div>Formula: {question.calculationFormula}, Inputs: {question.calculationInputs}</div>
-          <div>Input values from CalculatedResult: {JSON.stringify(inputValues)}</div>
-          <div>All cached measurement values: {JSON.stringify(getAllMeasurementValues())}</div>
-          <div>Result: {calculationResult.value}, Error: {calculationResult.error}</div>
-        </div>
 
-        <div className="text-2xl font-mono bg-gray-50 p-3 rounded-lg mb-3">
+        <div className="text-2xl font-mono bg-gray-50 p-3 rounded-lg mb-3 text-center">
           {isValid && calculationResult.value !== null
             ? `${calculationResult.value} ${question.unit || ''}`
             : `-- ${question.unit || ''}`

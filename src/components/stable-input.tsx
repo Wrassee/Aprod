@@ -1,12 +1,11 @@
-// src/components/stable-input.tsx - JAVÍTOTT, KONTROLLÁLT VERZIÓ
-import { Input } from "@/components/ui/input";
+// src/components/stable-input.tsx
 import React from "react";
 
 interface StableInputProps {
   questionId: string;
   type?: 'text' | 'number' | 'email';
-  value: string; // A value mostantól kötelező
-  onChange: (value: string) => void; // Az onChange is kötelező
+  value: string;
+  onChange?: (value: string) => void;   // opcionális
   placeholder?: string;
   className?: string;
   min?: number;
@@ -28,17 +27,17 @@ export function StableInput({
   onKeyDown
 }: StableInputProps) {
 
-  // A handleChange most már csak egyetlen dolgot csinál:
-  // Meghívja a szülőtől kapott onChange függvényt.
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e.target.value);
+    if (onChange) {
+      onChange(e.target.value);   // csak akkor hívjuk meg, ha van onChange
+    }
   };
 
   return (
     <input
       type={type}
-      value={value || ''} // Az érték mindig a prop-ból jön
-      onChange={handleChange} // A változás mindig a szülőnek megy
+      value={value || ''} // biztosítjuk, hogy mindig string legyen
+      onChange={handleChange}
       onKeyDown={onKeyDown}
       placeholder={placeholder}
       min={min}

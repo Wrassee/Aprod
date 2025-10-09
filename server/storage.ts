@@ -125,7 +125,7 @@ export class DatabaseStorage implements IStorage {
     return tpl ?? undefined;
   }
 
-  // JAVÍTVA: Az SQLite hibát okozó tranzakció helyett két külön műveletet használunk
+  // JAVÍTVA: Az SQLite hibát okozó tranzakció helyett két különböző műveletet használunk
   async setActiveTemplate(id: string) {
     const target = await this.getTemplate(id);
     if (!target) throw new Error("Template not found");
@@ -182,12 +182,56 @@ export class DatabaseStorage implements IStorage {
         .where(eq(questionConfigs.template_id, templateId))
         .orderBy(questionConfigs.created_at);
 
-    const configs = rawConfigs.map((config: any) => ({
-        ...config,
-        questionId: config.question_id || config.questionId,
-        cellReference: config.cell_reference || config.cellReference,
-        multiCell: config.multi_cell || config.multiCell || false,
-    }));
+    // DEBUG LOG: Nyers adatbázis eredmény
+    if (rawConfigs && rawConfigs.length > 0) {
+      console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+      console.log('NYERS ADATBÁZIS EREDMÉNY (a konverzió előtt):');
+      console.log(JSON.stringify(rawConfigs[0], null, 2));
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    }
+
+    // *** JAVÍTOTT, VÉGLEGES CAMELCASE KONVERZIÓ ***
+    const configs = rawConfigs.map((config: any) => {
+      const newConfig = { ...config };
+      
+      // 1. ÁLTALÁNOS: Automatikus snake_case -> camelCase konverzió minden mezőre
+      for (const key in newConfig) {
+        if (key.includes('_')) {
+          const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+          // Csak akkor hozzuk létre, ha még nem létezik
+          if (!(camelCaseKey in newConfig)) {
+            newConfig[camelCaseKey] = newConfig[key];
+          }
+        }
+      }
+      
+      // 2. MANUÁLIS "BOLONDBIZTOS" FELÜLÍRÁS a kritikus mezőkre
+      // A !== undefined ellenőrzés biztosítja, hogy a null értékek is átmásolódjanak
+      newConfig.questionId = config.question_id !== undefined ? config.question_id : config.questionId;
+      newConfig.cellReference = config.cell_reference !== undefined ? config.cell_reference : config.cellReference;
+      newConfig.multiCell = config.multi_cell !== undefined ? config.multi_cell : (config.multiCell || false);
+      newConfig.titleHu = config.title_hu !== undefined ? config.title_hu : config.titleHu;
+      newConfig.titleDe = config.title_de !== undefined ? config.title_de : config.titleDe;
+      newConfig.groupName = config.group_name !== undefined ? config.group_name : config.groupName;
+      newConfig.groupNameDe = config.group_name_de !== undefined ? config.group_name_de : config.groupNameDe;
+      newConfig.groupOrder = config.group_order !== undefined ? config.group_order : (config.groupOrder || 0);
+      newConfig.conditionalGroupKey = config.conditional_group_key !== undefined ? config.conditional_group_key : config.conditionalGroupKey;
+      newConfig.minValue = config.min_value !== undefined ? config.min_value : config.minValue;
+      newConfig.maxValue = config.max_value !== undefined ? config.max_value : config.maxValue;
+      newConfig.calculationFormula = config.calculation_formula !== undefined ? config.calculation_formula : config.calculationFormula;
+      newConfig.calculationInputs = config.calculation_inputs !== undefined ? config.calculation_inputs : config.calculationInputs;
+      newConfig.sheetName = config.sheet_name !== undefined ? config.sheet_name : config.sheetName;
+
+      return newConfig;
+    });
+
+    // DEBUG LOG: Konvertált eredmény
+    if (configs && configs.length > 0) {
+      console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
+      console.log('EREDMÉNY a camelCase konverzió UTÁN:');
+      console.log(JSON.stringify(configs[0], null, 2));
+      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+    }
 
     console.log(`✅ ${configs.length} question configs converted to camelCase.`);
     return configs;
@@ -217,4 +261,3 @@ export class DatabaseStorage implements IStorage {
 // 4️⃣ Exported singleton for convenient imports elsewhere
 // ------------------------------------------------------------
 export const storage = new DatabaseStorage();
-

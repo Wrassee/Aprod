@@ -1,7 +1,5 @@
 import { useMemo } from 'react';
-import { Question } from '../../shared/schema';
-
-type AnswerValue = string | number | boolean;
+import { Question, AnswerValue } from '@shared/schema';
 
 export interface ConditionalFilterHookResult {
   filteredQuestions: Question[];
@@ -20,74 +18,111 @@ export function useConditionalQuestionFilter(
   allQuestions: Question[],
   answers: Record<string, AnswerValue>
 ): ConditionalFilterHookResult {
-  
+
   return useMemo(() => {
-    // Step 1: Find all True/False questions that control conditional groups
-    const trueFalseQuestions = allQuestions.filter(q => 
-      q.type === 'radio' || q.type === 'checkbox'
+    // 1. Lépés: Keressük meg azokat a kérdéseket, amik más csoportokat vezérelhetnek
+    const controllingQuestions = allQuestions.filter(
+      q => q.conditional_group_key && (q.type === 'radio' || q.type === 'checkbox' || q.type === 'true_false')
     );
-    
-    // Step 2: Determine which conditional group keys are active (answered as true)
-    const activeConditions: string[] = [];
-    
-    trueFalseQuestions.forEach(question => {
-      // Use question_id (external ID) instead of question.id (UUID)
-      const answer = answers[question.question_id || question.id];
-      
-      // Robust truth value detection with normalization
+
+    // 2. Lépés: Határozzuk meg az aktív feltételes kulcsokat
+    const activeConditionKeys: string[] = [];
+
+    controllingQuestions.forEach(question => {
+      // JAVÍTÁS: A választ MINDIG a kérdés saját ID-ja alatt keressük!
+      const answer = answers[question.id];
+
+      // =================== DEBUG LOG ===================
+      console.log('--- FILTER DEBUG ---', {
+        questionId: question.id,
+        conditional_group_key: question.conditional_group_key,
+        allAnswerKeys: Object.keys(answers),
+        foundAnswer: answer,
+      });
+      // =================================================
+
+      // Értékeljük ki a választ
       const normalizedAnswer = String(answer).toLowerCase().trim();
-      const truthyValues = ['true', 'igen', 'yes', 'ja', '1', 'ok', 'valid', 'megfelelő'];
-      const isTruthy = truthyValues.includes(normalizedAnswer) || answer === true;
-      
-      if (isTruthy) {
-        // Use the question_id as the conditional group key
-        activeConditions.push(question.question_id || question.id);
+      const truthyValues = ['true', 'igen', 'yes', 'ja', '1', 'x'];
+
+      if (truthyValues.includes(normalizedAnswer) || answer === true) {
+        // Ha a válasz "igaz", akkor a conditional_group_key-t tesszük az aktív listába
+        if (question.conditional_group_key) {
+          activeConditionKeys.push(question.conditional_group_key);
+        }
       }
     });
-    
-    // Step 3: Filter questions based on conditional group keys
+
+    // 3. Lépés: Gyűjtsük össze az ÖSSZES feltételes csoportnevet
+    // JAVÍTÁS: Itt a groupName értékeket kell gyűjteni, NEM a conditional_group_key-ket!
+    const allConditionalGroupNames = new Set(
+      controllingQuestions
+        .map(q => q.conditional_group_key) // Ez adja meg, mely groupName-ek feltételesek
+        .filter(Boolean) as string[]
+    );
+
+    // 4. Lépés: Szűrjük a kérdéseket
     const filteredQuestions = allQuestions.filter(question => {
-      // If the question has no conditional group key, always include it
-      if (!question.conditional_group_key) {
+      // A vezérlő kérdések (amiknek van conditional_group_key-jük) mindig látszanak
+      if (question.conditional_group_key) {
         return true;
       }
-      
-      // Include the question only if its conditional group key is active
-      return activeConditions.includes(question.conditional_group_key);
+
+      // Ha egy kérdésnek nincs csoportneve, mindig látszik
+      if (!question.groupName) {
+        return true;
+      }
+
+      // Ha a kérdés csoportja NEM tartozik a feltételes csoportok közé, mindig látszik
+      if (!allConditionalGroupNames.has(question.groupName)) {
+        return true;
+      }
+
+      // Ha a kérdés feltételes csoportba tartozik, csak akkor látszik, ha a feltétel aktív
+      return activeConditionKeys.includes(question.groupName);
     });
-    
+
     console.log('🎯 ConditionalQuestionFilter:', {
       totalQuestions: allQuestions.length,
       filteredCount: filteredQuestions.length,
-      activeConditions: activeConditions.length,
-      activeConditionKeys: activeConditions
+      activeConditions: activeConditionKeys.length,
+      activeConditionKeys,
+      allConditionalGroupNames: Array.from(allConditionalGroupNames),
     });
-    
+
     return {
       filteredQuestions,
-      activeConditions,
+      activeConditions: activeConditionKeys,
       totalQuestions: allQuestions.length,
-      filteredCount: filteredQuestions.length
+      filteredCount: filteredQuestions.length,
     };
-    
+
   }, [allQuestions, answers]);
 }
 
 /**
  * Utility function to check if a question group should be visible
- * @param conditional_group_key - The group key to check
+ * @param groupName - The group name to check
  * @param activeConditions - Array of currently active condition keys
+ * @param allConditionalGroups - Set of all conditional group names
  * @returns boolean indicating if the group should be visible
  */
 export function isQuestionGroupVisible(
-  conditional_group_key: string | undefined,
-  activeConditions: string[]
+  groupName: string | undefined,
+  activeConditions: string[],
+  allConditionalGroups: Set<string>
 ): boolean {
-  if (!conditional_group_key) {
-    return true; // Always show questions without conditional logic
+  if (!groupName) {
+    return true; // Always show questions without group name
   }
-  
-  return activeConditions.includes(conditional_group_key);
+
+  // If the group is not conditional, always show it
+  if (!allConditionalGroups.has(groupName)) {
+    return true;
+  }
+
+  // If the group is conditional, only show if it's active
+  return activeConditions.includes(groupName);
 }
 
 /**
@@ -97,13 +132,13 @@ export function isQuestionGroupVisible(
  */
 export function generateDisabledAnswers(disabledQuestions: Question[]): Record<string, AnswerValue> {
   const disabledAnswers: Record<string, AnswerValue> = {};
-  
+
   disabledQuestions.forEach(question => {
-    // Use question_id (external ID) for answer keys
-    const answerKey = question.question_id || question.id;
+    // Use id as the primary key for answers
+    const answerKey = question.id;
     disabledAnswers[answerKey] = 'n.a.';
   });
-  
+
   return disabledAnswers;
 }
 
@@ -119,11 +154,19 @@ export function updateAnswersWithDisabled(
   allQuestions: Question[],
   filteredQuestions: Question[]
 ): Record<string, AnswerValue> {
-  // Use question_id for consistent comparison
-  const filteredIds = new Set(filteredQuestions.map(q => q.question_id || q.id));
-  const disabledQuestions = allQuestions.filter(q => !filteredIds.has(q.question_id || q.id));
-  const disabledAnswers = generateDisabledAnswers(disabledQuestions);
-  
+  // Use id for consistent comparison
+  const filteredIds = new Set(filteredQuestions.map(q => q.id));
+  const disabledQuestions = allQuestions.filter(q => !filteredIds.has(q.id));
+
+  const disabledAnswers: Record<string, AnswerValue> = {};
+  disabledQuestions.forEach(q => {
+    // Csak akkor írjuk felül "n.a."-ra, ha NEM vezérlő kérdés
+    // A vezérlő kérdéseknek mindig megmarad az eredeti válaszuk
+    if (!q.conditional_group_key) {
+      disabledAnswers[q.id] = 'n.a.';
+    }
+  });
+
   return {
     ...currentAnswers,
     ...disabledAnswers

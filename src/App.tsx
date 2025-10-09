@@ -296,156 +296,45 @@ function App() {
   };
 
   const handleDownloadExcel = async () => {
-    try {
-      console.log('Starting Excel download...');
-      
-      // Sync all cached values before sending data
-      const cachedRadioValues = (window as any).radioCache?.getAll?.() || {};
-      const cachedTrueFalseValues = (window as any).trueFalseCache || new Map();
-      const cachedInputValues = (window as any).stableInputValues || {};
-      const cachedMeasurementValues = (window as any).measurementCache?.getAll?.() || {};
-      const cachedCalculatedValues = (window as any).calculatedCache?.getAll?.() || {};
-      
-      // Convert Map to object if needed
-      const trueFalseAnswers: Record<string, string> = {};
-      if (cachedTrueFalseValues instanceof Map) {
-        cachedTrueFalseValues.forEach((value, key) => {
-          trueFalseAnswers[key] = value;
-        });
-      } else {
-        Object.assign(trueFalseAnswers, cachedTrueFalseValues);
-      }
-      
-      // Combine all answers including measurements
-      const combinedAnswers = {
-        ...formData.answers,
-        ...cachedRadioValues,
-        ...trueFalseAnswers,
-        ...cachedInputValues,
-        ...cachedMeasurementValues,
-        ...cachedCalculatedValues,
-      };
-      
-      const fullFormData = {
-        ...formData,
-        answers: combinedAnswers,
-      };
-      
-      console.log('Sending Excel generation request with', Object.keys(combinedAnswers).length, 'answers');
-      
-      const response = await fetch('/api/protocols/download-excel', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ formData: fullFormData, language }),
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Excel generation failed:', response.status, errorText);
-        throw new Error(`Excel generation failed: ${response.status} - ${errorText}`);
-      }
-      
-      const blob = await response.blob();
-      if (blob.size === 0) {
-        throw new Error('Generated Excel file is empty');
-      }
-      
-      // Get Otis Lift ID from all sources (cache + formData)
-      const otisLiftId = cachedInputValues['7'] || formData.answers['7'] || 'Unknown';
-      const filename = `AP_${otisLiftId}.xlsx`;
-      
-      console.log('Excel download filename:', filename);
-      console.log('Excel file size:', blob.size, 'bytes');
-      
-      // More robust download approach using different methods
-      try {
-        // Method 1: Try modern download API
-        if ('showSaveFilePicker' in window) {
-          const fileHandle = await (window as any).showSaveFilePicker({
-            suggestedName: filename,
-            types: [{
-              description: 'Excel files',
-              accept: { 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'] }
-            }]
-          });
-          const writable = await fileHandle.createWritable();
-          await writable.write(blob);
-          await writable.close();
-          console.log('Excel download completed successfully (File API)');
-          return;
-        }
-      } catch (fileApiError) {
-        console.log('File API not available, falling back to blob URL');
-      }
-      
-      // Method 2: Traditional blob URL approach with better error handling
-      let url: string | null = null;
-      let a: HTMLAnchorElement | null = null;
-      
-      try {
-        url = URL.createObjectURL(blob);
-        a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-        
-        // Add to DOM, click, and immediately remove
-        document.body.appendChild(a);
-        
-        // Use setTimeout to ensure DOM is ready
-        setTimeout(() => {
-          if (a) {
-            a.click();
-            console.log('Excel download completed successfully (Blob URL)');
-          }
-        }, 10);
-        
-      } catch (downloadError) {
-        console.error('Error during blob download:', downloadError);
-        
-        // Method 3: Fallback - direct blob download
-        try {
-          const blobUrl = URL.createObjectURL(blob);
-          window.open(blobUrl, '_blank');
-          console.log('Excel download completed successfully (Window open)');
-        } catch (fallbackError) {
-          console.error('All download methods failed:', fallbackError);
-          throw new Error('Excel letöltés sikertelen. Kérjük próbálja újra.');
-        }
-      }
-      
-      // Clean up - delayed to ensure download completes
-      setTimeout(() => {
-        try {
-          if (url) {
-            URL.revokeObjectURL(url);
-          }
-          if (a && document.body && document.body.contains(a)) {
-            document.body.removeChild(a);
-          }
-        } catch (cleanupError) {
-          // Silent cleanup - not critical
-          console.warn('Cleanup warning:', cleanupError);
-        }
-      }, 2000);
-      
-      console.log('Excel download completed successfully');
-      
-    } catch (error) {
-      console.error('Error downloading Excel:', error);
-      
-      // Detailed error logging for debugging
-      if (error instanceof Error) {
-        console.error('Error name:', error.name);
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-      }
-      
-      // User-friendly error message
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      alert(`Excel letöltési hiba: ${errorMessage}\n\nKérjük, próbálja újra vagy lépjen kapcsolatba a támogatással.`);
+  try {
+    console.log('Starting Excel download with up-to-date formData...');
+
+    // NINCS SZÜKSÉG SEMMILYEN CACHE ÖSSZEFÉSÜLÉSÉRE!
+    // A `formData` React state már mindent tartalmaz, ami kell.
+    
+    // Get Otis Lift ID from the correct state
+    const otisLiftId = formData.answers['7'] || 'Unknown';
+    const filename = `AP_${otisLiftId}.xlsx`;
+    
+    console.log('Excel download filename:', filename);
+
+    const response = await fetch('/api/protocols/download-excel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ formData: formData, language }), // Csak a naprakész `formData`-t küldjük
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Excel generation failed: ${response.status} - ${errorText}`);
     }
-  };
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+  } catch (error) {
+    console.error('Error downloading Excel:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    alert(`Excel letöltési hiba: ${errorMessage}\n\nKérjük, próbálja újra.`);
+  }
+};
 
   const handleViewProtocol = () => {
     setCurrentScreen('protocol-preview');
@@ -502,8 +391,9 @@ const handleStartNew = () => {
   // ====================================================================
 
   const handleGoHome = () => {
-    setCurrentScreen('start');
-  };
+  setCurrentScreen('start');
+  setCurrentQuestionnairePage(0); // <-- EZ A HIÁNYZÓ SOR
+};
 
   const handleSettings = () => {
     setCurrentScreen('admin');
@@ -530,7 +420,6 @@ const handleStartNew = () => {
   }, []);
 
   const handleAdminAccess = useCallback(() => setCurrentScreen('admin'), []);
-  const handleHome = useCallback(() => setCurrentScreen('start'), []);
 
   // Memoized measurement change handler to prevent re-renders
   const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
@@ -558,11 +447,11 @@ const handleStartNew = () => {
             onSave={handleSaveProgress}
             language={language}
             onAdminAccess={handleAdminAccess}
-            onHome={handleHome}
+            onHome={handleGoHome}
             onStartNew={handleStartNew}
             onPageChange={setCurrentQuestionnairePage}
+            // formData={formData}
             onQuestionChange={setCurrentQuestionId}
-            formData={formData}
             currentPage={currentQuestionnaireePage}
             currentQuestionId={currentQuestionId}
           />

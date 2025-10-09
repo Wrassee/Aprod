@@ -1,8 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator, Ruler, AlertTriangle } from 'lucide-react';
-import { StableInput } from './stable-input';
-import { MeasurementCache } from '@/utils/measurement-cache';
 import { useLanguageContext } from '@/components/language-provider';
 
 interface Question {
@@ -19,8 +17,8 @@ interface Question {
 
 interface MeasurementBlockProps {
   questions: Question[];
-  values?: Record<string, any>;
-  onChange: (questionId: string, value: string | number) => void;
+  values: Record<string, any>;
+  onChange: (questionId: string, value: string | number | undefined) => void;
   onAddError?: (error: { title: string; description: string; severity: 'low' | 'medium' | 'critical' }) => void;
 }
 
@@ -30,34 +28,47 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
   const measurementQuestions = questions.filter(q => q.type === 'measurement');
   const calculatedQuestions = questions.filter(q => q.type === 'calculated');
 
-  useEffect(() => {
-    MeasurementCache.restoreFromStorage();
-  }, []);
+  // Handle input change for measurement fields
+  const handleMeasurementChange = useCallback((questionId: string, inputValue: string) => {
+    console.log(`📊 MeasurementBlock - Input change for ${questionId}: "${inputValue}"`);
+    
+    if (inputValue === '' || inputValue === '.') {
+      onChange(questionId, undefined);
+    } else {
+      const parsedValue = parseFloat(inputValue);
+      if (!isNaN(parsedValue)) {
+        onChange(questionId, parsedValue);
+      }
+    }
+  }, [onChange]);
 
-  const calculateValue = (question: Question): number | null => {
+  // Calculate value for calculated questions based on current values
+  const calculateValue = useCallback((question: Question): number | null => {
     if (!question.calculationFormula || !question.calculationInputs) {
       return null;
     }
 
     try {
-      const measurementValues = (window as any).measurementValues || {};
       let formula = question.calculationFormula;
       
       const inputIds = Array.isArray(question.calculationInputs) 
         ? question.calculationInputs 
         : question.calculationInputs.split(',').map((id: string) => id.trim());
       
+      // Replace all input IDs with their current values
       for (const inputId of inputIds) {
-        const value = measurementValues[inputId];
+        const value = values[inputId];
         
         if (value !== undefined && value !== null && value !== '') {
           const numValue = typeof value === 'string' ? parseFloat(value) : value;
           if (!isNaN(numValue)) {
             formula = formula.replace(new RegExp(`\\b${inputId}\\b`, 'g'), numValue.toString());
           } else {
+            console.log(`⚠️ Invalid value for ${inputId} in calculation`);
             return null;
           }
         } else {
+          console.log(`⚠️ Missing value for ${inputId} in calculation`);
           return null;
         }
       }
@@ -65,15 +76,28 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
       try {
         const result = Function(`"use strict"; return (${formula})`)();
         const roundedResult = typeof result === 'number' && !isNaN(result) ? Math.round(result) : null;
+        
+        console.log(`🧮 Calculated ${question.id}: ${roundedResult} (formula: ${question.calculationFormula})`);
         return roundedResult;
       } catch (evalError) {
+        console.error(`❌ Calculation error for ${question.id}:`, evalError);
         return null;
       }
       
     } catch (error) {
+      console.error(`❌ Calculation setup error for ${question.id}:`, error);
       return null;
     }
-  };
+  }, [values]);
+
+  // Memoize calculated values to avoid unnecessary recalculations
+  const calculatedValues = useMemo(() => {
+    const results: Record<string, number | null> = {};
+    calculatedQuestions.forEach(q => {
+      results[q.id] = calculateValue(q);
+    });
+    return results;
+  }, [calculatedQuestions, calculateValue]);
 
   return (
     <div className="space-y-6">
@@ -87,63 +111,70 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {measurementQuestions.map((question, index) => (
-                <div key={question.id} className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-b-0">
-                  <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 font-semibold rounded-full shrink-0">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1 min-w-0 pr-4">
-                    <p className="text-lg font-medium text-gray-800 leading-relaxed">
-                      {language === 'de' ? question.titleDe : question.title}
-                    </p>
-                    {question.unit && (
-                      <p className="text-base text-gray-500 mt-1">
-                        {question.unit}
-                        {question.minValue !== undefined && question.maxValue !== undefined && 
-                          ` (${question.minValue}-${question.maxValue})`
-                        }
+              {measurementQuestions.map((question, index) => {
+                const currentValue = values[question.id];
+
+                return (
+                  <div key={question.id} className="flex items-center gap-4 py-3 border-b border-gray-100 last:border-b-0">
+                    <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 font-semibold rounded-full shrink-0">
+                      {index + 1}
+                    </div>
+                    <div className="flex-1 min-w-0 pr-4">
+                      <p className="text-lg font-medium text-gray-800 leading-relaxed">
+                        {language === 'de' ? question.titleDe : question.title}
                       </p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <StableInput
-                      questionId={question.id}
-                      type="number"
-                      placeholder="0"
-                      className="text-center font-mono border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-20"
-                      min={question.minValue}
-                      max={question.maxValue}
-                      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          // Find next focusable element
-                          const focusableElements = document.querySelectorAll(
-                            'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-                          );
-                          const currentIndex = Array.from(focusableElements).indexOf(e.currentTarget);
-                          const nextElement = focusableElements[currentIndex + 1] as HTMLElement;
-                          if (nextElement) {
-                            nextElement.focus();
-                            if (nextElement.tagName === 'INPUT') {
-                              (nextElement as HTMLInputElement).select();
+                      {question.unit && (
+                        <p className="text-base text-gray-500 mt-1">
+                          {question.unit}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <input
+                        type="text"
+                        value={currentValue?.toString() || ''}
+                        onChange={(e) => {
+                          let inputValue = e.target.value;
+                          
+                          // Only allow numbers and decimal point
+                          inputValue = inputValue.replace(/[^0-9.]/g, '');
+                          
+                          // Limit to 5 characters maximum
+                          if (inputValue.length > 5) {
+                            inputValue = inputValue.slice(0, 5);
+                            e.target.value = inputValue;
+                          }
+                          
+                          handleMeasurementChange(question.id, inputValue);
+                        }}
+                        onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            // Find next focusable element
+                            const focusableElements = document.querySelectorAll(
+                              'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+                            );
+                            const currentIndex = Array.from(focusableElements).indexOf(e.currentTarget);
+                            const nextElement = focusableElements[currentIndex + 1] as HTMLElement;
+                            if (nextElement) {
+                              nextElement.focus();
+                              if (nextElement.tagName === 'INPUT') {
+                                (nextElement as HTMLInputElement).select();
+                              }
                             }
                           }
-                        }
-                      }}
-                      initialValue={(() => {
-                        const cachedValue = (window as any).measurementValues?.[question.id] || 
-                                          (window as any).stableInputValues?.[question.id];
-                        const savedFormData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{"answers":{}}');
-                        const savedValue = savedFormData.answers?.[question.id];
-                        return cachedValue || savedValue || '';
-                      })()}
-                    />
-                    {question.unit && (
-                      <span className="text-sm text-gray-500 w-8">{question.unit}</span>
-                    )}
+                        }}
+                        placeholder="0"
+                        className="text-center font-mono border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500 w-20"
+                        maxLength={5}
+                      />
+                      {question.unit && (
+                        <span className="text-sm text-gray-500 w-8">{question.unit}</span>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             <div className="pt-4 border-t border-gray-200">
@@ -166,8 +197,9 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
           <CardContent>
             <div className="space-y-4">
               {calculatedQuestions.map((question, index) => {
-                const calculatedValue = calculateValue(question);
-                const isOutOfBounds = calculatedValue !== null && question.minValue !== undefined && question.maxValue !== undefined &&
+                const calculatedValue = calculatedValues[question.id];
+                const isOutOfBounds = calculatedValue !== null && 
+                  question.minValue !== undefined && question.maxValue !== undefined &&
                   (calculatedValue < question.minValue || calculatedValue > question.maxValue);
 
                 return (
@@ -179,18 +211,24 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                       <p className="text-lg font-medium text-gray-800 leading-relaxed">
                         {language === 'de' ? question.titleDe : question.title}
                       </p>
-                      <p className="text-base text-gray-500 mt-1">
-                        {question.unit}
-                        {isOutOfBounds && (
-                          <span className="ml-2 text-red-500 font-medium">
-                            ⚠️ {t.outOfRange}
-                          </span>
-                        )}
-                      </p>
+                      {question.minValue !== undefined && question.maxValue !== undefined && (
+                        <p className="text-sm text-gray-500 mt-1">
+                          {language === 'de' ? 'Zulässiger Bereich' : 'Megengedett tartomány'}: {question.minValue} - {question.maxValue} {question.unit}
+                        </p>
+                      )}
+                      {isOutOfBounds && (
+                        <p className="text-sm text-red-500 font-medium mt-1">
+                          ⚠️ {t.outOfRange || 'Határértéken kívül'}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
-                      <div className={`text-center font-mono text-lg font-bold px-3 py-2 rounded-md ${
-                        isOutOfBounds ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-600'
+                      <div className={`text-center font-mono text-lg font-bold px-3 py-2 rounded-md min-w-[80px] ${
+                        calculatedValue === null 
+                          ? 'bg-gray-50 text-gray-400' 
+                          : isOutOfBounds 
+                            ? 'bg-red-50 text-red-600 border border-red-200' 
+                            : 'bg-green-50 text-green-600'
                       }`}>
                         {calculatedValue !== null ? calculatedValue.toFixed(0) : '-'}
                       </div>
@@ -251,14 +289,12 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
   );
 }
 
+// DEPRECATED: These functions are no longer needed
 export const clearAllCalculatedValues = () => {
-  const calculatedQuestionIds = Object.keys(MeasurementCache.getAllValues()).filter(id => 
-    id.includes('calculation') || id.includes('calculated')
-  );
-  calculatedQuestionIds.forEach(id => MeasurementCache.clearValue(id));
+  console.warn('⚠️ clearAllCalculatedValues() is deprecated. Use React state instead.');
 };
 
-// Export function to get all calculated values for external use
 export const getAllCalculatedValues = (): Record<string, any> => {
-  return (window as any).calculatedValues || {};
+  console.warn('⚠️ getAllCalculatedValues() is deprecated. Use React state instead.');
+  return {};
 };

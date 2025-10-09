@@ -47,6 +47,7 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName }: 
               questionId={question.id}
               questionTitle={question.title}
               value={values[question.id]?.toString() || ''}
+              questionType={question.type}
               onChange={(newValue) => onChange(question.id, newValue as AnswerValue)}
             />
           ))}

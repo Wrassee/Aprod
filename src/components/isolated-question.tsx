@@ -55,7 +55,7 @@ const IsolatedQuestionComponent = memo(({
         return (
           <CacheRadio
             questionId={question.id}
-            initialValue={value?.toString() || ''}
+            value={value?.toString() || ''}
             options={radioOptions}
             onChange={onChange}
           />

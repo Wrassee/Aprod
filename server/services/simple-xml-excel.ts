@@ -76,50 +76,63 @@ class SimpleXmlExcelService {
     }
   }
 
+  // VÉGSŐ, EGYSZERŰSÍTETT createCellMappings - cellReference formátum alapú döntéssel
   private createCellMappings(formData: FormData, questionConfigs: any[], language: string): Array<{cell: string, value: string, label: string}> {
     const mappings: Array<{cell: string, value: string, label: string}> = [];
     
-    Object.entries(formData.answers).forEach(([questionId, answer]) => {
-      const config = questionConfigs.find(q => String(q.questionId) === questionId);
+    Object.entries(formData.answers).forEach(([key, answer]) => {
+      const config = questionConfigs.find(q => String(q.id) === key || q.questionId === key);
 
-      if (!config || config.cellReference === null || answer === null || answer === '' || answer === undefined) {
+      if (!config || !config.cellReference || answer === null || answer === '' || answer === undefined) {
         return; 
       }
       
-      console.log(`Processing: ID="${questionId}", Type="${config.type}", Answer="${answer}"`);
+      // A logoláshoz mentsük el a változókat
+      const type = config.type;
+      const cellRef = String(config.cellReference);
       
-      // --- HELYES LOGIKA (az ADATOKHOZ IGAZÍTVA) ---
-      // A rádiógombok (yes/no/na) VALÓJÁBAN 'checkbox' típussal érkeznek a log alapján.
-      if (config.type === 'checkbox') {
-        console.log(`>>> Handling as RADIO BUTTON (type was 'checkbox')`);
-        const cellRefs = config.cellReference.split(',').map((c: string) => c.trim());
-        const [yesCells, noCells, naCells] = cellRefs;
+      console.log(`Processing: ID="${key}", Type="${type}", CellRef="${cellRef}", Answer="${answer}"`);
+      
+      // ====================== VÉGSŐ, EGYSZERŰSÍTETT LOGIKA ======================
 
-        const applyX = (cells: string) => {
-          if (!cells) return;
-          cells.split(';').map(c => c.trim()).filter(Boolean).forEach(cell => {
-            mappings.push({ cell, value: 'x', label: `Question ${questionId}` });
-          });
-        };
+      // 1. ESET: Többcellásnak TŰNŐ kérdés.
+      // Ha a cellahivatkozás vesszőt tartalmaz, azt MINDIG többcellásként kezeljük,
+      // függetlenül a típustól és a multiCell flagtől. Ez a legbiztosabb jel.
+      if (cellRef.includes(',')) {
+        console.log(`>>> Handling as MULTI-CELL based on cellReference format`);
+        
+        const cellRefs = cellRef.split(',').map((c: string) => c.trim());
+        if (cellRefs.length >= 2) {
+          const [yesCells, noCells, naCells] = cellRefs;
+          
+          const applyX = (cells: string) => {
+            if (!cells) return;
+            cells.split(';').forEach(cell => {
+              if (cell) mappings.push({ cell: cell.trim(), value: 'X', label: `Question ${key}` });
+            });
+          };
 
-        if (answer === 'yes') applyX(yesCells);
-        else if (answer === 'no') applyX(noCells);
-        else if (answer === 'na') applyX(naCells);
-      } 
-      // A checkboxok (true/false) VALÓJÁBAN 'radio' típussal érkeznek a log alapján.
-      else if (config.type === 'radio') {
-        console.log(`>>> Handling as CHECKBOX (type was 'radio')`);
-        const cellValue = (answer === 'true' || answer === true) ? 'X' : '-';
-        mappings.push({ cell: config.cellReference, value: cellValue, label: `Question ${questionId}` });
-      } 
-      // Minden más típusú kérdés
-      else {
-        console.log(`>>> Handling as standard type: ${config.type}`);
-        mappings.push({ cell: config.cellReference, value: String(answer), label: `Question ${questionId}` });
+          if (answer === 'yes') applyX(yesCells);
+          else if (answer === 'no') applyX(noCells);
+          else if (answer === 'na' && naCells) applyX(naCells);
+        }
       }
+      // 2. ESET: Egycellás 'true/false' (radio)
+      else if (type === 'radio') {
+        console.log(`>>> Handling as SINGLE-CELL RADIO (true/false) -> X/-`);
+        const cellValue = (answer === 'true' || answer === true) ? 'X' : '-';
+        mappings.push({ cell: cellRef, value: cellValue, label: `Question ${key}` });
+      } 
+      // 3. ESET: Minden más egycellás kérdés (szöveg, szám, egycellás yes_no_na)
+      else {
+        console.log(`>>> Handling as standard type: ${type}`);
+        const formattedValue = this.formatAnswer(answer, language);
+        mappings.push({ cell: cellRef, value: formattedValue, label: `Question ${key}` });
+      }
+      // ======================================================================
     });
     
-    // Hibák hozzáadása az Excelhez
+    // Hibák hozzáadása
     if (formData.errors && formData.errors.length > 0) {
       formData.errors.forEach((error, index) => {
         const row = 737 + index;
@@ -131,6 +144,22 @@ class SimpleXmlExcelService {
     }
     
     return mappings;
+  }
+
+  private formatAnswer(answer: any, language: string): string {
+    if (answer === null || answer === undefined) return '';
+    
+    // Boolean vagy string boolean értékek kezelése
+    if (answer === true || answer === 'true') return language === 'hu' ? 'Igen' : 'Yes';
+    if (answer === false || answer === 'false') return language === 'hu' ? 'Nem' : 'No';
+    
+    // yes/no/na string értékek kezelése
+    if (answer === 'yes') return language === 'hu' ? 'Igen' : 'Yes';
+    if (answer === 'no') return language === 'hu' ? 'Nem' : 'No';
+    if (answer === 'na') return 'N/A';
+    
+    // Minden más esetben string-ként kezeljük
+    return String(answer);
   }
 
   private escapeXml(text: string): string {

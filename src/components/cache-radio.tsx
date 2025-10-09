@@ -1,39 +1,22 @@
-import { memo, useState, useEffect } from 'react';
+import { memo, useCallback } from 'react';
 
+// JAVÍTVA: A props interface most már value-t és onChange-et vár
 interface CacheRadioProps {
   questionId: string;
-  initialValue: string;
+  value: string | undefined; // Az aktuális kiválasztott érték a szülőtől
   options: Array<{ value: string; label: string }>;
+  onChange: (value: string) => void; // Függvény, amivel a szülőnek jelzünk
 }
 
-// Global cache for radio values to prevent parent updates
-const radioCache = new Map<string, string>();
+// JAVÍTVA: Nincs többé globális cache és belső állapot
+export const CacheRadio = memo(({ questionId, value, options, onChange }: CacheRadioProps) => {
 
-export const CacheRadio = memo(({ questionId, initialValue, options }: CacheRadioProps) => {
-  const [localValue, setLocalValue] = useState(() => {
-    // Get from cache or use initial value
-    return radioCache.get(questionId) || initialValue;
-  });
-
-  // Sync with initial value only if cache is empty
-  useEffect(() => {
-    if (!radioCache.has(questionId) && initialValue) {
-      setLocalValue(initialValue);
-      radioCache.set(questionId, initialValue);
-    }
-  }, [questionId, initialValue]);
-
-  const handleChange = (newValue: string) => {
-    setLocalValue(newValue);
-    radioCache.set(questionId, newValue);
-    
+  // JAVÍTVA: A handleChange most már csak a szülőt hívja meg.
+  // A useCallback használata itt is jó gyakorlat.
+  const handleChange = useCallback((newValue: string) => {
     console.log(`Radio changed: ${questionId} = ${newValue}`);
-    
-    // Dispatch custom event for save button to pick up
-    window.dispatchEvent(new CustomEvent('radio-change', {
-      detail: { questionId, value: newValue }
-    }));
-  };
+    onChange(newValue);
+  }, [onChange]);
 
   return (
     <div className="space-y-3">
@@ -46,9 +29,10 @@ export const CacheRadio = memo(({ questionId, initialValue, options }: CacheRadi
               id={inputId}
               name={questionId}
               value={option.value}
-              checked={localValue === option.value}
+              // JAVÍTVA: A `checked` állapotot a szülőtől kapott `value` prop határozza meg
+              checked={value === option.value}
               onChange={(e) => {
-                e.stopPropagation();
+                // Nem kell stopPropagation, és a handleChange már useCallback-be van csomagolva
                 if (e.target.checked) {
                   handleChange(option.value);
                 }
@@ -70,11 +54,9 @@ export const CacheRadio = memo(({ questionId, initialValue, options }: CacheRadi
 
 CacheRadio.displayName = 'CacheRadio';
 
-// Export function to get all cached values
+// A globális cache-re épülő függvények feleslegessé váltak, törölhetők.
+// Vagy a korábbi mintához hasonlóan kiürítheted őket egy figyelmeztetéssel.
 export const getAllCachedValues = (): Record<string, string> => {
-  const result: Record<string, string> = {};
-  radioCache.forEach((value, key) => {
-    result[key] = value;
-  });
-  return result;
+  console.warn('⚠️ getAllCachedValues() is deprecated. Use React state instead.');
+  return {};
 };

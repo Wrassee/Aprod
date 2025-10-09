@@ -15,6 +15,15 @@ import { errorRoutes } from "./routes/error-routes.js";
 // Gyorsítótár a kérdések tárolására
 let questionsCache: any[] | null = null;
 
+/**
+ * Kiüríti a memóriában tárolt kérdés cache-t.
+ * Ezt kívülről (pl. az admin-routes.ts-ből) is meg lehet hívni.
+ */
+export function clearQuestionsCache() {
+  questionsCache = null;
+  console.log('✅ In-memory questions cache cleared.');
+}
+
 export async function registerRoutes(app: Express) {
   await testConnection();
 
@@ -67,23 +76,23 @@ export async function registerRoutes(app: Express) {
           groupName = language === "de" ? "Messdaten" : "Mérési adatok";
         }
 
-        // 🔥 JAVÍTOTT: Robusztusabb type korrekció és options generálás
-        let correctedType = config.type;
-        let options: string[] | undefined = config.options; // Alapértelmezett átvétel
+        // JAVÍTOTT: Robusztusabb type korrekció és options generálás
+        let correctedType = config.type;
+        let options: string[] | undefined = config.options; // Alapértelmezett átvétel
 
-        // Először a specifikus placeholder-t ellenőrizzük, mert ez a legfontosabb jelző.
-        if (correctedType === 'radio') {
+        // Először a specifikus placeholder-t ellenőrizzük, mert ez a legfontosabb jelző.
+        if (correctedType === 'radio') {
             // Itt feltételezzük, hogy minden 'radio' típusú kérdésünk egyelőre true/false/n.a.
             // A jövőben ezt a placeholder alapján lehetne tovább bontani.
-          options = ['true', 'false', 'n.a.'];
-        }
+            options = ['true', 'false', 'n.a.'];
+        }
 
         return {
           id: config.questionId,
           title: language === "hu" ? (config.titleHu || config.title) : (config.titleDe || config.title),
           groupName: groupName,
-          type: correctedType, // 🔥 Korrigált type
-          options: options, // 🔥 ÚJ: Opciók a frontend számára
+          type: correctedType,
+          options: options,
           required: config.required,
           placeholder: config.placeholder,
           unit: config.unit,
@@ -118,10 +127,10 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // A cache manuális törlése (ez akár át is kerülhetne az admin-routes.ts-be)
+  // OPCIONÁLIS: Manuális cache törlés endpoint (fejlesztési/debug célokra)
   app.post("/api/cache/clear", (_req, res) => {
-    questionsCache = null;
-    console.log("✅ Questions cache cleared manually");
-    res.json({ success: true, message: "Cache cleared" });
+    clearQuestionsCache();
+    hybridTemplateLoader.clearCache();
+    res.json({ success: true, message: "All caches cleared" });
   });
 }

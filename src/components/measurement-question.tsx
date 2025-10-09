@@ -1,66 +1,42 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useLanguageContext } from '@/components/language-provider';
 import { Label } from '@/components/ui/label';
 import { Question } from '@shared/schema';
-import { StableInput } from './stable-input';
 
 interface MeasurementQuestionProps {
   question: Question;
   value: number | undefined;
-  onChange: (value: number) => void;
-}
-
-// Global helper functions for measurement values
-export function getAllMeasurementValues(): Record<string, number> {
-  // Check both caches for measurement values
-  const measurementCached = (window as any).measurementValues || {};
-  const stableInputCached = (window as any).stableInputValues || {};
-  const combined = { ...measurementCached, ...stableInputCached };
-  
-  const result: Record<string, number> = {};
-  
-  Object.keys(combined).forEach(key => {
-    const value = parseFloat(combined[key]);
-    if (!isNaN(value)) {
-      result[key] = value;
-    }
-  });
-  
-  return result;
-}
-
-export function clearAllMeasurementValues() {
-  (window as any).measurementValues = {};
+  onChange: (value: number | undefined) => void;
 }
 
 export function MeasurementQuestion({ question, value, onChange }: MeasurementQuestionProps) {
   const { language } = useLanguageContext();
 
-  const handleValueChange = (newValue: string) => {
-    // Store values PERSISTENTLY in dual cache system
-    if (!(window as any).measurementValues) {
-      (window as any).measurementValues = {};
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    let inputValue = e.target.value;
+    
+    // Only allow numbers and decimal point
+    inputValue = inputValue.replace(/[^0-9.]/g, '');
+    
+    // Limit to 5 characters maximum
+    if (inputValue.length > 5) {
+      inputValue = inputValue.slice(0, 5);
+      e.target.value = inputValue;
     }
-    (window as any).measurementValues[question.id] = newValue;
     
-    // ALSO store in stableInputValues for StableInput compatibility
-    if (!(window as any).stableInputValues) {
-      (window as any).stableInputValues = {};
+    // Parse and validate the value
+    if (inputValue === '' || inputValue === '.') {
+      // Empty or just a decimal point - clear the value
+      onChange(undefined);
+    } else {
+      const parsedValue = parseFloat(inputValue);
+      if (!isNaN(parsedValue)) {
+        onChange(parsedValue);
+      }
     }
-    (window as any).stableInputValues[question.id] = newValue;
     
-    // Mark this value as protected from clearing
-    if (!(window as any).protectedMeasurements) {
-      (window as any).protectedMeasurements = new Set();
-    }
-    (window as any).protectedMeasurements.add(question.id);
-    
-    // Trigger measurement change event for calculations
-    window.dispatchEvent(new CustomEvent('measurement-change'));
-    
-    // DON'T call onChange immediately to avoid React state conflicts
-    // Values will be picked up from cache during form submission
-  };
+    console.log(`✏️ Measurement input ${question.id}: "${inputValue}" -> ${parseFloat(inputValue) || 'undefined'}`);
+  }, [question.id, onChange]);
 
   const getTitle = () => {
     if (language === 'de' && question.titleDe) return question.titleDe;
@@ -68,16 +44,10 @@ export function MeasurementQuestion({ question, value, onChange }: MeasurementQu
     return question.title;
   };
 
-  // Check range from cached value to avoid re-renders
-  const getCachedValue = () => {
-    const cached = (window as any).measurementValues?.[question.id];
-    return cached ? parseFloat(cached) : value;
-  };
-  
-  const currentValue = getCachedValue();
-  const isOutOfRange = currentValue !== undefined && !isNaN(currentValue) && (
-    (question.minValue !== undefined && currentValue < question.minValue) ||
-    (question.maxValue !== undefined && currentValue > question.maxValue)
+  // Check if value is out of range
+  const isOutOfRange = value !== undefined && !isNaN(value) && (
+    (question.minValue !== undefined && value < question.minValue) ||
+    (question.maxValue !== undefined && value > question.maxValue)
   );
 
   return (
@@ -97,35 +67,8 @@ export function MeasurementQuestion({ question, value, onChange }: MeasurementQu
           <input
             id={question.id}
             type="text"
-            defaultValue={value?.toString() || ''}
-            onInput={(e) => {
-              const input = e.target as HTMLInputElement;
-              let val = input.value;
-              
-              // Only allow numbers and decimal point
-              val = val.replace(/[^0-9.]/g, '');
-              
-              // Limit to 5 characters maximum - STRICT ENFORCEMENT
-              if (val.length > 5) {
-                val = val.slice(0, 5);
-                input.value = val;
-              }
-              
-              // Clear old cache to prevent interference
-              if ((window as any).stableInputValues) {
-                delete (window as any).stableInputValues[question.id];
-              }
-              
-              // Store in measurement cache
-              if (!(window as any).measurementValues) {
-                (window as any).measurementValues = {};
-              }
-              (window as any).measurementValues[question.id] = val;
-              
-              console.log(`Measurement input ${question.id}: ${val} (length: ${val.length})`);
-              
-              handleValueChange(val);
-            }}
+            value={value?.toString() || ''}
+            onChange={handleInputChange}
             placeholder="0"
             className={`text-center text-sm px-1 border-2 rounded-lg py-1 ${isOutOfRange ? 'border-red-500' : 'border-gray-200'}`}
             maxLength={5}
@@ -150,4 +93,15 @@ export function MeasurementQuestion({ question, value, onChange }: MeasurementQu
       )}
     </div>
   );
+}
+
+// DEPRECATED: These global functions are no longer needed
+// They're kept for backward compatibility but should not be used
+export function getAllMeasurementValues(): Record<string, number> {
+  console.warn('⚠️ getAllMeasurementValues() is deprecated. Use React state instead.');
+  return {};
+}
+
+export function clearAllMeasurementValues() {
+  console.warn('⚠️ clearAllMeasurementValues() is deprecated. Use React state instead.');
 }

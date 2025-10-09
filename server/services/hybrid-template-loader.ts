@@ -252,6 +252,27 @@ export class HybridTemplateLoader {
       };
     }
   }
+  // IDE ILLSZD BE AZ ÚJ FÜGGVÉNYT
+
+  /**
+   * Törli a teljes 'temp' mappát, ezzel érvénytelenítve az összes cache-elt sablont.
+   */
+  clearCache(): void {
+    try {
+      const tempDir = path.join(process.cwd(), 'temp');
+      if (fs.existsSync(tempDir)) {
+        console.log(`🗑️ Clearing template cache directory: ${tempDir}`);
+        fs.rmSync(tempDir, { recursive: true, force: true });
+        console.log(`✅ Cache directory cleared successfully.`);
+      } else {
+        console.log(`ℹ️ Cache directory not found, nothing to clear.`);
+      }
+    } catch (error) {
+      console.error('❌ Error clearing template cache:', error);
+    }
+  }
+
+// EZ A SOR MÁR LÉTEZIK, EZ UTÁN MÁR NE ÍRJ SEMMIT A CLASS-ON BELÜL
 }
 
 // Singleton instance

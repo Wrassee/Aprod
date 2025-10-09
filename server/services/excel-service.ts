@@ -26,94 +26,138 @@ class ExcelService {
   }
 
   private async populateProtocolTemplate(templateBuffer: Buffer, formData: FormData, language: string): Promise<Buffer> {
-  try {
-    const workbook = XLSX.read(templateBuffer, { 
-      type: 'buffer',
-      cellStyles: true,
-      cellHTML: false,
-      sheetStubs: true
-    });
-    
-    const sheetName = workbook.SheetNames[0];
-    let worksheet = workbook.Sheets[sheetName];
-    
-    // 1. LÉPÉS: Kérdéskonfigok betöltése
-    let questionConfigs: any[] = [];
     try {
-      const questionsTemplate = await storage.getActiveTemplate('questions', language);
-      if (questionsTemplate) {
-        questionConfigs = await storage.getQuestionConfigsByTemplate(questionsTemplate.id);
-        console.log('Loaded question configs:', questionConfigs.length);
-      }
-    } catch (error) {
-      console.log('Could not load question configs:', error);
-    }
-    
-    // 2. LÉPÉS: Most már futtathatjuk a hibakeresést és a feldolgozást
-    console.log('BACKEND: Megkapott formData.answers kulcsok:', Object.keys(formData.answers)); // Log #1
-    
-    const cellMappings: Array<{cell: string, value: any, label: string}> = [];
+      const workbook = XLSX.read(templateBuffer, { 
+        type: 'buffer',
+        cellStyles: true,
+        cellHTML: false,
+        sheetStubs: true
+      });
+      
+      const sheetName = workbook.SheetNames[0];
+      let worksheet = workbook.Sheets[sheetName];
+      
+      // 1. LÉPÉS: Kérdéskonfigok betöltése
+      let questionConfigs: any[] = [];
+      try {
+        const questionsTemplate = await storage.getActiveTemplate('questions', language);
+        if (questionsTemplate) {
+          questionConfigs = await storage.getQuestionConfigsByTemplate(questionsTemplate.id);
+          console.log('Loaded question configs:', questionConfigs.length);
 
-    Object.entries(formData.answers).forEach(([questionId, answer]) => {
-      const config = questionConfigs.find(q => q.questionId === questionId);
-      
-      // *** A HIBAKERESŐ LOGIKA HELYES HELYE ITT VAN ***
-      // A ciklusban, miután már van `config` változónk
-      if (questionId.startsWith('Q_NID_')) {
-        console.log(`BACKEND: NIV adat feldolgozása: ID=${questionId}, Érték=${answer}`); // Log #2
-        if (config) {
-          console.log(`BACKEND: TALÁLAT! Ehhez a NIV adathoz van konfiguráció:`, config); // Log #3
-        } else {
-          console.log(`BACKEND: HIBA! Nincs konfiguráció a(z) "${questionId}" ID-hoz. Ellenőrizd az Excel template-et!`); // Log #4
+          // =================== NUKLEÁRIS OPCIÓ: BOLONDBIZTOS NORMALIZÁLÁS ===================
+          // Győződjünk meg róla, hogy a `cellReference` mindig létezik.
+          questionConfigs.forEach(config => {
+            if (config.cell_reference && !config.cellReference) {
+              config.cellReference = config.cell_reference;
+            }
+            // Ugyanez a többi mezőre is
+            if (config.question_id && !config.questionId) {
+              config.questionId = config.question_id;
+            }
+            if (config.title_hu && !config.titleHu) {
+              config.titleHu = config.title_hu;
+            }
+            if (config.title_de && !config.titleDe) {
+              config.titleDe = config.title_de;
+            }
+          });
+          console.log('✅ Question configs normalized to camelCase');
+          // ===============================================================================
+          
+          // DEBUG: Ellenőrizzük az első config struktúráját a normalizálás UTÁN
+          if (questionConfigs.length > 0) {
+            console.log('BACKEND DEBUG: First config structure AFTER normalization:', JSON.stringify(questionConfigs[0], null, 2));
+          }
         }
+      } catch (error) {
+        console.log('Could not load question configs:', error);
       }
       
-      if (config && config.cellReference && answer !== '' && answer !== null && answer !== undefined) {
+      // 2. LÉPÉS: Most már futtathatjuk a hibakeresést és a feldolgozást
+      console.log('BACKEND: Megkapott formData.answers kulcsok:', Object.keys(formData.answers)); // Log #1
+      
+      const cellMappings: Array<{cell: string, value: any, label: string}> = [];
+
+      // *** JAVÍTOTT RÉSZ: Mindkét azonosító típust ÉS mindkét mező formátumot kezeljük ***
+      Object.entries(formData.answers).forEach(([key, answer]) => {
+        // A 'key' a böngészőből érkező kulcs (lehet "7" vagy "lift_id").
+        // Keressünk a `config` tömbben `id`-re ÉS `questionId`-re is!
+        const config = questionConfigs.find(q => String(q.id) === key || q.questionId === key);
+        
+        // *** A HIBAKERESŐ LOGIKA HELYES HELYE ITT VAN ***
+        if (key.startsWith('Q_NID_')) {
+          console.log(`BACKEND: NIV adat feldolgozása: ID=${key}, Érték=${answer}`); // Log #2
+          if (config) {
+            console.log(`BACKEND: TALÁLAT! Ehhez a NIV adathoz van konfiguráció:`, config); // Log #3
+          } else {
+            console.log(`BACKEND: HIBA! Nincs konfiguráció a(z) "${key}" ID-hoz. Ellenőrizd az Excel template-et!`); // Log #4
+          }
+        }
+        
+        // Általános hibajelzés minden konfiguráció nélküli kulcshoz
+        if (!config) {
+          console.log(`BACKEND: FIGYELMEZTETÉS! Nincs konfiguráció a(z) "${key}" kulcshoz. Ellenőrizd az Excel template-et és az adatbázist!`);
+          return; // Ugorjuk át ezt a választ
+        }
+        
+        // *** EGYSZERŰSÍTETT: A normalizálás után már csak cellReference-t kell keresni ***
+        if (!config.cellReference) {
+          console.log(`BACKEND: HIBA! A(z) "${key}" konfigurációban nincs cellReference mező!`, config);
+          return; // Ugorjuk át ezt a választ
+        }
+        
+        console.log(`BACKEND: Sikeres párosítás: ${key} -> ${config.cellReference} (érték: ${answer})`);
+        
+        if (answer !== '' && answer !== null && answer !== undefined) {
+          cellMappings.push({
+            cell: config.cellReference,
+            value: answer,
+            label: config.title || config.titleHu || config.titleDe || `Question ${key}`
+          });
+        }
+      });
+      
+      console.log(`BACKEND: Összesen ${cellMappings.length} cella lesz kitöltve.`);
+      
+      // Aláírás mező
+      if (formData.signatureName && !cellMappings.find(m => m.cell === 'F9')) {
         cellMappings.push({
-          cell: config.cellReference,
-          value: answer,
-          label: config.title || `Question ${questionId}`
+          cell: 'F9',
+          value: formData.signatureName,
+          label: 'Signature name'
         });
       }
-    });
-    
-    // Aláírás mező
-    if (formData.signatureName && !cellMappings.find(m => m.cell === 'F9')) {
-      cellMappings.push({
-        cell: 'F9',
-        value: formData.signatureName,
-        label: 'Signature name'
-      });
-    }
-    
-    // Cellák kitöltése
-    let filledCells = 0;
-    cellMappings.forEach(mapping => {
-      const newValue = this.formatAnswer(mapping.value, language);
-      const existingCell = worksheet[mapping.cell];
+      
+      // Cellák kitöltése
+      let filledCells = 0;
+      cellMappings.forEach(mapping => {
+        const newValue = this.formatAnswer(mapping.value, language);
+        const existingCell = worksheet[mapping.cell];
 
-      worksheet[mapping.cell] = { 
-        v: newValue,
-        t: typeof newValue === 'number' ? 'n' : 's'
-      };
+        worksheet[mapping.cell] = { 
+          v: newValue,
+          t: typeof newValue === 'number' ? 'n' : 's'
+        };
 
-      if (existingCell && existingCell.s) {
-        worksheet[mapping.cell].s = existingCell.s;
-      }
+        if (existingCell && existingCell.s) {
+          worksheet[mapping.cell].s = existingCell.s;
+        }
 
-      filledCells++;
-    });
-    
-    workbook.Sheets[sheetName] = worksheet;
-    console.log(`Successfully filled ${filledCells} cells in the OTIS protocol template`);
-    
-    const buffer = XLSX.write(workbook, { 
-      type: 'buffer', 
-      bookType: 'xlsx',
-      compression: true,
-      cellStyles: true
+        filledCells++;
+        console.log(`BACKEND: Cella kitöltve: ${mapping.cell} = ${newValue}`);
       });
       
+      workbook.Sheets[sheetName] = worksheet;
+      console.log(`Successfully filled ${filledCells} cells in the OTIS protocol template`);
+      
+      const buffer = XLSX.write(workbook, { 
+        type: 'buffer', 
+        bookType: 'xlsx',
+        compression: true,
+        cellStyles: true
+      });
+        
       return buffer;
     } catch (error) {
       console.error('Error populating protocol template:', error);
@@ -139,13 +183,30 @@ class ExcelService {
         if (questionsTemplate) {
           const questionConfigs = await storage.getQuestionConfigsByTemplate(questionsTemplate.id);
           
-          Object.entries(formData.answers).forEach(([questionId, answer]) => {
-            const config = questionConfigs.find((q: any) => q.questionId === questionId);
+          // =================== NORMALIZÁLÁS A BASIC EXCEL-NÉL IS ===================
+          questionConfigs.forEach((config: any) => {
+            if (config.cell_reference && !config.cellReference) {
+              config.cellReference = config.cell_reference;
+            }
+            if (config.question_id && !config.questionId) {
+              config.questionId = config.question_id;
+            }
+            if (config.title_hu && !config.titleHu) {
+              config.titleHu = config.title_hu;
+            }
+            if (config.title_de && !config.titleDe) {
+              config.titleDe = config.title_de;
+            }
+          });
+          // =========================================================================
+          
+          Object.entries(formData.answers).forEach(([key, answer]) => {
+            const config = questionConfigs.find((q: any) => String(q.id) === key || q.questionId === key);
             const questionText = config ? 
               (language === 'hu' && config.titleHu ? config.titleHu :
                language === 'de' && config.titleDe ? config.titleDe :
                config.title) :
-              `Question ${questionId}`;
+              `Question ${key}`;
               
             worksheetData.push([
               questionText,

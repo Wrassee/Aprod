@@ -12,12 +12,8 @@ import { ErrorList } from '@/components/error-list';
 import { QuestionGroupHeader } from '@/components/question-group-header';
 import { useLanguageContext } from '@/components/language-provider';
 import { ArrowLeft, ArrowRight, Save, Settings, Home, Check, X, RotateCcw } from 'lucide-react';
-import { getAllCachedValues } from '@/components/cache-radio';
-import { getAllTrueFalseValues } from '@/components/true-false-radio';
-import { getAllStableInputValues } from '@/components/stable-input';
-import { getAllMeasurementValues } from '@/components/measurement-question';
 import { CalculatedResult } from '@/components/calculated-result';
-import { MeasurementBlock, getAllCalculatedValues } from '@/components/measurement-block';
+import { MeasurementBlock } from '@/components/measurement-block';
 import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
 import { FormData } from '@/lib/types';
 
@@ -36,11 +32,12 @@ interface QuestionnaireProps {
   onStartNew?: () => void;
   onPageChange?: (page: number) => void;
   onQuestionChange?: (questionId: string) => void;
-  formData: FormData;
   currentPage: number;
   currentQuestionId: string;
 }
+
 const math = create(all);
+
 const Questionnaire = memo(function Questionnaire({
   receptionDate,
   onReceptionDateChange,
@@ -56,8 +53,7 @@ const Questionnaire = memo(function Questionnaire({
   onStartNew,
   onPageChange,
   onQuestionChange,
-  formData,
-  currentPage: pageFromApp, // Átnevezzük, hogy ne ütközzön a belső 'currentPage' állapottal
+  currentPage: pageFromApp,
   currentQuestionId,
 }: QuestionnaireProps) {
   const { t, language: contextLanguage } = useLanguageContext();
@@ -75,36 +71,34 @@ const Questionnaire = memo(function Questionnaire({
   mountCountRef.current += 1;
   console.log('🔄 Questionnaire component rendered/mounted - RENDER COUNT:', mountCountRef.current);
   
-  // Use a stable ref for currentPage to prevent re-mounting
-  const currentPageRef = useRef(0);
-  const [currentPage, setCurrentPage] = useState(() => {
-    const saved = localStorage.getItem('questionnaire-current-page');
-    const initialPage = saved ? parseInt(saved, 10) : 0;
-    currentPageRef.current = initialPage;
-    return initialPage;
-  });
-  
-  console.log('📄 Current page:', currentPage);
+  console.log('📄 Current page from parent (pageFromApp):', pageFromApp);
 
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
-  const [cacheUpdateTrigger, setCacheUpdateTrigger] = useState(0);
-  const [measurementValues, setMeasurementValues] = useState<Record<string, number>>({});
-  const [calculatedResults, setCalculatedResults] = useState<Record<string, any>>({});
   const [measurementErrors, setMeasurementErrors] = useState<ProtocolError[]>([]);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  
+  // KRITIKUS: Belső state az answers-nek, hogy az input mezők azonnal reagáljanak
+  const [localAnswers, setLocalAnswers] = useState<Record<string, AnswerValue>>(answers);
+  
+  // Szinkronizáljuk a parent answers-szel
+  useEffect(() => {
+    setLocalAnswers(answers);
+  }, [answers]);
 
-  // Apply conditional filtering to questions
+  // Apply conditional filtering to questions - használjuk a localAnswers-t
   const { filteredQuestions, activeConditions, totalQuestions, filteredCount } = 
-    useConditionalQuestionFilter(allQuestions, answers);
+    useConditionalQuestionFilter(allQuestions, localAnswers);
 
   // Automatically set disabled questions to "n.a."
   useEffect(() => {
     if (allQuestions.length > 0 && filteredQuestions.length > 0) {
-      const updatedAnswers = updateAnswersWithDisabled(answers, allQuestions, filteredQuestions);
+      const updatedAnswers = updateAnswersWithDisabled(localAnswers, allQuestions, filteredQuestions);
       
       // Only update if there are actual changes
       const hasChanges = Object.keys(updatedAnswers).some(key => 
-        updatedAnswers[key] !== answers[key]
+        updatedAnswers[key] !== localAnswers[key]
       );
       
       if (hasChanges) {
@@ -114,24 +108,20 @@ const Questionnaire = memo(function Questionnaire({
           disabledCount: allQuestions.length - filteredQuestions.length
         });
         
+        // Frissítjük a localAnswers-t
+        setLocalAnswers(updatedAnswers);
+        
         // Update answers through the parent component using question_id as key
         Object.entries(updatedAnswers).forEach(([questionKey, value]) => {
-          if (value !== answers[questionKey]) {
+          if (value !== localAnswers[questionKey]) {
             onAnswerChange(questionKey, value);
           }
         });
       }
     }
-  }, [filteredQuestions, allQuestions, answers, onAnswerChange]);
+  }, [filteredQuestions, allQuestions, localAnswers, onAnswerChange]);
 
-  // Save current page to localStorage and notify parent component
-  useEffect(() => {
-    currentPageRef.current = currentPage;
-    localStorage.setItem('questionnaire-current-page', currentPage.toString());
-    onPageChange?.(currentPage);
-  }, [currentPage, onPageChange]);
-
-  // Load questions ONCE on mount only - no dependency array to prevent re-runs
+  // Load questions ONCE on mount only
   useEffect(() => {
     const loadQuestions = async () => {
       try {
@@ -157,14 +147,14 @@ const Questionnaire = memo(function Questionnaire({
               id: 'q2',
               questionId: 'q2',
               title: language === 'hu' ? 'Lift telepítés kész?' : 'Aufzuginstallation abgeschlossen?',
-              type: 'checkbox' as const, // JAVÍTVA
+              type: 'checkbox' as const,
               required: true,
             },
             {
               id: 'q3',
               questionId: 'q3',
               title: language === 'hu' ? 'Biztonsági rendszerek működnek?' : 'Sicherheitssysteme funktionsfähig?',
-              type: 'radio' as const, // JAVÍTVA
+              type: 'radio' as const,
               required: true,
             },
             {
@@ -196,9 +186,10 @@ const Questionnaire = memo(function Questionnaire({
 
     // Load questions only on mount
     loadQuestions();
-  }, [language]); // Depend on language
+  }, [language]);
 
   // Group questions by groupName and organize by groups
+  // *** JAVÍTVA: pageFromApp használata mindenütt ***
   const { questionGroups, totalPages, currentQuestions, progress, currentGroup } = useMemo(() => {
     // Group questions by groupName - use filteredQuestions for dynamic filtering
     const groups = filteredQuestions.reduce((acc: Record<string, Question[]>, question: Question) => {
@@ -232,10 +223,10 @@ const Questionnaire = memo(function Questionnaire({
 
     // Calculate pagination based on groups (1 group per page)
     const total = groupsArray.length;
-    const currentGroupData = groupsArray[currentPage] || { name: '', questions: [], questionCount: 0 };
-    const prog = total > 0 ? ((currentPage + 1) / total) * 100 : 0;
+    const currentGroupData = groupsArray[pageFromApp] || { name: '', questions: [], questionCount: 0 };
+    const prog = total > 0 ? ((pageFromApp + 1) / total) * 100 : 0;
     
-    console.log(`DEBUG: Found ${groupsArray.length} groups, total pages: ${total}, current page: ${currentPage + 1}/${total}`);
+    console.log(`DEBUG: Found ${groupsArray.length} groups, total pages: ${total}, current page: ${pageFromApp + 1}/${total}`);
     
     return { 
       questionGroups: groupsArray, 
@@ -244,62 +235,57 @@ const Questionnaire = memo(function Questionnaire({
       progress: prog,
       currentGroup: currentGroupData
     };
-  }, [filteredQuestions, currentPage, filteredCount]); // Use filteredQuestions and filteredCount for dynamic updates
+  }, [filteredQuestions, pageFromApp, filteredCount]);
 
-  // Listen for cache changes to trigger re-calculation
+  // Calculate derived values for calculated questions
   useEffect(() => {
-    const handleCacheChange = () => {
-      console.log('Cache change detected, checking can proceed...');
-      setCacheUpdateTrigger(prev => prev + 1);
-    };
-
-    window.addEventListener('radio-change', handleCacheChange);
-    window.addEventListener('button-check', handleCacheChange); // Button validation only
-    window.addEventListener('measurement-change', handleCacheChange);
-
-    return () => {
-      window.removeEventListener('radio-change', handleCacheChange);
-      window.removeEventListener('button-check', handleCacheChange);
-      window.removeEventListener('measurement-change', handleCacheChange);
-    };
-  }, []);
-
-// ✅ ÚJ, REAKTÍV KALKULÁCIÓS LOGIKA
-  useEffect(() => {
-    // 1. Gyűjtsük össze az összes jelenlegi bemeneti értéket a különböző cache-ekből
-    const allInputValues = {
-      ...getAllStableInputValues(),
-      ...getAllMeasurementValues(),
-    };
-
-    // 2. Keressük meg az összes "calculated" típusú kérdést
+    // Find all calculated questions
     const calculatedQuestions = allQuestions.filter(q => q.type === 'calculated');
 
-    // 3. Végezzük el a számításokat
+    // Perform calculations
     calculatedQuestions.forEach(q => {
       if (q.calculationFormula && q.calculationInputs) {
         try {
-          // A math.js scope objektumát használjuk a biztonságos behelyettesítéshez
-          const result = math.evaluate(q.calculationFormula, allInputValues);
+          // Create a scope object with all current answer values
+          const scope: Record<string, any> = {};
+          
+          // Add all answers to scope - használjuk a localAnswers-t
+          Object.entries(localAnswers).forEach(([key, value]) => {
+            // Convert numeric strings to numbers for calculation
+            if (typeof value === 'string' && !isNaN(Number(value))) {
+              scope[key] = Number(value);
+            } else {
+              scope[key] = value;
+            }
+          });
+
+          // Evaluate the formula with current values
+          const result = math.evaluate(q.calculationFormula, scope);
 
           if (typeof result === 'number' && !isNaN(result)) {
             const roundedResult = Math.round(result * 100) / 100;
-            // Frissítsük a szülő komponenst az új értékkel, de csak ha változott
-            if (answers[q.id] !== roundedResult) {
+            // Update if value changed
+            if (localAnswers[q.id] !== roundedResult) {
+              setLocalAnswers(prev => ({ ...prev, [q.id]: roundedResult }));
               onAnswerChange(q.id, roundedResult);
             }
           }
         } catch (error) {
-          // Ha a formula hibás, biztosítjuk, hogy ne legyen régi, hibás érték az állapotban.
-          if (answers[q.id] !== undefined) {
+          // Clear the value if calculation fails
+          if (localAnswers[q.id] !== undefined) {
+            setLocalAnswers(prev => {
+              const newAnswers = { ...prev };
+              delete newAnswers[q.id];
+              return newAnswers;
+            });
             onAnswerChange(q.id, undefined);
           }
         }
       }
     });
-  // A függőségi tömb: lefut, ha a kérdések betöltődtek, vagy ha bármelyik bemeneti mező változik (cacheUpdateTrigger)
-  }, [allQuestions, cacheUpdateTrigger, onAnswerChange, answers]);
-  // Ultra-stable error handlers with proper typing
+  }, [allQuestions, localAnswers, onAnswerChange]);
+
+  // Error handlers
   const handleAddError = useCallback((error: Omit<ProtocolError, 'id'>) => {
     const newError: ProtocolError = {
       ...error,
@@ -323,99 +309,128 @@ const Questionnaire = memo(function Questionnaire({
     onErrorsChange(currentErrors.filter((error: ProtocolError) => error.id !== id));
   }, [onErrorsChange, errors]);
 
-  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  
-  // ✅ ÁTÍRT, LEEGYSZERŰSÍTETT FÜGGVÉNY
-  const checkCanProceed = () => {
+  // KRITIKUS: handleLocalAnswerChange - helyi state frissítése + parent értesítése
+  const handleLocalAnswerChange = useCallback((questionId: string, value: AnswerValue) => {
+    // Azonnal frissítjük a helyi állapotot a gyors UI válaszért
+    setLocalAnswers(prev => ({
+      ...prev,
+      [questionId]: value
+    }));
+    // Értesítjük a parent-et is
+    onAnswerChange(questionId, value);
+    onQuestionChange?.(questionId);
+  }, [onAnswerChange, onQuestionChange]);
+
+  // Check if can proceed to next page - használjuk a localAnswers-t
+  const checkCanProceed = useCallback(() => {
     const requiredQuestionsOnPage = (currentQuestions as Question[]).filter(q => q.required);
     if (requiredQuestionsOnPage.length === 0) return true;
 
     return requiredQuestionsOnPage.every(q => {
-      const answer = answers[q.id];
+      const answer = localAnswers[q.id];
       return answer !== undefined && answer !== null && answer !== '';
     });
-  };
-  
-  // ✅ ÁTÍRT, LEEGYSZERŰSÍTETT FÜGGŐSÉGI TÖMB
+  }, [currentQuestions, localAnswers]);
+
   const canProceedState = useMemo(() => {
     return checkCanProceed();
-  }, [currentQuestions, answers]);
+  }, [checkCanProceed]);
 
-  const isLastPage = currentPage === totalPages - 1;
-  const progressPercent = totalPages > 0 ? Math.round(((currentPage + 1) / totalPages) * 100) : 0;
+  // *** JAVÍTVA: pageFromApp használata ***
+  const isLastPage = pageFromApp === totalPages - 1;
+  const progressPercent = totalPages > 0 ? Math.round(((pageFromApp + 1) / totalPages) * 100) : 0;
+
+  // Simple save handler - just save the formData from props
+  const handleSave = useCallback(() => {
+    setSaveStatus('saving');
+    try {
+      // Simply call parent's onSave - parent handles the actual saving
+      onSave?.();
+      
+      setSaveStatus('saved');
+      setLastSaved(new Date());
+      
+      // Reset status after 3 seconds
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } catch (error) {
+      console.error('Save failed:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    }
+  }, [onSave]);
+
+  // *** JAVÍTVA: pageFromApp használata a lapozásban ***
+  const handleNextPage = useCallback(() => {
+    const nextPage = pageFromApp + 1;
+    console.log('Moving to next page:', nextPage);
+    onPageChange?.(nextPage);
+  }, [pageFromApp, onPageChange]);
+
+  const handlePreviousPage = useCallback(() => {
+    const prevPage = Math.max(0, pageFromApp - 1);
+    console.log('Moving to previous page:', prevPage);
+    onPageChange?.(prevPage);
+  }, [pageFromApp, onPageChange]);
 
   return (
-    <div className="min-h-screen bg-light-surface" onSubmit={(e) => e.preventDefault()}>
+    <div className="min-h-screen bg-light-surface">
       <PageHeader
-  onHome={onHome}
-  onStartNew={onStartNew}
-  onAdminAccess={onAdminAccess}
-  title="OTIS APROD - Átvételi Protokoll"
-  receptionDate={receptionDate}
-  onReceptionDateChange={onReceptionDateChange}
-  language={language}
-  totalSteps={totalPages + 1}
-  currentStep={currentPage}
-  stepType="questionnaire"
-  
-  // === AI SEGÍTŐ PROPS A SZÜLŐTŐL ===
-  currentPage={pageFromApp + 1} // A props-ból kapott értéket használjuk (+1, mert nem 0-tól indexelt)
-  formData={formData}           // A props-ból kapott teljes formData objektumot adjuk át
-  currentQuestionId={currentQuestionId} // A props-ból kapott értéket használjuk
-  errors={errors}               // Az `errors` prop már korábban is megvolt
-/>
+        onHome={onHome}
+        onStartNew={onStartNew}
+        onAdminAccess={onAdminAccess}
+        title="OTIS APROD - Átvételi Protokoll"
+        receptionDate={receptionDate}
+        onReceptionDateChange={onReceptionDateChange}
+        language={language}
+        totalSteps={totalPages + 1}
+        currentStep={pageFromApp}
+        stepType="questionnaire"
+        currentPage={pageFromApp + 1}
+        currentQuestionId={currentQuestionId}
+        errors={errors}
+      />
+
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8" onSubmit={(e) => e.preventDefault()}>
+      <main className="max-w-7xl mx-auto px-6 py-8">
         {questionGroups.length > 0 && currentGroup && (
           <QuestionGroupHeader
             groupName={currentGroup.name}
             questionCount={currentGroup.questionCount}
             totalGroups={totalPages}
-            currentGroupIndex={currentPage}
+            currentGroupIndex={pageFromApp}
             language={language}
           />
         )}
 
         <div className="mb-8">
-          {currentPage === 0 || currentPage === 1 ? (
+          {/* *** JAVÍTVA: pageFromApp használata a feltételekben *** */}
+          {pageFromApp === 0 || pageFromApp === 1 ? (
             <div className="grid grid-cols-2 gap-8">
               {(currentQuestions as Question[]).map((question: Question) => {
                 return (
                   <IsolatedQuestion
                     key={question.id}
                     question={question}
-                    value={answers[question.id]}
-                    onChange={(value) => {
-                      onAnswerChange(question.id, value);
-                      onQuestionChange?.(question.id);
-                    }}
+                    value={localAnswers[question.id] ?? ""}
+                    onChange={(value) => handleLocalAnswerChange(question.id, value)}
                   />
                 );
               })}
             </div>
           ) : (
-            // ======================= KÖZPONTI JAVÍTÁS ITT =======================
-            // A 'true_false' típust 'radio'-ra cseréljük, ahogy a backend küldi.
-            (currentQuestions as Question[]).length > 0 && 
-            (currentGroup?.name === 'Modernizációban érintett') ? (
-              <TrueFalseGroup
-                questions={currentQuestions as Question[]}
-                values={answers}
-                onChange={onAnswerChange}
-                groupName={currentGroup?.name || 'Kérdések'}
-              />
+            (currentQuestions as Question[]).some(q => q.type === 'radio' || q.type === 'checkbox') ? (
+    <TrueFalseGroup
+      questions={currentQuestions as Question[]}
+      values={localAnswers}
+      onChange={handleLocalAnswerChange}
+      groupName={currentGroup?.name || 'Kérdések'}
+    />
             ) : (
               (currentQuestions as Question[]).some((q: Question) => q.type === 'measurement' || q.type === 'calculated') ? (
                 <MeasurementBlock
                   questions={(currentQuestions as Question[]).filter((q: Question) => q.type === 'measurement' || q.type === 'calculated')}
-                  values={answers}
-                  onChange={(questionId, value) => {
-                    onAnswerChange(questionId, value);
-                    if (typeof value === 'number') {
-                      setMeasurementValues(prev => ({ ...prev, [questionId]: value }));
-                    }
-                  }}
+                  values={localAnswers}
+                  onChange={handleLocalAnswerChange}
                   onAddError={handleAddError}
                 />
               ) : (
@@ -425,11 +440,8 @@ const Questionnaire = memo(function Questionnaire({
                       <IsolatedQuestion
                         key={question.id}
                         question={question}
-                        value={answers[question.id]}
-                        onChange={(value) => {
-                          onAnswerChange(question.id, value);
-                          onQuestionChange?.(question.id);
-                        }}
+                        value={localAnswers[question.id] ?? ""}
+                        onChange={(value) => handleLocalAnswerChange(question.id, value)}
                       />
                     );
                   })}
@@ -449,12 +461,12 @@ const Questionnaire = memo(function Questionnaire({
           />
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center" onSubmit={(e) => e.preventDefault()}>
+        {/* Navigation - *** JAVÍTVA: pageFromApp használata *** */}
+        <div className="flex justify-between items-center">
           <Button
             variant="outline"
-            onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
-            disabled={currentPage === 0}
+            onClick={handlePreviousPage}
+            disabled={pageFromApp === 0}
             className="flex items-center"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -464,49 +476,7 @@ const Questionnaire = memo(function Questionnaire({
           <div className="flex space-x-4">
             <button
               type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onTouchStart={(e) => e.preventDefault()}
-              onClick={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                console.log('Save button clicked on page:', currentPage);
-                setSaveStatus('saving');
-                try {
-                  const cachedRadioValues = getAllCachedValues();
-                  const cachedTrueFalseValues = getAllTrueFalseValues();
-                  const cachedInputValues = getAllStableInputValues();
-                  const cachedMeasurementValues = getAllMeasurementValues();
-                  const cachedCalculatedValues = getAllCalculatedValues();
-                  
-                  console.log('Save: Syncing cached values on page', currentPage);
-                  
-                  const currentFormData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{"answers":{}}');
-                  const updatedFormData = {
-                    ...currentFormData,
-                    answers: {
-                      ...currentFormData.answers,
-                      ...cachedRadioValues,
-                      ...cachedTrueFalseValues,
-                      ...cachedInputValues,
-                      ...cachedMeasurementValues,
-                      ...cachedCalculatedValues,
-                    }
-                  };
-                  
-                  localStorage.setItem('otis-protocol-form-data', JSON.stringify(updatedFormData));
-                  console.log('Save: Data saved directly to localStorage - NO React state updates');
-                  setSaveStatus('saved');
-                  setLastSaved(new Date());
-                  
-                  setTimeout(() => setSaveStatus('idle'), 3000);
-                  
-                } catch (error) {
-                  console.error('Save: Failed with error:', error);
-                  setSaveStatus('error');
-                  setTimeout(() => setSaveStatus('idle'), 3000);
-                }
-              }}
+              onClick={handleSave}
               disabled={saveStatus === 'saving'}
               className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input h-10 px-4 py-2 ${
                 saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
@@ -540,36 +510,7 @@ const Questionnaire = memo(function Questionnaire({
             {isLastPage ? (
               <Button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  // Sync all cached values before completing
-                  const cachedRadioValues = getAllCachedValues();
-                  const cachedTrueFalseValues = getAllTrueFalseValues();
-                  const cachedInputValues = getAllStableInputValues();
-                  const cachedMeasurementValues = getAllMeasurementValues();
-                  const cachedCalculatedValues = getAllCalculatedValues();
-                  
-                  console.log('Complete button: Syncing cached values...');
-                  
-                  Object.entries(cachedRadioValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedTrueFalseValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedInputValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedCalculatedValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as number);
-                  });
-                  
-                  // Small delay to ensure state updates before proceeding
-                  setTimeout(() => {
-                    onNext();
-                  }, 100);
-                }}
+                onClick={onNext}
                 disabled={!canProceedState}
                 className={`flex items-center text-white ${
                   canProceedState 
@@ -583,31 +524,7 @@ const Questionnaire = memo(function Questionnaire({
             ) : (
               <Button
                 type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  console.log('Next button clicked, canProceedState:', canProceedState);
-                  
-                  // Sync cached values before moving to next page
-                  const cachedRadioValues = getAllCachedValues();
-                  const cachedTrueFalseValues = getAllTrueFalseValues();
-                  const cachedInputValues = getAllStableInputValues();
-                  
-                  Object.entries(cachedRadioValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedTrueFalseValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  Object.entries(cachedInputValues).forEach(([questionId, value]) => {
-                    onAnswerChange(questionId, value as string);
-                  });
-                  
-                  const nextPage = currentPage + 1;
-                  console.log('Setting next page from', currentPage, 'to', nextPage);
-                  setCurrentPage(nextPage);
-                  localStorage.setItem('questionnaire-current-page', nextPage.toString());
-                }}
+                onClick={handleNextPage}
                 disabled={!canProceedState}
                 className={`flex items-center text-white ${
                   canProceedState 

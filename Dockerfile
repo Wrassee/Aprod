@@ -41,7 +41,13 @@ COPY package.json package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/shared ./shared
+
+# A Drizzle Kit-nek (a .ts fájlokkal)
+COPY --from=builder /app/shared ./shared 
+
+# A Node.js szervernek (a .js fájlokkal a dist mappán belül)
+COPY --from=builder /app/dist/shared ./dist/shared
+
 COPY --from=builder /app/drizzle.config*.ts ./
 COPY --from=builder /app/migrations ./migrations
 

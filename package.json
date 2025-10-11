@@ -14,7 +14,8 @@
     "db:studio:pg": "drizzle-kit studio --config ./drizzle.config.pg.ts",
     "db:generate:sqlite": "drizzle-kit generate --config ./drizzle.config.sqlite.ts",
     "db:studio:sqlite": "drizzle-kit studio --config ./drizzle.config.sqlite.ts",
-    "generate-grounding-questions": "ts-node scripts/generate-grounding-questions.ts"
+    "generate-grounding-questions": "ts-node scripts/generate-grounding-questions.ts",
+    "db:migrate": "drizzle-kit migrate --config ./drizzle.config.pg.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",
@@ -74,6 +75,7 @@
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.1",
+    "drizzle-kit": "^0.30.4",
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.6.0",
@@ -139,7 +141,6 @@
     "@types/react-dom": "^18.3.1",
     "@types/ws": "^8.5.13",
     "concurrently": "^9.2.1",
-    "drizzle-kit": "^0.30.4",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "tsc-alias": "^1.8.16",

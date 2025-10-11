@@ -1,4 +1,4 @@
-# 🏗️ OTIS APROD - TELJES TECHNIKAI DOKUMENTÁCIÓ
+# 🗃️ OTIS APROD - TELJES TECHNIKAI DOKUMENTÁCIÓ
 
 ## 📖 **TARTALOMJEGYZÉK**
 1. [Alkalmazás Áttekintés](#alkalmazás-áttekintés)
@@ -22,8 +22,8 @@ Az OTIS APROD egy **full-stack TypeScript alkalmazás**, amely digitalizálja az
 ### **Fő Célok:**
 - 📋 **Papír-alapú protokollok digitalizálása**
 - ⚡ **Munkafolyamat egyszerűsítése** OTIS technikusok számára
-- 🔄 **Automatizált Excel ↔ PDF konverzió** formátum megőrzéssel
-- 🌐 **Magyar és német nyelvi támogatás**
+- 📄 **Automatizált Excel ↔ PDF konverzió** formátum megőrzéssel
+- 🌍 **Magyar és német nyelvi támogatás**
 - 📱 **Mobil-első, tablet-optimalizált felület**
 
 ### **Felhasználók:**
@@ -169,20 +169,29 @@ POST /api/questions/filter
 Body: { language: string, conditions: string[] }
 ```
 
-#### **2. Template Management (`/api/admin/templates`)**
+#### **2. Template Management (`/api/admin/templates`) - 2024+ FRISSÍTETT**
 ```typescript
-// Template lista
+// Template lista (helyi + Supabase Storage)
 GET /api/admin/templates
 
-// Template feltöltés
+// Template feltöltés (multipart/form-data)
 POST /api/admin/templates/upload
-Content-Type: multipart/form-data
+Body: {
+  file: File,                    // Excel fájl (kötelező)
+  name: string,                  // Sablon neve (kötelező)
+  type: "unified" | "protocol",  // Sablon típusa (kötelező)
+  language: "multilingual"       // Nyelv (kötelező, default: "multilingual")
+}
+// Production: Supabase Storage-ba tölt fel, temp fájlokat automatikusan törli
+// Frontend validáció: minden kötelező mező ellenőrzése
 
 // Template aktiválás
 POST /api/admin/templates/:id/activate
+// Sikeres művelet után automatikus sablon lista frissítés
 
 // Template törlés
 DELETE /api/admin/templates/:id
+// Sikeres törlés után automatikus sablon lista frissítés
 
 // Elérhető template-ek (local + remote)
 GET /api/admin/templates/available
@@ -315,7 +324,7 @@ async function executeWithFilenameStrategies<T>(
 
 **Correction Strategies:**
 1. **Original:** Eredeti fájlnév próbálása
-2. **Simple Corrections:** Gyakori karaktercserék (`ÃÂ©` → `é`)
+2. **Simple Corrections:** Gyakori karaktercserék (`ÃƒÂ©` → `é`)
 3. **UTF-8 Decode:** UTF-8 dekódolási kísérletek
 4. **ASCII Cleanup:** ASCII karakterekre szűkítés
 5. **Safe Fallback:** Biztonságos fallback karakterek
@@ -419,17 +428,46 @@ interface GroundingData {
 - Új protokoll indítása
 ```
 
-#### **7. `admin.tsx` - Admin Interface**
+#### **7. `admin.tsx` - Admin Interface (2024+ FRISSÍTETT)**
 ```typescript
-// Funkciók:
-- Template lista (local + remote)
-- Template feltöltés drag&drop-pal
-- Template aktiválás/deaktiválás
-- Template törlés confirmation-nel
-- Cache kezelés (manual clear)
-- Template preview
-- Error handling és feedback
+// Frissített funkciók (2024+):
+- Template lista (helyi + Supabase Storage)
+- Template feltöltés drag&drop-pal, két típusra bontva: kérdés sablon és protokoll sablon
+- Feltöltésnél kötelező megadni: sablon neve, típusa ("unified" vagy "protocol"), valamint a language ("multilingual")
+- Fájlok feltöltése: production környezetben Supabase Storage-ba kerülnek, a temp fájlokat automatikusan törli a backend
+- Template aktiválás/deaktiválás és törlés API-n keresztül történik; sikeres művelet után automatikus sablonlista frissül
+- Betöltési stratégia kiválasztása (helyi először, cache először, csak távoli)
+- Sablon előnézet (template preview)
+- Manuális cache clear lehetőség
+- Frontend validáció: minden kötelező mezőre (név, típus, file) ellenőrzés
+- Hibakezelés: minden API hívás toast üzenettel visszajelez, a backend error üzenetét is megjeleníti
+
+// Új UX funkciók:
+- "Betöltési stratégia" választó: helyi először, cache először, csak távoli
+- Sablon előnézet részletesen mutatja az Excel tartalmát
+- Manuális cache törlés gomb
+- Sablon típus választó: "unified" (kérdés sablon) vagy "protocol" (protokoll sablon)
+- Drag & drop feltöltési felület vizuális feedback-kel
+- Real-time validációs hibaüzenetek a kötelező mezőknél
 ```
+
+#### **Admin API Endpointok (2024+ Frissített)**
+```typescript
+// Template management endpoints:
+GET    /api/admin/templates            // Sablonok listázása
+POST   /api/admin/templates/upload     // Sablon feltöltése (multipart/form-data, kötelező: file, name, type, language)
+POST   /api/admin/templates/:id/activate  // Sablon aktiválás
+DELETE /api/admin/templates/:id        // Sablon törlés
+GET    /api/admin/templates/available  // Elérhető sablonok (helyi + távoli)
+POST   /api/admin/cache/clear          // Manuális cache törlés
+```
+
+#### **Technikai Megjegyzés (Admin)**
+- **Production környezet:** A fájlok feltöltése Supabase Storage-ba történik, temp fájlokat a rendszer azonnal törli a feltöltés után.
+- **Frontend validáció:** A frontend validálja a sablon nevét, típusát és a feltöltött fájlt; csak ezek megléte esetén engedélyezett a feltöltés.
+- **Automatikus frissítés:** Minden admin művelet (feltöltés, aktiválás, törlés) után automatikusan frissül a sablon lista.
+- **Hibakezelés:** Hiba esetén a frontend toast-ban mutatja a backend részletes error üzenetét.
+- **Cache stratégia:** A betöltési stratégia választó lehetővé teszi a helyi/cache/távoli prioritás beállítását.
 
 ### **Közös Komponensek (`src/components/`)**
 
@@ -510,6 +548,7 @@ otis-aprod/
 │   │   ├── start-screen.tsx
 │   │   ├── questionnaire.tsx
 │   │   ├── niedervolt-table.tsx
+│   │   ├── admin.tsx             # Admin interface (2024+ frissített)
 │   │   └── ...
 │   ├── lib/                      # Utility függvények
 │   │   ├── utils.ts
@@ -538,7 +577,7 @@ otis-aprod/
 │   │   └── filename-corrections.ts
 │   ├── config/                   # Konfigurációs fájlok
 │   │   └── local-templates.ts
-│   ├── routes.ts                 # Fő API routes
+│   ├── routes.ts                 # Fő API routes (template endpoints)
 │   ├── storage.ts                # Database storage layer
 │   └── index.ts                  # Express szerver entry point
 ├── shared/                       # Közös típusok és sémák
@@ -581,7 +620,7 @@ otis-aprod/
 
 ## ⚙️ **SPECIÁLIS FUNKCIÓK ÉS MODULOK**
 
-### **1. Template Management System**
+### **1. Template Management System (2024+ Frissített)**
 
 #### **Hibrid Template Loader**
 ```typescript
@@ -594,6 +633,7 @@ otis-aprod/
 - Memory cache active template-ekhez
 - Automatic cache invalidation activation esetén
 - Template versioning support
+- Manuális cache törlés admin felületen
 ```
 
 #### **Excel Template Processing**
@@ -606,6 +646,28 @@ otis-aprod/
 - Header row: ID, titleHu, titleDe, Type, cellReference, Unit, ...
 - Multi-cell support: "A1,B1,C1" vagy complex "A1;A2,B1;B2" formátumok
 - Calculated questions: Formula és input dependencies
+```
+
+#### **Template Feltöltési Folyamat (2024+)**
+```typescript
+// 1. Frontend validáció
+- Kötelező mezők: name (string), type ("unified" | "protocol"), file (Excel)
+- Language: default "multilingual"
+- Real-time validációs feedback
+
+// 2. Multipart upload
+POST /api/admin/templates/upload
+Content-Type: multipart/form-data
+
+// 3. Backend processing
+- Production: Supabase Storage-ba feltöltés
+- Temp fájlok automatikus törlése
+- Metadata mentés adatbázisba
+- Sikeres feltöltés: automatikus lista frissítés
+
+// 4. Hiba kezelés
+- Backend error üzenetek toast-ban megjelenítve
+- Részletes hibajelzések minden lépésben
 ```
 
 ### **2. Niedervolt → Otis Automatic Mapping**
@@ -662,7 +724,7 @@ interface NiedervoltMeasurement {
       "id": "maschinenraum",
       "title": "1. Ellenőrzés a gépházban",
       "questions": [
-        { "id": "grd_mr_ref", "text": "Referencia földelés meglétele" },
+        { "id": "grd_mr_ref", "text": "Referencia földelés megléte" },
         { "id": "grd_mr_controller", "text": "Vezérlő burkolata és ajtói" }
       ]
     }
@@ -718,11 +780,19 @@ export const translations = {
   hu: {
     "start_new_protocol": "Új protokoll indítása",
     "continue_protocol": "Protokoll folytatása",
+    "admin_panel": "Admin felület",
+    "template_upload": "Sablon feltöltése",
+    "template_name": "Sablon neve",
+    "template_type": "Sablon típusa",
     // ...
   },
   de: {
     "start_new_protocol": "Neues Protokoll starten", 
     "continue_protocol": "Protokoll fortsetzen",
+    "admin_panel": "Admin-Oberfläche",
+    "template_upload": "Vorlage hochladen",
+    "template_name": "Vorlagenname",
+    "template_type": "Vorlagentyp",
     // ...
   }
 };
@@ -740,6 +810,46 @@ const groupName = language === 'de' && config.groupNameDe ? config.groupNameDe :
 
 // JSON-based content (Erdungskontrolle):
 const response = await fetch(`/questions_grounding_${language}.json`);
+```
+
+### **6. Admin Cache Management (2024+ Új Funkció)**
+
+#### **Cache Kezelési Stratégiák**
+```typescript
+// 1. Betöltési stratégia választó
+enum LoadStrategy {
+  LOCAL_FIRST = "local-first",      // Először helyi template-ek
+  CACHE_FIRST = "cache-first",      // Cache prioritás
+  REMOTE_ONLY = "remote-only"       // Csak távoli (Supabase)
+}
+
+// 2. Manuális cache törlés
+POST /api/admin/cache/clear
+Response: { success: true, message: "Cache cleared successfully" }
+
+// 3. Automatic cache invalidation
+- Template aktiválás után
+- Template törlés után
+- Template feltöltés után
+```
+
+#### **Template Preview Funkció**
+```typescript
+// Sablon előnézet részletes megjelenítése
+interface TemplatePreview {
+  name: string;
+  type: "unified" | "protocol";
+  language: string;
+  uploadedAt: Date;
+  isActive: boolean;
+  questionCount: number;          // Kérdések száma
+  sheets: string[];               // Excel lapok nevei
+  cellMappings: Array<{           // Cella mapping lista
+    questionId: string;
+    cellReference: string;
+    sheetName: string;
+  }>;
+}
 ```
 
 ---
@@ -772,15 +882,17 @@ DATABASE_URL=          # PostgreSQL connection string (production)
 # Supabase Storage
 SUPABASE_URL=          # Supabase project URL
 SUPABASE_ANON_KEY=     # Supabase anonymous key
+SUPABASE_BUCKET_NAME=  # Storage bucket neve (default: "otis-templates")
 
 # Email (Resend)
 RESEND_API_KEY=        # Email küldéshez
 
 # Development
 NODE_ENV=development   # development | production
+PORT=5000              # Server port (default: 5000)
 ```
 
-### **Production Deployment (Vercel)**
+### **Production Deployment (Replit/Vercel)**
 
 #### **Build Configuration**
 ```json
@@ -789,7 +901,11 @@ NODE_ENV=development   # development | production
   "build": "npm run build:frontend && npm run build:backend",
   "build:frontend": "vite build",
   "build:backend": "tsc server --outDir dist-server",
-  "start": "node dist-server/index.js"
+  "start": "node dist-server/index.js",
+  "db:generate": "drizzle-kit generate",
+  "db:push": "drizzle-kit push",
+  "db:migrate": "drizzle-kit migrate",
+  "db:studio": "drizzle-kit studio"
 }
 ```
 
@@ -805,7 +921,13 @@ NODE_ENV=development   # development | production
   "routes": [
     { "src": "/api/(.*)", "dest": "/dist-server/index.js" },
     { "src": "/(.*)", "dest": "/dist/index.html" }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production",
+    "DATABASE_URL": "@database_url",
+    "SUPABASE_URL": "@supabase_url",
+    "SUPABASE_ANON_KEY": "@supabase_anon_key"
+  }
 }
 ```
 
@@ -823,11 +945,57 @@ npm run db:studio         # Drizzle Studio GUI
 
 #### **Backup Strategy**
 ```bash
-# SQLite backup
+# SQLite backup (development)
 cp data/otis_aprod.db data/backup-$(date +%Y%m%d).db
 
-# PostgreSQL backup (Replit built-in)
+# PostgreSQL backup (Replit/Neon built-in)
 # Automatic checkpoint system
+# Point-in-time recovery available
+```
+
+### **Supabase Storage Setup (2024+ Kritikus)**
+
+#### **Storage Bucket Configuration**
+```typescript
+// Bucket létrehozás (egy alkalommal)
+Bucket name: "otis-templates"
+Public: false (privát bucket)
+Allowed MIME types: 
+  - application/vnd.openxmlformats-officedocument.spreadsheetml.sheet (.xlsx)
+  - application/vnd.ms-excel (.xls)
+Max file size: 50MB
+
+// Folder struktúra:
+otis-templates/
+├── unified/           # Kérdés sablonok
+│   ├── template-1.xlsx
+│   └── template-2.xlsx
+└── protocol/          # Protokoll sablonok
+    ├── protocol-1.xlsx
+    └── protocol-2.xlsx
+```
+
+#### **Security Policies**
+```sql
+-- Storage policies (Supabase Dashboard)
+
+-- Allow authenticated uploads
+CREATE POLICY "Allow authenticated uploads"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'otis-templates');
+
+-- Allow public reads (ha szükséges)
+CREATE POLICY "Allow public reads"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'otis-templates');
+
+-- Allow authenticated deletes
+CREATE POLICY "Allow authenticated deletes"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (bucket_id = 'otis-templates');
 ```
 
 ---
@@ -939,15 +1107,45 @@ const renderQuestionByType = (config: QuestionConfig) => {
 };
 ```
 
+### **Admin Template Management Fejlesztés (2024+)**
+
+#### **Új Template Típus Hozzáadása**
+```typescript
+// 1. Type definition bővítés
+export type TemplateType = "unified" | "protocol" | "new_type";
+
+// 2. Frontend dropdown update (admin.tsx)
+<Select>
+  <SelectItem value="unified">Kérdés sablon</SelectItem>
+  <SelectItem value="protocol">Protokoll sablon</SelectItem>
+  <SelectItem value="new_type">Új típus</SelectItem>
+</Select>
+
+// 3. Backend validation update
+const templateTypeSchema = z.enum(["unified", "protocol", "new_type"]);
+
+// 4. Storage folder structure
+otis-templates/
+├── new_type/
+│   └── template.xlsx
+```
+
 ### **Testing Strategy**
 
-#### **Manual Testing Checklist**
+#### **Manual Testing Checklist (2024+ Frissített)**
 ```bash
-# 1. Template Management
-- [ ] Template upload (valid Excel)
-- [ ] Template activation
-- [ ] Question parsing and display
-- [ ] Cache invalidation
+# 1. Template Management (Frissített)
+- [ ] Template feltöltés (valid Excel, kötelező mezők)
+- [ ] Frontend validáció tesztelése (név, típus, file)
+- [ ] Production: Supabase Storage feltöltés
+- [ ] Temp fájlok automatikus törlése
+- [ ] Template aktiválás/deaktiválás
+- [ ] Template törlés confirmation-nel
+- [ ] Automatikus lista frissítés minden művelet után
+- [ ] Betöltési stratégia váltás (local/cache/remote)
+- [ ] Sablon előnézet funkció
+- [ ] Manuális cache clear
+- [ ] Hiba visszajelzés toast-ban
 
 # 2. Questionnaire Flow  
 - [ ] Question display per language
@@ -973,9 +1171,9 @@ const renderQuestionByType = (config: QuestionConfig) => {
 
 ### **Common Development Patterns**
 
-#### **1. API Request Pattern**
+#### **1. API Request Pattern (2024+ Toast Feedback)**
 ```typescript
-// Standard mutation pattern
+// Standard mutation pattern with detailed error handling
 const { mutate, isPending, error } = useMutation({
   mutationFn: async (data: RequestType) => 
     apiRequest('/api/endpoint', { 
@@ -983,42 +1181,50 @@ const { mutate, isPending, error } = useMutation({
       body: JSON.stringify(data) 
     }),
   onSuccess: (result) => {
-    toast({ title: "Success!" });
+    toast({ 
+      title: "Sikeres művelet!", 
+      description: result.message || "A művelet sikeresen végrehajtva.",
+      variant: "default"
+    });
     queryClient.invalidateQueries({ queryKey: ['/api/related-data'] });
   },
-  onError: (error) => {
-    toast({ title: "Error", description: error.message, variant: "destructive" });
+  onError: (error: any) => {
+    toast({ 
+      title: "Hiba történt", 
+      description: error.message || "Ismeretlen hiba történt.",
+      variant: "destructive" 
+    });
   }
 });
 ```
 
-#### **2. Form Handling Pattern**
+#### **2. Form Handling Pattern (Admin Template Upload)**
 ```typescript
-// React Hook Form with Zod validation
-const form = useForm<FormData>({
-  resolver: zodResolver(formSchema),
-  defaultValues: initialData
+// Admin template upload form with validation
+const form = useForm<TemplateUploadData>({
+  resolver: zodResolver(z.object({
+    name: z.string().min(1, "Sablon neve kötelező"),
+    type: z.enum(["unified", "protocol"], { required_error: "Típus kötelező" }),
+    language: z.string().default("multilingual"),
+    file: z.instanceof(File, { message: "Fájl feltöltése kötelező" })
+  })),
+  defaultValues: {
+    name: "",
+    type: "unified",
+    language: "multilingual",
+    file: undefined
+  }
 });
 
-const onSubmit = (data: FormData) => {
-  mutate(data);
+const onSubmit = async (data: TemplateUploadData) => {
+  const formData = new FormData();
+  formData.append('file', data.file);
+  formData.append('name', data.name);
+  formData.append('type', data.type);
+  formData.append('language', data.language);
+  
+  uploadMutation.mutate(formData);
 };
-
-return (
-  <Form {...form}>
-    <form onSubmit={form.handleSubmit(onSubmit)}>
-      <FormField control={form.control} name="field" render={({ field }) => (
-        <FormItem>
-          <FormLabel>Label</FormLabel>
-          <FormControl>
-            <Input {...field} />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
-      )} />
-    </form>
-  </Form>
-);
 ```
 
 #### **3. Service Class Pattern**
@@ -1077,7 +1283,7 @@ export class FeatureService {
 }
 ```
 
-### **Teljes API Endpoint Lista**
+### **Teljes API Endpoint Lista (2024+ Frissített)**
 
 #### **Questions API**
 ```typescript
@@ -1085,13 +1291,19 @@ GET    /api/questions/:language          // Get questions by language
 POST   /api/questions/filter             // Filter questions by conditions
 ```
 
-#### **Templates API**
+#### **Templates API (2024+ Frissített)**
 ```typescript
 GET    /api/admin/templates              // List uploaded templates
-GET    /api/admin/templates/available    // List all available templates
+GET    /api/admin/templates/available    // List all available templates (local + remote)
 POST   /api/admin/templates/upload       // Upload new template
+       // Body (multipart/form-data):
+       // - file: File (kötelező)
+       // - name: string (kötelező)
+       // - type: "unified" | "protocol" (kötelező)
+       // - language: "multilingual" (kötelező, default)
 POST   /api/admin/templates/:id/activate // Activate template
 DELETE /api/admin/templates/:id          // Delete template
+POST   /api/admin/cache/clear            // Clear questions cache
 ```
 
 #### **Protocols API**
@@ -1114,11 +1326,99 @@ GET    /api/niedervolt/devices           // Get available devices
 POST   /api/upload                       // Upload files (images)
 ```
 
-#### **Admin API**
+### **API Request/Response Példák (2024+ Frissített)**
+
+#### **Template Upload Request**
 ```typescript
-POST   /api/admin/cache/clear           // Clear questions cache
+// Request
+POST /api/admin/templates/upload
+Content-Type: multipart/form-data
+
+FormData:
+{
+  file: [Excel File],
+  name: "Új protokoll sablon",
+  type: "protocol",
+  language: "multilingual"
+}
+
+// Success Response
+{
+  "success": true,
+  "message": "Template sikeresen feltöltve",
+  "data": {
+    "id": "uuid-here",
+    "name": "Új protokoll sablon",
+    "type": "protocol",
+    "file_path": "protocol/új-protokoll-sablon.xlsx",
+    "uploaded_at": "2024-10-11T10:30:00Z",
+    "is_active": false
+  }
+}
+
+// Error Response
+{
+  "success": false,
+  "message": "Sablon neve kötelező"
+}
+```
+
+#### **Template Activation Request**
+```typescript
+// Request
+POST /api/admin/templates/{templateId}/activate
+
+// Success Response
+{
+  "success": true,
+  "message": "Template aktiválva",
+  "data": {
+    "id": "uuid-here",
+    "is_active": true
+  }
+}
+```
+
+#### **Cache Clear Request**
+```typescript
+// Request
+POST /api/admin/cache/clear
+
+// Success Response
+{
+  "success": true,
+  "message": "Cache sikeresen törölve"
+}
 ```
 
 ---
 
-**🎉 Ez a teljes technikai dokumentáció minden információt tartalmaz az OTIS APROD alkalmazás megértéséhez és továbbfejlesztéséhez. A dokumentáció alapján bármely programozó vagy AI aszisztens képes hatékonyan dolgozni a projekttel.**
+## 🎯 **ÖSSZEFOGLALÁS ÉS KÖVETKEZŐ LÉPÉSEK**
+
+### **Kulcsfontosságú 2024+ Változások**
+
+#### **Admin Interface Fejlesztések**
+1. **Frontend validáció**: Minden kötelező mező (név, típus, file) ellenőrzése feltöltés előtt
+2. **Supabase integráció**: Production környezetben automatikus Supabase Storage feltöltés
+3. **Temp fájl kezelés**: Automatikus törlés feltöltés után
+4. **Toast feedback**: Részletes visszajelzés minden műveletről (sikeres/hiba)
+5. **Automatikus frissítés**: Lista újratöltése minden admin művelet után
+6. **Betöltési stratégia**: Választható cache/local/remote prioritás
+7. **Sablon előnézet**: Részletes Excel tartalom megjelenítés
+8. **Manuális cache clear**: Admin felületen elérhető cache törlés
+
+#### **API Endpoint Fejlesztések**
+- **POST /api/admin/templates/upload**: Kötelező mezők validáció
+- **POST /api/admin/cache/clear**: Új cache management endpoint
+- **Részletes error üzenetek**: Backend hibák frontendon megjelenítve
+
+### **Fejlesztési Prioritások**
+1. ✅ Template management modernizáció (2024+ kész)
+2. 🔄 Unit tesztek írása kritikus komponensekhez
+3. 📊 Analytics integráció használati statisztikákhoz
+4. 🔐 Autentikáció és autorizáció implementálása
+5. 📱 PWA funkciók bővítése (offline mode)
+
+---
+
+**🎉 Ez a frissített teljes technikai dokumentáció minden 2024+ fejlesztést tartalmaz az OTIS APROD alkalmazás megértéséhez és továbbfejlesztéséhez. A dokumentáció különös figyelmet fordít az admin template management új funkcióira, validációs követelményeire és hibakezelési stratégiáira.**

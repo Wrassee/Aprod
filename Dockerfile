@@ -3,11 +3,13 @@
 FROM node:20-slim AS builder
 
 WORKDIR /app
+
 # A python3 és build-essential továbbra is kellhet a natív modulok fordításához
 RUN apt-get update && apt-get install -y --no-install-recommends python3 build-essential && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
 # Itt a `ci` telepíti az összes függőséget, ami a buildhez kell.
 RUN npm ci
 
@@ -79,15 +81,33 @@ COPY package.json package-lock.json ./
 
 # Az előző fázisból átmásoljuk a már telepített és optimalizált `node_modules` mappát.
 COPY --from=builder /app/node_modules ./node_modules
+
 # Átmásoljuk a lefordított alkalmazást.
 COPY --from=builder /app/dist ./dist
+
 # Átmásoljuk a public mappát.
 COPY --from=builder /app/public ./public
 
 # Átmásoljuk a lefordított 'shared' mappát is a gyökérbe.
 COPY --from=builder /app/dist/shared ./shared
 
+# --- ÚJ LÉPÉSEK KEZDETE: AUTOMATIKUS MIGRÁCIÓ ---
+
+# 1. Másoljuk be az entrypoint scriptet a konténerbe
+COPY entrypoint.sh .
+
+# 2. Tegyük futtathatóvá
+RUN chmod +x entrypoint.sh
+
+# --- ÚJ LÉPÉSEK VÉGE ---
+
+# Temp könyvtár létrehozása feltöltésekhez
 RUN mkdir /app/temp && chmod 777 /app/temp
 
 EXPOSE 10000
+
+# --- MÓDOSÍTOTT INDÍTÁSI PARANCS ---
+# Az ENTRYPOINT fogja futtatni a scriptünket.
+# A CMD pedig átadja a scriptnek az alapértelmezett parancsot (a szerver indítását).
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["node", "dist/server/index.js"]

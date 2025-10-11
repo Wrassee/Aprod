@@ -110,6 +110,10 @@ RUN chmod +x entrypoint.sh
 # Temp könyvtár létrehozása feltöltésekhez
 RUN mkdir /app/temp && chmod 777 /app/temp
 
+# --- HIBAKERESŐ LÉPÉS ---
+# Listázzuk ki a /app mappa teljes tartalmát rekurzívan a logba
+RUN ls -R
+
 EXPOSE 10000
 
 # --- MÓDOSÍTOTT INDÍTÁSI PARANCS ---

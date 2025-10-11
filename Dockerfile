@@ -91,6 +91,9 @@ COPY --from=builder /app/public ./public
 # Átmásoljuk a lefordított 'shared' mappát is a gyökérbe.
 COPY --from=builder /app/dist/shared ./shared
 
+# --- ÚJ LÉPÉS: DRIZZLE KONFIG FÁJLOK BEMÁSOLÁSA ---
+COPY --from=builder /app/drizzle.config*.ts ./
+
 # --- ÚJ LÉPÉSEK KEZDETE: AUTOMATIKUS MIGRÁCIÓ ---
 
 # 1. Másoljuk be az entrypoint scriptet a konténerbe

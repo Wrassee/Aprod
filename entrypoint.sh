@@ -5,7 +5,7 @@ set -e
 
 # 1. LÉPÉS: Adatbázis migráció futtatása
 echo "🚀 Running database migrations..."
-npm run db:migrate
+npm run db:sync
 
 # 2. LÉPÉS: A szerver indítása
 # Az `exec "$@"` lecseréli a shell processzt a szerver processzre,

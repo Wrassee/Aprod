@@ -10,15 +10,6 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm ci
 
 COPY . .
-
-# --- HIBAKERESÉS 1: LÁTJUK A FÁJLOKAT A MÁSOLÁS UTÁN? ---
-RUN echo "--- Listing files in BUILDER stage after 'COPY . .' ---" && ls -l
-
-# --- HIBAKERESÉS 2: LÉTEZIK A MIGRATIONS MAPPA A BUILD ELŐTT? ---
-# Ha itt hibát dob, akkor a 'migrations' mappa valamiért nem került be a build kontextusba.
-RUN test -d /app/migrations && echo "✅ Migrations folder FOUND in builder stage before build" || (echo "❌ Migrations folder NOT FOUND in builder stage before build" && exit 1)
-
-
 RUN npm run build
 RUN npm prune --production
 
@@ -29,7 +20,45 @@ FROM node:20-slim
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    # ... (a hosszú apt-get lista változatlan)
+    python3 \
+    build-essential \
+    ca-certificates \
+    fonts-liberation \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libc6 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libexpat1 \
+    libfontconfig1 \
+    libgbm1 \
+    libgcc1 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
+    libgtk-3-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libstdc++6 \
+    libx11-6 \
+    libx11-xcb1 \
+    libxcb1 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxi6 \
+    libxrandr2 \
+    libxrender1 \
+    libxss1 \
+    libxtst6 \
+    lsb-release \
+    wget \
+    xdg-utils \
     libreoffice \
     default-jre-headless \
     && rm -rf /var/lib/apt/lists/*
@@ -39,21 +68,14 @@ COPY package.json package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/dist/shared ./shared
+COPY --from=builder /app/shared ./shared # <-- ITT A JAVÍTÁS
 COPY --from=builder /app/drizzle.config*.ts ./
 COPY --from=builder /app/migrations ./migrations
+
 COPY entrypoint.sh .
-
 RUN chmod +x entrypoint.sh
+
 RUN mkdir /app/temp && chmod 777 /app/temp
-
-# --- HIBAKERESÉS 3: LÁTJUK A VÉGSŐ FÁJLOKAT? ---
-RUN echo "--- Listing files in FINAL stage after all COPY commands ---" && ls -l
-
-# --- HIBAKERESÉS 4: LÉTEZIK A MIGRATIONS MAPPA A VÉGSŐ IMAGE-BEN? ---
-# Ha itt hibát dob, akkor a 'COPY --from=builder' parancs nem működött.
-RUN test -d /app/migrations && echo "✅ Migrations folder FOUND in final image" || (echo "❌ Migrations folder NOT FOUND in final image" && exit 1)
-
 
 EXPOSE 10000
 

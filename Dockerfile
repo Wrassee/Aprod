@@ -81,5 +81,5 @@ RUN mkdir /app/temp && chmod 777 /app/temp
 
 EXPOSE 10000
 
-ENTRYPOINT ["./entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
 CMD ["node", "dist/server/index.js"]

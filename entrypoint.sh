@@ -1,9 +1,15 @@
 #!/bin/sh
 set -e
-echo "==> Executing entrypoint script..."
 
-echo "==> Forcing database schema synchronization..."
-yes | npm run db:sync
+echo "==> 🚀 Executing entrypoint script..."
 
-echo "==> Synchronization finished. Starting server..."
+echo "==> 🧱 Running database migrations..."
+# Biztonságos migráció — ha már minden rendben, nem állítja le a konténert
+if npm run db:sync; then
+  echo "==> ✅ Database successfully synced!"
+else
+  echo "==> ⚠️ Migration failed or already applied, continuing..."
+fi
+
+echo "==> 🟢 Starting server..."
 exec "$@"

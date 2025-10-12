@@ -2,8 +2,8 @@
 set -e
 echo "==> Executing entrypoint script..."
 
-echo "==> Forcing database schema synchronization..."
-yes | npm run db:sync
+echo "==> Running database migrations..."
+npm run db:migrate
 
-echo "==> Synchronization finished. Starting server..."
+echo "==> Migrations finished. Starting server..."
 exec "$@"

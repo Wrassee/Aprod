@@ -78,8 +78,33 @@ export type InsertTemplate = typeof templates.$inferInsert;
 /* -------------------------------------------------------------------------
  * Question configurations – single source of truth for questions
  * ----------------------------------------------------------------------- */
-export const QuestionTypeEnum = z.enum(["text", "number", "date", "select", "checkbox"]);
-export type QuestionType = "number" | "date" | "select" | "text" | "checkbox" | "radio" | "measurement" | "calculated" | "true_false" | "yes_no_na";
+
+// === JAVÍTÁS ITT KEZDŐDIK ===
+// Bővítettük a Zod sémát az összes új kérdéstípussal, amit az excel-parser-ben is bevezettél.
+export const QuestionTypeEnum = z.enum([
+  "text", 
+  "number", 
+  "date", 
+  "select", 
+  "checkbox", 
+  "radio", 
+  "measurement", 
+  "calculated", 
+  "true_false", 
+  "yes_no_na",
+  // Új típusok hozzáadva:
+  "textarea", 
+  "phone", 
+  "email", 
+  "time", 
+  "multi_select"
+]);
+
+// A TypeScript típust most már a Zod sémából származtatjuk, hogy ne kelljen kétszer karbantartani.
+export type QuestionType = z.infer<typeof QuestionTypeEnum>;
+
+// === JAVÍTÁS VÉGE ===
+
 
 export const questionConfigs = pgTable("question_configs", {
   id: uuid("id")
@@ -92,7 +117,7 @@ export const questionConfigs = pgTable("question_configs", {
   title: text("title").notNull(),
   title_hu: text("title_hu"),
   title_de: text("title_de"),
-  type: text("type").notNull(),
+  type: text("type").notNull(), // Ez a mező most már elfogadja a fenti új típusokat is
   required: boolean("required").notNull().default(true),
   placeholder: text("placeholder"),
   cell_reference: text("cell_reference"),
@@ -107,7 +132,7 @@ export const questionConfigs = pgTable("question_configs", {
   max_value: integer("max_value"),
   calculation_formula: text("calculation_formula"),
   calculation_inputs: jsonb("calculation_inputs"),
-  // JAVÍTVA: .defaultNow() -> .default(sql`CURRENT_TIMESTAMP`)
+  // A `created_at` sorod tökéletes, változatlanul hagyva
   created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 

@@ -33,8 +33,12 @@ if (process.env.NODE_ENV === "production") {
     throw new Error("DATABASE_URL environment variable is required in production.");
   }
   
-  const schemaPath = path.resolve(process.cwd(), 'shared/schema.js');
-  schema = await import(pathToFileURL(schemaPath).href);
+  // ================= JAVÍTÁS KEZDETE =================
+  // A dinamikus importot egy sima relatív importra cseréljük.
+  // A build folyamat tudni fogja, hogy a `../shared/schema.js` fájlt kell betöltenie
+  // a `dist/server/db.js`-ből.
+  schema = await import("../shared/schema.js");
+  // ================= JAVÍTÁS VÉGE ===================
 
   neonConfig.webSocketConstructor = ws;
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });

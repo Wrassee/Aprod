@@ -2,10 +2,7 @@ import { memo, useCallback } from 'react';
 import { Question, AnswerValue } from '../../shared/schema.js';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { CacheRadio } from './cache-radio';
-import { TrueFalseRadio } from './true-false-radio';
-import { StyledRadioGroup } from './StyledRadioGroup'; // ÚJ IMPORT
-import { MeasurementQuestion } from './measurement-question';
+import { StyledRadioGroup } from './StyledRadioGroup';
 import { Camera, Image } from 'lucide-react';
 import { useLanguageContext } from './language-provider';
 import { StableInput } from './stable-input';
@@ -34,152 +31,91 @@ const IsolatedQuestionComponent = memo(({
     }
   }, [onImageUpload]);
 
-  const renderInput = useCallback(() => {
-    switch (question.type) {
-      // ================== JAVÍTOTT RADIO TÍPUS ==================
-      case 'radio':
-        // True/False kérdések - 2 gomb (Igen/Nem)
-        const trueFalseOptions = [
-          { value: 'true', label: t.yes || 'Igen' },
-          { value: 'false', label: t.no || 'Nem' }
-        ];
-        
-        return (
-          <div className="flex justify-center py-2">
-            <StyledRadioGroup
-              questionId={question.id}
-              value={value?.toString() || ''}
-              onChange={onChange}
-              options={trueFalseOptions}
-            />
-          </div>
-        );
-      
-      // ================== JAVÍTOTT CHECKBOX TÍPUS (yes/no/na) ==================
-      case 'checkbox':
-        // Yes/No/N.A. kérdések - 3 gomb
-        const yesNoNaOptions = [
-          { value: 'yes', label: t.yes || 'Igen' },
-          { value: 'no', label: t.no || 'Nem' },
-          { value: 'na', label: t.notApplicable || 'N.A.' }
-        ];
-        
-        return (
-          <div className="flex justify-center py-2">
-            <StyledRadioGroup
-              questionId={question.id}
-              value={value?.toString() || ''}
-              onChange={onChange}
-              options={yesNoNaOptions}
-            />
-          </div>
-        );
-      
-      // ================== RÉGI yes_no_na TÍPUS (ha még használnád) ==================
-      case 'yes_no_na':
-        const radioOptions = [
-          { value: 'yes', label: t.yes || 'Igen' },
-          { value: 'no', label: t.no || 'Nem' },
-          { value: 'na', label: t.notApplicable || 'N.A.' }
-        ];
-        
-        return (
-          <div className="flex justify-center py-2">
-            <StyledRadioGroup
-              questionId={question.id}
-              value={value?.toString() || ''}
-              onChange={onChange}
-              options={radioOptions}
-            />
-          </div>
-        );
-        
-      case 'true_false':
-        return (
-          <TrueFalseRadio
-            questionId={question.id}
-            questionTitle={question.title}
-            value={value?.toString() || ''}
-            onChange={(newValue) => onChange(newValue as AnswerValue)}
-          />
-        );
-        
-      case 'number':
-        return (
-          <StableInput
-            questionId={question.id}
-            type="number"
-            value={value?.toString() || ''}
-            onChange={onChange}
-            placeholder={question.placeholder || '0'}
-            className="w-full"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                const focusableElements = document.querySelectorAll(
-                  'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-                );
-                const currentIndex = Array.from(focusableElements).indexOf(e.currentTarget);
-                const nextElement = focusableElements[currentIndex + 1] as HTMLElement;
-                if (nextElement) {
-                  nextElement.focus();
-                  if (nextElement.tagName === 'INPUT') {
-                    (nextElement as HTMLInputElement).select();
-                  }
-                }
-              }
-            }}
-          />
-        );
-        
-      case 'measurement':
-        return (
-          <MeasurementQuestion
-            question={question}
-            value={typeof value === 'number' ? value : undefined}
-            onChange={(newValue) => onChange(newValue)}
-          />
-        );
-        
-      case 'calculated':
-        return (
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">
-              Számított mező - értéket automatikusan meghatározza
-            </p>
-          </div>
-        );
-        
-      case 'text':
-      default:
-        return (
-          <StableInput
-            questionId={question.id}
-            type="text"
-            value={value?.toString() || ''}
-            onChange={onChange}
-            placeholder={question.placeholder || t.enterText || 'Szöveg megadása'}
-            className="w-full"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                const focusableElements = document.querySelectorAll(
-                  'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
-                );
-                const currentIndex = Array.from(focusableElements).indexOf(e.currentTarget);
-                const nextElement = focusableElements[currentIndex + 1] as HTMLElement;
-                if (nextElement) {
-                  nextElement.focus();
-                  if (nextElement.tagName === 'INPUT') {
-                    (nextElement as HTMLInputElement).select();
-                  }
-                }
-              }
-            }}
-          />
-        );
+  const handleEnterKeyNavigation = useCallback((e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const focusableElements = document.querySelectorAll(
+        'input:not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      const currentIndex = Array.from(focusableElements).indexOf(e.currentTarget);
+      const nextElement = focusableElements[currentIndex + 1] as HTMLElement;
+      if (nextElement) {
+        nextElement.focus();
+        if (nextElement.tagName === 'INPUT') {
+          (nextElement as HTMLInputElement).select();
+        }
+      }
     }
-  }, [question, value, onChange, t]);
+  }, []);
+
+  const renderInput = useCallback(() => {
+    // Radio-alapú komponensek kezelése
+    if (question.type === 'radio' || question.type === 'checkbox' || question.type === 'yes_no_na' || question.type === 'true_false') {
+      let options: Array<{ value: string; label: string }> = [];
+      
+      switch (question.type) {
+        case 'radio':
+        case 'true_false':
+          // True/False kérdések - 2 gomb (Igen/Nem)
+          options = [
+            { value: 'true', label: t.yes || 'Igen' },
+            { value: 'false', label: t.no || 'Nem' }
+          ];
+          break;
+          
+        case 'checkbox':
+        case 'yes_no_na':
+          // Yes/No/N.A. kérdések - 3 gomb
+          options = [
+            { value: 'yes', label: t.yes || 'Igen' },
+            { value: 'no', label: t.no || 'Nem' },
+            { value: 'na', label: t.notApplicable || 'N.A.' }
+          ];
+          break;
+      }
+      
+      return (
+        <div className="flex justify-center py-2">
+          <StyledRadioGroup
+            questionId={question.id}
+            value={value?.toString() || ''}
+            onChange={onChange}
+            options={options}
+          />
+        </div>
+      );
+    }
+    
+    // Speciális esetek
+    if (question.type === 'calculated') {
+      return (
+        <div className="p-4 bg-gray-50 rounded-lg">
+          <p className="text-sm text-gray-600">
+            Számított mező - értéket automatikusan meghatározza
+          </p>
+        </div>
+      );
+    }
+    
+    // Minden más input típus esetén a StableInput komponenst használjuk
+    return (
+      <StableInput
+        questionId={question.id}
+        type={question.type as 'text' | 'number' | 'measurement' | 'select' | 'multi_select' | 'date' | 'time'}
+        value={value?.toString() || ''}
+        onChange={onChange}
+        placeholder={question.placeholder}
+        onKeyDown={handleEnterKeyNavigation}
+        options={question.options}
+        required={question.required}
+        min={question.min_value}
+        max={question.max_value}
+        maxLength={question.maxLength}
+        unit={question.unit}
+        calculationConfig={question.calculationConfig}
+      />
+    );
+  }, [question, value, onChange, t, handleEnterKeyNavigation]);
 
   return (
     <Card className="w-full">

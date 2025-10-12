@@ -24,6 +24,15 @@ interface MeasurementBlockProps {
 
 export function MeasurementBlock({ questions, values, onChange, onAddError }: MeasurementBlockProps) {
   const { language, t } = useLanguageContext();
+
+  // 1. LÉPÉS: Ezt a blokkot másold be a `useLanguageContext` hívás után
+  const getTranslatedTitle = (question: Question) => {
+    if (language === 'de' && question.titleDe) {
+      return question.titleDe; // Ha van német fordítás, azt használjuk
+    }
+    // Bármely más esetben (vagy ha nincs német fordítás), a magyar címet használjuk
+    return question.titleHu || question.title; 
+  };
   
   const measurementQuestions = questions.filter(q => q.type === 'measurement');
   const calculatedQuestions = questions.filter(q => q.type === 'calculated');
@@ -121,7 +130,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                     </div>
                     <div className="flex-1 min-w-0 pr-4">
                       <p className="text-lg font-medium text-gray-800 leading-relaxed">
-                        {language === 'de' ? question.titleDe : question.title}
+                        {getTranslatedTitle(question)}
                       </p>
                       {question.unit && (
                         <p className="text-base text-gray-500 mt-1">
@@ -209,7 +218,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                     </div>
                     <div className="flex-1 min-w-0 pr-4">
                       <p className="text-lg font-medium text-gray-800 leading-relaxed">
-                        {language === 'de' ? question.titleDe : question.title}
+                        {getTranslatedTitle(question)}
                       </p>
                       {question.minValue !== undefined && question.maxValue !== undefined && (
                         <p className="text-sm text-gray-500 mt-1">

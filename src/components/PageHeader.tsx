@@ -104,7 +104,7 @@ const PageHeader: FC<PageHeaderProps> = ({
           </div>
 
           {/* ----- 2. KÖZÉPSŐ RÉSZ (AI SEGÉD) ----- */}
-          <div className="flex-1 flex justify-center items-center">
+          <div className="flex justify-center items-center">
             <SmartHelpWizard
               currentPage={currentPage}
               formData={formData}

@@ -3,20 +3,16 @@ import React, {
   useEffect,
   useCallback,
   useRef,
-  useMemo,
 } from "react";
 
-/* -------------------- 3rd‑party -------------------- */
+/* -------------------- 3rd-party -------------------- */
 import { queryClient } from "./lib/queryClient.js";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
-import { LanguageProvider } from "./components/language-provider.js";
+import { LanguageProvider, useLanguageContext } from "./components/language-provider.js";
 
-/* --------------------  PWA  (jelenleg letiltva) -------------------- */
-// import { PWAInstallBanner, OfflineIndicator } from "./components/pwa‑install‑banner";
-
-/* --------------------  Oldalak / Komponensek -------------------- */
+/* --------------------  Oldalak / Komponensek -------------------- */
 import { StartScreen } from "./pages/start-screen.js";
 import Questionnaire from "./pages/questionnaire.js";
 import { NiedervoltTable } from "./pages/niedervolt-table.js";
@@ -25,36 +21,43 @@ import { Completion } from "./pages/completion.js";
 import { Admin } from "./pages/admin.js";
 import { ProtocolPreview } from "./pages/protocol-preview.js";
 import { Erdungskontrolle } from "./pages/erdungskontrolle.js";
-import { SmartHelpWizard } from "./components/smart-help-wizard.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
-/* --------------------  Shared schema -------------------- */
+/* --------------------  Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema.js";
 
-/* --------------------  404  -------------------- */
-import NotFound from "./pages/not-found.js";
+type Screen = 'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview';
 
-function App() {
-  const [currentScreen, setCurrentScreen] = useState<'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview'>('start');
-  const [currentQuestionnaireePage, setCurrentQuestionnairePage] = useState(0);
-  const [currentQuestionId, setCurrentQuestionId] = useState<string>('');
-  const [language, setLanguage] = useState<'hu' | 'de'>('hu');
+// === PROPS INTERFACE A KÉPERNYŐÁLLAPOT ÁTADÁSÁHOZ ===
+interface AppContentProps {
+  currentScreen: Screen;
+  setCurrentScreen: (screen: Screen) => void;
+  currentQuestionnaireePage: number;
+  setCurrentQuestionnairePage: (page: number) => void;
+  currentQuestionId: string;
+  setCurrentQuestionId: (id: string) => void;
+  clearTrigger: number;
+  setClearTrigger: (trigger: number) => void;
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+}
 
-  // ====================================================================
-  // === MÓDOSÍTÁS 1: ÚJ clearTrigger ÁLLAPOT HOZZÁADÁSA ===
-  // ====================================================================
-  const [clearTrigger, setClearTrigger] = useState(Date.now());
-  // ====================================================================
-
-  const [formData, setFormData] = useState<FormData>({
-    receptionDate: new Date().toISOString().split('T')[0], // Always keep as ISO format for HTML date input
-    answers: {},
-    errors: [],
-    signature: '',
-    signatureName: '',
-    niedervoltMeasurements: [],
-    niedervoltTableMeasurements: {},
-  });
+// === APPCONTENT KOMPONENS - CSAK A NYELVI CONTEXTET HASZNÁLJA ===
+function AppContent({
+  currentScreen,
+  setCurrentScreen,
+  currentQuestionnaireePage,
+  setCurrentQuestionnairePage,
+  currentQuestionId,
+  setCurrentQuestionId,
+  clearTrigger,
+  setClearTrigger,
+  formData,
+  setFormData,
+}: AppContentProps) {
+  // === HASZNÁLJUK A NYELVI CONTEXTET ===
+  const { language, setLanguage } = useLanguageContext();
+  
   const formDataRef = useRef(formData);
   
   // Keep ref updated with latest formData
@@ -62,50 +65,28 @@ function App() {
     formDataRef.current = formData;
   }, [formData]);
 
-  // Load saved form data on initialization
-  useEffect(() => {
-    const saved = localStorage.getItem('otis-protocol-form-data');
-    if (saved) {
-      try {
-        const parsedData = JSON.parse(saved);
-        // If no receptionDate is saved or it's empty, use today's date
-        if (!parsedData.receptionDate || parsedData.receptionDate === '') {
-          parsedData.receptionDate = new Date().toISOString().split('T')[0];
-        }
-        setFormData(parsedData);
-      } catch (e) {
-        console.error('Error loading saved form data:', e);
-      }
-    }
-  }, []);
-
   const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
+    // === NYELV BEÁLLÍTÁSA A CONTEXTEN KERESZTÜL ===
     setLanguage(selectedLanguage);
-    // Save language to localStorage so LanguageProvider can use it
     localStorage.setItem('otis-protocol-language', selectedLanguage);
-    console.log('🌍 App.tsx - Language saved to localStorage:', localStorage.getItem('otis-protocol-language'));
     setCurrentScreen('questionnaire');
-    // Clear navigation state for new session - reset to page 0
+    setCurrentQuestionnairePage(0);
     localStorage.setItem('questionnaire-current-page', '0');
     
     // Clear error list when starting new protocol
     localStorage.removeItem('protocol-errors');
     window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
-    
-    // Force LanguageProvider to update by triggering a manual check
     window.dispatchEvent(new Event('storage'));
   };
 
   const handleSaveProgress = useCallback(() => {
-    console.log('🔧 ISOLATED save - no form data access');
-    // Do absolutely nothing that could trigger re-renders
-    // Save functionality is handled directly in questionnaire component
+    // Save is handled automatically by useEffect
+    console.log('✅ Progress saved automatically');
   }, []);
 
   const handleQuestionnaireNext = () => {
-    // After completing all template questions, show the Erdungskontrolle page
-    console.log('🔄 Questionnaire completed - showing Erdungskontrolle page');
+    console.log('📄 Questionnaire completed - showing Erdungskontrolle page');
     setCurrentScreen('erdungskontrolle');
   };
 
@@ -124,7 +105,7 @@ function App() {
   };
 
   const handleSignatureComplete = async () => {
-    console.log('🔄 Starting protocol completion process...');
+    console.log('📄 Starting protocol completion process...');
     
     // Prevent multiple clicks
     const currentTime = Date.now();
@@ -135,59 +116,29 @@ function App() {
     (window as any).lastCompleteAttempt = currentTime;
     
     try {
-      // Sync all cached values before creating protocol
-      const cachedRadioValues = (window as any).radioCache?.getAll?.() || {};
-      const cachedTrueFalseValues = (window as any).trueFalseCache || new Map();
-      const cachedInputValues = (window as any).stableInputValues || {};
-      const cachedMeasurementValues = (window as any).measurementCache?.getAll?.() || {};
-      const cachedCalculatedValues = (window as any).calculatedCache?.getAll?.() || {};
-      
-      // Convert Map to object if needed
-      const trueFalseAnswers: Record<string, string> = {};
-      if (cachedTrueFalseValues instanceof Map) {
-        cachedTrueFalseValues.forEach((value, key) => {
-          trueFalseAnswers[key] = value;
-        });
-      } else {
-        Object.assign(trueFalseAnswers, cachedTrueFalseValues);
-      }
-      
-      // Combine all answers including measurements
-      const combinedAnswers = {
-        ...formData.answers,
-        ...cachedRadioValues,
-        ...trueFalseAnswers,
-        ...cachedInputValues,
-        ...cachedMeasurementValues,
-        ...cachedCalculatedValues,
-      };
-      
       // Ensure we have a valid receptionDate
       const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
       
-      // Include niedervolt measurements
       const protocolData = {
         receptionDate,
         reception_date: receptionDate,
         language,
-        answers: combinedAnswers,
+        answers: formData.answers,
         errors: formData.errors || [],
         signature: formData.signature || '',
-        signatureName: formData.signatureName || (window as any).signatureNameValue || '',
+        signatureName: formData.signatureName || '',
         completed: true,
       };
       
       console.log('✅ Protocol data prepared:', {
-        answerCount: Object.keys(combinedAnswers).length,
+        answerCount: Object.keys(protocolData.answers).length,
         errorCount: protocolData.errors.length,
         hasSignature: Boolean(protocolData.signature),
         hasSignatureName: Boolean(protocolData.signatureName),
         receptionDate: protocolData.receptionDate,
-        reception_date: protocolData.reception_date,
         language: protocolData.language
       });
       
-      // Submit the protocol data to backend
       console.log('📤 Sending protocol to backend...');
       const response = await fetch('/api/protocols', {
         method: 'POST',
@@ -204,8 +155,6 @@ function App() {
         // Save the final form data to localStorage before navigating
         const finalFormData = {
           ...formData,
-          answers: combinedAnswers,
-          signatureName: protocolData.signatureName,
           completed: true
         };
         localStorage.setItem('otis-protocol-form-data', JSON.stringify(finalFormData));
@@ -216,18 +165,12 @@ function App() {
         const errorText = await response.text();
         console.error('❌ Protocol creation failed:', errorText);
         alert(`Protokoll mentési hiba: ${errorText}\n\nKérjük próbálja újra vagy lépjen kapcsolatba a támogatással.`);
-        
-        // Reset completion lock
         delete (window as any).lastCompleteAttempt;
       }
     } catch (error) {
       console.error('❌ Error completing protocol:', error);
-      
-      // User-friendly error message
       const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba történt';
       alert(`Protokoll befejezési hiba: ${errorMessage}\n\nKérjük ellenőrizze az internetkapcsolatot és próbálja újra.`);
-      
-      // Reset completion lock
       delete (window as any).lastCompleteAttempt;
     }
   };
@@ -278,12 +221,10 @@ function App() {
         const a = document.createElement('a');
         a.href = url;
         
-        // Get Otis Lift ID from all sources (cache + formData)
-        const cachedInputValues = (window as any).stableInputValues || {};
-        const otisLiftId = cachedInputValues['7'] || formData.answers['7'] || 'Unknown';
+        const otisLiftId = formData.answers['7'] || 'Unknown';
         a.download = `AP_${otisLiftId}.pdf`;
         
-        console.log('PDF download filename:', `AP_${otisLiftId}.pdf`);
+        console.log('PDF download filename:', a.download);
         
         document.body.appendChild(a);
         a.click();
@@ -296,143 +237,136 @@ function App() {
   };
 
   const handleDownloadExcel = async () => {
-  try {
-    console.log('Starting Excel download with up-to-date formData...');
+    try {
+      console.log('Starting Excel download with up-to-date formData...');
+      
+      const otisLiftId = formData.answers['7'] || 'Unknown';
+      const filename = `AP_${otisLiftId}.xlsx`;
+      
+      console.log('Excel download filename:', filename);
 
-    // NINCS SZÜKSÉG SEMMILYEN CACHE ÖSSZEFÉSÜLÉSÉRE!
-    // A `formData` React state már mindent tartalmaz, ami kell.
-    
-    // Get Otis Lift ID from the correct state
-    const otisLiftId = formData.answers['7'] || 'Unknown';
-    const filename = `AP_${otisLiftId}.xlsx`;
-    
-    console.log('Excel download filename:', filename);
+      const response = await fetch('/api/protocols/download-excel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formData, language }),
+      });
 
-    const response = await fetch('/api/protocols/download-excel', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ formData: formData, language }), // Csak a naprakész `formData`-t küldjük
-    });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Excel generation failed: ${response.status} - ${errorText}`);
+      }
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Excel generation failed: ${response.status} - ${errorText}`);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+
+    } catch (error) {
+      console.error('Error downloading Excel:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      alert(`Excel letöltési hiba: ${errorMessage}\n\nKérjük, próbálja újra.`);
     }
-
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    window.URL.revokeObjectURL(url);
-    document.body.removeChild(a);
-
-  } catch (error) {
-    console.error('Error downloading Excel:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    alert(`Excel letöltési hiba: ${errorMessage}\n\nKérjük, próbálja újra.`);
-  }
-};
+  };
 
   const handleViewProtocol = () => {
     setCurrentScreen('protocol-preview');
   };
 
-  // ====================================================================
-// === VÉGLEGES, JAVÍTOTT handleStartNew (az eredeti alapján) ===
-// ====================================================================
-const handleStartNew = () => {
-  console.log('🆕 Starting new protocol - clearing all data with page reload...');
-  
-  // 1. LÉPÉS: Töröljük az összes ismert localStorage kulcsot
-  localStorage.removeItem('otis-protocol-form-data');
-  localStorage.removeItem('protocol-errors');
-  localStorage.removeItem('questionnaire-current-page');
-  // Új Niedervolt kulcsok törlése is
-  localStorage.removeItem('niedervolt-table-measurements');
-  localStorage.removeItem('niedervolt-selected-devices');
-  localStorage.removeItem('niedervolt-custom-devices');
-  
-  // 2. LÉPÉS: Töröljük az összes ismert globális cache-t
-  if ((window as any).radioCache) {
-    console.log('Clearing radio cache...');
-    (window as any).radioCache.clear();
-  }
-  if ((window as any).trueFalseCache) {
-    console.log('Clearing true/false cache...');
-    (window as any).trueFalseCache.clear();
-  }
-  if ((window as any).stableInputValues) {
-    console.log('Clearing input values...');
-    (window as any).stableInputValues = {};
-  }
-  if ((window as any).measurementCache) {
-    console.log('Clearing measurement cache...');
-    (window as any).measurementCache.clear();
-  }
-  if ((window as any).calculatedCache) {
-    console.log('Clearing calculated values cache...');
-    (window as any).calculatedCache = {};
-  }
-  
-  // 3. LÉPÉS: Értesítjük a komponenseket (a biztonság kedvéért)
-  window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
-  
-  // 4. LÉPÉS: A "NUKLEÁRIS OPCIÓ" - Oldal újratöltése
-  // Ez a lépés garantálja, hogy minden komponens tiszta lappal indul.
-  setTimeout(() => {
-    window.location.reload();
-  }, 100); // Rövid késleltetés, hogy a törlési műveletek befejeződjenek.
-  
-  console.log('✅ All data cleared - page reload initiated.');
-};
-  // ====================================================================
+  const handleStartNew = useCallback(() => {
+    console.log('🆕 Starting new protocol - clearing all data...');
+    
+    // Clear all localStorage keys
+    const keysToRemove = [
+      'otis-protocol-form-data',
+      'protocol-errors',
+      'questionnaire-current-page',
+      'niedervolt-table-measurements',
+      'niedervolt-selected-devices',
+      'niedervolt-custom-devices',
+    ];
+    
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    // Clear global caches
+    if ((window as any).radioCache) (window as any).radioCache.clear();
+    if ((window as any).trueFalseCache) (window as any).trueFalseCache.clear();
+    if ((window as any).stableInputValues) (window as any).stableInputValues = {};
+    if ((window as any).measurementCache) (window as any).measurementCache.clear();
+    if ((window as any).calculatedCache) (window as any).calculatedCache = {};
+    
+    // Notify components
+    window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
+    
+    // Reset form data
+    setFormData({
+      receptionDate: new Date().toISOString().split('T')[0],
+      answers: {},
+      errors: [],
+      signature: '',
+      signatureName: '',
+      niedervoltMeasurements: [],
+      niedervoltTableMeasurements: {},
+    });
+    
+    // Trigger component remount
+    setClearTrigger(Date.now());
+    
+    // Reset navigation state
+    setCurrentScreen('start');
+    setCurrentQuestionnairePage(0);
+    setCurrentQuestionId('');
+    
+    console.log('✅ All data cleared - ready for new protocol');
+  }, [setFormData, setClearTrigger, setCurrentScreen, setCurrentQuestionnairePage, setCurrentQuestionId]);
 
-  const handleGoHome = () => {
-  setCurrentScreen('start');
-  setCurrentQuestionnairePage(0); // <-- EZ A HIÁNYZÓ SOR
-};
+  const handleGoHome = useCallback(() => {
+    setCurrentScreen('start');
+    setCurrentQuestionnairePage(0);
+  }, [setCurrentScreen, setCurrentQuestionnairePage]);
 
-  const handleSettings = () => {
+  const handleSettings = useCallback(() => {
     setCurrentScreen('admin');
-  };
+  }, [setCurrentScreen]);
 
-  const handleBackToSignature = () => {
+  const handleBackToSignature = useCallback(() => {
     setCurrentScreen('signature');
-  };
+  }, [setCurrentScreen]);
 
-  // Stable callbacks defined outside Router to prevent recreation
+  // Stable callbacks to prevent recreation
   const handleAnswerChange = useCallback((questionId: string, value: AnswerValue) => {
     setFormData(prev => ({
       ...prev,
       answers: { ...prev.answers, [questionId]: value }
     }));
-  }, []);
+  }, [setFormData]);
 
   const handleReceptionDateChange = useCallback((date: string) => {
     setFormData(prev => ({ ...prev, receptionDate: date }));
-  }, []);
+  }, [setFormData]);
 
   const handleErrorsChange = useCallback((errors: ProtocolError[]) => {
     setFormData(prev => ({ ...prev, errors }));
-  }, []);
+  }, [setFormData]);
 
-  const handleAdminAccess = useCallback(() => setCurrentScreen('admin'), []);
+  const handleAdminAccess = useCallback(() => setCurrentScreen('admin'), [setCurrentScreen]);
 
-  // Memoized measurement change handler to prevent re-renders
   const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
     setFormData(prev => ({ ...prev, niedervoltMeasurements: measurements }));
-  }, []);
+  }, [setFormData]);
 
-  // Conditional render without Wouter to prevent re-mounting
+  // Conditional render without router
   const renderCurrentScreen = () => {
-    console.log('🏠 Route component function called - currentScreen:', currentScreen);
+    console.log('🏠 Rendering screen:', currentScreen);
     
     switch (currentScreen) {
       case 'start':
         return <StartScreen onLanguageSelect={handleLanguageSelect} />;
+        
       case 'questionnaire':
         return (
           <Questionnaire
@@ -450,15 +384,16 @@ const handleStartNew = () => {
             onHome={handleGoHome}
             onStartNew={handleStartNew}
             onPageChange={setCurrentQuestionnairePage}
-            // formData={formData}
             onQuestionChange={setCurrentQuestionId}
             currentPage={currentQuestionnaireePage}
             currentQuestionId={currentQuestionId}
           />
         );
+        
       case 'erdungskontrolle':
         return (
           <Erdungskontrolle
+            key={`erdungskontrolle-${clearTrigger}`}
             formData={formData}
             setFormData={setFormData}
             onNext={() => setCurrentScreen('niedervolt')}
@@ -471,16 +406,15 @@ const handleStartNew = () => {
             onReceptionDateChange={handleReceptionDateChange}
           />
         );
+        
       case 'niedervolt':
         return (
           <NiedervoltTable
-            // ====================================================================
-            // === MÓDOSÍTÁS 3: A KEY PROP DINAMIKUSSÁ TÉTELE ===
-            // ====================================================================
             key={`niedervolt-table-${clearTrigger}`}
-            // ====================================================================
             measurements={formData.niedervoltTableMeasurements || {}}
-            onMeasurementsChange={(measurements) => setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))}
+            onMeasurementsChange={(measurements) => 
+              setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))
+            }
             onBack={handleNiedervoltBack}
             onNext={handleNiedervoltNext}
             receptionDate={formData.receptionDate}
@@ -492,9 +426,11 @@ const handleStartNew = () => {
             setFormData={setFormData}
           />
         );
+        
       case 'signature':
         return (
           <Signature
+            key={`signature-${clearTrigger}`}
             signature={formData.signature || ''}
             onSignatureChange={(signature) => setFormData(prev => ({ ...prev, signature }))}
             signatureName={formData.signatureName || ''}
@@ -503,6 +439,7 @@ const handleStartNew = () => {
             onComplete={handleSignatureComplete}
           />
         );
+        
       case 'completion':
         return (
           <Completion
@@ -524,28 +461,93 @@ const handleStartNew = () => {
             }}
           />
         );
+        
       case 'admin':
-        return <Admin 
-          onBack={() => setCurrentScreen('questionnaire')} 
-          onHome={() => setCurrentScreen('start')} 
-        />;
+        return (
+          <Admin 
+            onBack={() => setCurrentScreen('questionnaire')} 
+            onHome={() => setCurrentScreen('start')} 
+          />
+        );
+        
       case 'protocol-preview':
         return <ProtocolPreview onBack={() => setCurrentScreen('completion')} />;
+        
       default:
         return <StartScreen onLanguageSelect={handleLanguageSelect} />;
     }
   };
 
   return (
-  <QueryClientProvider client={queryClient}>
-    <LanguageProvider>
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         {renderCurrentScreen()}
       </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+// === APP KOMPONENS: ÁLLAPOTOK A LANGUAGEPROVIDER-EN KÍVÜL ===
+function App() {
+  // === ÁLLAPOTOK AZ APP SZINTJÉN - NEM RESETELŐDNEK NYELVVÁLTÁSKOR ===
+  const [currentScreen, setCurrentScreen] = useState<Screen>('start');
+  const [currentQuestionnaireePage, setCurrentQuestionnairePage] = useState(0);
+  const [currentQuestionId, setCurrentQuestionId] = useState<string>('');
+  const [clearTrigger, setClearTrigger] = useState(Date.now());
+  
+  const [formData, setFormData] = useState<FormData>({
+    receptionDate: new Date().toISOString().split('T')[0],
+    answers: {},
+    errors: [],
+    signature: '',
+    signatureName: '',
+    niedervoltMeasurements: [],
+    niedervoltTableMeasurements: {},
+  });
+
+  // Load saved form data on initialization
+  useEffect(() => {
+    const saved = localStorage.getItem('otis-protocol-form-data');
+    if (saved) {
+      try {
+        const parsedData = JSON.parse(saved);
+        // If no receptionDate is saved or it's empty, use today's date
+        if (!parsedData.receptionDate || parsedData.receptionDate === '') {
+          parsedData.receptionDate = new Date().toISOString().split('T')[0];
+        }
+        setFormData(parsedData);
+      } catch (e) {
+        console.error('Error loading saved form data:', e);
+      }
+    }
+  }, []);
+
+  // Auto-save formData to localStorage whenever it changes
+  useEffect(() => {
+    const saveTimer = setTimeout(() => {
+      localStorage.setItem('otis-protocol-form-data', JSON.stringify(formData));
+    }, 500); // Debounce 500ms
+
+    return () => clearTimeout(saveTimer);
+  }, [formData]);
+
+  return (
+    <LanguageProvider>
+      <AppContent
+        currentScreen={currentScreen}
+        setCurrentScreen={setCurrentScreen}
+        currentQuestionnaireePage={currentQuestionnaireePage}
+        setCurrentQuestionnairePage={setCurrentQuestionnairePage}
+        currentQuestionId={currentQuestionId}
+        setCurrentQuestionId={setCurrentQuestionId}
+        clearTrigger={clearTrigger}
+        setClearTrigger={setClearTrigger}
+        formData={formData}
+        setFormData={setFormData}
+      />
     </LanguageProvider>
-  </QueryClientProvider>
-);
+  );
 }
 
 export default App;

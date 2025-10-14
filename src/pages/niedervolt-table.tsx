@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguageContext } from '@/components/language-provider';
 import { useToast } from '@/hooks/use-toast';
@@ -416,60 +416,81 @@ export function NiedervoltTable({
           </div>
         </div>
       </main>
-      <Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl'}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-              {allDevices.map((device) => (
-                <div
-                  key={device.id}
-                  className={`p-3 border rounded cursor-pointer transition-all ${
-                    selectedDevices.has(device.id)
-                      ? 'bg-blue-100 border-blue-500'
-                      : 'hover:bg-gray-50'
-                  }`}
-                  onClick={() => toggleDeviceSelection(device.id)}
+
+      {/* === JAVÍTOTT DIALÓGUSABLAK KEZDETE === */}
+<Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
+  <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+    <DialogHeader>
+      <DialogTitle>{t.deviceSelection || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}</DialogTitle>
+    </DialogHeader>
+
+    {/* Eszközök listája és Hozzáadás rész (most már görgethető) */}
+    <div className="flex-grow overflow-y-auto pr-4 -mr-4 space-y-4">
+      
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        {allDevices.map((device) => (
+          <div
+            key={device.id}
+            className={`p-3 border rounded cursor-pointer transition-all ${
+              selectedDevices.has(device.id)
+                ? 'bg-blue-100 border-blue-500'
+                : 'hover:bg-gray-50'
+            }`}
+            onClick={() => toggleDeviceSelection(device.id)}
+          >
+            <div className="flex justify-between items-center">
+              <span>{getDeviceName(device)}</span>
+              {customDevices.some(d => d.id === device.id) && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => { e.stopPropagation(); removeCustomDevice(device.id); }}
                 >
-                  <div className="flex justify-between items-center">
-                    <span>{getDeviceName(device)}</span>
-                    {customDevices.some(d => d.id === device.id) && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => { e.stopPropagation(); removeCustomDevice(device.id); }}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="border-t pt-4 mt-4">
-              <h4 className="font-medium mb-2">{language === 'hu' ? 'Saját eszköz hozzáadása' : 'Eigenes Gerät hinzufügen'}</h4>
-              <div className="flex flex-col md:flex-row gap-2">
-                <Input
-                  placeholder="DE"
-                  value={newDeviceName.de}
-                  onChange={(e) => setNewDeviceName(prev => ({ ...prev, de: e.target.value }))}
-                />
-                <Input
-                  placeholder="HU"
-                  value={newDeviceName.hu}
-                  onChange={(e) => setNewDeviceName(prev => ({ ...prev, hu: e.target.value }))}
-                />
-                <Button onClick={addCustomDevice}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {language === 'hu' ? 'Hozzáadás' : 'Hinzufügen'}
+                  <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
-              </div>
+              )}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
+        ))}
+      </div>
+
+      <div className="border-t pt-4 mt-4 p-1">
+        <h4 className="font-medium mb-2">{language === 'hu' ? 'Saját eszköz hozzáadása' : 'Eigenes Gerät hinzufügen'}</h4>
+        <div className="flex flex-col md:flex-row gap-2">
+          <Input
+            placeholder="DE"
+            value={newDeviceName.de}
+            onChange={(e) => setNewDeviceName(prev => ({ ...prev, de: e.target.value }))}
+            className="flex-1"
+          />
+          <Input
+            placeholder="HU"
+            value={newDeviceName.hu}
+            onChange={(e) => setNewDeviceName(prev => ({ ...prev, hu: e.target.value }))}
+            className="flex-1"
+          />
+          <Button onClick={addCustomDevice} className="flex-shrink-0">
+            <Plus className="h-4 w-4 mr-2" />
+            {language === 'hu' ? 'Hozzáadás' : 'Hinzufügen'}
+          </Button>
+        </div>
+      </div>
+
+    </div> {/* <-- A GÖRGETHETŐ DIV VÉGE */}
+
+    {/* === A LÁBLÉC A HELYES HELYEN: A GÖRGETHETŐ DIV UTÁN, DE MÉG A DIALOGCONTENT-EN BELÜL === */}
+    <DialogFooter className="pt-4 flex-shrink-0">
+      <DialogClose asChild>
+        <Button type="button">
+          {t.ok || 'OK'}
+        </Button>
+      </DialogClose>
+    </DialogFooter>
+    
+  </DialogContent>
+</Dialog>
+{/* === JAVÍTOTT DIALÓGUSABLAK VÉGE === */}
+
     </div>
   );
 }

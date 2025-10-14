@@ -1,15 +1,19 @@
-import { useState, useEffect } from 'react';
+// src/hooks/use-language.ts
+
+import { useState, useEffect, useMemo } from 'react';
 import { translations, Translation } from '@/lib/translations';
 
 export function useLanguage() {
   const [language, setLanguage] = useState<'hu' | 'de'>('hu');
-  const [t, setT] = useState<Translation>(translations.hu);
-
-  useEffect(() => {
-    console.log('Language changed to:', language, 'Translations loaded:', translations[language]);
-    setT(translations[language]);
-    // Save to localStorage for persistence
+  
+  // === DERIVED STATE: A fordítások közvetlenül a language állapotból ===
+  // A useMemo biztosítja, hogy a fordítási objektum azonnal elérhető legyen
+  // a renderelési fázisban, nem kell várni egy következő render ciklusra.
+  const t = useMemo(() => {
+    console.log(`✅ Translations derived for language: ${language}`);
+    // A localStorage mentést is itt végezzük, csak akkor, ha a nyelv változik
     localStorage.setItem('otis-protocol-language', language);
+    return translations[language];
   }, [language]);
 
   // Load saved language on initialization and listen for storage changes
@@ -17,12 +21,12 @@ export function useLanguage() {
     const checkLanguage = () => {
       const saved = localStorage.getItem('otis-protocol-language') as 'hu' | 'de';
       if (saved && (saved === 'hu' || saved === 'de') && saved !== language) {
-        console.log('Loading/updating saved language:', saved, 'current:', language);
+        console.log('📥 Loading/updating saved language:', saved, 'current:', language);
         setLanguage(saved);
       }
     };
     
-    // Check immediately
+    // Check immediately on mount
     checkLanguage();
     
     // Check periodically to catch localStorage changes
@@ -33,7 +37,7 @@ export function useLanguage() {
       if (e.key === 'otis-protocol-language' && e.newValue) {
         const newLang = e.newValue as 'hu' | 'de';
         if (newLang === 'hu' || newLang === 'de') {
-          console.log('Storage event language change:', newLang);
+          console.log('🔄 Storage event language change:', newLang);
           setLanguage(newLang);
         }
       }
@@ -50,6 +54,6 @@ export function useLanguage() {
   return {
     language,
     setLanguage,
-    t,
+    t, // Most már azonnal elérhető a helyes fordítás
   };
 }

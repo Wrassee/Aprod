@@ -5,22 +5,21 @@ import { RotateCcw, Settings, Home } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { SmartHelpWizard } from "@/components/smart-help-wizard";
+import { useLanguageContext } from "@/components/language-provider";
 
 interface PageHeaderProps {
   title?: string;
   onHome?: () => void;
   onAdminAccess?: () => void;
   onStartNew?: () => void;
-  progressPercent?: number; // 0-100
-  language?: 'hu' | 'de';
+  progressPercent?: number;
   receptionDate?: string;
   onReceptionDateChange?: (date: string) => void;
   totalSteps?: number;
   currentStep?: number;
-  stepType?: 'questionnaire' | 'niedervolt';
-  progressText?: string; // Custom progress text (optional)
+  stepType?: "questionnaire" | "niedervolt";
+  progressText?: string;
   showProgress?: boolean;
-  // AI Segítő props
   currentPage?: number;
   formData?: any;
   currentQuestionId?: string;
@@ -28,34 +27,39 @@ interface PageHeaderProps {
 }
 
 const PageHeader: FC<PageHeaderProps> = ({
-  title = "OTIS APROD - Átvételi Protokoll",
+  title,
   onHome,
   onAdminAccess,
   onStartNew,
   progressPercent = 0,
-  language = 'hu',
   receptionDate,
   onReceptionDateChange,
   totalSteps,
   currentStep,
-  stepType = 'questionnaire',
+  stepType = "questionnaire",
   progressText,
   showProgress = true,
-  // AI Segítő props
   currentPage = 1,
   formData = {},
   currentQuestionId,
   errors = [],
 }) => {
-  // A komponens logikája (calculateUnifiedProgress, getProgressText) változatlan marad...
+  // === HASZNÁLJUK A NYELVI KONTEXTUST ===
+  const { language, t } = useLanguageContext();
+
+  // === DINAMIKUS CÍM ===
+  const displayTitle = title || t.title || "OTIS APROD - Protokoll";
+
+  // === EGYSÉGES PROGRESS KALKULÁCIÓ ===
   const calculateUnifiedProgress = (): number => {
     if (totalSteps && currentStep !== undefined) {
-      if (stepType === 'questionnaire') {
+      if (stepType === "questionnaire") {
         const questionnaireProgress = (currentStep / totalSteps) * 100;
         return Math.round(questionnaireProgress);
-      } else if (stepType === 'niedervolt') {
+      } else if (stepType === "niedervolt") {
         const baseProgress = ((totalSteps - 1) / totalSteps) * 100;
-        const niedervoltProgress = baseProgress + (progressPercent * (100 - baseProgress) / 100);
+        const niedervoltProgress =
+          baseProgress + (progressPercent * (100 - baseProgress)) / 100;
         return Math.round(niedervoltProgress);
       }
     }
@@ -64,46 +68,44 @@ const PageHeader: FC<PageHeaderProps> = ({
 
   const unifiedProgress = calculateUnifiedProgress();
 
+  // === PROGRESS SZÖVEG DINAMIKUS FORDÍTÁSSAL ===
   const getProgressText = (): string => {
-    if (progressText) {
-      return progressText;
-    }
+    if (progressText) return progressText;
     if (totalSteps && currentStep !== undefined) {
-      if (stepType === 'questionnaire') {
-        return language === 'hu' 
-          ? `Folyamat: ${currentStep + 1} / ${totalSteps}` 
-          : `Fortschritt: ${currentStep + 1} / ${totalSteps}`;
-      }
+      return language === "hu"
+        ? `Folyamat: ${currentStep + 1} / ${totalSteps}`
+        : `Fortschritt: ${currentStep + 1} / ${totalSteps}`;
     }
-    return language === 'hu' ? 'Folyamat' : 'Fortschritt';
+    return language === "hu" ? "Folyamat" : "Fortschritt";
   };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-10">
       <div className="max-w-7xl mx-auto px-6 py-4">
-        
-        {/* ===== FELSŐ SOR: HÁROMRÉSZES, KÖZÉPRE IGAZÍTOTT ELRENDEZÉS ===== */}
+        {/* ===== FELSŐ SOR ===== */}
         <div className="flex items-center justify-between mb-4 w-full">
 
           {/* ----- 1. BAL OLDAL ----- */}
-          <div className="flex-1 flex justify-start items-center space-x-2">
+          <div className="flex-1 flex justify-start items-center space-x-2 overflow-hidden">
             <img
               src="/otis-elevators-seeklogo_1753525178175.png"
               alt="OTIS Logo"
-              className="h-12 w-12"
+              className="h-12 w-12 flex-shrink-0"
             />
             {onHome && (
               <Home
-                className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600"
+                className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 flex-shrink-0"
                 onClick={onHome}
               />
             )}
-            <h1 className="text-xl font-semibold text-gray-800 whitespace-nowrap">{title}</h1>
+            <h1 className="text-[17px] font-semibold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
+                {displayTitle}
+                </h1>
           </div>
 
-          {/* ----- 2. KÖZÉPSŐ RÉSZ (AI GOMB) ----- */}
+          {/* ----- 2. KÖZÉPSŐ RÉSZ (AI SEGÉD) ----- */}
           <div className="flex-1 flex justify-center items-center">
-            <SmartHelpWizard 
+            <SmartHelpWizard
               currentPage={currentPage}
               formData={formData}
               currentQuestionId={currentQuestionId}
@@ -116,7 +118,10 @@ const PageHeader: FC<PageHeaderProps> = ({
             {receptionDate !== undefined && onReceptionDateChange && (
               <div className="flex items-center space-x-2">
                 <Label className="text-sm font-medium text-gray-600 whitespace-nowrap">
-                  {language === 'hu' ? 'Átvétel dátuma' : 'Übernahmedatum'}
+                  {t.receptionDate ||
+                    (language === "hu"
+                      ? "Átvétel dátuma"
+                      : "Übernahmedatum")}
                 </Label>
                 <Input
                   type="date"
@@ -133,7 +138,7 @@ const PageHeader: FC<PageHeaderProps> = ({
                 size="sm"
               >
                 <RotateCcw className="h-4 w-4" />
-                <span>Új protokoll</span>
+                <span>{t.startNew || "Új protokoll"}</span>
               </Button>
             )}
             {onAdminAccess && (
@@ -144,13 +149,17 @@ const PageHeader: FC<PageHeaderProps> = ({
             )}
           </div>
         </div>
-        
-        {/* ALSÓ SOR: PROGRESS BAR (VÁLTOZATLAN) */}
+
+        {/* ===== ALSÓ SOR: PROGRESS BAR ===== */}
         {showProgress && (
           <>
             <div className="flex items-center justify-between">
-              <span className="text-base font-medium text-blue-700">{getProgressText()}</span>
-              <span className="text-base font-medium text-blue-700">{unifiedProgress}%</span>
+              <span className="text-base font-medium text-blue-700">
+                {getProgressText()}
+              </span>
+              <span className="text-base font-medium text-blue-700">
+                {unifiedProgress}%
+              </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2.5 mt-1">
               <div

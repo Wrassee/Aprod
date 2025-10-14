@@ -103,16 +103,6 @@ const PageHeader: FC<PageHeaderProps> = ({
                 </h1>
           </div>
 
-          {/* ----- 2. KÖZÉPSŐ RÉSZ (AI SEGÉD) ----- */}
-          <div className="flex justify-center items-center">
-            <SmartHelpWizard
-              currentPage={currentPage}
-              formData={formData}
-              currentQuestionId={currentQuestionId}
-              errors={errors}
-            />
-          </div>
-
           {/* ----- 3. JOBB OLDAL ----- */}
           <div className="flex-1 flex justify-end items-center space-x-4">
             {receptionDate !== undefined && onReceptionDateChange && (

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { create, all } from 'mathjs';
 import { Question, AnswerValue, ProtocolError } from '@shared/schema';
 import { Button } from '@/components/ui/button';
+import { SmartHelpWizard } from '@/components/smart-help-wizard';
 import PageHeader from '@/components/PageHeader';
 import { IsolatedQuestion } from '@/components/isolated-question';
 import { TrueFalseGroup } from '@/components/true-false-group';
@@ -372,20 +373,32 @@ function Questionnaire({
         </div>
 
         <div className="flex justify-between items-center">
-          <Button
-            variant="outline"
-            onClick={handlePreviousPage}
-            disabled={pageFromApp === 0}
-            className="flex items-center"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {t.previous}
-          </Button>
-          
-          <div className="flex space-x-4">
-            <button
-              type="button"
-              onClick={handleSave}
+  {/* Bal oldali gomb (Vissza) */}
+  <Button
+    variant="outline"
+    onClick={handlePreviousPage}
+    disabled={pageFromApp === 0}
+    className="flex items-center"
+  >
+    <ArrowLeft className="h-4 w-4 mr-2" />
+    {t.previous}
+  </Button>
+
+  {/* ===== EZ AZ ÚJ, BEILLESZTETT RÉSZ ===== */}
+  {/* Középső gomb (AI) */}
+  <SmartHelpWizard
+    currentPage={pageFromApp + 1}
+    formData={localAnswers}
+    currentQuestionId={currentQuestionId}
+    errors={errors}
+  />
+  {/* ======================================= */}
+
+  {/* Jobb oldali gombok (Mentés, Tovább) */}
+  <div className="flex space-x-4">
+    <button
+      type="button"
+      onClick={handleSave}
               disabled={saveStatus === 'saving'}
               className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input h-10 px-4 py-2 ${
                 saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :

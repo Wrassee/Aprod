@@ -223,7 +223,7 @@ export function SmartHelpWizard({ currentPage, formData, currentQuestionId, erro
           className="bg-gradient-to-r from-blue-500 to-purple-600 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300"
         >
           <Brain className="h-4 w-4 mr-2" />
-          {language === 'hu' ? 'AI' : 'AI'}
+          {language === 'hu' ? 'AI Segítő' : 'AI Hilfe'}
           {suggestions.length > 0 && (
             <Badge variant="secondary" className="ml-2 bg-white text-blue-600">
               {suggestions.length}

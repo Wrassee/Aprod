@@ -1,6 +1,7 @@
-// server/services/grounding-pdf-service.ts - VÉGLEGES, JAVÍTOTT ÉKEZETKEZELÉS
+// server/services/grounding-pdf-service.ts - VÉGLEGES, FONTKIT REGISZTRÁCIÓVAL
 
-import { PDFDocument, PDFTextField } from 'pdf-lib'; // Fontos: a PDFTextField importálása
+import { PDFDocument, PDFTextField } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit'; // ✅ 1. FONTKIT IMPORTÁLÁSA
 import fs from 'fs';
 import path from 'path';
 import { groundingPdfMapping } from '../config/grounding-pdf-mapping.js';
@@ -8,29 +9,29 @@ import { GroundingAnswer, FormData } from '../../shared/types.js';
 
 export class GroundingPdfService {
   static async generateFilledPdf(formData: FormData): Promise<Buffer> {
-    console.log('--- FUT A VÉGLEGES, HELYES ÉKEZETKEZELŐ KÓD! v5 ---');
-    
     const templatePath = path.resolve(process.cwd(), 'public/templates/Erdungskontrolle.pdf');
     const pdfBytes = fs.readFileSync(templatePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
     
-    // ✅ 1. BETŰTÍPUS BEOLVASÁSA ÉS BEÁGYAZÁSA
+    // ✅ 2. FONTKIT REGISZTRÁLÁSA A DOKUMENTUMHOZ
+    pdfDoc.registerFontkit(fontkit);
+
+    // ✅ 3. BETŰTÍPUS BEOLVASÁSA ÉS BEÁGYAZÁSA
     const fontPath = path.resolve(process.cwd(), 'public/fonts/Roboto-Regular.ttf');
     const fontBytes = fs.readFileSync(fontPath);
     const robotoFont = await pdfDoc.embedFont(fontBytes);
 
     const form = pdfDoc.getForm();
 
-    // ✅ 2. AZ ÖSSZES SZÖVEGES MEZŐ BETŰTÍPUSÁNAK BEÁLLÍTÁSA EGYSZERRE
+    // Az összes szöveges mező betűtípusának beállítása
     const fields = form.getFields();
     fields.forEach(field => {
-      // Csak a szöveges mezőket módosítjuk
       if (field instanceof PDFTextField) {
         field.defaultUpdateAppearances(robotoFont);
       }
     });
 
-    // 3. Fejléc és kép mezők kitöltése
+    // Fejléc és kép mezők kitöltése
     for (const { appDataKey, pdfFieldName } of groundingPdfMapping.metadata) {
       const value = (formData as any)[appDataKey];
       if (value === undefined || value === '') continue;
@@ -42,7 +43,6 @@ export class GroundingPdfService {
         } catch (e) { console.warn(`⚠️ Hiba az aláíráskép beillesztésekor:`, e); }
       } else {
         try {
-          // ✅ Visszaállítva egy argumentumra! A betűtípust már fent beállítottuk.
           form.getTextField(pdfFieldName).setText(String(value));
         } catch { console.warn(`⚠️ Szöveges mező nem található: "${pdfFieldName}"`); }
       }

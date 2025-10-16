@@ -1,7 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SimpleSignatureCanvas } from '@/components/simple-signature-canvas';
-import { MegaStableInput } from '@/components/mega-stable-input';
 import { useLanguageContext } from '@/components/language-provider';
 import { formatDate } from '@/lib/utils';
 import { ArrowLeft, Check, Calendar } from 'lucide-react';
@@ -12,56 +11,48 @@ interface SignatureProps {
   signatureName: string;
   onSignatureNameChange: (name: string) => void;
   onBack: () => void;
-  onComplete: () => void;
+  onComplete: (finalSignerName: string) => void; // ✅ Most már paraméterrel
 }
 
 export function Signature({
   signature,
   onSignatureChange,
-  signatureName,
+  signatureName: initialSignatureName, // Kezdőérték a prop-ból
   onSignatureNameChange,
   onBack,
   onComplete,
 }: SignatureProps) {
   const { t, language } = useLanguageContext();
   const currentDate = formatDate(new Date(), language);
-  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // ✅ Egyszerű React state - controlled component minta
+  const [signerName, setSignerName] = useState(initialSignatureName || '');
 
-  const canComplete = true; // Allow completion with or without signature, printed name allowed independently
+  const canComplete = true; // Engedélyezzük a befejezést aláírással vagy anélkül
 
-  // Stable input handling - prevent cursor jumping
-  useEffect(() => {
-    const input = inputRef.current;
-    if (!input) return;
-
-    // Set initial value only if empty
-    if (!input.value) {
-      input.value = signatureName || '';
-    }
-
-    const handleInput = (e: Event) => {
-      const target = e.target as HTMLInputElement;
-      const newValue = target.value;
-      console.log(`Signature name typing: ${newValue}`);
-      
-      // Store globally without triggering React updates
-      (window as any).signatureNameValue = newValue;
-      
-      // Debounced update to prevent cursor jumping
-      clearTimeout((window as any).signatureNameTimeout);
-      (window as any).signatureNameTimeout = setTimeout(() => {
-        onSignatureNameChange(newValue);
-      }, 500);
-    };
-
-    // Only use input event to prevent focus loss
-    input.addEventListener('input', handleInput);
+  const handleComplete = () => {
+    console.log('🔘 Protocol completion button clicked');
     
-    return () => {
-      input.removeEventListener('input', handleInput);
-      clearTimeout((window as any).signatureNameTimeout);
+    // 1. Olvasd ki a jelenlegi adatokat a localStorage-ból
+    const currentData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
+    
+    // 2. Frissítsd az adatokat az aláíró nevével
+    const updatedData = { 
+      ...currentData, 
+      signerName: signerName.trim() // Trim whitespace
     };
-  }, []); // Only run once on mount
+
+    // 3. Mentsd vissza a frissített adatokat a localStorage-ba
+    localStorage.setItem('otis-protocol-form-data', JSON.stringify(updatedData));
+    console.log('💾 Signature name saved to localStorage:', signerName);
+
+    // 4. Frissítsük a globális állapotot is a parent komponensben
+    onSignatureNameChange(signerName.trim());
+    
+    // 5. Navigáljunk a következő oldalra
+    console.log('✅ Calling onComplete...');
+    onComplete(signerName);
+  };
 
   return (
     <div className="min-h-screen bg-light-surface">
@@ -75,7 +66,9 @@ export function Signature({
                 alt="OTIS Logo" 
                 className="h-12 w-12 mr-4"
               />
-              <h1 className="text-xl font-semibold text-gray-800">OTIS APROD - Átvételi Protokoll</h1>
+              <h1 className="text-xl font-semibold text-gray-800">
+                OTIS APROD - Átvételi Protokoll
+              </h1>
             </div>
           </div>
         </div>
@@ -96,18 +89,23 @@ export function Signature({
             />
           </div>
           
-          {/* Optional Name Input */}
+          {/* Aláíró neve input - CONTROLLED COMPONENT */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {t.printedName}:
             </label>
             <div className="relative">
               <input
-                ref={inputRef}
                 type="text"
                 placeholder={t.printedName}
                 className="w-full h-12 px-4 text-lg border-2 border-gray-300 rounded-lg focus:border-otis-blue focus:outline-none bg-white"
                 autoComplete="off"
+                value={signerName} // ✅ Controlled: az input értéke mindig a state-ből jön
+                onChange={(e) => {
+                  const newValue = e.target.value;
+                  console.log('📝 Signature name typing:', newValue);
+                  setSignerName(newValue); // ✅ State frissítése minden gépeléskor
+                }}
                 style={{ 
                   fontSize: '18px',
                   minHeight: '48px'
@@ -119,8 +117,8 @@ export function Signature({
           {/* Date Stamp */}
           <div className="flex items-center text-sm text-gray-600 mb-8">
             <Calendar className="h-4 w-4 mr-2" />
-            <span>{t.signatureDate}</span>
-            <span className="font-medium">{currentDate}</span>
+            <span>{t.signatureDate}: </span>
+            <span className="font-medium ml-1">{currentDate}</span>
           </div>
           
           {/* Navigation */}
@@ -129,7 +127,7 @@ export function Signature({
               className="flex items-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 transition-colors"
               type="button"
               onClick={() => {
-                console.log('🔙 Signature Back button clicked - direct call');
+                console.log('🔙 Signature Back button clicked');
                 onBack();
               }}
             >
@@ -138,26 +136,7 @@ export function Signature({
             </button>
             
             <Button
-              onClick={(e) => {
-                console.log('🔘 Protocol completion button clicked');
-                
-                // Prevent default behavior and stop propagation
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Sync signature name from global storage before completing
-                const signatureName = (window as any).signatureNameValue || '';
-                if (signatureName) {
-                  console.log('📝 Syncing signature name:', signatureName);
-                  onSignatureNameChange(signatureName);
-                }
-                
-                // Small delay to ensure state updates
-                setTimeout(() => {
-                  console.log('⏰ Calling onComplete after sync delay');
-                  onComplete();
-                }, 100);
-              }}
+              onClick={handleComplete}
               disabled={!canComplete}
               className="bg-otis-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white flex items-center px-8"
             >

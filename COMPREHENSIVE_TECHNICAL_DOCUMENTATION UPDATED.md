@@ -1,15 +1,15 @@
 # 🗃️ OTIS APROD - TELJES TECHNIKAI DOKUMENTÁCIÓ
 
 ## 📖 **TARTALOMJEGYZÉK**
-1. [Alkalmazás Áttekintés](#alkalmazás-áttekintés)
-2. [Architektúra és Technológiai Stack](#architektúra-és-technológiai-stack)
-3. [Adatbázis Séma és Adatmodell](#adatbázis-séma-és-adatmodell)
-4. [Backend API és Szolgáltatások](#backend-api-és-szolgáltatások)
-5. [Frontend Komponensek és Oldalak](#frontend-komponensek-és-oldalak)
-6. [Fájl Struktúra és Szervezés](#fájl-struktúra-és-szervezés)
-7. [Speciális Funkciók és Modulok](#speciális-funkciók-és-modulok)
-8. [Deployment és Környezetek](#deployment-és-környezetek)
-9. [Fejlesztési Útmutató](#fejlesztési-útmutató)
+1.  [Alkalmazás Áttekintés](#alkalmazás-áttekintés)
+2.  [Architektúra és Technológiai Stack](#architektúra-és-technológiai-stack)
+3.  [Adatbázis Séma és Adatmodell](#adatbázis-séma-és-adatmodell)
+4.  [Backend API és Szolgáltatások](#backend-api-és-szolgáltatások)
+5.  [Frontend Komponensek és Oldalak](#frontend-komponensek-és-oldalak)
+6.  [Fájl Struktúra és Szervezés](#fájl-struktúra-és-szervezés)
+7.  [Speciális Funkciók és Modulok](#speciális-funkciók-és-modulok)
+8.  [Deployment és Környezetek](#deployment-és-környezetek)
+9.  [Fejlesztési Útmutató](#fejlesztési-útmutató)
 10. [API Referencia](#api-referencia)
 
 ---
@@ -212,10 +212,17 @@ GET /api/protocols/:id/download-pdf
 // Excel letöltés
 GET /api/protocols/:id/download-excel
 
-// Erdungskontrolle PDF
+// Erdungskontrolle PDF (Refaktorált)
 POST /api/protocols/download-grounding-pdf
-Body: { answers: object, receptionDate: string }
-```
+// Body (Content-Type: multipart/form-data):
+// - groundingCheckAnswers: JSON string
+// - liftId: string
+// - agency: string
+// - technicianName: string
+// - address: string
+// - receptionDate: string
+// - visum: string (az aláíró begépelt neve)
+// - signature: string (a rajzolt aláírás Base64 kódolt képe)
 
 #### **4. Niedervolt API (`/api/niedervolt`)**
 ```typescript
@@ -328,6 +335,60 @@ async function executeWithFilenameStrategies<T>(
 3. **UTF-8 Decode:** UTF-8 dekódolási kísérletek
 4. **ASCII Cleanup:** ASCII karakterekre szűkítés
 5. **Safe Fallback:** Biztonságos fallback karakterek
+
+#### **6. `grounding-pdf-service.ts` - Földelési PDF Generálás (2024+ ÚJ)**
+```typescript
+class GroundingPdfService {
+  // PDF formanyomtatvány kitöltése adatok alapján
+  static async generateFilledPdf(formData: FormData): Promise<Buffer>
+}
+
+PDF Kitöltési Folyamat:
+
+Sablon Betöltés: A public/templates/Erdungskontrolle.pdf formanyomtatvány beolvasása.
+
+Adat Mapping: A server/config/grounding-pdf-mapping.ts konfigurációs fájl alapján a bejövő adatok (pl. liftId, receptionDate) hozzárendelése a PDF űrlapmezőihez.
+
+Kép Beágyazás: A Base64 formátumú, rajzolt aláírás (signature) képként való beágyazása a PDF erre kijelölt képmezőjébe (PDFButton). A pdf-lib könyvtárat használja a képkezeléshez.
+
+Kilapítás (Flattening): A form.flatten() paranccsal az összes interaktív űrlapmező (szövegdobozok, képmező) véglegesen a dokumentum részévé válik. Ez biztosítja, hogy a letöltött PDF már nem szerkeszthető.
+
+PDF Buffer Visszaadása: A kész, kitöltött és lezárt PDF fájl bufferként való visszaadása.
+
+
+
+### ## 2. Módosítás: `SPECIÁLIS FUNKCIÓK ÉS MODULOK` szekció
+
+Itt teljesen lecseréljük az `Erdungskontrolle` modul leírását, hogy az új, PDF-alapú működést tükrözze.
+
+#### **3. Erdungskontrolle (Grounding Control) Module (Frissített)**
+
+A modul a refaktorálás során jelentősen átalakult. A korábbi Excel-alapú generálás helyett most már közvetlenül egy **PDF formanyomtatványt** tölt ki a `pdf-lib` könyvtár segítségével, ami gyorsabb és megbízhatóbb működést eredményez.
+
+**JSON-Based Question System (Változatlan)**
+```typescript
+// questions_grounding_hu.json struktúra:
+{
+  "groups": [
+    {
+      "id": "maschinenraum",
+      "title": "1. Ellenőrzés a gépházban",
+      "questions": [
+        { "id": "grd_mr_ref", "text": "Referencia földelés megléte" },
+        // ...
+      ]
+    }
+  ]
+}
+
+
+PDF Form Filling & Signature Embedding (Új)
+
+Közvetlen Kitöltés: A backend a grounding-pdf-service segítségével közvetlenül írja be a válaszokat és a fejlécadatokat a Erdungskontrolle.pdf sablonba.
+
+Kép Beágyazás: A signature.tsx oldalon rajzolt, Base64 formátumú aláírás képként kerül beágyazásra a PDF erre kijelölt képmezőjébe (signature).
+
+Véglegesítés: A generált PDF "kilapításra" kerül (flatten), így a letöltött dokumentum már nem szerkeszthető, garantálva az adatok integritását.
 
 ---
 
@@ -1159,9 +1220,12 @@ otis-templates/
 - [ ] FI measurement validation
 
 # 4. PDF Generation
-- [ ] Excel template population
-- [ ] LibreOffice conversion
-- [ ] File download
+- [ ] Excel template population (fő protokoll)
+- [ ] LibreOffice conversion (fő protokoll)
+- [ ] File download (Excel és PDF)
+- [X] Grounding PDF form filling (ÚJ, TESZTELVE)
+- [X] Grounding PDF signature image embedding (ÚJ, TESZTELVE)
+- [X] Grounding PDF flattening (nem szerkeszthető) (ÚJ, TESZTELVE)
 
 # 5. Multi-language
 - [ ] Hungarian/German language switching

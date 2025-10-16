@@ -66,7 +66,7 @@ function AppContent({
   }, [formData]);
 
   const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
-    console.log('🌍 App.tsx - Language selected:', selectedLanguage);
+    console.log('🌐 App.tsx - Language selected:', selectedLanguage);
     // === NYELV BEÁLLÍTÁSA A CONTEXTEN KERESZTÜL ===
     setLanguage(selectedLanguage);
     localStorage.setItem('otis-protocol-language', selectedLanguage);
@@ -104,8 +104,11 @@ function AppContent({
     setCurrentScreen('niedervolt');
   };
 
-  const handleSignatureComplete = async () => {
-    console.log('📄 Starting protocol completion process...');
+  // ============================================================================
+  // === JAVÍTOTT handleSignatureComplete - FOGADJA A FINAL SIGNER NAME-ET ===
+  // ============================================================================
+  const handleSignatureComplete = async (finalSignerName: string) => { 
+  console.log('📄 App.tsx: Starting protocol completion process with final name:', finalSignerName);
     
     // Prevent multiple clicks
     const currentTime = Date.now();
@@ -116,17 +119,32 @@ function AppContent({
     (window as any).lastCompleteAttempt = currentTime;
     
     try {
-      // Ensure we have a valid receptionDate
+      // 1. VÉGLEGES, GARANTÁLTAN FRISS ADATOBJEKTUM
       const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
       
+      const finalFormData = { 
+    ...formData, 
+    signerName: finalSignerName.trim(), // Használjuk a kapott, garantáltan friss nevet
+    completed: true,
+  };
+
+      // 2. FRISSÍTSD A REACT ÁLLAPOTOT
+      setFormData(finalFormData);
+
+      // 3. AZONNAL MENTSD EL A VÉGLEGES ADATOT A LOCALSTORAGE-BE
+      // Ez felülír minden háttérben futó időzített mentést!
+      localStorage.setItem('otis-protocol-form-data', JSON.stringify(finalFormData));
+      console.log('💾 App.tsx: GUARANTEED FINAL data saved to localStorage with signerName:', finalSignerName);
+      
+      // 4. A VÉGLEGES ADATTAL KÜLDD EL A BACKEND-NEK
       const protocolData = {
         receptionDate,
         reception_date: receptionDate,
         language,
-        answers: formData.answers,
-        errors: formData.errors || [],
-        signature: formData.signature || '',
-        signatureName: formData.signatureName || '',
+        answers: finalFormData.answers,
+        errors: finalFormData.errors || [],
+        signature: finalFormData.signature || '',
+        signatureName: finalFormData.signerName, // ✅ Garantáltan friss
         completed: true,
       };
       
@@ -135,6 +153,7 @@ function AppContent({
         errorCount: protocolData.errors.length,
         hasSignature: Boolean(protocolData.signature),
         hasSignatureName: Boolean(protocolData.signatureName),
+        signerName: protocolData.signatureName,
         receptionDate: protocolData.receptionDate,
         language: protocolData.language
       });
@@ -151,13 +170,6 @@ function AppContent({
       if (response.ok) {
         const result = await response.json();
         console.log('✅ Protocol saved successfully:', result.id);
-        
-        // Save the final form data to localStorage before navigating
-        const finalFormData = {
-          ...formData,
-          completed: true
-        };
-        localStorage.setItem('otis-protocol-form-data', JSON.stringify(finalFormData));
         
         setCurrentScreen('completion');
         console.log('🎉 Protocol completion successful - navigating to completion screen');
@@ -436,7 +448,7 @@ function AppContent({
             signatureName={formData.signatureName || ''}
             onSignatureNameChange={(signatureName) => setFormData(prev => ({ ...prev, signatureName }))}
             onBack={handleSignatureBack}
-            onComplete={handleSignatureComplete}
+            onComplete={handleSignatureComplete} // ✅ Most már fogadja a finalSignerName-et
           />
         );
         
@@ -459,6 +471,7 @@ function AppContent({
               inspectorName: formData.answers['4'] as string || '',
               inspectionDate: formData.receptionDate
             }}
+            language={language}
           />
         );
         

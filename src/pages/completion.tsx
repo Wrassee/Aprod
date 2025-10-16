@@ -1,5 +1,5 @@
 import PageHeader from '@/components/PageHeader';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguageContext } from '@/components/language-provider';
 import { ErrorExport } from '@/components/error-export';
@@ -118,78 +118,121 @@ export function Completion({
     }
   };
 
-  const handleDownloadGroundingPDF = async () => {
+  const handleDownloadGroundingPDF = useCallback(async () => {
     setIsGroundingPdfDownloading(true);
     try {
       console.log('Starting grounding PDF download from completion page...');
 
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.groundingCheckAnswers) {
-        throw new Error('No grounding data found in localStorage to generate PDF.');
+        throw new Error('Nincsenek földelési adatok a PDF generálásához.');
       }
+      
+      // === VÉGLEGES PAYLOAD ÖSSZEÁLLÍTÁSA A PONTOS SPECIFIKÁCIÓ ALAPJÁN ===
 
+      // 1. Címadatok kinyerése és összefűzése (3, 4, 5, 6 kérdések)
+      const plz = savedData.answers?.['3'] || '';          // Irányítószám
+      const city = savedData.answers?.['4'] || '';         // Város
+      const street = savedData.answers?.['5'] || '';       // Utca
+      const houseNumber = savedData.answers?.['6'] || '';  // Házszám
+      
+      // Üres részeket kiszűrve, szóközzel elválasztva fűzzük össze
+      const fullAddress = [plz, city, street, houseNumber]
+        .filter(Boolean)
+        .join(' ');
+
+      // 2. A teljes payload objektum létrehozása
+      const payload = {
+        // Földelési válaszok
+        groundingCheckAnswers: savedData.groundingCheckAnswers,
+
+        // Adatok a pontos kérdés ID-k alapján:
+        liftId: savedData.answers?.['7'] || '',         // Lift-azonosító (7. kérdés)
+        agency: savedData.answers?.['9'] || '',         // Agentur (9. kérdés)
+        technicianName: savedData.answers?.['2'] || '', // Technikus neve (2. kérdés)
+        address: fullAddress,                           // Összefűzött cím (3+4+5+6)
+
+        // Nem kérdésből származó adatok
+        receptionDate: savedData.receptionDate || '',   // Dátum a date pickerből
+        visum: savedData.signerName || '',              // Aláíró neve a SignatureCanvas-ból
+      };
+
+      console.log('Sending payload to backend:', payload);
+
+      // 3. FormData objektum létrehozása (a backend ezt várja!)
+      const formData = new FormData();
+      
+      // A payload adatainak hozzáadása kulcs-érték páronként
+      formData.append('groundingCheckAnswers', JSON.stringify(payload.groundingCheckAnswers));
+      formData.append('liftId', payload.liftId);
+      formData.append('agency', payload.agency);
+      formData.append('technicianName', payload.technicianName);
+      formData.append('address', payload.address);
+      formData.append('receptionDate', payload.receptionDate);
+      formData.append('visum', payload.visum);
+      formData.append('signature', savedData.signature || '');
+
+      // 4. API hívás FormData objektummal (headers nélkül - automatikusan beállítódik)
       const response = await fetch('/api/protocols/download-grounding-pdf', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          formData: savedData,
-          language: language,
-        }),
+        body: formData,  // ✅ FormData, nem JSON.stringify!
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to generate grounding PDF on the server.');
+        throw new Error(errorData.message || 'A földelési PDF generálása sikertelen.');
       }
 
+      // 4. PDF letöltése
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.style.display = 'none';
       a.href = url;
-
-      const liftId = savedData.answers?.['7'] ? String(savedData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
-      a.download = `OTIS_Grounding_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
+      
+      const liftIdForFilename = payload.liftId.replace(/[^a-zA-Z0-9]/g, '_') || 'Unknown';
+      a.download = `OTIS_Grounding_Protocol_${liftIdForFilename}_${payload.receptionDate || new Date().toISOString().split('T')[0]}.pdf`;
 
       document.body.appendChild(a);
       a.click();
-
       window.URL.revokeObjectURL(url);
       a.remove();
-
+      
       console.log('Grounding PDF download initiated successfully.');
+      
       toast({
         title: language === 'hu' ? 'Sikeres letöltés' : 'Download erfolgreich',
-        description: language === 'hu' ? 'A földelési jegyzőkönyv sikeresen letöltve.' : 'Das Erdungsprotokoll wurde erfolgreich heruntergeladen.',
+        description: language === 'hu' 
+          ? 'A földelési jegyzőkönyv sikeresen letöltve.' 
+          : 'Das Erdungsprotokoll wurde erfolgreich heruntergeladen.',
         duration: 3000,
       });
+
     } catch (error) {
-      console.error('Error during grounding PDF download:', error);
+      console.error('Hiba a földelési PDF letöltése során:', error);
       toast({
         title: language === 'hu' ? 'Letöltési hiba' : 'Download Fehler',
-        description: language === 'hu' 
-          ? 'A földelési jegyzőkönyv letöltése sikertelen. Kérjük próbálja újra.' 
-          : 'Das Erdungsprotokoll konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.',
+        description: (error as Error).message || (language === 'hu'
+          ? 'A földelési jegyzőkönyv letöltése sikertelen. Kérjük próbálja újra.'
+          : 'Das Erdungsprotokoll konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.'),
         variant: 'destructive',
         duration: 5000,
       });
     } finally {
       setIsGroundingPdfDownloading(false);
     }
-  };
+  }, [language, toast]);
 
   return (
     <div className="min-h-screen bg-light-surface">
-      {/* Itt van az új, egységes fejléc, a progress bar nélkül */}
       <PageHeader
         onHome={onGoHome}
         onStartNew={onStartNew}
         onAdminAccess={onSettings}
         language={language}
-        showProgress={false} // <-- A LÉNYEGI VÁLTOZTATÁS
+        showProgress={false}
       />
 
-      {/* A main rész és a tartalma változatlan */}
       <main className="max-w-4xl mx-auto px-6 py-8">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
           <div className="mb-8">

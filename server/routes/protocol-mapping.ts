@@ -1,5 +1,6 @@
 // server/routes/protocol-mapping.ts
 import { Router } from 'express';
+import multer from 'multer'; // ✅ ÚJ: FormData feldolgozáshoz
 import { z } from 'zod';
 import { supabaseStorage } from '../services/supabase-storage.js';
 import { storage } from '../storage.js';
@@ -8,6 +9,7 @@ import { pdfService } from '../services/pdf-service.js';
 import { GroundingPdfService } from '../services/grounding-pdf-service.js';
 
 const router = Router();
+const upload = multer(); // ✅ Multer inicializálás FormData kezeléshez
 
 // PROTOKOLL LÉTREHOZÁSA
 router.post('/', async (req, res) => {
@@ -94,31 +96,62 @@ router.post('/download-pdf', async (req, res) => {
   }
 });
 
-// FÖLDELÉSI PDF LETÖLTÉS
-router.post('/download-grounding-pdf', async (req, res) => {
-  try {
-    const formData = req.body.formData;
+// =========================================================
+// === FÖLDELÉSI PDF LETÖLTÉS - TELJESEN ÁTDOLGOZOTT VERZIÓ ===
+// =========================================================
+router.post(
+  '/download-grounding-pdf',
+  upload.none(), // ✅ Multer middleware - FormData feldolgozás fájlok nélkül
+  async (req, res) => {
+    try {
+      console.log('⚡️ Received request to generate grounding PDF...');
 
-    if (!formData) {
-      return res.status(400).json({ message: "Hiányzó formData a kérésben." });
+      // Ellenőrizzük, hogy megérkezett-e a földelési válaszok
+      const groundingCheckAnswersString = req.body.groundingCheckAnswers;
+      if (!groundingCheckAnswersString) {
+        return res.status(400).json({ 
+          message: 'Hiányzó "groundingCheckAnswers" a kérésben.' 
+        });
+      }
+
+      // Összeállítjuk a service által várt objektumot a FormData mezőkből
+      const servicePayload = {
+  liftId: req.body.liftId || '',
+  agency: req.body.agency || '',
+  technicianName: req.body.technicianName || '',
+  address: req.body.address || '',
+  receptionDate: req.body.receptionDate || '',
+  visum: req.body.visum || '',
+  signature: req.body.signature || '', // ✅ EZ A HIÁNYZÓ SOR!
+  // A JSON stringet visszaalakítjuk objektummá
+  groundingCheckAnswers: JSON.parse(groundingCheckAnswersString),
+};
+      
+      // Meghívjuk a PDF-kezelő szolgáltatást
+      const pdfBuffer = await GroundingPdfService.generateFilledPdf(servicePayload);
+
+      // Fájlnév összeállítása
+      const safeFileName = servicePayload.liftId.replace(/[^a-zA-Z0-9]/g, '_') || 'jegyzokonyv';
+      const filename = `Erdungskontrolle_${safeFileName}_${servicePayload.receptionDate || new Date().toISOString().split('T')[0]}.pdf`;
+
+      // Visszaküldjük a generált PDF fájlt
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+      res.send(pdfBuffer);
+      
+      console.log('✅ Grounding PDF successfully generated and sent:', filename);
+
+    } catch (error) {
+      console.error('❌ Hiba a földelési PDF generálása közben:', error);
+      
+      // Részletes hibaüzenet fejlesztői módban
+      const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba';
+      res.status(500).json({ 
+        message: 'Szerverhiba a PDF generálása közben.',
+        error: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      });
     }
-
-    console.log('⚡️ Received request to generate grounding PDF...');
-    
-    // Meghívjuk a PDF-kezelő szolgáltatásunkat
-    const pdfBuffer = await GroundingPdfService.generateFilledPdf(formData);
-
-    // Visszaküldjük a generált PDF fájlt a böngészőnek
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="Erdungskontrolle_${formData.liftId || 'jegyzokonyv'}.pdf"`);
-    res.send(pdfBuffer);
-    
-    console.log('✅ Grounding PDF successfully generated and sent.');
-
-  } catch (error) {
-    console.error('❌ Hiba a földelési PDF generálása közben:', error);
-    res.status(500).json({ message: 'Szerverhiba a PDF generálása közben.' });
   }
-});
+);
 
 export { router as protocolMappingRoutes };

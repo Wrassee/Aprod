@@ -41,6 +41,8 @@ export const groundingPdfMapping: {
     { questionId: 'OK1/10', okFieldName: 'OK1/10', notOkFieldName: 'nicht OK1/10' },
     { questionId: 'OK1/11', okFieldName: 'OK1/11', notOkFieldName: 'nicht OK1/11' },
     { questionId: 'OK1/12', okFieldName: 'OK1/12', notOkFieldName: 'nicht OK1/12' },
+    { questionId: 'OK1/13', okFieldName: 'OK1/13', notOkFieldName: 'nicht OK1/13' },
+    { questionId: 'OK1/14', okFieldName: 'OK1/14', notOkFieldName: 'nicht OK1/14' },
 
     // 2. Kabinendach
     { questionId: 'OK2/1',  okFieldName: 'OK2/1',  notOkFieldName: 'nicht OK2/1' },
@@ -57,6 +59,7 @@ export const groundingPdfMapping: {
     { questionId: 'OK2/12', okFieldName: 'OK2/12', notOkFieldName: 'nicht OK2/12' },
     { questionId: 'OK2/13', okFieldName: 'OK2/13', notOkFieldName: 'nicht OK2/13' },
     { questionId: 'OK2/14', okFieldName: 'OK2/14', notOkFieldName: 'nicht OK2/14' },
+    { questionId: 'OK2/17', okFieldName: 'OK2/17', notOkFieldName: 'nicht OK2/17' },
 
     // 3. Schacht
     { questionId: 'OK3/1',  okFieldName: 'OK3/1',  notOkFieldName: 'nicht OK3/1' },
@@ -86,7 +89,8 @@ export const groundingPdfMapping: {
     { questionId: 'OK5/3', okFieldName: 'OK5/3', notOkFieldName: 'nicht OK5/3' },
     { questionId: 'OK5/4', okFieldName: 'OK5/4', notOkFieldName: 'nicht OK5/4' },
     { questionId: 'OK5/5', okFieldName: 'OK5/5', notOkFieldName: 'nicht OK5/5' },
-    { questionId: 'OK5/6', okFieldName: 'OK5/6', notOkFieldName: 'nicht OK5/6' }
+    { questionId: 'OK5/6', okFieldName: 'OK5/6', notOkFieldName: 'nicht OK5/6' },
+    { questionId: 'OK5/9', okFieldName: 'OK5/9', notOkFieldName: 'nicht OK5/9' }
   ],
 
   // Bemerkung/Punkt mezők

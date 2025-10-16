@@ -121,10 +121,16 @@ router.post(
   technicianName: req.body.technicianName || '',
   address: req.body.address || '',
   receptionDate: req.body.receptionDate || '',
+  signerName: req.body.visum || '', // A típusban valószínűleg signerName van
   visum: req.body.visum || '',
-  signature: req.body.signature || '', // ✅ EZ A HIÁNYZÓ SOR!
-  // A JSON stringet visszaalakítjuk objektummá
+  signature: req.body.signature || '',
   groundingCheckAnswers: JSON.parse(groundingCheckAnswersString),
+
+  // ✅ A TÍPUSHIBÁT MEGOLDÓ ÚJ SOROK:
+  answers: {}, // Kötelező, de ehhez a PDF-hez nem kell
+  errors: [],  // Kötelező, de ehhez a PDF-hez nem kell
+  niedervoltMeasurements: [], // Kötelező, de ehhez a PDF-hez nem kell
+  niedervoltTableMeasurements: {}, // Kötelező, de ehhez a PDF-hez nem kell
 };
       
       // Meghívjuk a PDF-kezelő szolgáltatást

@@ -157,6 +157,8 @@ export interface FormData {
 
   /** Grounding check answers - OK / NOT OK / Not Applicable */
   groundingCheckAnswers?: Record<string, GroundingAnswer>;
+
+  customGroundingTexts?: { [key: string]: string };
 }
 
 // ------------------------------------------------------------

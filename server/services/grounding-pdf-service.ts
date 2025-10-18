@@ -1,6 +1,7 @@
-// server/services/grounding-pdf-service.ts - VÉGLEGES, MÉRETEZÉSSEL JAVÍTOTT VERZIÓ
+// server/services/grounding-pdf-service.ts - VÉGLEGES, JAVÍTOTT ÉKEZETKEZELÉS
 
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFTextField } from 'pdf-lib'; // ✅ PDFTextField importálása
+import fontkit from '@pdf-lib/fontkit';
 import fs from 'fs';
 import path from 'path';
 import { groundingPdfMapping } from '../config/grounding-pdf-mapping.js';
@@ -8,17 +9,32 @@ import { GroundingAnswer, FormData } from '../../shared/types.js';
 
 export class GroundingPdfService {
   static async generateFilledPdf(formData: FormData): Promise<Buffer> {
-    const templatePath = path.resolve(
-      process.cwd(),
-      'public/templates/Erdungskontrolle.pdf'
-    );
+    console.log('--- FUT A VÉGLEGES, HELYES ÉKEZETKEZELŐ KÓD! v6 ---');
+    
+    const templatePath = path.resolve(process.cwd(), 'public/templates/Erdungskontrolle.pdf');
     const pdfBytes = fs.readFileSync(templatePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
+    
+    // ✅ 1. FONTKIT REGISZTRÁLÁSA A DOKUMENTUMHOZ
+    pdfDoc.registerFontkit(fontkit);
+
+    // ✅ 2. BETŰTÍPUS BEOLVASÁSA ÉS BEÁGYAZÁSA
+    const fontPath = path.resolve(process.cwd(), 'public/fonts/Roboto-Regular.ttf');
+    const fontBytes = fs.readFileSync(fontPath);
+    const robotoFont = await pdfDoc.embedFont(fontBytes);
+
     const form = pdfDoc.getForm();
 
-    // =================================================================
-    // === 1. JAVÍTOTT FEJLÉC ÉS KÉP KITÖLTÉS (EGYSÉGESÍTVE) ===
-    // =================================================================
+    // ✅ 3. AZ ÖSSZES SZÖVEGES MEZŐ BETŰTÍPUSÁNAK BEÁLLÍTÁSA EGYSZERRE
+    const fields = form.getFields();
+    fields.forEach(field => {
+      // Csak a szöveges mezőket módosítjuk
+      if (field instanceof PDFTextField) {
+        field.defaultUpdateAppearances(robotoFont);
+      }
+    });
+
+    // 4. Fejléc és kép mezők kitöltése
     for (const { appDataKey, pdfFieldName } of groundingPdfMapping.metadata) {
       const value = (formData as any)[appDataKey];
       if (value === undefined || value === '') continue;
@@ -33,19 +49,15 @@ export class GroundingPdfService {
           const imageField = form.getButton(pdfFieldName);
           const widgets = imageField.getWidgets();
           if (widgets.length > 0) {
-            const { width, height, x, y } = widgets[0].getRectangle();
+            const { width, height } = widgets[0].getRectangle();
             
             // 3. Arányos méretezés kiszámítása
             const scale = Math.min(width / pngImage.width, height / pngImage.height);
-            const scaledWidth = pngImage.width * scale;
-            const scaledHeight = pngImage.height * scale;
-
-            // 4. Kép beállítása a gomb ikonjaként, méretezés nélkül (az Acrobat kezeli)
-            // A trükk az, hogy a flatten() parancs előtt kell ezt megtenni.
+            
+            // 4. Kép beállítása a gomb ikonjaként
             imageField.setImage(pngImage);
             console.log(`✅ Signature image set for field: "${pdfFieldName}"`);
           }
-
         } catch (e) {
           console.warn(`⚠️ Hiba az aláíráskép beillesztésekor a(z) '${pdfFieldName}' mezőbe:`, e);
         }
@@ -53,6 +65,7 @@ export class GroundingPdfService {
       // A TÖBBI SZÖVEGES MEZŐ
       else {
         try {
+          // ✅ Visszaállítva egy argumentumra! A betűtípust már fent beállítottuk.
           form.getTextField(pdfFieldName).setText(String(value));
         } catch {
           console.warn(`⚠️ Szöveges mező nem található vagy nem kompatibilis: "${pdfFieldName}"`);
@@ -77,37 +90,42 @@ export class GroundingPdfService {
       }
     }
 
-    // 2. Hibás válaszok összegyűjtése (változatlan)
+    // 5. Hibás válaszok összegyűjtése
     const remarks: { punkt: string; bemerkung: string }[] = [];
     groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
       const answer = formData.groundingCheckAnswers?.[questionId];
       if (!answer) return;
       try {
-        if (answer === 'ok') form.getTextField(okFieldName).setText('X');
-        else if (answer === 'not_ok') {
+        if (answer === 'ok') {
+          form.getTextField(okFieldName).setText('X');
+        } else if (answer === 'not_ok') {
           form.getTextField(notOkFieldName).setText('X');
           const punkt = okFieldName.replace('OK', '');
           remarks.push({ punkt, bemerkung: `Hiba a ${punkt} pontnál.` });
         } else if (answer === 'not_applicable') {
           form.getTextField(okFieldName).setText('-');
         }
-      } catch (e) { console.warn(`⚠️ Hiba a(z) ${questionId} válasz beírásakor.`); }
+      } catch (e) { 
+        console.warn(`⚠️ Hiba a(z) ${questionId} válasz beírásakor.`);
+      }
     });
 
-    // 3. Bemerkung mezők kitöltése (változatlan)
+    // 6. Bemerkung mezők kitöltése
     groundingPdfMapping.remarks.forEach((row, index) => {
       if (remarks[index]) {
         try {
           form.getTextField(row.punktField).setText(remarks[index].punkt);
           form.getTextField(row.bemerkungField).setText(remarks[index].bemerkung);
-        } catch (e) { console.warn(`⚠️ Hiba a Bemerkung sor beírásakor.`); }
+        } catch (e) { 
+          console.warn(`⚠️ Hiba a Bemerkung sor beírásakor.`);
+        }
       }
     });
     
-    // 4. PDF Kilapítása (Ez "ráégeti" a képet a gombra a helyes méretben)
+    // 7. PDF Kilapítása (Ez "ráégeti" a képet a gombra a helyes méretben)
     form.flatten();
 
-    // 5. PDF Mentése
+    // 8. PDF Mentése
     const filledPdfBytes = await pdfDoc.save();
     return Buffer.from(filledPdfBytes);
   }

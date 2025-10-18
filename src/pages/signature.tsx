@@ -30,26 +30,23 @@ export function Signature({
 
   const canComplete = true; // Engedélyezzük a befejezést aláírással vagy anélkül
 
+  // === KÖZPONTI MENTŐ FÜGGVÉNY ===
+  const handleSave = () => {
+    // Csak akkor mentünk, ha tényleg van mit
+    if (signerName) {
+      console.log('💾 Saving signer name to localStorage:', signerName);
+      const currentData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
+      const updatedData = { ...currentData, signerName: signerName.trim() };
+      localStorage.setItem('otis-protocol-form-data', JSON.stringify(updatedData));
+      
+      // Frissítjük a szülő állapotát is, a konzisztencia kedvéért
+      onSignatureNameChange(signerName.trim());
+    }
+  };
+
   const handleComplete = () => {
     console.log('🔘 Protocol completion button clicked');
-    
-    // 1. Olvasd ki a jelenlegi adatokat a localStorage-ból
-    const currentData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
-    
-    // 2. Frissítsd az adatokat az aláíró nevével
-    const updatedData = { 
-      ...currentData, 
-      signerName: signerName.trim() // Trim whitespace
-    };
-
-    // 3. Mentsd vissza a frissített adatokat a localStorage-ba
-    localStorage.setItem('otis-protocol-form-data', JSON.stringify(updatedData));
-    console.log('💾 Signature name saved to localStorage:', signerName);
-
-    // 4. Frissítsük a globális állapotot is a parent komponensben
-    onSignatureNameChange(signerName.trim());
-    
-    // 5. Navigáljunk a következő oldalra
+    handleSave(); // ✅ Központi mentő függvényt hívjuk
     console.log('✅ Calling onComplete...');
     onComplete(signerName);
   };
@@ -104,8 +101,9 @@ export function Signature({
                 onChange={(e) => {
                   const newValue = e.target.value;
                   console.log('📝 Signature name typing:', newValue);
-                  setSignerName(newValue); // ✅ State frissítése minden gépeléskor
+                  setSignerName(newValue); // ✅ State frissítése minden gépelésnél
                 }}
+                onBlur={handleSave} // ✅ AUTOMATIKUS MENTÉS, ha a mező elveszti a fókuszt
                 style={{ 
                   fontSize: '18px',
                   minHeight: '48px'
@@ -128,6 +126,7 @@ export function Signature({
               type="button"
               onClick={() => {
                 console.log('🔙 Signature Back button clicked');
+                handleSave(); // ✅ MENTÉS NAVIGÁCIÓ ELŐTT
                 onBack();
               }}
             >

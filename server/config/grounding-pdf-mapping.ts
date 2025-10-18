@@ -22,8 +22,8 @@ export const groundingPdfMapping: {
     { appDataKey: 'agency', pdfFieldName: 'Agentur' },
     { appDataKey: 'receptionDate', pdfFieldName: 'Datum' },
     { appDataKey: 'address', pdfFieldName: 'Adresse der Anlage' },
-    { appDataKey: 'signature', pdfFieldName: 'signature' }
-    // { appDataKey: 'visum', pdfFieldName: 'Visum' } //
+    { appDataKey: 'signature', pdfFieldName: 'signature' },
+    { appDataKey: 'visum', pdfFieldName: 'Visum' }
   ],
 
   // A kérdések (Excel question_id → PDF OK/nicht OK mezők)

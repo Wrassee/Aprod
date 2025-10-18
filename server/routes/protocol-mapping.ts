@@ -131,7 +131,7 @@ router.post(
         visum: req.body.visum || '',
         signature: req.body.signature || '',
         groundingCheckAnswers: JSON.parse(groundingCheckAnswersString),
-        customTexts: customTexts, // ✅ ÚJ MEZŐ HOZZÁADVA
+        customGroundingTexts: customTexts,
 
         // ✅ A TÍPUSHIBÁT MEGOLDÓ ÚJ SOROK:
         answers: {}, // Kötelező, de ehhez a PDF-hez nem kell

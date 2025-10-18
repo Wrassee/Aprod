@@ -97,21 +97,21 @@ export class GroundingPdfService {
       try {
         const message = "A további hibákat keresd a közös hibalistában";
 
-        // Töröljük a 2. sor pontját
-        const punktRow2Field = form.getTextField('PunktRow2');
-        punktField.setText('');
-        punktField.updateAppearances(robotoFont);
+    // Töröljük a 2. sor pontját
+    const punktRow2Field = form.getTextField('PunktRow2');
+    punktRow2Field.setText(''); // ✅ JAVÍTVA
+    punktRow2Field.updateAppearances(robotoFont); // ✅ JAVÍTVA
 
-        // Beírjuk az üzenetet a 2. sor megjegyzésébe
-        const bemerkungRow2Field = form.getTextField('Bemerkung Row2');
-        bemerkungRow2Field.setText(message);
-        bemerkungRow2Field.updateAppearances(robotoFont);
+    // Beírjuk az üzenetet a 2. sor megjegyzésébe
+    const bemerkungRow2Field = form.getTextField('Bemerkung Row2');
+    bemerkungRow2Field.setText(message);
+    bemerkungRow2Field.updateAppearances(robotoFont);
 
-        console.log('📝 Too many errors, added overflow message to Bemerkung Row2.');
-      } catch (e) {
-        console.warn(`⚠️ Hiba a "további hibák" üzenet beírásakor:`, e);
-      }
-    }
+    console.log('📝 Too many errors, added overflow message to Bemerkung Row2.');
+  } catch (e) {
+    console.warn(`⚠️ Hiba a "további hibák" üzenet beírásakor:`, e);
+  }
+}
     
     form.flatten();
     const filledPdfBytes = await pdfDoc.save();

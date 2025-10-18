@@ -1,10 +1,12 @@
-// src/pages/erdungskontrolle.tsx (TELJES OPTIMALIZÁLT VERZIÓ)
+// src/pages/erdungskontrolle.tsx (TELJES OPTIMALIZÁLT VERZIÓ EGYÉNI SOROKKAL)
 
 import { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import PageHeader from '@/components/PageHeader';
 import { useLanguageContext } from '@/components/language-provider';
@@ -15,6 +17,8 @@ import { ProtocolError } from '../../shared/schema';
 interface GroundingQuestion {
   id: string;
   text: string;
+  isCustom?: boolean;
+  pdfTextFieldName?: string;
 }
 
 interface GroundingGroup {
@@ -153,6 +157,10 @@ export function Erdungskontrolle({
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle');
 
+  // ÚJ STATE-EK AZ EGYÉNI SOROKHOZ
+  const [activeCustomRows, setActiveCustomRows] = useState<{ [key: string]: boolean }>({});
+  const [customRowTexts, setCustomRowTexts] = useState<{ [key: string]: string }>({});
+
   // OPTIMALIZÁCIÓ: JSON cache a nyelvváltásnál
   const cacheRef = useRef<{ [lang: string]: GroundingData }>({});
 
@@ -183,15 +191,41 @@ export function Erdungskontrolle({
     loadGroundingQuestions();
   }, [language]);
 
+  // Egyéni sorok betöltése a formData-ból
+  useEffect(() => {
+    if (formData.customGroundingTexts) {
+      setCustomRowTexts(formData.customGroundingTexts);
+      // Aktiváljuk azokat a sorokat, amelyekhez van szöveg
+      const active: { [key: string]: boolean } = {};
+      Object.keys(formData.customGroundingTexts).forEach(key => {
+        // Keressük meg a megfelelő question ID-t
+        groundingData?.groups.forEach(group => {
+          group.questions.forEach(q => {
+            if (q.isCustom && q.pdfTextFieldName === key) {
+              active[q.id] = true;
+            }
+          });
+        });
+      });
+      setActiveCustomRows(active);
+    }
+  }, [formData.customGroundingTexts, groundingData]);
+
   const answers = formData.groundingCheckAnswers || {};
 
   // ===========================================================
   // === OPTIMALIZÁLT handleAnswerChange – O(1) hiba frissítés ===
   // ===========================================================
   const handleAnswerChange = useCallback(
-    (questionId: string, value: GroundingAnswer) => {
+    (questionId: string, value: GroundingAnswer | undefined) => {
       setFormData((currentFormData) => {
-        const newAnswers = { ...(currentFormData.groundingCheckAnswers || {}), [questionId]: value };
+        const newAnswers = { ...(currentFormData.groundingCheckAnswers || {}) };
+        
+        if (value === undefined) {
+          delete newAnswers[questionId];
+        } else {
+          newAnswers[questionId] = value;
+        }
         
         // Csak az adott kérdéshez tartozó hibát kezeljük
         let newErrors = [...(currentFormData.errors || [])].filter(
@@ -203,10 +237,15 @@ export function Erdungskontrolle({
           for (const group of groundingData.groups) {
             const question = group.questions.find((q) => q.id === questionId);
             if (question) {
+              // Egyéni sorok esetén a customRowTexts-ből vesszük a szöveget
+              const questionText = question.isCustom && question.pdfTextFieldName
+                ? customRowTexts[question.pdfTextFieldName] || question.text
+                : question.text;
+              
               newErrors.push({
                 id: `grounding_${questionId}`,
                 title: language === 'hu' ? 'Földelési hiba' : 'Erdungsfehler',
-                description: `${group.title}: ${question.text}`,
+                description: `${group.title}: ${questionText}`,
                 severity: 'medium' as const,
                 context: questionId,
                 images: [],
@@ -223,40 +262,61 @@ export function Erdungskontrolle({
         };
       });
     },
-    [setFormData, groundingData, language]
+    [setFormData, groundingData, language, customRowTexts]
   );
 
   // OPTIMALIZÁCIÓ: useMemo a számított értékekhez
-  const totalQuestions = useMemo(
-    () => groundingData?.groups.reduce((sum, group) => sum + group.questions.length, 0) || 0,
-    [groundingData]
-  );
+  const totalQuestions = useMemo(() => {
+    if (!groundingData) return 0;
+    return groundingData.groups.reduce((sum, group) => {
+      // Csak a nem egyéni vagy aktív egyéni sorokat számoljuk
+      return sum + group.questions.filter(q => 
+        !q.isCustom || activeCustomRows[q.id]
+      ).length;
+    }, 0);
+  }, [groundingData, activeCustomRows]);
 
-  const answeredQuestions = Object.keys(answers).length;
+  const answeredQuestions = useMemo(() => {
+    if (!groundingData) return 0;
+    let count = 0;
+    groundingData.groups.forEach(group => {
+      group.questions.forEach(q => {
+        // Csak akkor számítjuk, ha nem egyéni, vagy ha egyéni és aktív
+        if ((!q.isCustom || activeCustomRows[q.id]) && answers[q.id]) {
+          count++;
+        }
+      });
+    });
+    return count;
+  }, [groundingData, answers, activeCustomRows]);
   
   const progressPercent = useMemo(
     () => (totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0),
     [answeredQuestions, totalQuestions]
   );
 
-  const canProceed = useMemo(
-    () =>
-      groundingData
-        ? groundingData.groups.every((group) =>
-            group.questions.every((question) =>
-              Object.prototype.hasOwnProperty.call(answers, question.id)
-            )
-          ) && totalQuestions > 0
-        : false,
-    [groundingData, answers, totalQuestions]
-  );
+  const canProceed = useMemo(() => {
+    if (!groundingData) return false;
+    return groundingData.groups.every((group) =>
+      group.questions.every((question) => {
+        // Ha egyéni sor és nem aktív, nem kötelező
+        if (question.isCustom && !activeCustomRows[question.id]) return true;
+        // Minden más esetben kötelező válasz
+        return Object.prototype.hasOwnProperty.call(answers, question.id);
+      })
+    ) && totalQuestions > 0;
+  }, [groundingData, answers, activeCustomRows, totalQuestions]);
 
   // OPTIMALIZÁCIÓ: Async mentés requestIdleCallback-kel
   const handleManualSave = useCallback(() => {
     setSaveStatus('saving');
     setTimeout(() => {
       const saveData = () => {
-        localStorage.setItem('otis-protocol-form-data', JSON.stringify(formData));
+        const dataToSave = {
+          ...formData,
+          customGroundingTexts: customRowTexts
+        };
+        localStorage.setItem('otis-protocol-form-data', JSON.stringify(dataToSave));
         setSaveStatus('saved');
         setTimeout(() => setSaveStatus('idle'), 2000);
       };
@@ -268,7 +328,16 @@ export function Erdungskontrolle({
         setTimeout(saveData, 0);
       }
     }, 400);
-  }, [formData]);
+  }, [formData, customRowTexts]);
+
+  // Tovább gomb kezelése - egyéni szövegek mentése
+  const handleNextPage = useCallback(() => {
+    setFormData(currentFormData => ({
+      ...currentFormData,
+      customGroundingTexts: customRowTexts
+    }));
+    onNext();
+  }, [setFormData, customRowTexts, onNext]);
 
   if (loading) {
     return (
@@ -331,8 +400,8 @@ export function Erdungskontrolle({
                 <CardTitle className="text-lg">{group.title}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                {/* OPTIMALIZÁCIÓ: Memoizált komponensek használata */}
-                {group.questions.map((q) => (
+                {/* Normál kérdések renderelése */}
+                {group.questions.filter(q => !q.isCustom).map((q) => (
                   <GroundingQuestionItem
                     key={q.id}
                     question={q}
@@ -340,6 +409,51 @@ export function Erdungskontrolle({
                     language={language}
                     onChange={handleAnswerChange}
                   />
+                ))}
+
+                {/* --- EGYÉNI TÉTELEK KEZELÉSE --- */}
+                {group.questions.filter(q => q.isCustom).map(customQuestion => (
+                  <div key={customQuestion.id} className="border-t p-4 bg-gray-50">
+                    <div className="flex items-center justify-between mb-2">
+                      <Label htmlFor={`switch-${customQuestion.id}`} className="font-semibold text-gray-700">
+                        {language === 'hu' ? 'Egyéni tétel hozzáadása' : 'Benutzerdefinierter Artikel hinzufügen'}
+                      </Label>
+                      <Switch
+                        id={`switch-${customQuestion.id}`}
+                        checked={!!activeCustomRows[customQuestion.id]}
+                        onCheckedChange={(isChecked) => {
+                          setActiveCustomRows(prev => ({ ...prev, [customQuestion.id]: isChecked }));
+                          // Ha kikapcsoljuk, töröljük a választ is
+                          if (!isChecked) {
+                            handleAnswerChange(customQuestion.id, undefined);
+                          }
+                        }}
+                      />
+                    </div>
+
+                    {/* Feltételesen megjelenő input és válasz gombok */}
+                    {activeCustomRows[customQuestion.id] && customQuestion.pdfTextFieldName && (
+                      <div className="mt-4 space-y-3">
+                        <Input
+                          placeholder={language === 'hu' ? 'Mért eszköz leírása...' : 'Beschreibung des gemessenen Geräts...'}
+                          value={customRowTexts[customQuestion.pdfTextFieldName] || ''}
+                          onChange={(e) => {
+                            setCustomRowTexts(prev => ({ ...prev, [customQuestion.pdfTextFieldName!]: e.target.value }));
+                          }}
+                          className="border-gray-300"
+                        />
+                        <GroundingQuestionItem
+                          question={{ 
+                            id: customQuestion.id, 
+                            text: customRowTexts[customQuestion.pdfTextFieldName] || (language === 'hu' ? 'Egyéni tétel' : 'Benutzerdefiniert')
+                          }}
+                          currentAnswer={answers[customQuestion.id]}
+                          language={language}
+                          onChange={handleAnswerChange}
+                        />
+                      </div>
+                    )}
+                  </div>
                 ))}
               </CardContent>
             </Card>
@@ -380,7 +494,7 @@ export function Erdungskontrolle({
             </Button>
 
             <Button
-              onClick={onNext}
+              onClick={handleNextPage}
               disabled={!canProceed}
               className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
             >

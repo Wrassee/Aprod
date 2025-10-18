@@ -171,6 +171,7 @@ export function Completion({
       formData.append('receptionDate', payload.receptionDate);
       formData.append('visum', payload.visum);
       formData.append('signature', savedData.signature || '');
+      formData.append('customTexts', JSON.stringify(savedData.customGroundingTexts || '{}'));
 
       // 4. API hívás FormData objektummal (headers nélkül - automatikusan beállítódik)
       const response = await fetch('/api/protocols/download-grounding-pdf', {

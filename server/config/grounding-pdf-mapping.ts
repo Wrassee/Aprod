@@ -41,7 +41,8 @@ export const groundingPdfMapping: {
     { questionId: 'OK1/10', okFieldName: 'OK1/10', notOkFieldName: 'nicht OK1/10' },
     { questionId: 'OK1/11', okFieldName: 'OK1/11', notOkFieldName: 'nicht OK1/11' },
     { questionId: 'OK1/12', okFieldName: 'OK1/12', notOkFieldName: 'nicht OK1/12' },
-    { questionId: 'OK1/13', okFieldName: 'OK1/13', notOkFieldName: 'nicht OK1/13' },
+    // === EGYÉNI SOR BLOCK 1 ===
+    { questionId: 'OKRow13', okFieldName: 'OKRow13', notOkFieldName: 'nicht OKRow13' },
     { questionId: 'OK1/14', okFieldName: 'OK1/14', notOkFieldName: 'nicht OK1/14' },
 
     // 2. Kabinendach
@@ -59,6 +60,9 @@ export const groundingPdfMapping: {
     { questionId: 'OK2/12', okFieldName: 'OK2/12', notOkFieldName: 'nicht OK2/12' },
     { questionId: 'OK2/13', okFieldName: 'OK2/13', notOkFieldName: 'nicht OK2/13' },
     { questionId: 'OK2/14', okFieldName: 'OK2/14', notOkFieldName: 'nicht OK2/14' },
+    // === EGYÉNI SOROK BLOCK 2 ===
+    { questionId: 'OKRow15', okFieldName: 'OKRow15', notOkFieldName: 'nicht OKRow15' },
+    { questionId: 'OKRow16', okFieldName: 'OKRow16', notOkFieldName: 'nicht OKRow16' },
     { questionId: 'OK2/17', okFieldName: 'OK2/17', notOkFieldName: 'nicht OK2/17' },
 
     // 3. Schacht
@@ -71,6 +75,9 @@ export const groundingPdfMapping: {
     { questionId: 'OK3/7',  okFieldName: 'OK3/7',  notOkFieldName: 'nicht OK3/7' },
     { questionId: 'OK3/8',  okFieldName: 'OK3/8',  notOkFieldName: 'nicht OK3/8' },
     { questionId: 'OK3/9',  okFieldName: 'OK3/9',  notOkFieldName: 'nicht OK3/9' },
+    // === EGYÉNI SOROK BLOCK 3 ===
+    { questionId: 'OKRow10', okFieldName: 'OKRow10', notOkFieldName: 'nicht OKRow10' },
+    { questionId: 'OKRow11', okFieldName: 'OKRow11', notOkFieldName: 'nicht OKRow11' },
     { questionId: 'OK3/12', okFieldName: 'OK3/12', notOkFieldName: 'nicht OK3/12' },
 
     // 4. Schachtgrube
@@ -81,6 +88,9 @@ export const groundingPdfMapping: {
     { questionId: 'OK4/5',  okFieldName: 'OK4/5',  notOkFieldName: 'nicht OK4/5' },
     { questionId: 'OK4/6',  okFieldName: 'OK4/6',  notOkFieldName: 'nicht OK4/6' },
     { questionId: 'OK4/7',  okFieldName: 'OK4/7',  notOkFieldName: 'nicht OK4/7' },
+    // === EGYÉNI SOROK BLOCK 4 ===
+    { questionId: 'OKRow8', okFieldName: 'OKRow8', notOkFieldName: 'nicht OKRow8' },
+    { questionId: 'OKRow9', okFieldName: 'OKRow9', notOkFieldName: 'nicht OKRow9' },
     { questionId: 'OK4/10', okFieldName: 'OK4/10', notOkFieldName: 'nicht OK4/10' },
 
     // 5. Kabine
@@ -90,6 +100,9 @@ export const groundingPdfMapping: {
     { questionId: 'OK5/4', okFieldName: 'OK5/4', notOkFieldName: 'nicht OK5/4' },
     { questionId: 'OK5/5', okFieldName: 'OK5/5', notOkFieldName: 'nicht OK5/5' },
     { questionId: 'OK5/6', okFieldName: 'OK5/6', notOkFieldName: 'nicht OK5/6' },
+    // === EGYÉNI SOROK BLOCK 5 ===
+    { questionId: 'OKRow5/7', okFieldName: 'OKRow5/7', notOkFieldName: 'nicht OKRow5/7' },
+    { questionId: 'OKRow5/8', okFieldName: 'OKRow5/8', notOkFieldName: 'nicht OKRow5/8' },
     { questionId: 'OK5/9', okFieldName: 'OK5/9', notOkFieldName: 'nicht OK5/9' }
   ],
 

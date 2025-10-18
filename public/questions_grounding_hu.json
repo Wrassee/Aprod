@@ -79,7 +79,10 @@
           "text": "Sebességhatároló"
         },
         {
-          "id": "OKRow13"
+          "id": "OKRow13",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row1/13"
         },
         {
           "id": "OK1/14",
@@ -148,10 +151,16 @@
           "text": "Fém kábelcsatornák"
         },
         {
-          "id": "OKRow15"
+          "id": "OKRow15",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row2/15"
         },
         {
-          "id": "OKRow16"
+          "id": "OKRow16",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row2/16"
         },
         {
           "id": "OK2/17",
@@ -200,10 +209,16 @@
           "text": "Kabin vezetősínei"
         },
         {
-          "id": "OKRow10"
+          "id": "OKRow10",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row3/10"
         },
         {
-          "id": "OKRow11"
+          "id": "OKRow11",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row3/11"
         },
         {
           "id": "OK3/12",
@@ -244,10 +259,16 @@
           "text": "Fém kábelcsatornák"
         },
         {
-          "id": "OKRow8"
+          "id": "OKRow8",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row4/8"
         },
         {
-          "id": "OKRow9"
+          "id": "OKRow9",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row4/9"
         },
         {
           "id": "OK4/10",
@@ -284,10 +305,16 @@
           "text": "Kabinküszöb"
         },
         {
-          "id": "OKRow5/7"
+          "id": "OKRow5/7",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row5/7"
         },
         {
-          "id": "OKRow5/8"
+          "id": "OKRow5/8",
+          "text": "Egyéni tétel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row5/8"
         },
         {
           "id": "OK5/9",

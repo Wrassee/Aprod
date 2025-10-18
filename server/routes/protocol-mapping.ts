@@ -114,24 +114,31 @@ router.post(
         });
       }
 
+      // === ÚJ: Egyéni szövegek fogadása ===
+      const customTextsString = req.body.customTexts;
+      const customTexts = customTextsString ? JSON.parse(customTextsString) : {};
+      
+      console.log('📝 Custom texts received:', Object.keys(customTexts).length, 'entries');
+
       // Összeállítjuk a service által várt objektumot a FormData mezőkből
       const servicePayload = {
-  liftId: req.body.liftId || '',
-  agency: req.body.agency || '',
-  technicianName: req.body.technicianName || '',
-  address: req.body.address || '',
-  receptionDate: req.body.receptionDate || '',
-  signerName: req.body.visum || '', // A típusban valószínűleg signerName van
-  visum: req.body.visum || '',
-  signature: req.body.signature || '',
-  groundingCheckAnswers: JSON.parse(groundingCheckAnswersString),
+        liftId: req.body.liftId || '',
+        agency: req.body.agency || '',
+        technicianName: req.body.technicianName || '',
+        address: req.body.address || '',
+        receptionDate: req.body.receptionDate || '',
+        signerName: req.body.visum || '', // A típusban valószínűleg signerName van
+        visum: req.body.visum || '',
+        signature: req.body.signature || '',
+        groundingCheckAnswers: JSON.parse(groundingCheckAnswersString),
+        customTexts: customTexts, // ✅ ÚJ MEZŐ HOZZÁADVA
 
-  // ✅ A TÍPUSHIBÁT MEGOLDÓ ÚJ SOROK:
-  answers: {}, // Kötelező, de ehhez a PDF-hez nem kell
-  errors: [],  // Kötelező, de ehhez a PDF-hez nem kell
-  niedervoltMeasurements: [], // Kötelező, de ehhez a PDF-hez nem kell
-  niedervoltTableMeasurements: {}, // Kötelező, de ehhez a PDF-hez nem kell
-};
+        // ✅ A TÍPUSHIBÁT MEGOLDÓ ÚJ SOROK:
+        answers: {}, // Kötelező, de ehhez a PDF-hez nem kell
+        errors: [],  // Kötelező, de ehhez a PDF-hez nem kell
+        niedervoltMeasurements: [], // Kötelező, de ehhez a PDF-hez nem kell
+        niedervoltTableMeasurements: {}, // Kötelező, de ehhez a PDF-hez nem kell
+      };
       
       // Meghívjuk a PDF-kezelő szolgáltatást
       const pdfBuffer = await GroundingPdfService.generateFilledPdf(servicePayload);

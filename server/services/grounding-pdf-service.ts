@@ -90,6 +90,28 @@ export class GroundingPdfService {
         } catch (e) { console.warn(`⚠️ Hiba a Bemerkung sor beírásakor.`)}
       }
     });
+    // =========================================================================
+    // === EZ AZ ÚJ BLOKK: TÚL SOK HIBA ESETÉN FELÜLÍRJA A 2. SORT ===
+    // =========================================================================
+    if (remarks.length > 2) {
+      try {
+        const message = "A további hibákat keresd a közös hibalistában";
+
+        // Töröljük a 2. sor pontját
+        const punktRow2Field = form.getTextField('PunktRow2');
+        punktField.setText('');
+        punktField.updateAppearances(robotoFont);
+
+        // Beírjuk az üzenetet a 2. sor megjegyzésébe
+        const bemerkungRow2Field = form.getTextField('Bemerkung Row2');
+        bemerkungRow2Field.setText(message);
+        bemerkungRow2Field.updateAppearances(robotoFont);
+
+        console.log('📝 Too many errors, added overflow message to Bemerkung Row2.');
+      } catch (e) {
+        console.warn(`⚠️ Hiba a "további hibák" üzenet beírásakor:`, e);
+      }
+    }
     
     form.flatten();
     const filledPdfBytes = await pdfDoc.save();

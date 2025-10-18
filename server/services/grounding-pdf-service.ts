@@ -21,14 +21,9 @@ export class GroundingPdfService {
 
     const form = pdfDoc.getForm();
 
-    const fields = form.getFields();
-    fields.forEach(field => {
-      if (field instanceof PDFTextField) {
-        field.defaultUpdateAppearances(robotoFont);
-      }
-    });
+    // A központi betűtípus-beállítást (forEach ciklus) kivettük, mert megbízhatatlan.
 
-    // Fejléc és kép mezők kitöltése
+    // 1. Fejléc és kép mezők kitöltése
     for (const { appDataKey, pdfFieldName } of groundingPdfMapping.metadata) {
       const value = (formData as any)[appDataKey];
       if (value === undefined || value === '') continue;
@@ -40,23 +35,29 @@ export class GroundingPdfService {
         } catch (e) { console.warn(`⚠️ Hiba az aláíráskép beillesztésekor:`, e); }
       } else {
         try {
-          form.getTextField(pdfFieldName).setText(String(value));
+          const field = form.getTextField(pdfFieldName);
+          field.setText(String(value));
+          // ✅ EZ A JAVÍTÁS: Azonnal frissítjük a kinézetet a helyes betűtípussal
+          field.updateAppearances(robotoFont); 
         } catch { console.warn(`⚠️ Szöveges mező nem található: "${pdfFieldName}"`); }
       }
     }
 
-    // Egyéni szövegek beírása
+    // 2. Egyéni szövegek beírása
     if (formData.customGroundingTexts) {
       for (const [pdfFieldName, textValue] of Object.entries(formData.customGroundingTexts)) {
         if (textValue && typeof textValue === 'string') {
           try {
-            form.getTextField(pdfFieldName).setText(textValue);
+            const field = form.getTextField(pdfFieldName);
+            field.setText(textValue);
+            // ✅ EZ A JAVÍTÁS ITT IS: Azonnal frissítjük a kinézetet
+            field.updateAppearances(robotoFont);
           } catch { console.warn(`⚠️ Egyéni szövegmező nem található: "${pdfFieldName}"`); }
         }
       }
     }
     
-    // Válaszok feldolgozása
+    // 3. Válaszok feldolgozása
     const remarks: { punkt: string; bemerkung: string }[] = [];
     if (formData.groundingCheckAnswers) {
       groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
@@ -75,12 +76,17 @@ export class GroundingPdfService {
       });
     }
 
-    // Bemerkung mezők kitöltése
+    // 4. Bemerkung mezők kitöltése
     groundingPdfMapping.remarks.forEach((row, index) => {
       if (remarks[index]) {
         try {
-          form.getTextField(row.punktField).setText(remarks[index].punkt);
-          form.getTextField(row.bemerkungField).setText(remarks[index].bemerkung);
+          const punktField = form.getTextField(row.punktField);
+          punktField.setText(remarks[index].punkt);
+          punktField.updateAppearances(robotoFont); // ✅ JAVÍTÁS ITT IS
+
+          const bemerkungField = form.getTextField(row.bemerkungField);
+          bemerkungField.setText(remarks[index].bemerkung);
+          bemerkungField.updateAppearances(robotoFont); // ✅ JAVÍTÁS ITT IS
         } catch (e) { console.warn(`⚠️ Hiba a Bemerkung sor beírásakor.`)}
       }
     });

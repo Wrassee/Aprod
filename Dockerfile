@@ -10,7 +10,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm ci
 
 COPY . .
-RUN echo "Forcing a clean rebuild with cache bust: $(date)" && npm run build
+RUN npm run build
 RUN npm prune --production
 
 

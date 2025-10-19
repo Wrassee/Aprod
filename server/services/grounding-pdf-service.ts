@@ -9,8 +9,6 @@ import { GroundingAnswer, FormData } from '../../shared/types.js';
 
 export class GroundingPdfService {
   static async generateFilledPdf(formData: FormData): Promise<Buffer> {
-    console.log('--- BUILD TESZT V7 - EZ A LEGFRISSEBB KÓD ---'); // <-- ADD HOZZÁ EZT A SORT!
-    console.log('--- FUT A VÉGLEGES, HELYES ÉKEZETKEZELŐ KÓD! v6 ---');
     console.log('--- FUT A VÉGLEGES, HELYES ÉKEZETKEZELŐ KÓD! v6 ---');
     
     const templatePath = path.resolve(process.cwd(), 'public/templates/Erdungskontrolle.pdf');
@@ -43,33 +41,38 @@ export class GroundingPdfService {
 
       // KÜLÖN LOGIKA AZ ALÁÍRÁS KÉPNEK
       if (appDataKey === 'signature' && typeof value === 'string' && value.startsWith('data:image/png;base64,')) {
-    try {
-        // 1. Kép beágyazása
-        const pngImage = await pdfDoc.embedPng(value);
-
-        // 2. Mező lekérése általános metódussal
-        const imageField = form.getField(pdfFieldName);
-
-        // 3. Típusellenőrzés, hogy a mező valóban gomb-e
-        if (imageField instanceof PDFButton) {
-            const widgets = imageField.getWidgets(); // ✅ Így már helyes!
+        try {
+          // 1. Kép beágyazása
+          const pngImage = await pdfDoc.embedPng(value);
+          
+          // 2. A célmező lekérdezése általánosabb getField-del
+          const imageField = form.getField(pdfFieldName);
+          
+          // 3. Típusellenőrzés, hogy biztosan gomb-e
+          if (imageField instanceof PDFButton) {
+            // ✅ BIZTONSÁGOS WIDGETS LEKÉRÉS - megkerüli a TypeScript típusproblémát
+            const widgets = (imageField as any).acroField?.getWidgets?.() || [];
+            
             if (widgets.length > 0) {
-                const { width, height } = widgets[0].getRectangle();
-                
-                // Arányos méretezés (opcionális, de hasznos)
-                const scale = Math.min(width / pngImage.width, height / pngImage.height);
-
-                // Kép beállítása
-                imageField.setImage(pngImage);
-                console.log(`✅ Signature image set for field: "${pdfFieldName}"`);
+              const rect = widgets[0].getRectangle?.() || [0, 0, pngImage.width, pngImage.height];
+              const [x1, y1, x2, y2] = rect;
+              const width = x2 - x1;
+              const height = y2 - y1;
+              
+              // 4. Arányos méretezés kiszámítása
+              const scale = Math.min(width / pngImage.width, height / pngImage.height);
+              
+              // 5. Kép beállítása a gomb ikonjaként
+              imageField.setImage(pngImage);
+              console.log(`✅ Signature image set for field: "${pdfFieldName}"`);
             }
-        } else {
-            console.warn(`⚠️ A(z) "${pdfFieldName}" mező nem gomb típusú, nem lehet képet beállítani.`);
+          } else {
+            console.warn(`⚠️ A(z) "${pdfFieldName}" mező nem gomb típusú.`);
+          }
+        } catch (e) {
+          console.warn(`⚠️ Hiba az aláíráskép beillesztésekor a(z) '${pdfFieldName}' mezőbe:`, e);
         }
-    } catch (e) {
-        console.warn(`⚠️ Hiba az aláíráskép beillesztésekor a(z) '${pdfFieldName}' mezőbe:`, e);
-    }
-}
+      } 
       // A TÖBBI SZÖVEGES MEZŐ
       else {
         try {

@@ -9,6 +9,8 @@ import { GroundingAnswer, FormData } from '../../shared/types.js';
 
 export class GroundingPdfService {
   static async generateFilledPdf(formData: FormData): Promise<Buffer> {
+    console.log('--- BUILD TESZT V7 - EZ A LEGFRISSEBB KÓD ---'); // <-- ADD HOZZÁ EZT A SORT!
+    console.log('--- FUT A VÉGLEGES, HELYES ÉKEZETKEZELŐ KÓD! v6 ---');
     console.log('--- FUT A VÉGLEGES, HELYES ÉKEZETKEZELŐ KÓD! v6 ---');
     
     const templatePath = path.resolve(process.cwd(), 'public/templates/Erdungskontrolle.pdf');

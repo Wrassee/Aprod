@@ -82,7 +82,7 @@ export class GroundingPdfService {
     // === EGYÉNI SZÖVEGEK BEÍRÁSA A PDF-BE ===
     if (formData.customGroundingTexts) {
       console.log('📝 Processing custom texts...');
-      for (const [pdfFieldName, textValue] of Object.entries(formData.customTexts)) {
+      for (const [pdfFieldName, textValue] of Object.entries(formData.customGroundingTexts)) {
         // Csak akkor írunk, ha van szöveg
         if (textValue && typeof textValue === 'string') {
           try {

@@ -1,6 +1,6 @@
 // server/services/grounding-pdf-service.ts - VÉGLEGES, JAVÍTOTT ÉKEZETKEZELÉS
 
-import { PDFDocument, PDFTextField } from 'pdf-lib'; // ✅ PDFTextField importálása
+import { PDFDocument, PDFTextField, PDFButton } from 'pdf-lib'; // ✅ PDFTextField és PDFButton importálása
 import fontkit from '@pdf-lib/fontkit';
 import fs from 'fs';
 import path from 'path';
@@ -41,27 +41,33 @@ export class GroundingPdfService {
 
       // KÜLÖN LOGIKA AZ ALÁÍRÁS KÉPNEK
       if (appDataKey === 'signature' && typeof value === 'string' && value.startsWith('data:image/png;base64,')) {
-        try {
-          // 1. Kép beágyazása
-          const pngImage = await pdfDoc.embedPng(value);
-          
-          // 2. A célmező (gomb) és annak méreteinek lekérdezése
-          const imageField = form.getButton(pdfFieldName);
-          const widgets = imageField.getWidgets();
-          if (widgets.length > 0) {
-            const { width, height } = widgets[0].getRectangle();
-            
-            // 3. Arányos méretezés kiszámítása
-            const scale = Math.min(width / pngImage.width, height / pngImage.height);
-            
-            // 4. Kép beállítása a gomb ikonjaként
-            imageField.setImage(pngImage);
-            console.log(`✅ Signature image set for field: "${pdfFieldName}"`);
-          }
-        } catch (e) {
-          console.warn(`⚠️ Hiba az aláíráskép beillesztésekor a(z) '${pdfFieldName}' mezőbe:`, e);
+    try {
+        // 1. Kép beágyazása
+        const pngImage = await pdfDoc.embedPng(value);
+
+        // 2. Mező lekérése általános metódussal
+        const imageField = form.getField(pdfFieldName);
+
+        // 3. Típusellenőrzés, hogy a mező valóban gomb-e
+        if (imageField instanceof PDFButton) {
+            const widgets = imageField.getWidgets(); // ✅ Így már helyes!
+            if (widgets.length > 0) {
+                const { width, height } = widgets[0].getRectangle();
+                
+                // Arányos méretezés (opcionális, de hasznos)
+                const scale = Math.min(width / pngImage.width, height / pngImage.height);
+
+                // Kép beállítása
+                imageField.setImage(pngImage);
+                console.log(`✅ Signature image set for field: "${pdfFieldName}"`);
+            }
+        } else {
+            console.warn(`⚠️ A(z) "${pdfFieldName}" mező nem gomb típusú, nem lehet képet beállítani.`);
         }
-      } 
+    } catch (e) {
+        console.warn(`⚠️ Hiba az aláíráskép beillesztésekor a(z) '${pdfFieldName}' mezőbe:`, e);
+    }
+}
       // A TÖBBI SZÖVEGES MEZŐ
       else {
         try {
@@ -74,7 +80,7 @@ export class GroundingPdfService {
     }
 
     // === EGYÉNI SZÖVEGEK BEÍRÁSA A PDF-BE ===
-    if (formData.customTexts) {
+    if (formData.customGroundingTexts) {
       console.log('📝 Processing custom texts...');
       for (const [pdfFieldName, textValue] of Object.entries(formData.customTexts)) {
         // Csak akkor írunk, ha van szöveg

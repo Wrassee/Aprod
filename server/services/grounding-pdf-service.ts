@@ -1,4 +1,4 @@
-// server/services/grounding-pdf-service.ts – VÉGLEGES, HELYES BETŰBEÁGYAZÁS (v9)
+// server/services/grounding-pdf-service.ts – VÉGLEGES, DEPLOY-BIZTOS VERZIÓ (v10)
 
 import { PDFDocument, PDFTextField, PDFButton } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
@@ -9,146 +9,118 @@ import { GroundingAnswer, FormData } from '../../shared/types.js';
 
 export class GroundingPdfService {
   static async generateFilledPdf(formData: FormData): Promise<Buffer> {
-    console.log('--- FUT A VÉGLEGES, HELYES ÉKEZETKEZELŐ KÓD! v9 ---');
+    console.log('--- FUT A DEPLOY-BIZTOS, VASTAG BETŰS VERZIÓ! v10 ---');
 
-    // 1️⃣ PDF sablon betöltése
+    // 1️⃣ PDF és betűtípusok előkészítése (Helyes sorrend)
     const templatePath = path.resolve(process.cwd(), 'public/templates/Erdungskontrolle.pdf');
     const pdfBytes = fs.readFileSync(templatePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
-
-    // 2️⃣ Fontkit regisztrálása
+    
     pdfDoc.registerFontkit(fontkit);
 
-    // 3️⃣ Betűtípusok beágyazása
     const regularFontPath = path.resolve(process.cwd(), 'public/fonts/Roboto-Regular.ttf');
     const boldFontPath = path.resolve(process.cwd(), 'public/fonts/Roboto-Bold.ttf');
-
     const regularFontBytes = fs.readFileSync(regularFontPath);
     const boldFontBytes = fs.readFileSync(boldFontPath);
-
     const robotoFont = await pdfDoc.embedFont(regularFontBytes);
     const robotoBold = await pdfDoc.embedFont(boldFontBytes);
-
+    
     const form = pdfDoc.getForm();
 
-    // 4️⃣ Alapadatok kitöltése
-    for (const { appDataKey, pdfFieldName } of groundingPdfMapping.metadata) {
-      const value = (formData as any)[appDataKey];
-      if (!value) continue;
-
-      if (appDataKey === 'signature' && typeof value === 'string' && value.startsWith('data:image/png;base64,')) {
-        try {
-          const pngImage = await pdfDoc.embedPng(value);
-          const imageField = form.getField(pdfFieldName);
-          if (imageField instanceof PDFButton) {
-            (imageField as any).setImage(pngImage);
-            console.log(`✅ Signature image set for field: "${pdfFieldName}"`);
-          }
-        } catch (e) {
-          console.warn(`⚠️ Hiba az aláíráskép beillesztésekor a(z) '${pdfFieldName}' mezőbe:`, e);
+    // 2️⃣ Alapadatok és egyéni szövegek kitöltése
+    // Összegyűjtjük az összes kitöltendő szöveges mezőt
+    const allTextFields: { [key: string]: string | undefined } = { ...formData.customGroundingTexts };
+    groundingPdfMapping.metadata.forEach(meta => {
+        if (meta.appDataKey !== 'signature' && (formData as any)[meta.appDataKey]) {
+            allTextFields[meta.pdfFieldName] = (formData as any)[meta.appDataKey];
         }
-      } else {
-        try {
-          const field = form.getTextField(pdfFieldName);
-          field.setText(String(value));
-          field.setFont(robotoFont);
-          field.setFontSize(10);
-        } catch {
-          console.warn(`⚠️ Szöveges mező nem található vagy nem kompatibilis: "${pdfFieldName}"`);
-        }
-      }
-    }
+    });
 
-    // 5️⃣ Egyéni szövegek beírása
-    if (formData.customGroundingTexts) {
-      console.log('📝 Processing custom texts...');
-      for (const [pdfFieldName, textValue] of Object.entries(formData.customGroundingTexts)) {
+    // Ciklus a szöveges mezők kitöltésére a sima betűtípussal
+    for (const [pdfFieldName, textValue] of Object.entries(allTextFields)) {
         if (textValue && typeof textValue === 'string') {
-          try {
-            const field = form.getTextField(pdfFieldName);
-            field.setText(textValue);
-            field.setFont(robotoFont);
-            field.setFontSize(10);
-            console.log(`✅ Custom text written to field "${pdfFieldName}"`);
-          } catch {
-            console.warn(`⚠️ Egyéni szövegmező nem található: "${pdfFieldName}"`);
-          }
+            try {
+                const field = form.getTextField(pdfFieldName);
+                field.setText(textValue);
+                field.updateAppearances(robotoFont); // Sima betűtípus a fejléchez és egyéni szövegekhez
+            } catch (e) {
+                console.warn(`⚠️ Szöveges mező nem található vagy nem kompatibilis: "${pdfFieldName}"`);
+            }
         }
-      }
+    }
+    
+    // 3️⃣ Aláírás beillesztése (külön kezelve)
+    const signatureValue = formData.signature;
+    if (signatureValue && typeof signatureValue === 'string' && signatureValue.startsWith('data:image/png;base64,')) {
+        try {
+            const pngImage = await pdfDoc.embedPng(signatureValue);
+            const imageField = form.getButton('signature');
+            imageField.setImage(pngImage);
+            console.log('✅ Signature image inserted');
+        } catch(e) {
+            console.warn(`⚠️ Hiba az aláíráskép beillesztésekor:`, e);
+        }
     }
 
-    // 6️⃣ Földelési kérdések (OK / nicht OK / -) – HELYES VERZIÓ
+    // 4️⃣ Földelési kérdések (OK / nicht OK / -)
     const remarks: { punkt: string; bemerkung: string }[] = [];
-groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
-    const answer = formData.groundingCheckAnswers?.[questionId];
-    if (!answer) return;
+    groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
+      const answer = formData.groundingCheckAnswers?.[questionId];
+      if (!answer) return;
 
-    try {
-        if (answer === 'ok') {
-            const field = form.getTextField(okFieldName);
-            field.setText('X');
-            // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
-            field.updateAppearances(robotoBold);
-        } else if (answer === 'not_ok') {
-            const field = form.getTextField(notOkFieldName);
-            field.setText('X');
-            // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
-            field.updateAppearances(robotoBold);
+      try {
+        if (answer === 'ok' || answer === 'not_ok' || answer === 'not_applicable') {
+            const isNotOk = answer === 'not_ok';
+            const fieldName = isNotOk ? notOkFieldName : okFieldName;
+            const textToSet = answer === 'not_applicable' ? '-' : 'X';
 
-            const punkt = okFieldName.replace('OK', '');
-            remarks.push({ punkt, bemerkung: `Hiba a ${punkt} pontnál.` });
-        } else if (answer === 'not_applicable') {
-            const field = form.getTextField(okFieldName);
-            field.setText('-');
-            // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
-            field.updateAppearances(robotoBold);
+            const field = form.getTextField(fieldName);
+            field.setText(textToSet);
+            // ✅ A GARANTÁLTAN MŰKÖDŐ METÓDUS: Csak a VASTAG betűtípust adjuk át
+            field.updateAppearances(robotoBold); 
+            
+            if (isNotOk) {
+                const punkt = okFieldName.replace('OK', '');
+                remarks.push({ punkt, bemerkung: `Hiba a ${punkt} pontnál.` });
+            }
         }
-    } catch (e) {
-        console.warn(`⚠️ Hiba a(z) ${questionId} válasz beírásakor:`, e);
-    }
-});
+      } catch (e) { 
+        console.warn(`⚠️ Hiba a(z) ${questionId} válasz beírásakor.`, e);
+      }
+    });
 
-    // 7️⃣ Bemerkung mezők kitöltése – HELYES VERZIÓ
+    // 5️⃣ Bemerkung mezők kitöltése
     if (remarks.length >= 1) {
-    try {
-        const row1 = groundingPdfMapping.remarks[0];
-        const punktField1 = form.getTextField(row1.punktField);
-        const bemerkungField1 = form.getTextField(row1.bemerkungField);
+        try {
+            const row1 = groundingPdfMapping.remarks[0];
+            const punktField1 = form.getTextField(row1.punktField);
+            punktField1.setText(remarks[0].punkt);
+            punktField1.updateAppearances(robotoBold); // Legyen a hiba is vastag
 
-        punktField1.setText(remarks[0].punkt);
-        bemerkungField1.setText(remarks[0].bemerkung);
-
-        // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
-        punktField1.updateAppearances(robotoBold);
-        bemerkungField1.updateAppearances(robotoBold);
-    } catch (e) {
-        console.warn(`⚠️ Hiba a Bemerkung 1. sor beírásakor:`, e);
+            const bemerkungField1 = form.getTextField(row1.bemerkungField);
+            bemerkungField1.setText(remarks[0].bemerkung);
+            bemerkungField1.updateAppearances(robotoBold);
+        } catch (e) { console.warn(`⚠️ Hiba a Bemerkung 1. sor beírásakor.`); }
     }
-}
+    if (remarks.length >= 2) {
+        try {
+            const row2 = groundingPdfMapping.remarks[1];
+            const punktField2 = form.getTextField(row2.punktField);
+            const bemerkungField2 = form.getTextField(row2.bemerkungField);
 
-if (remarks.length >= 2) {
-    try {
-        const row2 = groundingPdfMapping.remarks[1];
-        const punktField2 = form.getTextField(row2.punktField);
-        const bemerkungField2 = form.getTextField(row2.bemerkungField);
-
-        if (remarks.length > 2) {
-            bemerkungField2.setText('A további hibákat keresd a közös hibalistában');
-            punktField2.setText('');
-        } else {
-            punktField2.setText(remarks[1].punkt);
-            bemerkungField2.setText(remarks[1].bemerkung);
-        }
-
-        // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
-        punktField2.updateAppearances(robotoBold);
-        bemerkungField2.updateAppearances(robotoBold);
-    } catch (e) {
-        console.warn(`⚠️ Hiba a Bemerkung 2. sor beírásakor:`, e);
+            if (remarks.length > 2) {
+                bemerkungField2.setText('A további hibákat keresd a közös hibalistában');
+                punktField2.setText('');
+            } else {
+                punktField2.setText(remarks[1].punkt);
+                bemerkungField2.setText(remarks[1].bemerkung);
+            }
+            punktField2.updateAppearances(robotoBold);
+            bemerkungField2.updateAppearances(robotoBold);
+        } catch (e) { console.warn(`⚠️ Hiba a Bemerkung 2. sor beírásakor.`); }
     }
-}
-
-    // 8️⃣ PDF kilapítása és mentés
+    
+    // 6️⃣ Véglegesítés és mentés
     form.flatten();
     const filledPdfBytes = await pdfDoc.save();
     return Buffer.from(filledPdfBytes);

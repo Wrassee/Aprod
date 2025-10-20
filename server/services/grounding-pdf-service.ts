@@ -79,38 +79,38 @@ export class GroundingPdfService {
 
     // 6️⃣ Földelési kérdések (OK / nicht OK / -) – HELYES VERZIÓ
     const remarks: { punkt: string; bemerkung: string }[] = [];
-    groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
-      const answer = formData.groundingCheckAnswers?.[questionId];
-      if (!answer) return;
+groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
+    const answer = formData.groundingCheckAnswers?.[questionId];
+    if (!answer) return;
 
-      try {
+    try {
         if (answer === 'ok') {
-          const field = form.getTextField(okFieldName);
-          field.setText('X');
-          field.setFont(robotoBold);
-          field.setFontSize(14);
+            const field = form.getTextField(okFieldName);
+            field.setText('X');
+            // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
+            field.updateAppearances(robotoBold);
         } else if (answer === 'not_ok') {
-          const field = form.getTextField(notOkFieldName);
-          field.setText('X');
-          field.setFont(robotoBold);
-          field.setFontSize(14);
+            const field = form.getTextField(notOkFieldName);
+            field.setText('X');
+            // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
+            field.updateAppearances(robotoBold);
 
-          const punkt = okFieldName.replace('OK', '');
-          remarks.push({ punkt, bemerkung: `Hiba a ${punkt} pontnál.` });
+            const punkt = okFieldName.replace('OK', '');
+            remarks.push({ punkt, bemerkung: `Hiba a ${punkt} pontnál.` });
         } else if (answer === 'not_applicable') {
-          const field = form.getTextField(okFieldName);
-          field.setText('-');
-          field.setFont(robotoBold);
-          field.setFontSize(14);
+            const field = form.getTextField(okFieldName);
+            field.setText('-');
+            // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
+            field.updateAppearances(robotoBold);
         }
-      } catch (e) {
+    } catch (e) {
         console.warn(`⚠️ Hiba a(z) ${questionId} válasz beírásakor:`, e);
-      }
-    });
+    }
+});
 
     // 7️⃣ Bemerkung mezők kitöltése – HELYES VERZIÓ
     if (remarks.length >= 1) {
-      try {
+    try {
         const row1 = groundingPdfMapping.remarks[0];
         const punktField1 = form.getTextField(row1.punktField);
         const bemerkungField1 = form.getTextField(row1.bemerkungField);
@@ -118,37 +118,35 @@ export class GroundingPdfService {
         punktField1.setText(remarks[0].punkt);
         bemerkungField1.setText(remarks[0].bemerkung);
 
-        punktField1.setFont(robotoBold);
-        punktField1.setFontSize(10);
-        bemerkungField1.setFont(robotoBold);
-        bemerkungField1.setFontSize(10);
-      } catch (e) {
+        // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
+        punktField1.updateAppearances(robotoBold);
+        bemerkungField1.updateAppearances(robotoBold);
+    } catch (e) {
         console.warn(`⚠️ Hiba a Bemerkung 1. sor beírásakor:`, e);
-      }
     }
+}
 
-    if (remarks.length >= 2) {
-      try {
+if (remarks.length >= 2) {
+    try {
         const row2 = groundingPdfMapping.remarks[1];
         const punktField2 = form.getTextField(row2.punktField);
         const bemerkungField2 = form.getTextField(row2.bemerkungField);
 
         if (remarks.length > 2) {
-          bemerkungField2.setText('A további hibákat keresd a közös hibalistában');
-          punktField2.setText('');
+            bemerkungField2.setText('A további hibákat keresd a közös hibalistában');
+            punktField2.setText('');
         } else {
-          punktField2.setText(remarks[1].punkt);
-          bemerkungField2.setText(remarks[1].bemerkung);
+            punktField2.setText(remarks[1].punkt);
+            bemerkungField2.setText(remarks[1].bemerkung);
         }
 
-        punktField2.setFont(robotoBold);
-        punktField2.setFontSize(10);
-        bemerkungField2.setFont(robotoBold);
-        bemerkungField2.setFontSize(10);
-      } catch (e) {
+        // ✅ JAVÍTÁS: Csak a betűtípust adjuk át, méret nélkül
+        punktField2.updateAppearances(robotoBold);
+        bemerkungField2.updateAppearances(robotoBold);
+    } catch (e) {
         console.warn(`⚠️ Hiba a Bemerkung 2. sor beírásakor:`, e);
-      }
     }
+}
 
     // 8️⃣ PDF kilapítása és mentés
     form.flatten();

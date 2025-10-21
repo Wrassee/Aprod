@@ -62,32 +62,43 @@ export class GroundingPdfService {
         }
     }
 
-    // 4️⃣ Földelési kérdések (OK / nicht OK / -)
-    const remarks: { punkt: string; bemerkung: string }[] = [];
-    groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
-      const answer = formData.groundingCheckAnswers?.[questionId];
-      if (!answer) return;
+    // 4️⃣ Földelési kérdések (OK / nicht OK / -) – VÉGLEGES, PONTOS PÁROSÍTÁSSAL
+const remarks: { punkt: string; bemerkung: string }[] = [];
+groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
+    const answer = formData.groundingCheckAnswers?.[questionId];
+    if (!answer) return;
 
-      try {
-        if (answer === 'ok' || answer === 'not_ok' || answer === 'not_applicable') {
-            const isNotOk = answer === 'not_ok';
-            const fieldName = isNotOk ? notOkFieldName : okFieldName;
-            const textToSet = answer === 'not_applicable' ? '-' : 'X';
+    try {
+        if (answer === 'ok') {
+            const field = form.getTextField(okFieldName);
+            field.setText('X');
+            field.updateAppearances(robotoBold);
+        } else if (answer === 'not_ok') {
+            const field = form.getTextField(notOkFieldName);
+            field.setText('X');
+            field.updateAppearances(robotoBold);
 
-            const field = form.getTextField(fieldName);
-            field.setText(textToSet);
-            // ✅ A GARANTÁLTAN MŰKÖDŐ METÓDUS: Csak a VASTAG betűtípust adjuk át
-            field.updateAppearances(robotoBold); 
-            
-            if (isNotOk) {
-                const punkt = okFieldName.replace('OK', '');
-                remarks.push({ punkt, bemerkung: `Hiba a ${punkt} pontnál.` });
-            }
+            const punkt = okFieldName.replace('OK', '');
+
+            // ✅ JAVÍTÁS ITT: A keresést rugalmassá tesszük
+            // Azt ellenőrizzük, hogy a hiba `id`-ja a `questionId`-ra végződik-e.
+            const specificError = formData.errors?.find(err => err.id.endsWith(questionId));
+
+            // A nyelvfüggő leírás kinyerése, tartalék szöveggel.
+            const bemerkungText = specificError?.description || `Hiba a ${punkt} pontnál.`;
+
+            // Hozzáadás a listához.
+            remarks.push({ punkt, bemerkung: bemerkungText });
+
+        } else if (answer === 'not_applicable') {
+            const field = form.getTextField(okFieldName);
+            field.setText('-');
+            field.updateAppearances(robotoBold);
         }
-      } catch (e) { 
+    } catch (e) { 
         console.warn(`⚠️ Hiba a(z) ${questionId} válasz beírásakor.`, e);
-      }
-    });
+    }
+});
 
     // 5️⃣ Bemerkung mezők kitöltése
     if (remarks.length >= 1) {

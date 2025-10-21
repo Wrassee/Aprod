@@ -197,10 +197,11 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               {language === 'hu' ? 'Email' : 'E-Mail'}
             </Button>
 
+            {/* Nyomtatás gomb - EGYSÉGES STÍLUS */}
             <Button
               onClick={printReport}
               variant="outline"
-              className="border-gray-300"
+              className="text-otis-blue border-2 border-otis-blue hover:bg-otis-blue hover:text-white active:bg-otis-blue active:text-white transition-colors"
             >
               <Printer className="h-4 w-4 mr-2" />
               {language === 'hu' ? 'Nyomtatás' : 'Drucken'}

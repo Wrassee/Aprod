@@ -97,57 +97,62 @@ router.post('/download-pdf', async (req, res) => {
 });
 
 // =========================================================
-// === FÖLDELÉSI PDF LETÖLTÉS - TELJESEN ÁTDOLGOZOTT VERZIÓ ===
+// === FÖLDELÉSI PDF LETÖLTÉS - VÉGLEGESEN JAVÍTOTT VERZIÓ ===
 // =========================================================
 router.post(
   '/download-grounding-pdf',
-  upload.none(), // ✅ Multer middleware - FormData feldolgozás fájlok nélkül
+  upload.none(), // Multer middleware FormData feldolgozáshoz
   async (req, res) => {
     try {
       console.log('⚡️ Received request to generate grounding PDF...');
 
-      // Ellenőrizzük, hogy megérkezett-e a földelési válaszok
+      // --- 1. LÉPÉS: A STRING-GÉ ALAKÍTOTT ADATOK FOGADÁSA ---
       const groundingCheckAnswersString = req.body.groundingCheckAnswers;
+      const customTextsString = req.body.customTexts;
+      const errorsString = req.body.errors; // ✅ HIÁNYZÓ LÉPÉS: A hibák string fogadása
+
       if (!groundingCheckAnswersString) {
         return res.status(400).json({ 
           message: 'Hiányzó "groundingCheckAnswers" a kérésben.' 
         });
       }
 
-      // === ÚJ: Egyéni szövegek fogadása ===
-      const customTextsString = req.body.customTexts;
-      const customTexts = customTextsString ? JSON.parse(customTextsString) : {};
+      // --- 2. LÉPÉS: A STRINGEK VISSZAALAKÍTÁSA OBJEKTUMOKKÁ (JSON.parse) ---
+      const groundingCheckAnswers = JSON.parse(groundingCheckAnswersString);
+      const customGroundingTexts = customTextsString ? JSON.parse(customTextsString) : {};
+      const errors = errorsString ? JSON.parse(errorsString) : []; // ✅ HIÁNYZÓ LÉPÉS: A hibák visszaalakítása tömbbé
       
-      console.log('📝 Custom texts received:', Object.keys(customTexts).length, 'entries');
+      console.log('📝 Custom texts received:', Object.keys(customGroundingTexts).length, 'entries');
+      console.log('❗️ Errors received:', JSON.stringify(errors, null, 2));
 
-      // Összeállítjuk a service által várt objektumot a FormData mezőkből
+      // --- 3. LÉPÉS: A PAYLOAD ÖSSZEÁLLÍTÁSA A HELYES, FELDOLGOZOTT ADATOKBÓL ---
       const servicePayload = {
         liftId: req.body.liftId || '',
         agency: req.body.agency || '',
         technicianName: req.body.technicianName || '',
         address: req.body.address || '',
         receptionDate: req.body.receptionDate || '',
-        signerName: req.body.visum || '', // A típusban valószínűleg signerName van
+        signerName: req.body.visum || '',
         visum: req.body.visum || '',
         signature: req.body.signature || '',
-        groundingCheckAnswers: JSON.parse(groundingCheckAnswersString),
-        customGroundingTexts: customTexts,
+        groundingCheckAnswers: groundingCheckAnswers,
+        customGroundingTexts: customGroundingTexts,
+        
+        // ✅ JAVÍTÁS: Itt már a feldolgozott `errors` tömböt használjuk!
+        errors: errors, 
 
-        // ✅ A TÍPUSHIBÁT MEGOLDÓ ÚJ SOROK:
-        answers: {}, // Kötelező, de ehhez a PDF-hez nem kell
-        errors: [],  // Kötelező, de ehhez a PDF-hez nem kell
-        niedervoltMeasurements: [], // Kötelező, de ehhez a PDF-hez nem kell
-        niedervoltTableMeasurements: {}, // Kötelező, de ehhez a PDF-hez nem kell
+        // Kötelező, de üres mezők a típus-kompatibilitás miatt
+        answers: {}, 
+        niedervoltMeasurements: [],
+        niedervoltTableMeasurements: {},
       };
       
-      // Meghívjuk a PDF-kezelő szolgáltatást
+      // 4. LÉPÉS: PDF generálás és küldés (változatlan)
       const pdfBuffer = await GroundingPdfService.generateFilledPdf(servicePayload);
 
-      // Fájlnév összeállítása
       const safeFileName = servicePayload.liftId.replace(/[^a-zA-Z0-9]/g, '_') || 'jegyzokonyv';
       const filename = `Erdungskontrolle_${safeFileName}_${servicePayload.receptionDate || new Date().toISOString().split('T')[0]}.pdf`;
 
-      // Visszaküldjük a generált PDF fájlt
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
       res.send(pdfBuffer);
@@ -156,8 +161,6 @@ router.post(
 
     } catch (error) {
       console.error('❌ Hiba a földelési PDF generálása közben:', error);
-      
-      // Részletes hibaüzenet fejlesztői módban
       const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba';
       res.status(500).json({ 
         message: 'Szerverhiba a PDF generálása közben.',

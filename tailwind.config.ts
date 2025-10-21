@@ -44,6 +44,8 @@ export default {
         border: "var(--border)",
         input: "var(--input)",
         ring: "var(--ring)",
+        'otis-blue': '#005f9e',      
+        'otis-light-blue': '#e6f0f6',
         chart: {
           "1": "var(--chart-1)",
           "2": "var(--chart-2)",

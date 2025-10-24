@@ -1,32 +1,6 @@
 {
   "groups": [
     {
-      "id": "Check",
-      "title": "Eredmény",
-      "questions": [
-        {
-          "id": "X1",
-          "text": "Hibás földelés a gépházban"
-        },
-        {
-          "id": "X2",
-          "text": "Hibás vezetékelés"
-        },
-        {
-          "id": "X3",
-          "text": "Lift leállítva mindkét ok miatt"
-        },
-        {
-          "id": "X4",
-          "text": "Hibás vezetőképesség"
-        },
-        {
-          "id": "X5",
-          "text": "Vezetőképesség helyreállítva:"
-        }
-      ]
-    },
-    {
       "id": "maschinenraum",
       "title": "1. Mérés a gépházban ",
       "questions": [

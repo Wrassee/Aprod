@@ -12,6 +12,8 @@ import { ArrowLeft, ArrowRight, Save, Settings, Check, Plus, Trash2, Filter } fr
 import PageHeader from '@/components/PageHeader';
 import type { NiedervoltMeasurement } from '@/types/niedervolt-devices';
 import { FormData } from '@/lib/types';
+import { InfinityInput } from '@/components/InfinityInput';
+import { TypeSelectorInput } from '@/components/TypeSelectorInput';
 
 interface CustomDevice {
   id: string;
@@ -114,7 +116,7 @@ export function NiedervoltTable({
       
       setIsInitialized(true);
     }
-  }, [devices.length, isInitialized, measurements, onMeasurementsChange]);
+  }, [devices, isInitialized, onMeasurementsChange]);
 
   useEffect(() => { if (isInitialized) { localStorage.setItem('niedervolt-table-measurements', JSON.stringify(measurements)); } }, [measurements, isInitialized]);
   useEffect(() => { if (isInitialized) { localStorage.setItem('niedervolt-selected-devices', JSON.stringify(Array.from(selectedDevices))); } }, [selectedDevices, isInitialized]);
@@ -127,10 +129,49 @@ export function NiedervoltTable({
     return language === 'hu' ? device.nameHU : device.nameDE;
   };
 
-  const updateMeasurement = useCallback((deviceId: string, field: keyof NiedervoltMeasurement, value: string) => {
-    const cleanValue = value === "-" ? "" : value;
-    onMeasurementsChange({ ...measurements, [deviceId]: { ...measurements[deviceId], deviceId, [field]: cleanValue } });
-  }, [measurements, onMeasurementsChange]);
+  // ÚJ: Frissített updateMeasurement numerikus validációval
+  const updateMeasurement = useCallback(
+  (deviceId: string, field: keyof NiedervoltMeasurement, value: string) => {
+    const numericOnlyFields: (keyof NiedervoltMeasurement)[] = [
+      'iccLN',
+      'iccLPE',
+      'fiIn',
+      'fiDin',
+    ];
+    let cleanValue = value;
+
+    // 1. LÉPÉS: A 'cleanValue' meghatározása a validáció alapján
+    if (numericOnlyFields.includes(field)) {
+      if (value !== '-') {
+        cleanValue = value.replace(/[^0-9.]/g, '');
+      }
+    }
+    
+    // 2. LÉPÉS: Az 'updated' objektum létrehozása a 'cleanValue' felhasználásával
+    const current = measurements[deviceId] || {};
+    const updated: NiedervoltMeasurement = {
+      ...current,
+      deviceId: deviceId,
+      [field]: cleanValue,
+    };
+
+    // 3. LÉPÉS: A kölcsönös kizárás logikája
+    if (field === 'biztositek' && cleanValue !== '') {
+      updated.kismegszakito = '';
+    }
+    if (field === 'kismegszakito' && cleanValue !== '') {
+      updated.biztositek = '';
+    }
+
+    // 4. LÉPÉS: Az állapot frissítése
+    const newMeasurements: Record<string, NiedervoltMeasurement> = {
+      ...measurements,
+      [deviceId]: updated,
+    };
+    onMeasurementsChange(newMeasurements);
+  },
+  [measurements, onMeasurementsChange]
+);
     
   const getFieldLabel = (field: string) => {
     const labels = {
@@ -173,7 +214,6 @@ export function NiedervoltTable({
     }
   };
 
-  // *** MÓDOSÍTVA: stabil deviceId alapú questionId generálás ***
   const generateNiedervoltQuestionIds = (measurements: Record<string, NiedervoltMeasurement>) => {
     const questionAnswers: Record<string, string> = {};
     
@@ -346,37 +386,52 @@ export function NiedervoltTable({
                 <tbody>
                   {activeDevices.map((device) => {
                     const measurement = measurements[device.id] || {};
-                    const getQuestionId = (field: string) => `Q_NID_${device.id}_${field}`;
                     
                     return (
                       <tr key={device.id} className="hover:bg-gray-50">
                         <td className="border border-gray-300 p-2 font-medium">{getDeviceName(device)}</td>
-                        {['biztositek','kismegszakito','tipusjelzes','szigetelesNPE','szigetelesL1PE','szigetelesL2PE','szigetelesL3PE','iccLN','iccLPE','fiIn','fiDin','fiTest'].map((field) => (
-                          <td key={field} className="border border-gray-300 p-2">
-                            {field === 'biztositek' || field === 'kismegszakito' || field === 'fiTest' ? (
-                              <Select
-                                value={measurement[field as keyof NiedervoltMeasurement] || ''}
-                                onValueChange={(value) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, value)}
-                              >
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="-" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  {(dropdownOptions[field] || []).map((option: string, index: number) => (
-                                    <SelectItem key={index} value={option}>{option}</SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            ) : (
-                              <Input
-                                type="text"
-                                value={measurement[field as keyof NiedervoltMeasurement] || ''}
-                                onChange={(e) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, e.target.value)}
-                                className="w-full"
-                              />
-                            )}
-                          </td>
-                        ))}
+                        {['biztositek','kismegszakito','tipusjelzes','szigetelesNPE','szigetelesL1PE','szigetelesL2PE','szigetelesL3PE','iccLN','iccLPE','fiIn','fiDin','fiTest'].map((field) => {
+                          const szigetelesFields = ['szigetelesNPE', 'szigetelesL1PE', 'szigetelesL2PE', 'szigetelesL3PE'];
+                          
+                          return (
+                            <td key={field} className="border border-gray-300 p-2">
+                              {field === 'biztositek' || field === 'kismegszakito' || field === 'fiTest' ? (
+                                <Select
+                                  value={measurement[field as keyof NiedervoltMeasurement] || ''}
+                                  onValueChange={(value) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, value)}
+                                >
+                                  <SelectTrigger className="w-full"><SelectValue placeholder="-" /></SelectTrigger>
+                                  <SelectContent>
+                                    {(dropdownOptions[field] || []).map((option: string, index: number) => (
+                                      <SelectItem key={index} value={option}>{option}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : szigetelesFields.includes(field) ? (
+                                <InfinityInput
+                                  value={measurement[field as keyof NiedervoltMeasurement] || ''}
+                                  onChange={(value) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, value)}
+                                />
+                              ) : field === 'tipusjelzes' ? (
+                                <TypeSelectorInput
+                                  value={measurement.tipusjelzes || ''}
+                                  onChange={(value) => updateMeasurement(device.id, 'tipusjelzes', value)}
+                                />
+                              ) : (
+                                <Input
+    type="text"
+    value={measurement[field as keyof NiedervoltMeasurement] || ''}
+    onChange={(e) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, e.target.value)}
+    className={`w-full ${
+      ['tipusjelzes', 'iccLN', 'iccLPE', 'fiIn', 'fiDin'].includes(field)
+        ? 'text-center' // <-- HA A MEZŐ A LISTÁBAN VAN, KÖZÉPRE IGAZÍTJUK
+        : ''
+    }`}
+  />
+)}
+                            </td>
+                          );
+                        })}
                       </tr>
                     );
                   })}
@@ -386,111 +441,116 @@ export function NiedervoltTable({
           </CardContent>
         </Card>
         <div className="mt-8 flex justify-between items-center">
-          <Button variant="outline" onClick={onBack}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            {language === 'hu' ? 'Vissza' : 'Zurück'}
-          </Button>
-          <div className="flex items-center space-x-4">
-            <Button variant="outline" onClick={handleManualSave}>
-              {saveStatus === 'saving' ? (
-                <>
-                  <Save className="h-4 w-4 mr-2 animate-spin" />
-                  {language === 'hu' ? 'Mentés...' : 'Speichern...'}
-                </>
-              ) : saveStatus === 'saved' ? (
-                <>
-                  <Check className="h-4 w-4 mr-2 text-green-500" />
-                  {language === 'hu' ? 'Elmentve' : 'Gespeichert'}
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {language === 'hu' ? 'Mentés' : 'Speichern'}
-                </>
-              )}
-            </Button>
-            <Button onClick={handleSaveAndProceed}>
-              {language === 'hu' ? 'Tovább' : 'Weiter'}
-              <ArrowRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
+          <Button
+  variant="outline"
+  onClick={onBack}
+  className="border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+>
+  <ArrowLeft className="h-4 w-4 mr-2" />
+  {language === 'hu' ? 'Vissza' : 'Zurück'}
+</Button>
+
+<div className="flex items-center space-x-4">
+  <Button
+    variant="outline"
+    onClick={handleManualSave}
+    className="border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+  >
+    {saveStatus === 'saving' ? (
+      <>
+        <Save className="h-4 w-4 mr-2 animate-spin" />
+        {language === 'hu' ? 'Mentés...' : 'Speichern...'}
+      </>
+    ) : saveStatus === 'saved' ? (
+      <>
+        <Check className="h-4 w-4 mr-2 text-green-500" />
+        {language === 'hu' ? 'Elmentve' : 'Gespeichert'}
+      </>
+    ) : (
+      <>
+        <Save className="h-4 w-4 mr-2" />
+        {language === 'hu' ? 'Mentés' : 'Speichern'}
+      </>
+    )}
+  </Button> {/* <-- EZ A HIÁNYZÓ SOR */}
+
+  <Button
+    onClick={handleSaveAndProceed}
+    className="bg-otis-blue text-white hover:bg-white hover:text-otis-blue border border-otis-blue"
+  >
+    {language === 'hu' ? 'Tovább' : 'Weiter'}
+    <ArrowRight className="h-4 w-4 ml-2" />
+  </Button>
+</div>
         </div>
       </main>
 
-      {/* === JAVÍTOTT DIALÓGUSABLAK KEZDETE === */}
-<Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
-  <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
-    <DialogHeader>
-      <DialogTitle>{t.deviceSelection || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}</DialogTitle>
-    </DialogHeader>
+      <Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
+        <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>{t.deviceSelection || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}</DialogTitle>
+          </DialogHeader>
 
-    {/* Eszközök listája és Hozzáadás rész (most már görgethető) */}
-    <div className="flex-grow overflow-y-auto pr-4 -mr-4 space-y-4">
-      
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-        {allDevices.map((device) => (
-          <div
-            key={device.id}
-            className={`p-3 border rounded cursor-pointer transition-all ${
-              selectedDevices.has(device.id)
-                ? 'bg-blue-100 border-blue-500'
-                : 'hover:bg-gray-50'
-            }`}
-            onClick={() => toggleDeviceSelection(device.id)}
-          >
-            <div className="flex justify-between items-center">
-              <span>{getDeviceName(device)}</span>
-              {customDevices.some(d => d.id === device.id) && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => { e.stopPropagation(); removeCustomDevice(device.id); }}
+          <div className="flex-grow overflow-y-auto pr-4 -mr-4 space-y-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {allDevices.map((device) => (
+                <div
+                  key={device.id}
+                  className={`p-3 border rounded cursor-pointer transition-all ${
+                    selectedDevices.has(device.id)
+                      ? 'bg-blue-100 border-blue-500'
+                      : 'hover:bg-gray-50'
+                  }`}
+                  onClick={() => toggleDeviceSelection(device.id)}
                 >
-                  <Trash2 className="h-4 w-4 text-red-500" />
+                  <div className="flex justify-between items-center">
+                    <span>{getDeviceName(device)}</span>
+                    {customDevices.some(d => d.id === device.id) && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={(e) => { e.stopPropagation(); removeCustomDevice(device.id); }}
+                      >
+                        <Trash2 className="h-4 w-4 text-red-500" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="border-t pt-4 mt-4 p-1">
+              <h4 className="font-medium mb-2">{language === 'hu' ? 'Saját eszköz hozzáadása' : 'Eigenes Gerät hinzufügen'}</h4>
+              <div className="flex flex-col md:flex-row gap-2">
+                <Input
+                  placeholder="DE"
+                  value={newDeviceName.de}
+                  onChange={(e) => setNewDeviceName(prev => ({ ...prev, de: e.target.value }))}
+                  className="flex-1"
+                />
+                <Input
+                  placeholder="HU"
+                  value={newDeviceName.hu}
+                  onChange={(e) => setNewDeviceName(prev => ({ ...prev, hu: e.target.value }))}
+                  className="flex-1"
+                />
+                <Button onClick={addCustomDevice} className="flex-shrink-0">
+                  <Plus className="h-4 w-4 mr-2" />
+                  {language === 'hu' ? 'Hozzáadás' : 'Hinzufügen'}
                 </Button>
-              )}
+              </div>
             </div>
           </div>
-        ))}
-      </div>
 
-      <div className="border-t pt-4 mt-4 p-1">
-        <h4 className="font-medium mb-2">{language === 'hu' ? 'Saját eszköz hozzáadása' : 'Eigenes Gerät hinzufügen'}</h4>
-        <div className="flex flex-col md:flex-row gap-2">
-          <Input
-            placeholder="DE"
-            value={newDeviceName.de}
-            onChange={(e) => setNewDeviceName(prev => ({ ...prev, de: e.target.value }))}
-            className="flex-1"
-          />
-          <Input
-            placeholder="HU"
-            value={newDeviceName.hu}
-            onChange={(e) => setNewDeviceName(prev => ({ ...prev, hu: e.target.value }))}
-            className="flex-1"
-          />
-          <Button onClick={addCustomDevice} className="flex-shrink-0">
-            <Plus className="h-4 w-4 mr-2" />
-            {language === 'hu' ? 'Hozzáadás' : 'Hinzufügen'}
-          </Button>
-        </div>
-      </div>
-
-    </div> {/* <-- A GÖRGETHETŐ DIV VÉGE */}
-
-    {/* === A LÁBLÉC A HELYES HELYEN: A GÖRGETHETŐ DIV UTÁN, DE MÉG A DIALOGCONTENT-EN BELÜL === */}
-    <DialogFooter className="pt-4 flex-shrink-0">
-      <DialogClose asChild>
-        <Button type="button">
-          {t.ok || 'OK'}
-        </Button>
-      </DialogClose>
-    </DialogFooter>
-    
-  </DialogContent>
-</Dialog>
-{/* === JAVÍTOTT DIALÓGUSABLAK VÉGE === */}
-
+          <DialogFooter className="pt-4 flex-shrink-0">
+            <DialogClose asChild>
+              <Button type="button">
+                {t.ok || 'OK'}
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

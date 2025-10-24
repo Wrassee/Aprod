@@ -268,7 +268,7 @@ export function Completion({
               {t.saveToCloud}
             </Button>
 
-            {/* Download PDF - VISSZAÁLLÍTVA */}
+            {/* Download PDF */}
             <Button
               onClick={handleDownloadPDF}
               disabled={isPdfDownloading}
@@ -311,30 +311,24 @@ export function Completion({
               {isGroundingPdfDownloading ? t.generating : t.downloadGroundingPDF}
             </Button>
 
-            {/* View Protocol - EGYSÉGES UI */}
+            {/* View Protocol - Lila színű, PDF letöltés funkcióval */}
             <Button
-              onClick={onViewProtocol}
-              variant="outline"
-              className="text-otis-blue border-2 border-otis-blue hover:bg-otis-blue hover:text-white active:bg-otis-blue active:text-white flex items-center justify-center py-4 h-auto transition-colors"
+              onClick={handleDownloadPDF}
+              disabled={isPdfDownloading}
+              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
             >
-              <Eye className="h-5 w-5 mr-3" />
-              {t.viewProtocol}
+              {isPdfDownloading ? (
+                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
+              ) : (
+                <Eye className="h-5 w-5 mr-3" />
+              )}
+              {isPdfDownloading ? t.generating : t.viewProtocol}
             </Button>
           </div> 
 
           {/* Navigation buttons */}
-          <div className="flex gap-4 justify-center">
-            {/* Back to Signature */}
-            <Button
-              onClick={onBackToSignature}
-              variant="outline"
-              className="text-gray-600 border-2 border-gray-300 hover:bg-gray-50 px-6 py-3"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t.back}
-            </Button>
-
-            {/* Start New Protocol - EGYSÉGES UI */}
+          <div className="mt-8 flex flex-col items-center gap-4">
+            {/* Start New Protocol */}
             <Button
               onClick={onStartNew}
               variant="outline"
@@ -343,23 +337,33 @@ export function Completion({
               <Plus className="h-4 w-4 mr-2" />
               {t.startNew}
             </Button>
-          </div>
-        </div>
 
-        {/* Error Export Section */}
-        {(errors.length > 0 || JSON.parse(localStorage.getItem('protocol-errors') || '[]').length > 0) && (
-          <div className="mt-8">
-            <ErrorExport 
-              errors={errors.length > 0 ? errors : JSON.parse(localStorage.getItem('protocol-errors') || '[]')}
-              protocolData={protocolData || {
-                buildingAddress: '',
-                liftId: '',
-                inspectorName: '',
-                inspectionDate: new Date().toISOString().split('T')[0]
-              }}
-            />
+            {/* Vissza gomb */}
+            <Button
+              variant="outline"
+              onClick={onBackToSignature}
+              className="border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              {language === 'hu' ? 'Vissza' : 'Zurück'}
+            </Button>
           </div>
-        )}
+
+          {/* Error Export Section */}
+          {(errors.length > 0 || JSON.parse(localStorage.getItem('protocol-errors') || '[]').length > 0) && (
+            <div className="mt-8">
+              <ErrorExport 
+                errors={errors.length > 0 ? errors : JSON.parse(localStorage.getItem('protocol-errors') || '[]')}
+                protocolData={protocolData || {
+                  buildingAddress: '',
+                  liftId: '',
+                  inspectorName: '',
+                  inspectionDate: new Date().toISOString().split('T')[0]
+                }}
+              />
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

@@ -461,18 +461,24 @@ export function Erdungskontrolle({
         </div>
 
         <div className="flex justify-between items-center mt-8 pt-6 border-t">
-          <Button variant="outline" onClick={onBack} className="flex items-center space-x-2">
-            <ArrowLeft className="h-4 w-4" />
-            <span>{language === 'hu' ? 'Vissza' : 'Zurück'}</span>
-          </Button>
+  {/* Vissza gomb */}
+  <Button
+    variant="outline"
+    onClick={onBack}
+    className="flex items-center space-x-2 border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+  >
+    <ArrowLeft className="h-4 w-4" />
+    <span>{language === 'hu' ? 'Vissza' : 'Zurück'}</span>
+  </Button>
 
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="outline"
-              onClick={handleManualSave}
-              disabled={saveStatus === 'saving'}
-              className="flex items-center space-x-2"
-            >
+  <div className="flex items-center space-x-4">
+    {/* Mentés gomb */}
+    <Button
+      variant="outline"
+      onClick={handleManualSave}
+      disabled={saveStatus === 'saving'}
+      className="flex items-center space-x-2 border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+    >
               {saveStatus === 'saving' ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (

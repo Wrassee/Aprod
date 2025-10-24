@@ -1,32 +1,6 @@
 {
   "groups": [
     {
-      "id": "Check",
-      "title": "Bilanz",
-      "questions": [
-        {
-          "id": "X1",
-          "text": "Defekte Erdung im Maschinenraum"
-        },
-        {
-          "id": "X2",
-          "text": "Defekte verdrahtung"
-        },
-        {
-          "id": "X3",
-          "text": "Anlage abgestelt bei beiden Gründe"
-        },
-        {
-          "id": "X4",
-          "text": "Leitfähigkeit fehlerhaft"
-        },
-        {
-          "id": "X5",
-          "text": "Leitfähigkeit in Ordnung gebracht am:"
-        }
-      ]
-    },
-    {
       "id": "maschinenraum",
       "title": "1. Prüfung im Maschinenraum",
       "questions": [

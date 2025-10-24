@@ -62,43 +62,44 @@ export class GroundingPdfService {
         }
     }
 
-    // 4️⃣ Földelési kérdések (OK / nicht OK / -) – VÉGLEGES, PONTOS PÁROSÍTÁSSAL
-const remarks: { punkt: string; bemerkung: string }[] = [];
-groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
-    const answer = formData.groundingCheckAnswers?.[questionId];
-    if (!answer) return;
+    // 4️⃣ Földelési kérdések (OK / nicht OK / -) - NYELVFÜGGŐ HIBAKIÍRÁSSAL
+    const remarks: { punkt: string; bemerkung: string }[] = [];
+    groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
+      const answer = formData.groundingCheckAnswers?.[questionId];
+      if (!answer) return;
 
-    try {
-        if (answer === 'ok') {
-            const field = form.getTextField(okFieldName);
-            field.setText('X');
-            field.updateAppearances(robotoBold);
-        } else if (answer === 'not_ok') {
-            const field = form.getTextField(notOkFieldName);
-            field.setText('X');
-            field.updateAppearances(robotoBold);
+      try {
+        if (answer === 'ok' || answer === 'not_ok' || answer === 'not_applicable') {
+            const isNotOk = answer === 'not_ok';
+            const fieldName = isNotOk ? notOkFieldName : okFieldName;
+            const textToSet = answer === 'not_applicable' ? '-' : 'X';
 
-            const punkt = okFieldName.replace('OK', '');
+            const field = form.getTextField(fieldName);
+            field.setText(textToSet);
+            // ✅ A GARANTÁLTAN MŰKÖDŐ METÓDUS: Csak a VASTAG betűtípust adjuk át
+            field.updateAppearances(robotoBold); 
+            
+            if (isNotOk) {
+                const punkt = okFieldName.replace('OK', '');
+                
+                // --- ÚJ LOGIKA: NYELVFÜGGŐ HIBALEÍRÁS ---
+                // 1. Keressük meg a konkrét hibát a formData.errors tömbben az aktuális questionId alapján
+                const specificError = formData.errors?.find(err => (err as any).context === questionId);
 
-            // ✅ JAVÍTÁS ITT: A keresést rugalmassá tesszük
-            // Azt ellenőrizzük, hogy a hiba `id`-ja a `questionId`-ra végződik-e.
-            const specificError = formData.errors?.find(err => err.id.endsWith(questionId));
+                // 2. A hiba leírása a 'bemerkung' mezőbe. Ha nem találunk konkrét hibát, egy általános szöveg lesz a tartalék.
+                let bemerkungText = `Hiba a ${punkt} pontnál.`; // Alapértelmezett, tartalék szöveg
+                if (specificError && specificError.description) {
+                    bemerkungText = specificError.description; // Felülírjuk a konkrét, nyelvfüggő leírással
+                }
 
-            // A nyelvfüggő leírás kinyerése, tartalék szöveggel.
-            const bemerkungText = specificError?.description || `Hiba a ${punkt} pontnál.`;
-
-            // Hozzáadás a listához.
-            remarks.push({ punkt, bemerkung: bemerkungText });
-
-        } else if (answer === 'not_applicable') {
-            const field = form.getTextField(okFieldName);
-            field.setText('-');
-            field.updateAppearances(robotoBold);
+                // 3. A remarks tömbhöz már a dinamikus szöveget adjuk hozzá
+                remarks.push({ punkt, bemerkung: bemerkungText });
+            }
         }
-    } catch (e) { 
+      } catch (e) { 
         console.warn(`⚠️ Hiba a(z) ${questionId} válasz beírásakor.`, e);
-    }
-});
+      }
+    });
 
     // 5️⃣ Bemerkung mezők kitöltése
     if (remarks.length >= 1) {
@@ -129,6 +130,72 @@ groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }
             punktField2.updateAppearances(robotoBold);
             bemerkungField2.updateAppearances(robotoBold);
         } catch (e) { console.warn(`⚠️ Hiba a Bemerkung 2. sor beírásakor.`); }
+    }
+    
+    // ====================================================================
+    // ✅ ÚJ BLOKK: EREDMÉNY MEZŐK AUTOMATIKUS KITÖLTÉSE (EGYEDI LOGIKÁVAL)
+    // ====================================================================
+    try {
+        console.log('📊 Eredmény mezők kiértékelése...');
+
+        // Segédfüggvény: van-e hiba egy adott csoportban
+        const hasErrorInGroup = (groupPrefix: string) => {
+            const questionsInGroup = groundingPdfMapping.answers.filter(
+                q => q.questionId.startsWith(groupPrefix)
+            );
+            return questionsInGroup.some(
+                question => formData.groundingCheckAnswers?.[question.questionId] === 'not_ok'
+            );
+        };
+
+        // X1: Hiba van az OK1/ (Maschinenraum) csoportban
+        const hasErrorInX1 = hasErrorInGroup('OK1/');
+        if (hasErrorInX1) {
+            console.log(`❗️ Hiba észlelve az OK1/ csoportban. X1 mező bejelölése.`);
+            const field = form.getTextField('X1');
+            field.setText('X');
+            field.updateAppearances(robotoBold);
+        }
+
+        // X2: Hiba van az OK2/ - OK5/ BÁRMELYIK csoportban
+        const hasErrorInX2 = hasErrorInGroup('OK2/') || 
+                             hasErrorInGroup('OK3/') || 
+                             hasErrorInGroup('OK4/') || 
+                             hasErrorInGroup('OK5/');
+        if (hasErrorInX2) {
+            console.log(`❗️ Hiba észlelve az OK2/-OK5/ csoportok valamelyikében. X2 mező bejelölése.`);
+            const field = form.getTextField('X2');
+            field.setText('X');
+            field.updateAppearances(robotoBold);
+        }
+
+        // X3: Hiba van az OK1/ ÉS (OK2/ - OK5/ valamelyikében)
+        const hasErrorInX3 = hasErrorInX1 && hasErrorInX2;
+        if (hasErrorInX3) {
+            console.log(`❗️ Hiba észlelve az OK1/ ÉS OK2/-OK5/ csoportokban. X3 mező bejelölése.`);
+            const field = form.getTextField('X3');
+            field.setText('X');
+            field.updateAppearances(robotoBold);
+        }
+
+        // X4: Hiba van BÁRMELYIK csoportban (OK1/ - OK5/)
+        const hasErrorInX4 = hasErrorInGroup('OK1/') || 
+                             hasErrorInGroup('OK2/') || 
+                             hasErrorInGroup('OK3/') || 
+                             hasErrorInGroup('OK4/') || 
+                             hasErrorInGroup('OK5/');
+        if (hasErrorInX4) {
+            console.log(`❗️ Hiba észlelve valamelyik csoportban. X4 mező bejelölése.`);
+            const field = form.getTextField('X4');
+            field.setText('X');
+            field.updateAppearances(robotoBold);
+        }
+
+        // X5: Nincs automatikus logika - kézi kitöltésre hagyva
+        console.log('ℹ️ X5 mező kézi kitöltésre hagyva (utóellenőrzés).');
+
+    } catch (e) {
+        console.warn(`⚠️ Hiba történt az eredmény mezők automatikus kitöltése során.`, e);
     }
     
     // 6️⃣ Véglegesítés és mentés

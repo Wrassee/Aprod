@@ -375,14 +375,14 @@ function Questionnaire({
         <div className="flex justify-between items-center">
   {/* Bal oldali gomb (Vissza) */}
   <Button
-    variant="outline"
-    onClick={handlePreviousPage}
-    disabled={pageFromApp === 0}
-    className="flex items-center"
-  >
-    <ArrowLeft className="h-4 w-4 mr-2" />
-    {t.previous}
-  </Button>
+  variant="outline"
+  onClick={handlePreviousPage}
+  disabled={pageFromApp === 0}
+  className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+>
+  <ArrowLeft className="h-4 w-4 mr-2" />
+  {t.previous}
+</Button>
 
   {/* ===== EZ AZ ÚJ, BEILLESZTETT RÉSZ ===== */}
   {/* Középső gomb (AI) */}
@@ -396,67 +396,67 @@ function Questionnaire({
 
   {/* Jobb oldali gombok (Mentés, Tovább) */}
   <div className="flex space-x-4">
-    <button
-      type="button"
-      onClick={handleSave}
-              disabled={saveStatus === 'saving'}
-              className={`inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input h-10 px-4 py-2 ${
-                saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
-                saveStatus === 'error' ? 'bg-red-100 border-red-300 text-red-700' :
-                'bg-background hover:bg-accent hover:text-accent-foreground'
-              }`}
-            >
+    <Button
+  variant="outline"
+  onClick={handleSave}
+  disabled={saveStatus === 'saving'}
+  className={`flex items-center space-x-2 ${
+    saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
+    saveStatus === 'error' ? 'bg-red-100 border-red-300 text-red-700' :
+    'border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white' // EZ AZ ÚJ ALAPÉRTELMEZETT STÍLUS
+  }`}
+>
               {saveStatus === 'saving' ? (
-                <>
-                  <div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
-                  {t.saving}
-                </>
-              ) : saveStatus === 'saved' ? (
-                <>
-                  <Check className="h-4 w-4 mr-2 text-green-600" />
-                  {t.saved}
-                </>
-              ) : saveStatus === 'error' ? (
-                <>
-                  <X className="h-4 w-4 mr-2 text-red-600" />
-                  {t.error}
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  {t.save}
-                </>
-              )}
-            </button>
+    <>
+      <div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
+      {t.saving}
+    </>
+  ) : saveStatus === 'saved' ? (
+    <>
+      <Check className="h-4 w-4 mr-2 text-green-600" />
+      {t.saved}
+    </>
+  ) : saveStatus === 'error' ? (
+    <>
+      <X className="h-4 w-4 mr-2 text-red-600" />
+      {t.error}
+    </>
+  ) : (
+    <>
+      <Save className="h-4 w-4 mr-2" />
+      {t.save}
+    </>
+  )}
+</Button>
             
             {isLastPage ? (
               <Button
-                type="button"
-                onClick={onNext}
-                disabled={!canProceed}
-                className={`flex items-center text-white ${
-                  canProceed 
-                    ? 'bg-otis-blue hover:bg-blue-700 cursor-pointer' 
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
+    type="button"
+    onClick={onNext}
+    disabled={!canProceed}
+    className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
+      canProceed 
+        ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
+        : 'bg-gray-400 text-white cursor-not-allowed'
+    }`}
+  >
                 {t.next}
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
-            ) : (
-              <Button
-                type="button"
-                onClick={handleNextPage}
-                disabled={!canProceed}
-                className={`flex items-center text-white ${
-                  canProceed 
-                    ? 'bg-otis-blue hover:bg-blue-700 cursor-pointer' 
-                    : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {t.next} {canProceed ? '✓' : '✗'}
-                <ArrowRight className="h-4 w-4 ml-2" />
-              </Button>
+    <ArrowRight className="h-4 w-4 ml-2" />
+  </Button>
+) : (
+  <Button
+    type="button"
+    onClick={handleNextPage}
+    disabled={!canProceed}
+    className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
+      canProceed 
+        ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
+        : 'bg-gray-400 text-white cursor-not-allowed'
+    }`}
+  >
+    {t.next} {canProceed ? '✓' : '✗'}
+    <ArrowRight className="h-4 w-4 ml-2" />
+  </Button>
             )}
           </div>
         </div>

@@ -6,7 +6,7 @@ import { storage } from '../storage.js';
 import { supabaseStorage } from '../services/supabase-storage.js';
 import { excelParserService } from '../services/excel-parser.js';
 import { hybridTemplateLoader } from '../services/hybrid-template-loader.js';
-import { clearQuestionsCache } from '../routes.js'; // *** ÚJ IMPORT ***
+import { clearQuestionsCache } from '../routes.js';
 
 const router = express.Router();
 
@@ -20,13 +20,11 @@ const upload = multer({ dest: uploadDir });
 router.get("/templates/available", async (_req, res) => {
   try {
     const allTemplates = await hybridTemplateLoader.getAllAvailableTemplates();
-    // JAVÍTVA: A válasz tartalmazza a jelenleg aktív sablon infóját is
     const activeTemplate = await storage.getActiveTemplate('unified', 'multilingual');
     res.json({
       ...allTemplates,
       current: {
         templateId: activeTemplate?.id,
-        // Ide jöhetne a stratégia is, ha tárolnánk
       }
     });
   } catch (error) {
@@ -35,7 +33,7 @@ router.get("/templates/available", async (_req, res) => {
   }
 });
 
-// POST /api/admin/templates/select - Sablon kiválasztása (ez hiányzott)
+// POST /api/admin/templates/select - Sablon kiválasztása
 router.post("/templates/select", async (req, res) => {
   try {
     const { templateId, loadStrategy } = req.body;
@@ -69,6 +67,56 @@ router.get("/templates", async (_req, res) => {
   }
 });
 
+// =========================================================
+// === VISSZAÁLLÍTOTT FUNKCIÓ: TEMPLATE FÁJL LETÖLTÉSE ===
+// =========================================================
+router.get("/templates/:id/download", async (req, res) => {
+  try {
+    const templateId = req.params.id;
+    console.log(`[DOWNLOAD] Request received for template ID: ${templateId}`);
+
+    // 1. Lekérjük a sablon adatait az adatbázisból az ID alapján
+    const template = await storage.getTemplate(templateId);
+
+    if (!template) {
+      console.error(`[DOWNLOAD] Error: Template not found with ID: ${templateId}`);
+      return res.status(404).json({ message: "Template not found" });
+    }
+
+    // 2. Ellenőrizzük, hogy van-e fájl útvonal megadva
+    const filePath = template.file_path;
+    if (!filePath) {
+      console.error('[DOWNLOAD] Error: file_path is missing for this template.');
+      return res.status(500).json({ message: 'File path is missing for this template.' });
+    }
+
+    // 3. Letöltjük a fájlt a Supabase Storage-ból
+    // Mivel a `downloadFile` helyi fájlba ment, létrehozunk egy temp útvonalat
+    const tempLocalPath = path.join(uploadDir, `download-${Date.now()}-${template.file_name}`);
+    
+    console.log(`[DOWNLOAD] Attempting to download from storage path: ${filePath} to ${tempLocalPath}`);
+    await supabaseStorage.downloadFile(filePath, tempLocalPath);
+    console.log(`[DOWNLOAD] File downloaded successfully to temp path.`);
+
+    // 4. Az Express `res.download` funkciójával elküldjük a fájlt, ami a küldés után törli is azt
+    res.download(tempLocalPath, template.file_name, (err) => {
+      if (err) {
+        console.error("Error sending file to client:", err);
+      }
+      
+      // A callback biztosítja, hogy a fájl törlése a küldés után történjen
+      fs.unlink(tempLocalPath, (unlinkErr) => {
+        if (unlinkErr) console.error("Error deleting temp file:", unlinkErr);
+        else console.log(`✅ Cleaned up temporary file: ${tempLocalPath}`);
+      });
+    });
+
+  } catch (error) {
+    console.error("❌ Error during template download:", error);
+    res.status(500).json({ message: "Failed to download template file." });
+  }
+});
+
 // POST /api/admin/templates/upload - Új sablon feltöltése
 router.post("/templates/upload", upload.single('file'), async (req: any, res) => {
   try {
@@ -79,7 +127,6 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
     const { originalname, path: tempPath } = req.file;
     const { name, type, language } = req.body;
 
-    // *** JAVÍTÁS 1: Kötelezővé tesszük a 'type' mezőt ***
     if (!type) {
       return res.status(400).json({ message: "Template 'type' ('unified' or 'protocol') is required." });
     }
@@ -99,7 +146,6 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
     });
     console.log(`[Upload] DB entry created for template ID: ${newTemplate.id}`);
 
-    // *** JAVÍTÁS 2: Csak akkor futtatjuk a parsert, ha a típus 'unified' vagy 'questions' ***
     if (templateType === 'unified' || templateType === 'questions') {
       console.log(`Parsing questions for template of type "${templateType}"...`);
       const questions = await excelParserService.parseQuestionsFromExcel(tempPath);
@@ -115,7 +161,6 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
           ...q,
           template_id: newTemplate.id,
           question_id: q.questionId,
-          // ✅ VÉGSŐ JAVÍTÁS: manuálisan hozzárendeljük a camelCase mezőt a snake_case oszlophoz
           cell_reference: q.cellReference ?? null,
         });
       }
@@ -142,7 +187,6 @@ router.post("/templates/:id/activate", async (req, res) => {
   try {
     await storage.setActiveTemplate(req.params.id);
 
-    // *** JAVÍTÁS 3: Cache törlése aktiválás után ***
     hybridTemplateLoader.clearCache();
     console.log('✅ Template cache cleared after activation.');
     clearQuestionsCache();

@@ -121,10 +121,10 @@ export function Signature({
           
           {/* Navigation */}
           <div className="flex justify-between">
-            <button
-              className="flex items-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 transition-colors"
-              type="button"
-              onClick={() => {
+            <Button
+  variant="outline"
+  className="border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+  onClick={() => {
                 console.log('🔙 Signature Back button clicked');
                 handleSave(); // ✅ MENTÉS NAVIGÁCIÓ ELŐTT
                 onBack();
@@ -132,7 +132,7 @@ export function Signature({
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t.back}
-            </button>
+            </Button>
             
             <Button
               onClick={handleComplete}

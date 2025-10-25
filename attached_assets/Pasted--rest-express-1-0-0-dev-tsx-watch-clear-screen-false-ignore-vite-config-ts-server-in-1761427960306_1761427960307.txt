@@ -1,0 +1,48 @@
+
+> rest-express@1.0.0 dev
+> tsx watch --clear-screen=false --ignore "./vite.config.ts.*" server/index.ts
+
+🔧 Initializing SQLite – development mode
+✅ SQLite connection OK
+8:58:27 PM [vite-express] Running in development mode
+8:58:28 PM [vite-express] Using Vite to resolve the config file
+🚀 Server listening on http://localhost:5000
+🔧 Vite-Express is running in development mode.
+[API Request] GET /api/questions/hu
+ℹ️  Cache is empty, loading template with hybrid loader...
+🔍 Looking for active template – type=unified, language=multilingual
+📋 Result: kerdeses (multilingual)
+🔍 Loading template: e42326c0-2048-4070-8d2e-4ce325c23900 (type: unified, language: multilingual, strategy: local_first)
+☁️ Loading template from Supabase...
+📄 Using existing cached file: /home/runner/workspace/temp/template-Abnahme FRAGEN.xlsx
+📋 Template loaded from: supabase (kerdeses)
+🔍 Parsing questions from: /home/runner/workspace/temp/template-Abnahme FRAGEN.xlsx
+📋 Headers found in Excel: [ID, titleHu, titleDe, Type, cellReference, options, Unit, calculation_formula, calculation_inputs, min_value, max_value, sheetName, groupOrder, required, placeholder, placeholderDE, groupName, groupNameDe, multiCell, title, conditional_group_key, , , , , ]
+📊 Column indices found: { TYPE: 3, OPTIONS: 5, MAX_LENGTH: -1, CELL_REF: 4 }
+📝 Question 11 (select) has options: Zürich,Luzern,Basel,St Gallen
+✅ Successfully parsed 31 questions.
+📊 Parse statistics: {
+  total: 31,
+  withCellRef: 28,
+  withOptions: 1,
+  byType: {
+    text: 8,
+    number: 2,
+    textarea: 1,
+    select: 1,
+    phone: 1,
+    radio: 11,
+    yes_no_na: 2,
+    measurement: 3,
+    calculated: 2
+  }
+}
+✅ Parsed 31 questions.
+[API Request] GET /api/questions/hu
+✅ Serving questions from cache
+[API Request] GET /api/questions/hu
+✅ Serving questions from cache
+9:28:14 PM [vite] vite.config.ts changed, restarting server...
+9:28:14 PM [vite] server restarted.
+[API Request] GET /api/questions/hu
+✅ Serving questions from cache

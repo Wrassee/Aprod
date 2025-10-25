@@ -72,13 +72,17 @@ export async function registerRoutes(app: Express) {
       const formattedQuestions = questionsCache.map((config) => {
         const typeStr = config.type as string;
         
-        // Generate group information with NEW structure
+        // Generate group key with proper slugify fallback
         const groupKey = config.groupKey || (config.groupName ? config.groupName.toLowerCase().replace(/\s+/g, '_') : 'default');
-        let groupName = language === "de" && config.groupNameDe ? config.groupNameDe : config.groupName;
+        
+        // Determine localized group names
+        let groupNameHu = config.groupName || 'Csoport nélkül';
+        let groupNameDe = config.groupNameDe || config.groupName || 'Ohne Gruppe';
         
         // Special handling for measurement/calculated types
         if (typeStr === "measurement" || typeStr === "calculated") {
-          groupName = language === "de" ? "Messdaten" : "Mérési adatok";
+          groupNameHu = "Mérési adatok";
+          groupNameDe = "Messdaten";
         }
 
         // JAVÍTOTT: Robusztusabb type korrekció és options generálás
@@ -94,18 +98,18 @@ export async function registerRoutes(app: Express) {
         return {
           id: config.questionId,
           
-          // NEW: Localized title object
+          // NEW: Localized title object - ALWAYS construct it properly
           title: {
             hu: config.titleHu || config.title || '',
             de: config.titleDe || config.title || ''
           },
           
-          // NEW: Group object with key and localized title
+          // NEW: Group object with key and localized title - ALWAYS construct it properly
           group: {
             key: groupKey,
             title: {
-              hu: config.groupName || 'Csoport nélkül',
-              de: config.groupNameDe || config.groupName || 'Ohne Gruppe'
+              hu: groupNameHu,
+              de: groupNameDe
             }
           },
           
@@ -126,10 +130,11 @@ export async function registerRoutes(app: Express) {
           cellReference: config.cellReference,
           sheetName: config.sheetName,
           
-          // DEPRECATED: Backward compatibility - old structure
-          groupName: groupName,
+          // DEPRECATED: Backward compatibility - old structure (for legacy frontend code)
+          groupName: language === "de" ? groupNameDe : groupNameHu,
           titleHu: config.titleHu,
           titleDe: config.titleDe,
+          conditional_group_key: config.conditionalGroupKey,
         };
       });
 

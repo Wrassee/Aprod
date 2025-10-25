@@ -101,6 +101,7 @@ export async function registerRoutes(app: Express) {
           groupOrder: config.groupOrder,
           cellReference: config.cellReference,
           sheetName: config.sheetName,
+          conditional_group_key: config.conditionalGroupKey, // CRITICAL FIX: Send conditional key to frontend
         };
       });
 

@@ -8,11 +8,16 @@ interface TrueFalseGroupProps {
   questions: Question[];
   values: Record<string, AnswerValue>;
   onChange: (questionId: string, value: AnswerValue) => void;
-  groupName: string;
+  groupName: string;  // Display name (already localized from parent)
+  language?: 'hu' | 'de';  // Optional language for direct group.title access
 }
 
-export const TrueFalseGroup = memo(({ questions, values, onChange, groupName }: TrueFalseGroupProps) => {
-  const { t } = useLanguageContext();
+export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, language }: TrueFalseGroupProps) => {
+  const { t, language: contextLanguage } = useLanguageContext();
+  
+  // Use NEW group.title structure if available, fallback to groupName prop
+  const lang = language || contextLanguage;
+  const displayName = questions[0]?.group?.title?.[lang] || groupName;
 
   if (questions.length === 0) return null;
 
@@ -22,7 +27,7 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName }: 
     <Card className="border border-gray-200 shadow-sm">
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-semibold text-gray-800">
-          {groupName}
+          {displayName}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -71,7 +76,8 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName }: 
             return (
               <div key={question.id} className="flex items-center p-3 rounded-lg hover:bg-gray-50 min-h-[60px]">
                 <span className="flex-1 text-gray-800 text-sm">
-                  {question.title}
+                  {/* NEW: Use localized title object if available */}
+                  {question.title?.[lang] || question.title}
                   {question.required && <span className="text-red-500 ml-1">*</span>}
                 </span>
 

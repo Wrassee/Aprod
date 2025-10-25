@@ -140,7 +140,31 @@ export const insertQuestionConfigSchema = createInsertSchema(questionConfigs);
 export type QuestionConfig = typeof questionConfigs.$inferSelect;
 export type InsertQuestionConfig = typeof questionConfigs.$inferInsert;
 
-export type Question = QuestionConfig;
+// NEW: Extended Question type with localized structure
+export interface LocalizedText {
+  hu: string;
+  de: string;
+}
+
+export interface QuestionGroup {
+  key: string;
+  title: LocalizedText;
+}
+
+// Extended Question type with NEW structure and backward compatibility
+export type Question = QuestionConfig & {
+  // NEW STRUCTURE: Localized title object
+  title?: string | LocalizedText;
+  
+  // NEW STRUCTURE: Group object with key and localized title
+  group?: QuestionGroup;
+  
+  // NEW STRUCTURE: Renamed conditional key
+  conditional_key?: string;
+  
+  // Options for select/radio questions
+  options?: string[];
+};
 
 /* -------------------------------------------------------------------------
  * Relations – enables eager loading with Drizzle

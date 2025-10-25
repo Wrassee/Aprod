@@ -21,8 +21,9 @@ export function useConditionalQuestionFilter(
 
   return useMemo(() => {
     // 1. Lépés: Keressük meg azokat a kérdéseket, amik más csoportokat vezérelhetnek
+    // NEW: Use conditional_key instead of conditional_group_key
     const controllingQuestions = allQuestions.filter(
-      q => q.conditional_group_key && (q.type === 'radio' || q.type === 'checkbox' || q.type === 'true_false')
+      q => (q.conditional_key || q.conditional_group_key) && (q.type === 'radio' || q.type === 'checkbox' || q.type === 'true_false')
     );
 
     // 2. Lépés: Határozzuk meg az aktív feltételes kulcsokat
@@ -31,11 +32,14 @@ export function useConditionalQuestionFilter(
     controllingQuestions.forEach(question => {
       // JAVÍTÁS: A választ MINDIG a kérdés saját ID-ja alatt keressük!
       const answer = answers[question.id];
+      
+      // NEW: Support both old and new conditional_key field
+      const conditionalKey = question.conditional_key || question.conditional_group_key;
 
       // =================== DEBUG LOG ===================
       console.log('--- FILTER DEBUG ---', {
         questionId: question.id,
-        conditional_group_key: question.conditional_group_key,
+        conditional_key: conditionalKey,
         allAnswerKeys: Object.keys(answers),
         foundAnswer: answer,
       });
@@ -46,40 +50,44 @@ export function useConditionalQuestionFilter(
       const truthyValues = ['true', 'igen', 'yes', 'ja', '1', 'x'];
 
       if (truthyValues.includes(normalizedAnswer) || answer === true) {
-        // Ha a válasz "igaz", akkor a conditional_group_key-t tesszük az aktív listába
-        if (question.conditional_group_key) {
-          activeConditionKeys.push(question.conditional_group_key);
+        // Ha a válasz "igaz", akkor a conditional_key-t tesszük az aktív listába
+        if (conditionalKey) {
+          activeConditionKeys.push(conditionalKey);
         }
       }
     });
 
-    // 3. Lépés: Gyűjtsük össze az ÖSSZES feltételes csoportnevet
-    // JAVÍTÁS: Itt a groupName értékeket kell gyűjteni, NEM a conditional_group_key-ket!
-    const allConditionalGroupNames = new Set(
+    // 3. Lépés: Gyűjtsük össze az ÖSSZES feltételes kulcsokat
+    // NEW: Collect conditional keys, not group names
+    const allConditionalKeys = new Set(
       controllingQuestions
-        .map(q => q.conditional_group_key) // Ez adja meg, mely groupName-ek feltételesek
+        .map(q => q.conditional_key || q.conditional_group_key)
         .filter(Boolean) as string[]
     );
 
     // 4. Lépés: Szűrjük a kérdéseket
     const filteredQuestions = allQuestions.filter(question => {
-      // A vezérlő kérdések (amiknek van conditional_group_key-jük) mindig látszanak
-      if (question.conditional_group_key) {
+      // A vezérlő kérdések mindig látszanak
+      const hasConditionalKey = question.conditional_key || question.conditional_group_key;
+      if (hasConditionalKey) {
         return true;
       }
 
-      // Ha egy kérdésnek nincs csoportneve, mindig látszik
-      if (!question.groupName) {
+      // NEW: Use group.key for conditional filtering instead of groupName
+      const groupKey = question.group?.key || question.groupName;
+      
+      // Ha egy kérdésnek nincs csoportja, mindig látszik
+      if (!groupKey) {
         return true;
       }
 
-      // Ha a kérdés csoportja NEM tartozik a feltételes csoportok közé, mindig látszik
-      if (!allConditionalGroupNames.has(question.groupName)) {
+      // Ha a kérdés csoportja NEM tartozik a feltételes kulcsok közé, mindig látszik
+      if (!allConditionalKeys.has(groupKey)) {
         return true;
       }
 
       // Ha a kérdés feltételes csoportba tartozik, csak akkor látszik, ha a feltétel aktív
-      return activeConditionKeys.includes(question.groupName);
+      return activeConditionKeys.includes(groupKey);
     });
 
     console.log('🎯 ConditionalQuestionFilter:', {
@@ -87,7 +95,7 @@ export function useConditionalQuestionFilter(
       filteredCount: filteredQuestions.length,
       activeConditions: activeConditionKeys.length,
       activeConditionKeys,
-      allConditionalGroupNames: Array.from(allConditionalGroupNames),
+      allConditionalKeys: Array.from(allConditionalKeys),
     });
 
     return {
@@ -162,7 +170,8 @@ export function updateAnswersWithDisabled(
   disabledQuestions.forEach(q => {
     // Csak akkor írjuk felül "n.a."-ra, ha NEM vezérlő kérdés
     // A vezérlő kérdéseknek mindig megmarad az eredeti válaszuk
-    if (!q.conditional_group_key) {
+    // NEW: Check both conditional_key and conditional_group_key for backward compatibility
+    if (!q.conditional_key && !q.conditional_group_key) {
       disabledAnswers[q.id] = 'n.a.';
     }
   });

@@ -832,6 +832,122 @@ cp data/otis_aprod.db data/backup-$(date +%Y%m%d).db
 
 ---
 
+## 🔄 **ARCHITEKTURÁLIS REFAKTORÁLÁS: EGYSÉGES NYELVI STRUKTÚRA**
+
+### **Jelenlegi Probléma**
+A korábbi implementáció **duplikált nyelvi mezőket** használt minden entitáshoz:
+- `titleHu` és `titleDe` külön mezők
+- `groupName` és `groupNameDe` külön mezők
+- Frontend `useLanguageContext()` konfliktus a backend nyelvvel
+- `groupName` egyszerre logikai azonosító és megjelenítési cím
+
+### **Új Architektúra (v0.6.0+)**
+
+#### **Objektum-alapú Nyelvi Struktúra**
+```typescript
+// ÚJ STRUKTÚRA - Egységes és bővíthető
+{
+  "id": "Q12",
+  "title": {
+    "hu": "Kérdés magyarul",
+    "de": "Frage auf Deutsch"
+  },
+  "group": {
+    "key": "electrical_check",        // Logikai azonosító
+    "title": {
+      "hu": "Villamos ellenőrzés",
+      "de": "Elektrische Prüfung"
+    }
+  },
+  "conditional_key": "section_A",     // Külön feltételes logika
+  "type": "yes_no_na"
+}
+
+// RÉGI STRUKTÚRA - Duplikált és korlátozó
+{
+  "id": "Q12",
+  "titleHu": "Kérdés magyarul",
+  "titleDe": "Frage auf Deutsch",
+  "groupName": "Villamos ellenőrzés",
+  "groupNameDe": "Elektrische Prüfung",
+  "conditional_group_key": "section_A",
+  "type": "yes_no_na"
+}
+```
+
+#### **Előnyök**
+| Szempont | Régi | Új |
+|----------|------|-----|
+| Nyelvi kezelés | Duplikált mezők | Egységes `title: { hu, de }` |
+| Bővíthetőség | Nehéz új nyelv hozzáadása | `title.en` egyszerűen hozzáadható |
+| Csoportosítás | `groupName` keveri logika+UI | `group.key` és `group.title` külön |
+| Feltételes logika | `groupName`-hez kötött | `conditional_key` önálló |
+| Hibalehetőség | Magas (kettős fordítás) | Alacsony (backend adja a nyelvet) |
+
+#### **Backend Implementáció**
+```typescript
+// server/routes.ts - Új formázás
+const formattedQuestions = questionsCache.map((config) => ({
+  id: config.questionId,
+  title: {
+    hu: config.titleHu || config.title,
+    de: config.titleDe || config.title
+  },
+  group: {
+    key: config.groupKey || slugify(config.groupName),
+    title: {
+      hu: config.groupName,
+      de: config.groupNameDe || config.groupName
+    }
+  },
+  conditional_key: config.conditionalGroupKey,
+  type: config.type,
+  // ... további mezők
+}));
+```
+
+#### **Frontend Használat**
+```typescript
+// Questionnaire.tsx - Csoportosítás
+const groupedByKey = questions.reduce((acc, q) => {
+  const key = q.group.key;
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(q);
+  return acc;
+}, {});
+
+// TrueFalseGroup.tsx - Megjelenítés
+<h3>{group.title[language]}</h3>
+
+// Nincs szükség useLanguageContext()-ra a kérdéseknél!
+```
+
+#### **Kompatibilitási Stratégia**
+```typescript
+// Backward compatibility - fallback a régi mezőkre
+title: {
+  hu: config.titleHu || config.title || '',
+  de: config.titleDe || config.title || ''
+},
+group: {
+  key: config.groupKey || slugify(config.groupName) || 'default',
+  title: {
+    hu: config.groupName || 'Csoport nélkül',
+    de: config.groupNameDe || config.groupName || 'Ohne Gruppe'
+  }
+}
+```
+
+#### **Migráció Lépései**
+1. ✅ **Types Update:** `shared/types.ts` - új interface-ek
+2. ✅ **Backend:** `routes.ts` - új formázás fallback-kel
+3. ✅ **Excel Parser:** `groupKey` generálás slug-ból
+4. ✅ **Frontend Components:** `group.key` és `group.title[lang]` használata
+5. ✅ **Conditional Filter:** `conditional_key` használata
+6. ✅ **Testing:** Régi és új template-ek kompatibilitása
+
+---
+
 ## 👩‍💻 **FEJLESZTÉSI ÚTMUTATÓ**
 
 ### **Új Funkció Hozzáadása**

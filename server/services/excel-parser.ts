@@ -16,6 +16,7 @@ export interface ParsedQuestion {
   multiCell?: boolean;
   groupName?: string;
   groupNameDe?: string;
+  groupKey?: string;  // NEW: Generated slug from groupName
   groupOrder?: number;
   conditionalGroupKey?: string;
   unit?: string;
@@ -37,6 +38,29 @@ export interface TemplateInfo {
 
 class ExcelParserService {
   // --- SEGÉDFÜGGVÉNYEK ---
+
+  /** Slug generálás magyar ékezetes karakterekkel */
+  private slugify(text: string): string {
+    if (!text) return 'default';
+    
+    // Magyar karakterek transliteráció
+    const charMap: Record<string, string> = {
+      'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ö': 'o', 'ő': 'o', 'ú': 'u', 'ü': 'u', 'ű': 'u',
+      'Á': 'a', 'É': 'e', 'Í': 'i', 'Ó': 'o', 'Ö': 'o', 'Ő': 'o', 'Ú': 'u', 'Ü': 'u', 'Ű': 'u',
+      'ä': 'a', 'ë': 'e', 'ï': 'i', 'ö': 'o', 'ü': 'u', 'ß': 'ss',
+      'Ä': 'a', 'Ë': 'e', 'Ï': 'i', 'Ö': 'o', 'Ü': 'u'
+    };
+    
+    return text
+      .split('')
+      .map(char => charMap[char] || char)
+      .join('')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '_')  // Replace special chars with underscore
+      .replace(/^_+|_+$/g, '')      // Remove leading/trailing underscores
+      .replace(/_+/g, '_');         // Replace multiple underscores with single
+  }
 
   /** Rugalmas fejléc-kereső: több alias nevet is felismer és a szóközöket is kezeli */
   private findHeaderIndex(headers: string[], ...variants: string[]): number {
@@ -200,6 +224,10 @@ class ExcelParserService {
         );
 
         // === TELJES KÉRDÉS OBJEKTUM AZ ÚJ MEZŐKKEL ===
+        const groupName = colIndices.GROUP_NAME !== -1 && row[colIndices.GROUP_NAME] 
+          ? String(row[colIndices.GROUP_NAME]).trim() 
+          : undefined;
+        
         const q: ParsedQuestion = {
           questionId: String(row[colIndices.ID]).trim(),
           title: String(row[colIndices.TITLE] || row[colIndices.TITLE_HU] || row[colIndices.ID]),
@@ -235,12 +263,11 @@ class ExcelParserService {
           multiCell: colIndices.MULTI_CELL !== -1 
             ? this.parseBoolean(row[colIndices.MULTI_CELL]) 
             : false,
-          groupName: colIndices.GROUP_NAME !== -1 && row[colIndices.GROUP_NAME] 
-            ? String(row[colIndices.GROUP_NAME]).trim() 
-            : undefined,
+          groupName: groupName,
           groupNameDe: colIndices.GROUP_NAME_DE !== -1 && row[colIndices.GROUP_NAME_DE] 
             ? String(row[colIndices.GROUP_NAME_DE]).trim() 
             : undefined,
+          groupKey: groupName ? this.slugify(groupName) : 'default',  // NEW: Auto-generate slug
           groupOrder: colIndices.GROUP_ORDER !== -1 && row[colIndices.GROUP_ORDER] 
             ? parseInt(String(row[colIndices.GROUP_ORDER])) 
             : 0,

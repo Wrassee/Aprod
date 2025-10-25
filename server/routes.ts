@@ -68,10 +68,15 @@ export async function registerRoutes(app: Express) {
         console.log(`✅ Parsed ${questionsCache.length} questions.`);
       }
 
-      // A válasz formázása a frontend számára, a kért nyelvnek megfelelően
+      // A válasz formázása a frontend számára az ÚJ STRUKTÚRÁVAL
       const formattedQuestions = questionsCache.map((config) => {
-        let groupName = language === "de" && config.groupNameDe ? config.groupNameDe : config.groupName;
         const typeStr = config.type as string;
+        
+        // Generate group information with NEW structure
+        const groupKey = config.groupKey || (config.groupName ? config.groupName.toLowerCase().replace(/\s+/g, '_') : 'default');
+        let groupName = language === "de" && config.groupNameDe ? config.groupNameDe : config.groupName;
+        
+        // Special handling for measurement/calculated types
         if (typeStr === "measurement" || typeStr === "calculated") {
           groupName = language === "de" ? "Messdaten" : "Mérési adatok";
         }
@@ -80,17 +85,34 @@ export async function registerRoutes(app: Express) {
         let correctedType = config.type;
         let options: string[] | undefined = config.options; // Alapértelmezett átvétel
 
-        // Először a specifikus placeholder-t ellenőrizzük, mert ez a legfontosabb jelző.
+        // Először a specifikus placeholder-t ellenőrizzük
         if (correctedType === 'radio') {
-            // Itt feltételezzük, hogy minden 'radio' típusú kérdésünk egyelőre true/false/n.a.
-            // A jövőben ezt a placeholder alapján lehetne tovább bontani.
             options = ['true', 'false', 'n.a.'];
         }
 
+        // NEW STRUCTURE: Unified localized response
         return {
           id: config.questionId,
-          title: language === "hu" ? (config.titleHu || config.title) : (config.titleDe || config.title),
-          groupName: groupName,
+          
+          // NEW: Localized title object
+          title: {
+            hu: config.titleHu || config.title || '',
+            de: config.titleDe || config.title || ''
+          },
+          
+          // NEW: Group object with key and localized title
+          group: {
+            key: groupKey,
+            title: {
+              hu: config.groupName || 'Csoport nélkül',
+              de: config.groupNameDe || config.groupName || 'Ohne Gruppe'
+            }
+          },
+          
+          // NEW: Renamed conditional_key (was conditional_group_key)
+          conditional_key: config.conditionalGroupKey,
+          
+          // Standard fields
           type: correctedType,
           options: options,
           required: config.required,
@@ -100,10 +122,14 @@ export async function registerRoutes(app: Express) {
           maxValue: config.maxValue,
           calculationFormula: config.calculationFormula,
           calculationInputs: config.calculationInputs,
-          conditional_group_key: config.conditionalGroupKey,
           groupOrder: config.groupOrder,
           cellReference: config.cellReference,
           sheetName: config.sheetName,
+          
+          // DEPRECATED: Backward compatibility - old structure
+          groupName: groupName,
+          titleHu: config.titleHu,
+          titleDe: config.titleDe,
         };
       });
 

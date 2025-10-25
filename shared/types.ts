@@ -165,18 +165,41 @@ export interface FormData {
 // 4️⃣ Question configuration (table `question_configs`)
 // ------------------------------------------------------------
 
+/**
+ * Localized text structure for multi-language support
+ */
+export interface LocalizedText {
+  hu: string;
+  de: string;
+}
+
+/**
+ * Question group structure with logical key and localized title
+ */
+export interface QuestionGroup {
+  /** Logical identifier for the group (e.g. "electrical_check") */
+  key: string;
+  /** Localized group titles */
+  title: LocalizedText;
+}
+
 export interface QuestionConfig {
   id: UUID;
   /** FK → `templates.id` */
   templateId: UUID;
   /** Unique identifier of the question inside the template */
   questionId: string;
-  /** Default title (fallback language) */
-  title: string;
-  /** Hungarian title */
+  
+  // NEW STRUCTURE: Localized title object
+  /** Localized question titles */
+  title: LocalizedText;
+  
+  // DEPRECATED: Old structure (kept for backward compatibility)
+  /** @deprecated Use title.hu instead */
   titleHu?: string;
-  /** German title */
+  /** @deprecated Use title.de instead */
   titleDe?: string;
+  
   /** Question type – limited to `QuestionType` */
   type: QuestionType;
   /** Whether the field is mandatory */
@@ -189,12 +212,27 @@ export interface QuestionConfig {
   sheetName?: string;
   /** If the question spans multiple cells */
   multiCell?: boolean;
-  /** Logical grouping name */
+  
+  // NEW STRUCTURE: Group object with key and localized title
+  /** Question group information */
+  group?: QuestionGroup;
+  
+  // DEPRECATED: Old structure (kept for backward compatibility)
+  /** @deprecated Use group.key instead */
   groupName?: string;
-  /** Group name in German */
+  /** @deprecated Use group.title.de instead */
   groupNameDe?: string;
+  /** @deprecated Use group.key instead */
+  groupKey?: string;
+  
   /** Order of the group */
   groupOrder?: number;
+  
+  /** Conditional display key (replaces conditional_group_key) */
+  conditionalKey?: string;
+  /** @deprecated Use conditionalKey instead */
+  conditionalGroupKey?: string;
+  
   /** Unit label (e.g. "mm", "kg") */
   unit?: string;
   /** Minimum numeric value (if applicable) */
@@ -205,6 +243,8 @@ export interface QuestionConfig {
   calculationFormula?: string;
   /** List of question IDs that feed the formula (stored as JSONB) */
   calculationInputs?: string[];
+  /** Radio button options */
+  options?: string[];
 }
 
 // ------------------------------------------------------------

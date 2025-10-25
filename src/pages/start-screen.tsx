@@ -37,7 +37,10 @@ export function StartScreen({ onLanguageSelect }: StartScreenProps) {
         <Button
           variant="outline"
           className="flex flex-col items-center p-6 h-auto border-2 border-gray-200 hover:border-otis-blue hover:bg-otis-light-blue transition-all duration-200 transform hover:scale-105"
-          onClick={() => onLanguageSelect('de')}
+          onClick={() => {
+            console.log('🇩🇪 GERMAN BUTTON CLICKED!');
+            onLanguageSelect('de');
+          }}
         >
           <div className="w-20 h-14 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1/3 bg-black"></div>
@@ -51,7 +54,10 @@ export function StartScreen({ onLanguageSelect }: StartScreenProps) {
         <Button
           variant="outline"
           className="flex flex-col items-center p-6 h-auto border-2 border-gray-200 hover:border-otis-blue hover:bg-otis-light-blue transition-all duration-200 transform hover:scale-105"
-          onClick={() => onLanguageSelect('hu')}
+          onClick={() => {
+            console.log('🇭🇺 HUNGARIAN BUTTON CLICKED!');
+            onLanguageSelect('hu');
+          }}
         >
           <div className="w-20 h-14 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-1/3 bg-red-500"></div>

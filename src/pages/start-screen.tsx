@@ -56,7 +56,6 @@ export function StartScreen({ onLanguageSelect }: StartScreenProps) {
           className="flex flex-col items-center p-6 h-auto border-2 border-gray-200 hover:border-otis-blue hover:bg-otis-light-blue transition-all duration-200 transform hover:scale-105"
           onClick={() => {
             console.log('🇭🇺 HUNGARIAN BUTTON CLICKED!');
-            alert('Magyar nyelv kiválasztva!'); // TESZT: Látható alert
             onLanguageSelect('hu');
           }}
         >

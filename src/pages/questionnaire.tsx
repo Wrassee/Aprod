@@ -35,7 +35,7 @@ interface QuestionnaireProps {
 const math = create(all);
 
 // Fallback questions if no template is loaded
-const FALLBACK_QUESTIONS: Question[] = [
+const FALLBACK_QUESTIONS: Partial<Question>[] = [
   {
     id: 'q1',
     questionId: 'q1',
@@ -50,7 +50,7 @@ const FALLBACK_QUESTIONS: Question[] = [
     type: 'checkbox' as const,
     required: true,
   },
-];
+] as Question[];
 
 // === JAVÍTÁS 1: ELTÁVOLÍTOTTUK A memo() WRAPPERT ===
 function Questionnaire({
@@ -128,12 +128,12 @@ function Questionnaire({
           console.log('✅ Questions loaded:', questionsData.length);
           setAllQuestions(questionsData);
         } else {
-          console.warn('⚠️ No active template found, using fallback questions');
-          setAllQuestions(FALLBACK_QUESTIONS);
+          console.warn('⚠️ No active template found, using empty question list');
+          setAllQuestions([]);
         }
       } catch (error) {
         console.error('❌ Error loading questions:', error);
-        setAllQuestions(FALLBACK_QUESTIONS);
+        setAllQuestions([]);
       } finally {
         setQuestionsLoading(false);
       }

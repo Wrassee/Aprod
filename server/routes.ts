@@ -68,21 +68,12 @@ export async function registerRoutes(app: Express) {
         console.log(`✅ Parsed ${questionsCache.length} questions.`);
       }
 
-      // A válasz formázása a frontend számára az ÚJ STRUKTÚRÁVAL
+      // A válasz formázása a frontend számára - EREDETI STRUKTÚRA
       const formattedQuestions = questionsCache.map((config) => {
+        let groupName = language === "de" && config.groupNameDe ? config.groupNameDe : config.groupName;
         const typeStr = config.type as string;
-        
-        // Generate group key with proper slugify fallback
-        const groupKey = config.groupKey || (config.groupName ? config.groupName.toLowerCase().replace(/\s+/g, '_') : 'default');
-        
-        // Determine localized group names
-        let groupNameHu = config.groupName || 'Csoport nélkül';
-        let groupNameDe = config.groupNameDe || config.groupName || 'Ohne Gruppe';
-        
-        // Special handling for measurement/calculated types
         if (typeStr === "measurement" || typeStr === "calculated") {
-          groupNameHu = "Mérési adatok";
-          groupNameDe = "Messdaten";
+          groupName = language === "de" ? "Messdaten" : "Mérési adatok";
         }
 
         // JAVÍTOTT: Robusztusabb type korrekció és options generálás
@@ -94,29 +85,10 @@ export async function registerRoutes(app: Express) {
             options = ['true', 'false', 'n.a.'];
         }
 
-        // NEW STRUCTURE: Unified localized response
         return {
           id: config.questionId,
-          
-          // NEW: Localized title object - ALWAYS construct it properly
-          title: {
-            hu: config.titleHu || config.title || '',
-            de: config.titleDe || config.title || ''
-          },
-          
-          // NEW: Group object with key and localized title - ALWAYS construct it properly
-          group: {
-            key: groupKey,
-            title: {
-              hu: groupNameHu,
-              de: groupNameDe
-            }
-          },
-          
-          // NEW: Renamed conditional_key (was conditional_group_key)
-          conditional_key: config.conditionalGroupKey,
-          
-          // Standard fields
+          title: language === "hu" ? (config.titleHu || config.title) : (config.titleDe || config.title),
+          groupName: groupName,
           type: correctedType,
           options: options,
           required: config.required,
@@ -129,12 +101,6 @@ export async function registerRoutes(app: Express) {
           groupOrder: config.groupOrder,
           cellReference: config.cellReference,
           sheetName: config.sheetName,
-          
-          // DEPRECATED: Backward compatibility - old structure (for legacy frontend code)
-          groupName: language === "de" ? groupNameDe : groupNameHu,
-          titleHu: config.titleHu,
-          titleDe: config.titleDe,
-          conditional_group_key: config.conditionalGroupKey,
         };
       });
 

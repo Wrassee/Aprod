@@ -142,39 +142,35 @@ function Questionnaire({
     loadQuestions();
   }, [language]);
 
-  // Group questions and paginate using NEW group.key structure
+  // Group questions and paginate
   const { questionGroups, totalPages, currentQuestions, currentGroup } = useMemo(() => {
     const groups = filteredQuestions.reduce((acc: Record<string, Question[]>, question: Question) => {
-      // NEW: Use group.key for grouping instead of groupName
-      const groupKey = question.group?.key || question.groupName || 'default';
+      const groupName = question.groupName;
       
-      if (!acc[groupKey]) {
-        acc[groupKey] = [];
+      if (!groupName) {
+        return acc;
       }
-      acc[groupKey].push(question);
+      
+      if (!acc[groupName]) {
+        acc[groupName] = [];
+      }
+      acc[groupName].push(question);
       return acc;
     }, {} as Record<string, Question[]>);
 
     // Sort questions by groupOrder
-    Object.keys(groups).forEach(groupKey => {
-      groups[groupKey].sort((a: Question, b: Question) => (a.groupOrder || 0) - (b.groupOrder || 0));
+    Object.keys(groups).forEach(groupName => {
+      groups[groupName].sort((a: Question, b: Question) => (a.groupOrder || 0) - (b.groupOrder || 0));
     });
 
-    // Convert to array with NEW structure
+    // Convert to array
     const groupsArray = Object.entries(groups)
-      .filter(([key, questions]) => questions.length > 0)
-      .map(([key, questions]) => {
-        // Get localized group title from first question in group
-        const firstQuestion = questions[0];
-        const groupTitle = firstQuestion.group?.title?.[language] || firstQuestion.groupName || key;
-        
-        return {
-          key,  // NEW: Group key for identification
-          name: groupTitle,  // Localized display name
-          questions,
-          questionCount: questions.length
-        };
-      });
+      .filter(([groupName, questions]) => questions.length > 0)
+      .map(([groupName, questions]) => ({
+        name: groupName,
+        questions,
+        questionCount: questions.length
+      }));
 
     const total = groupsArray.length;
     const currentGroupData = groupsArray[pageFromApp] || { name: '', questions: [], questionCount: 0 };

@@ -1,5 +1,46 @@
 # 🚀 OTIS APROD - VERSION UPDATE
 
+## 📅 **Verzió: v0.6.0** | **Dátum: 2025-10-25**
+
+### 🔄 **MAJOR REFACTORING: Unified Language Structure**
+
+**Architectural Shift:** Complete migration from duplicated language fields to object-based i18n pattern.
+
+#### Backend Changes
+1. **server/routes.ts** - API Response
+   - ✅ NEW: `title: { hu, de }` always constructed
+   - ✅ NEW: `group: { key, title: { hu, de } }` always constructed
+   - ✅ NEW: `conditional_key` field
+   - ✅ Backward compatibility maintained
+
+2. **server/services/excel-parser.ts**
+   - ✅ NEW: `slugify()` for automatic groupKey generation
+   - ✅ Supports Hungarian/German characters
+
+#### Frontend Changes
+3. **src/pages/questionnaire.tsx**
+   - ✅ Groups by `question.group?.key`
+   - ✅ Displays `question.group?.title?.[language]`
+
+4. **src/components/true-false-group.tsx**
+   - ✅ Renders `group.title[lang]` and `question.title[lang]`
+
+5. **src/components/conditional-question-filter.tsx**
+   - ✅ Uses `conditional_key` and `group.key`
+
+#### Type System
+6. **shared/types.ts & shared/schema.ts**
+   - ✅ NEW: `LocalizedText`, `QuestionGroup` interfaces
+   - ✅ Extended `Question` type with new structure
+
+#### Documentation
+7. **COMPREHENSIVE_TECHNICAL_DOCUMENTATION.md**
+   - ✅ Complete refactoring guide added
+
+**Benefits:** Extensibility, type safety, reduced duplication, clean separation of logic/display
+
+---
+
 ## 📅 **Verzió: v0.5.0** | **Dátum: 2025-09-25**
 
 ---

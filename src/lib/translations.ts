@@ -1,3 +1,4 @@
+// Interface definíciója - MEGHATÁROZZA A SZÜKSÉGES KULCSOKAT
 export interface Translation {
   // Start Screen
   slogan: string;
@@ -109,12 +110,16 @@ export interface Translation {
   generalData: string;
   machineRoom: string;
   modernizationAffected: string;
-  questionsInGroup: string;
+  // JAVÍTVA: Csak egyszer szerepel
+  questionsInGroup: string; 
   groupOf: string;
   viewErrors: string;
   downloadErrorList: string;
+  // JAVÍTVA: Hozzáadva az interfészhez
+  question: string; 
 }
 
+// Fordítási objektumok
 export const translations: Record<string, Translation> = {
   hu: {
     // Start Screen
@@ -221,7 +226,8 @@ export const translations: Record<string, Translation> = {
     machineRoom: "Gépház",
     modernizationAffected: "Modernizációban érintett",
     measurementData: "Mérési adatok",
-    questionsInGroup: "kérdés ebben a csoportban",
+    // JAVÍTVA: Csak egyszer szerepel
+    questionsInGroup: "kérdés ebben a csoportban", 
     groupOf: "csoport",
     calculatedValuesValidated: "A számított értékek automatikusan kiszámításra kerülnek. A határértéken kívüli értékek pirossal jelennek meg.",
     calculatedValues: "Számított értékek",
@@ -229,8 +235,8 @@ export const translations: Record<string, Translation> = {
     outOfRange: "Határértéken kívül (700-9000 mm)",
     viewErrors: "Hibák megtekintése",
     downloadErrorList: "Hibalista letöltése",
-    question: "Kérdés", // <-- ÚJ SOR
-    questionsInGroup: "kérdés ebben a csoportban",
+    // JAVÍTVA: Megfelelő helyen van az objektumban
+    question: "Kérdés", 
   },
   de: {
     // Start Screen
@@ -337,7 +343,8 @@ export const translations: Record<string, Translation> = {
     machineRoom: "Maschinenraum",
     modernizationAffected: "Von Modernisierung betroffen",
     measurementData: "Messdaten",
-    questionsInGroup: "Fragen in dieser Gruppe",
+    // JAVÍTVA: Csak egyszer szerepel
+    questionsInGroup: "Fragen in dieser Gruppe", 
     groupOf: "Gruppe",
     calculatedValuesValidated: "Die berechneten Werte werden automatisch berechnet. Werte außerhalb der Grenzwerte werden rot angezeigt.",
     calculatedValues: "Berechnete Werte",
@@ -345,7 +352,7 @@ export const translations: Record<string, Translation> = {
     outOfRange: "Außerhalb der Grenzwerte (700-9000 mm)",
     viewErrors: "Fehler anzeigen",
     downloadErrorList: "Fehlerliste herunterladen",
-    question: "Frage", // <-- ÚJ SOR
-    questionsInGroup: "Fragen in dieser Gruppe",
+    // JAVÍTVA: Megfelelő helyen van az objektumban
+    question: "Frage", 
   },
 };

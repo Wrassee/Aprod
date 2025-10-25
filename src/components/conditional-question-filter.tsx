@@ -53,11 +53,11 @@ export function useConditionalQuestionFilter(
       }
     });
 
-    // 3. Lépés: Gyűjtsük össze az ÖSSZES feltételes csoportnevet
-    // JAVÍTÁS: Itt a groupName értékeket kell gyűjteni, NEM a conditional_group_key-ket!
-    const allConditionalGroupNames = new Set(
+    // 3. Lépés: Gyűjtsük össze az ÖSSZES feltételes kulcsokat
+    // FIXED: Használjuk a conditional_group_key értékeket (stable slugs)
+    const allConditionalKeys = new Set(
       controllingQuestions
-        .map(q => q.conditional_group_key) // Ez adja meg, mely groupName-ek feltételesek
+        .map(q => q.conditional_group_key) // Ez adja meg, mely groupKey-ek feltételesek
         .filter(Boolean) as string[]
     );
 
@@ -68,18 +68,18 @@ export function useConditionalQuestionFilter(
         return true;
       }
 
-      // Ha egy kérdésnek nincs csoportneve, mindig látszik
-      if (!question.groupName) {
+      // Ha egy kérdésnek nincs groupKey-je, mindig látszik
+      if (!question.groupKey) {
         return true;
       }
 
-      // Ha a kérdés csoportja NEM tartozik a feltételes csoportok közé, mindig látszik
-      if (!allConditionalGroupNames.has(question.groupName)) {
+      // Ha a kérdés csoportja NEM tartozik a feltételes kulcsok közé, mindig látszik
+      if (!allConditionalKeys.has(question.groupKey)) {
         return true;
       }
 
       // Ha a kérdés feltételes csoportba tartozik, csak akkor látszik, ha a feltétel aktív
-      return activeConditionKeys.includes(question.groupName);
+      return activeConditionKeys.includes(question.groupKey);
     });
 
     console.log('🎯 ConditionalQuestionFilter:', {
@@ -87,7 +87,7 @@ export function useConditionalQuestionFilter(
       filteredCount: filteredQuestions.length,
       activeConditions: activeConditionKeys.length,
       activeConditionKeys,
-      allConditionalGroupNames: Array.from(allConditionalGroupNames),
+      allConditionalKeys: Array.from(allConditionalKeys),
     });
 
     return {

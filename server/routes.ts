@@ -89,6 +89,7 @@ export async function registerRoutes(app: Express) {
           id: config.questionId,
           title: language === "hu" ? (config.titleHu || config.title) : (config.titleDe || config.title),
           groupName: groupName,
+          groupKey: config.groupKey, // NEW: Stable slug for filtering (NOT translated)
           type: correctedType,
           options: options,
           required: config.required,

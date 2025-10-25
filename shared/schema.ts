@@ -167,50 +167,36 @@ export interface QuestionGroup {
 export type AnswerValue = string | number | boolean | string[] | null | undefined;
 
 /**
- * Extended Question type with UNIFIED MULTILINGUAL structure
+ * Extended Question type with MULTILINGUAL GROUP STRUCTURE
  * 
- * NEW STRUCTURE (preferred):
- * - title: LocalizedText - Both languages in one object
- * - group: QuestionGroup - Stable key + localized titles
- * - conditional_key: string - Controls visibility of other groups
+ * KEY CONCEPTS:
+ * - groupKey: STABLE slug for filtering (e.g., "inverter", "electrical") - NOT translated, NOT shown in UI
+ * - groupName/groupNameDE: LOCALIZED display names - shown in UI
+ * - conditional_group_key: Matches groupKey to control visibility - NOT translated
  * 
- * LEGACY STRUCTURE (backward compatibility during migration):
- * - titleHu, titleDe: Individual language fields
- * - groupName: Flat group name
- * - conditional_group_key: Old conditional field name
+ * MIGRATION STRATEGY:
+ * Backend sends BOTH old flat fields AND new structured fields during transition.
+ * Frontend gradually migrates to use new fields, then we remove legacy fields.
  */
-export type Question = Omit<
-  QuestionConfig,
-  'title' | 'title_hu' | 'title_de' | 'group_name' | 'group_name_de' | 'conditional_group_key'
-> & {
-  // NEW STRUCTURE: Localized title (can be string during migration or LocalizedText)
-  title: string | LocalizedText;
+export type Question = QuestionConfig & {
+  // NEW FIELD: Stable group identifier (NOT translated, used for conditional filtering)
+  groupKey?: string;  // e.g., "inverter", "electrical" - matches conditional_group_key
   
-  // NEW STRUCTURE: Group object with key and localized title (preferred)
+  // NEW STRUCTURE: Optional group object with key + localized titles (future)
   group?: QuestionGroup;
-  
-  // NEW STRUCTURE: Renamed conditional key (preferred)
-  conditional_key?: string;
   
   // Options for select/radio questions
   options?: string[];
   
-  // BACKWARD COMPATIBILITY: Legacy snake_case fields (backend still uses these)
-  title_hu?: string | null;
-  title_de?: string | null;
-  group_name?: string | null;
-  group_name_de?: string | null;
-  conditional_group_key?: string | null;
-  
-  // BACKWARD COMPATIBILITY: Legacy camelCase aliases (frontend uses these)
+  // LEGACY COMPATIBILITY: Keep all existing fields during migration
   questionId?: string;         // alias for question_id
-  titleHu?: string | null;     // legacy - use title.hu instead
-  titleDe?: string | null;     // legacy - use title.de instead
-  groupName?: string | null;   // legacy - use group.key or group.title[lang]
-  groupNameDe?: string | null; // legacy - alias for group_name_de
-  groupOrder?: number | null;  // legacy - alias for group_order
-  groupKey?: string;           // NEW field for stable group identification
-  conditionalGroupKey?: string | null; // legacy - alias for conditional_group_key
+  titleHu?: string | null;     // legacy flat field
+  titleDe?: string | null;     // legacy flat field
+  groupName?: string | null;   // LOCALIZED display name (shown in UI)
+  groupNameDe?: string | null; // LOCALIZED display name (shown in UI)
+  groupOrder?: number | null;
+  conditionalGroupKey?: string | null; // camelCase alias
+  conditional_group_key?: string | null; // snake_case - matches groupKey for filtering
   cellReference?: string | null; // alias for cell_reference
   sheetName?: string | null;   // alias for sheet_name
   multiCell?: boolean | null;  // alias for multi_cell

@@ -197,6 +197,7 @@ class ExcelParserService {
         MULTI_CELL: this.findHeaderIndex(headers, 'multi_cell', 'multiCell', 'több_cella'),
         GROUP_NAME: this.findHeaderIndex(headers, 'group_name', 'groupName', 'csoport'),
         GROUP_NAME_DE: this.findHeaderIndex(headers, 'group_name_de', 'groupNameDe', 'német_csoport'),
+        GROUP_KEY: this.findHeaderIndex(headers, 'groupKey', 'group_key'), // NEW: Stable slug from Excel
         GROUP_ORDER: this.findHeaderIndex(headers, 'group_order', 'groupOrder', 'sorrend'),
         CONDITIONAL_GROUP_KEY: this.findHeaderIndex(headers, 'conditionalGroupKey', 'conditional_group_key'),
         UNIT: this.findHeaderIndex(headers, 'unit', 'egység', 'mértékegység'),
@@ -267,7 +268,10 @@ class ExcelParserService {
           groupNameDe: colIndices.GROUP_NAME_DE !== -1 && row[colIndices.GROUP_NAME_DE] 
             ? String(row[colIndices.GROUP_NAME_DE]).trim() 
             : undefined,
-          groupKey: groupName ? this.slugify(groupName) : 'default',  // NEW: Auto-generate slug
+          // FIXED: Read groupKey from Excel first, fallback to auto-generate slug
+          groupKey: (colIndices.GROUP_KEY !== -1 && row[colIndices.GROUP_KEY]) 
+            ? String(row[colIndices.GROUP_KEY]).trim() 
+            : (groupName ? this.slugify(groupName) : 'default'),
           groupOrder: colIndices.GROUP_ORDER !== -1 && row[colIndices.GROUP_ORDER] 
             ? parseInt(String(row[colIndices.GROUP_ORDER])) 
             : 0,

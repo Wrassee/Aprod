@@ -123,3 +123,5 @@ replit.nix
 
 # Ignore local development database files and folder
 /data/
+*.db-shm
+*.db-wal

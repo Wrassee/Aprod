@@ -140,12 +140,24 @@ export const insertQuestionConfigSchema = createInsertSchema(questionConfigs);
 export type QuestionConfig = typeof questionConfigs.$inferSelect;
 export type InsertQuestionConfig = typeof questionConfigs.$inferInsert;
 
-// NEW: Extended Question type with localized structure
+/* -------------------------------------------------------------------------
+ * MULTILINGUAL STRUCTURE - Unified language support
+ * ----------------------------------------------------------------------- */
+
+/**
+ * Localized text object containing both Hungarian and German translations
+ * Example: { hu: "Általános adatok", de: "Allgemeine Daten" }
+ */
 export interface LocalizedText {
   hu: string;
   de: string;
 }
 
+/**
+ * Question group with stable key and localized titles
+ * - key: Stable slug for programmatic use (e.g., "general_info", "electrical")
+ * - title: Localized display names
+ */
 export interface QuestionGroup {
   key: string;
   title: LocalizedText;
@@ -154,29 +166,51 @@ export interface QuestionGroup {
 // Answer value type - can be string, number, boolean, or array
 export type AnswerValue = string | number | boolean | string[] | null | undefined;
 
-// Extended Question type with NEW structure and backward compatibility
-export type Question = QuestionConfig & {
-  // NEW STRUCTURE: Localized title object
-  title?: string | LocalizedText;
+/**
+ * Extended Question type with UNIFIED MULTILINGUAL structure
+ * 
+ * NEW STRUCTURE (preferred):
+ * - title: LocalizedText - Both languages in one object
+ * - group: QuestionGroup - Stable key + localized titles
+ * - conditional_key: string - Controls visibility of other groups
+ * 
+ * LEGACY STRUCTURE (backward compatibility during migration):
+ * - titleHu, titleDe: Individual language fields
+ * - groupName: Flat group name
+ * - conditional_group_key: Old conditional field name
+ */
+export type Question = Omit<
+  QuestionConfig,
+  'title' | 'title_hu' | 'title_de' | 'group_name' | 'group_name_de' | 'conditional_group_key'
+> & {
+  // NEW STRUCTURE: Localized title (can be string during migration or LocalizedText)
+  title: string | LocalizedText;
   
-  // NEW STRUCTURE: Group object with key and localized title
+  // NEW STRUCTURE: Group object with key and localized title (preferred)
   group?: QuestionGroup;
   
-  // NEW STRUCTURE: Renamed conditional key
+  // NEW STRUCTURE: Renamed conditional key (preferred)
   conditional_key?: string;
   
   // Options for select/radio questions
   options?: string[];
   
-  // CAMELCASE ALIASES for backward compatibility with frontend
-  questionId?: string;  // alias for question_id
-  titleHu?: string | null;     // alias for title_hu
-  titleDe?: string | null;     // alias for title_de
-  groupName?: string | null;   // alias for group_name
-  groupNameDe?: string | null; // alias for group_name_de
-  groupOrder?: number | null;  // alias for group_order
-  groupKey?: string;    // NEW field for group identification
-  conditionalGroupKey?: string | null; // alias for conditional_group_key
+  // BACKWARD COMPATIBILITY: Legacy snake_case fields (backend still uses these)
+  title_hu?: string | null;
+  title_de?: string | null;
+  group_name?: string | null;
+  group_name_de?: string | null;
+  conditional_group_key?: string | null;
+  
+  // BACKWARD COMPATIBILITY: Legacy camelCase aliases (frontend uses these)
+  questionId?: string;         // alias for question_id
+  titleHu?: string | null;     // legacy - use title.hu instead
+  titleDe?: string | null;     // legacy - use title.de instead
+  groupName?: string | null;   // legacy - use group.key or group.title[lang]
+  groupNameDe?: string | null; // legacy - alias for group_name_de
+  groupOrder?: number | null;  // legacy - alias for group_order
+  groupKey?: string;           // NEW field for stable group identification
+  conditionalGroupKey?: string | null; // legacy - alias for conditional_group_key
   cellReference?: string | null; // alias for cell_reference
   sheetName?: string | null;   // alias for sheet_name
   multiCell?: boolean | null;  // alias for multi_cell

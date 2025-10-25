@@ -65,20 +65,29 @@ function AppContent({
     formDataRef.current = formData;
   }, [formData]);
 
-  const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
+  const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de') => {
     console.log('🌐 App.tsx - Language selected:', selectedLanguage);
+    console.log('🌐 Before setCurrentScreen - currentScreen is:', currentScreen);
+    
     // === NYELV BEÁLLÍTÁSA A CONTEXTEN KERESZTÜL ===
     setLanguage(selectedLanguage);
     localStorage.setItem('otis-protocol-language', selectedLanguage);
-    setCurrentScreen('questionnaire');
-    setCurrentQuestionnairePage(0);
-    localStorage.setItem('questionnaire-current-page', '0');
+    
+    // JAVÍTÁS: setTimeout biztosítja hogy a setCurrentScreen a következő event loop-ban fut
+    // amikor a LanguageContext frissítés már befejeződött
+    setTimeout(() => {
+      console.log('🌐 Setting screen to questionnaire...');
+      setCurrentScreen('questionnaire');
+      setCurrentQuestionnairePage(0);
+      localStorage.setItem('questionnaire-current-page', '0');
+      console.log('🌐 After setCurrentScreen - should be questionnaire');
+    }, 0);
     
     // Clear error list when starting new protocol
     localStorage.removeItem('protocol-errors');
     window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
     window.dispatchEvent(new Event('storage'));
-  };
+  }, [setLanguage, setCurrentScreen, setCurrentQuestionnairePage, currentScreen]);
 
   const handleSaveProgress = useCallback(() => {
     // Save is handled automatically by useEffect
@@ -373,7 +382,7 @@ function AppContent({
 
   // Conditional render without router
   const renderCurrentScreen = () => {
-    console.log('🏠 Rendering screen:', currentScreen);
+    console.log('🏠 Rendering screen:', currentScreen, '(language:', language, ')');
     
     switch (currentScreen) {
       case 'start':

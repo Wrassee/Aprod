@@ -151,6 +151,9 @@ export interface QuestionGroup {
   title: LocalizedText;
 }
 
+// Answer value type - can be string, number, boolean, or array
+export type AnswerValue = string | number | boolean | string[] | null | undefined;
+
 // Extended Question type with NEW structure and backward compatibility
 export type Question = QuestionConfig & {
   // NEW STRUCTURE: Localized title object
@@ -164,6 +167,23 @@ export type Question = QuestionConfig & {
   
   // Options for select/radio questions
   options?: string[];
+  
+  // CAMELCASE ALIASES for backward compatibility with frontend
+  questionId?: string;  // alias for question_id
+  titleHu?: string;     // alias for title_hu
+  titleDe?: string;     // alias for title_de
+  groupName?: string;   // alias for group_name
+  groupNameDe?: string; // alias for group_name_de
+  groupOrder?: number;  // alias for group_order
+  groupKey?: string;    // NEW field for group identification
+  conditionalGroupKey?: string; // alias for conditional_group_key
+  cellReference?: string; // alias for cell_reference
+  sheetName?: string;   // alias for sheet_name
+  multiCell?: boolean;  // alias for multi_cell
+  minValue?: number;    // alias for min_value
+  maxValue?: number;    // alias for max_value
+  calculationFormula?: string; // alias for calculation_formula
+  calculationInputs?: any[];   // alias for calculation_inputs
 };
 
 /* -------------------------------------------------------------------------

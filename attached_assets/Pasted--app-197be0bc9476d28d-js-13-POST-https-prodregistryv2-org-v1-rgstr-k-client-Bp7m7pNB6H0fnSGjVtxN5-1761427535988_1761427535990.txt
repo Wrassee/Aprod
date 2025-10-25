@@ -1,0 +1,2212 @@
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427503828&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=3637&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+post @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEventsViaPost @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEvents @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_retryFailedLogs @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+_safeRetryFailedLogs @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+t._notifyVisibilityChanged @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:15
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'ambient-light-sensor'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'battery'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'execution-while-not-rendered'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'execution-while-out-of-viewport'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'layout-animations'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'legacy-image-formats'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'navigation-override'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'oversized-images'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'publickey-credentials'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'speaker-selection'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'unoptimized-images'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'unsized-media'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Unrecognized feature: 'pointer-lock'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Allow attribute will take precedence over 'allowfullscreen'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+3833-36a0dfee31cc16f4.js:1 Allow attribute will take precedence over 'allowpaymentrequest'.
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+n @ main-f0a86f37aa06fa38.js:1
+u @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ main-f0a86f37aa06fa38.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+navigateTo @ 3833-36a0dfee31cc16f4.js:1
+refresh @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ 3833-36a0dfee31cc16f4.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+onClick @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+eB @ framework-fb17f2dbe4220b38.js:1
+eH @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+re @ framework-fb17f2dbe4220b38.js:1
+rt @ framework-fb17f2dbe4220b38.js:1
+(anonymous) @ framework-fb17f2dbe4220b38.js:1
+uT @ framework-fb17f2dbe4220b38.js:1
+eM @ framework-fb17f2dbe4220b38.js:1
+ru @ framework-fb17f2dbe4220b38.js:1
+tB @ framework-fb17f2dbe4220b38.js:1
+tD @ framework-fb17f2dbe4220b38.js:1
+n @ _app-197be0bc9476d28d.js:13
+inject.js:1 Port connected
+inject.js:1 Port connected
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'battery'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427504345&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=3637&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+s @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+post @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEventsViaPost @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEvents @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_retryFailedLogs @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+_safeRetryFailedLogs @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+t._notifyVisibilityChanged @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:15
+cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10  POST https://ingest.app.coframe.com/ingest/v2/batched_events/68c9ad4d4cddb58cf3a1f93d/ net::ERR_BLOCKED_BY_CLIENT
+U @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+N @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+(anonymous) @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+n @ _app-197be0bc9476d28d.js:13
+inject.js:1 Port connected
+inject.js:1 Port connected
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427510145&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=3637&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427512917&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=1&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+post @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEventsViaPost @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEvents @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+flush @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+_safeFlushAndForget @ _app-197be0bc9476d28d.js:30
+e @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:13
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427513446&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=1&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+s @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+post @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEventsViaPost @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+_sendEvents @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:30
+flush @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+_safeFlushAndForget @ _app-197be0bc9476d28d.js:30
+e @ _app-197be0bc9476d28d.js:30
+n @ _app-197be0bc9476d28d.js:13
+use-language.ts:13 ✅ Translations derived for language: hu
+App.tsx:385 🏠 Rendering screen: start (language: hu )
+(index):62 [PWA] Service Worker registered successfully: ServiceWorkerRegistration {installing: null, waiting: null, active: ServiceWorker, navigationPreload: NavigationPreloadManager, scope: 'https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/', …}
+workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:142  GET https://replit.com/public/js/beacon.js net::ERR_BLOCKED_BY_CLIENT
+onIframeLoad @ workspace_iframe.html?initialPath=%2F&id=%3Arh2%3A:142
+App.tsx:385 🏠 Rendering screen: start (language: hu )
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427514653&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=3637&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+_app-197be0bc9476d28d.js:13  ERROR  [Statsig] A networking error occurred during POST request to https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427514653&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=3637&gz=1. TypeError: Failed to fetch TypeError: Failed to fetch
+    at _app-197be0bc9476d28d.js:13:9046
+    at _app-197be0bc9476d28d.js:1:199757
+    at o (_app-197be0bc9476d28d.js:15:163574)
+    at a.<anonymous> (_app-197be0bc9476d28d.js:18:170163)
+    at Generator.next (<anonymous>)
+    at _app-197be0bc9476d28d.js:18:167756
+    at new Promise (<anonymous>)
+    at n (_app-197be0bc9476d28d.js:18:167505)
+    at a._sendRequest (_app-197be0bc9476d28d.js:18:169386)
+    at _app-197be0bc9476d28d.js:15:112305
+    at u._capture (_app-197be0bc9476d28d.js:15:112603)
+    at e.<computed> [as _sendRequest] (_app-197be0bc9476d28d.js:15:112274)
+    at a.<anonymous> (_app-197be0bc9476d28d.js:18:171334)
+    at Generator.next (<anonymous>)
+    at a (_app-197be0bc9476d28d.js:18:167561)
+(anonymous) @ _app-197be0bc9476d28d.js:13
+a.JZ.<computed> @ _app-197be0bc9476d28d.js:15
+error @ _app-197be0bc9476d28d.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+s @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+_app-197be0bc9476d28d.js:13   WARN  [Statsig] Failed to flush events.
+(anonymous) @ _app-197be0bc9476d28d.js:13
+warn @ _app-197be0bc9476d28d.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:30
+a @ _app-197be0bc9476d28d.js:30
+_app-197be0bc9476d28d.js:13   WARN  [Statsig] Unable to save failed logs to storage
+(anonymous) @ _app-197be0bc9476d28d.js:13
+warn @ _app-197be0bc9476d28d.js:1
+_saveFailedLogsToStorage @ _app-197be0bc9476d28d.js:30
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:30
+a @ _app-197be0bc9476d28d.js:30
+cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10  POST https://ingest.app.coframe.com/ingest/v2/batched_events/68c9ad4d4cddb58cf3a1f93d/ net::ERR_BLOCKED_BY_CLIENT
+U @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+N @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+(anonymous) @ cf.js?config=%257B%2522projectId%2522%253A%252268c9ad4d4cddb58cf3a1f93d%2522%252C%2522startTime%2522%253A1761386972793%252C%2522timeoutMs%2522%253A1000%252C%2522currentUrl%2522%253A%2522https%253A%252F%252Freplit.com%252Fusage%253FpaymentMethod%253Dtrue%2526from%253Dnotifications%2522%252C%2522trackingOnly%2522%253Atrue%257D:10
+n @ _app-197be0bc9476d28d.js:13
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427515451&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=1&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+_app-197be0bc9476d28d.js:13  POST https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427519962&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=1&gz=1 net::ERR_BLOCKED_BY_CLIENT
+(anonymous) @ _app-197be0bc9476d28d.js:13
+(anonymous) @ _app-197be0bc9476d28d.js:1
+o @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+_app-197be0bc9476d28d.js:13  ERROR  [Statsig] A networking error occurred during POST request to https://prodregistryv2.org/v1/rgstr?k=client-Bp7m7pNB6H0fnSGjVtxN5BeWQw4BSAat4OFsXa3VcTF&st=javascript-client&sv=3.26.0&t=1761427519962&sid=d861437f-cea8-4140-a7e5-f53c4f44cece&ec=1&gz=1. TypeError: Failed to fetch TypeError: Failed to fetch
+    at _app-197be0bc9476d28d.js:13:9046
+    at _app-197be0bc9476d28d.js:1:199757
+    at o (_app-197be0bc9476d28d.js:15:163574)
+    at a.<anonymous> (_app-197be0bc9476d28d.js:18:170163)
+    at Generator.next (<anonymous>)
+    at _app-197be0bc9476d28d.js:18:167756
+    at new Promise (<anonymous>)
+    at n (_app-197be0bc9476d28d.js:18:167505)
+    at a._sendRequest (_app-197be0bc9476d28d.js:18:169386)
+    at _app-197be0bc9476d28d.js:15:112305
+    at u._capture (_app-197be0bc9476d28d.js:15:112603)
+    at e.<computed> [as _sendRequest] (_app-197be0bc9476d28d.js:15:112274)
+    at a.<anonymous> (_app-197be0bc9476d28d.js:18:171334)
+    at Generator.next (<anonymous>)
+    at a (_app-197be0bc9476d28d.js:18:167561)
+(anonymous) @ _app-197be0bc9476d28d.js:13
+a.JZ.<computed> @ _app-197be0bc9476d28d.js:15
+error @ _app-197be0bc9476d28d.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+s @ _app-197be0bc9476d28d.js:18
+Promise.then
+u @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:18
+n @ _app-197be0bc9476d28d.js:18
+_sendRequest @ _app-197be0bc9476d28d.js:18
+(anonymous) @ _app-197be0bc9476d28d.js:15
+_capture @ _app-197be0bc9476d28d.js:15
+e.<computed> @ _app-197be0bc9476d28d.js:15
+(anonymous) @ _app-197be0bc9476d28d.js:18
+a @ _app-197be0bc9476d28d.js:18
+_app-197be0bc9476d28d.js:13   WARN  [Statsig] Failed to flush events.
+(anonymous) @ _app-197be0bc9476d28d.js:13
+warn @ _app-197be0bc9476d28d.js:1
+(anonymous) @ _app-197be0bc9476d28d.js:30
+a @ _app-197be0bc9476d28d.js:30
+App.tsx:69 🌐 App.tsx - Language selected: hu
+App.tsx:70 🌐 Before setCurrentScreen - currentScreen is: start
+App.tsx:79 🌐 Setting screen to questionnaire...
+App.tsx:83 🌐 After setCurrentScreen - should be questionnaire
+App.tsx:385 🏠 Rendering screen: questionnaire (language: hu )
+conditional-question-filter.tsx:93 🎯 ConditionalQuestionFilter: {totalQuestions: 0, filteredCount: 0, activeConditions: 0, activeConditionKeys: Array(0), allConditionalKeys: Array(0)}
+questionnaire.tsx:128 ✅ Questions loaded: 31
+conditional-question-filter.tsx:40 --- FILTER DEBUG --- {questionId: '16', conditional_key: 'inverter', allAnswerKeys: Array(42), foundAnswer: 'false'}
+conditional-question-filter.tsx:93 🎯 ConditionalQuestionFilter: {totalQuestions: 31, filteredCount: 30, activeConditions: 0, activeConditionKeys: Array(0), allConditionalKeys: Array(1)}
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18678
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+conditional-question-filter.tsx:40 --- FILTER DEBUG --- {questionId: '16', conditional_key: 'inverter', allAnswerKeys: Array(42), foundAnswer: 'false'}
+conditional-question-filter.tsx:93 🎯 ConditionalQuestionFilter: {totalQuestions: 31, filteredCount: 30, activeConditions: 0, activeConditionKeys: Array(0), allConditionalKeys: Array(1)}
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=f6a8a448:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=f6a8a448:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=f6a8a448:3733:39)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+callCallback2 @ chunk-WERSD76P.js?v=f6a8a448:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=f6a8a448:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=f6a8a448:3733
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:14032 The above error occurred in the <h3> component:
+
+    at h3
+    at div
+    at div
+    at div
+    at _c9 (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/ui/card.tsx:20:11)
+    at https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/isolated-question.tsx:26:3
+    at div
+    at div
+    at main
+    at div
+    at Questionnaire (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/pages/questionnaire.tsx:49:3)
+    at Provider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/chunk-PLT6GTVM.js?v=f6a8a448:38:15)
+    at TooltipProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f6a8a448:64:5)
+    at QueryClientProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=f6a8a448:3086:3)
+    at AppContent (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:38:3)
+    at LanguageProvider (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/components/language-provider.tsx:21:36)
+    at App (https://f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev/src/App.tsx:494:45)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+logCapturedError @ chunk-WERSD76P.js?v=f6a8a448:14032
+update.callback @ chunk-WERSD76P.js?v=f6a8a448:14052
+callCallback @ chunk-WERSD76P.js?v=f6a8a448:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=f6a8a448:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=f6a8a448:17093
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=f6a8a448:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=f6a8a448:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=f6a8a448:17920
+commitRootImpl @ chunk-WERSD76P.js?v=f6a8a448:19353
+commitRoot @ chunk-WERSD76P.js?v=f6a8a448:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=f6a8a448:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18718
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384
+chunk-WERSD76P.js?v=f6a8a448:9934 Uncaught Error: Objects are not valid as a React child (found: object with keys {hu, de}). If you meant to render a collection of children, use an array instead.
+    at throwOnInvalidObjectType (chunk-WERSD76P.js?v=f6a8a448:9934:17)
+    at createChild (chunk-WERSD76P.js?v=f6a8a448:10110:15)
+    at reconcileChildrenArray (chunk-WERSD76P.js?v=f6a8a448:10282:33)
+    at reconcileChildFibers2 (chunk-WERSD76P.js?v=f6a8a448:10559:24)
+    at reconcileChildren (chunk-WERSD76P.js?v=f6a8a448:14290:37)
+    at updateHostComponent (chunk-WERSD76P.js?v=f6a8a448:14807:11)
+    at beginWork (chunk-WERSD76P.js?v=f6a8a448:15935:22)
+    at beginWork$1 (chunk-WERSD76P.js?v=f6a8a448:19753:22)
+    at performUnitOfWork (chunk-WERSD76P.js?v=f6a8a448:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=f6a8a448:19137:13)
+throwOnInvalidObjectType @ chunk-WERSD76P.js?v=f6a8a448:9934
+createChild @ chunk-WERSD76P.js?v=f6a8a448:10110
+reconcileChildrenArray @ chunk-WERSD76P.js?v=f6a8a448:10282
+reconcileChildFibers2 @ chunk-WERSD76P.js?v=f6a8a448:10559
+reconcileChildren @ chunk-WERSD76P.js?v=f6a8a448:14290
+updateHostComponent @ chunk-WERSD76P.js?v=f6a8a448:14807
+beginWork @ chunk-WERSD76P.js?v=f6a8a448:15935
+beginWork$1 @ chunk-WERSD76P.js?v=f6a8a448:19753
+performUnitOfWork @ chunk-WERSD76P.js?v=f6a8a448:19198
+workLoopSync @ chunk-WERSD76P.js?v=f6a8a448:19137
+renderRootSync @ chunk-WERSD76P.js?v=f6a8a448:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=f6a8a448:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=f6a8a448:18684
+workLoop @ chunk-WERSD76P.js?v=f6a8a448:197
+flushWork @ chunk-WERSD76P.js?v=f6a8a448:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=f6a8a448:384

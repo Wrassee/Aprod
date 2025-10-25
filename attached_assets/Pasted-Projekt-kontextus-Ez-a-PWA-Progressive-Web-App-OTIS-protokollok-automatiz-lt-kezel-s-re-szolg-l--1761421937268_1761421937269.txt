@@ -1,0 +1,174 @@
+Projekt kontextus
+
+Ez a PWA (Progressive Web App) OTIS-protokollok automatizált kezelésére szolgál.
+A frontend React + TypeScript alapú, a backend Express + Supabase.
+A kérdések Excel-sablonból töltődnek be (excelParserService), és a backend JSON-ban adja át őket a frontendnek, amely csoportosítva (groupName alapján) rendereli a kérdéseket.
+
+⚙️ Jelenlegi állapot – Funkcionális leírás
+1. Adatszerkezet
+
+A backend az Excelből beolvasott kérdéseket így küldi:
+
+{
+  "id": "Q12",
+  "titleHu": "Kérdés magyarul",
+  "titleDe": "Frage auf Deutsch",
+  "groupName": "Biztonsági ellenőrzés",
+  "groupNameDe": "Sicherheitsprüfung",
+  "conditional_group_key": "section_A",
+  "type": "yes_no_na",
+  ...
+}
+
+2. Frontend megjelenítés logikája
+
+A React oldalon:
+
+A groupName alapján történik a csoportosítás: ez határozza meg a kérdésblokkot (fejléc + kérdések).
+
+A conditional_group_key jelzi, hogy egy kérdés csak akkor jelenjen meg, ha egy előző válasz „aktiválta” a kulcsot (pl. ha valaki Igen-t választott egy korábbi kérdésre).
+
+3. Megjelenítés
+
+A TrueFalseGroup.tsx komponens felel a blokkokért:
+
+a groupName értékét használja blokkfejlécnek (pl. „Villamos ellenőrzés”),
+
+a belső sorok a Questionnaire.tsx által csoportosított kérdéseket jelenítik meg.
+
+4. Nyelvi kezelés
+
+A useLanguageContext() hook és t fordítási függvény biztosítja, hogy a szöveg a felhasználó által választott nyelven jelenjen meg.
+A fordítás jelenleg a titleHu, titleDe, groupName, groupNameDe mezők alapján történik.
+
+⚠️ A jelenlegi megoldás hátrányai
+
+Kettős nyelvi struktúra
+
+Külön mezők vannak minden nyelvhez (titleHu, titleDe, groupNameDe, stb.).
+
+Ez redundáns és karbantarthatatlan Excel-szinten is (kettős adatbevitel).
+
+Fordítási kontextusok konfliktusban
+
+A useLanguageContext() + t függvény gyakran ütközik a kérdések nyelvi logikájával, mert a titleHu/titleDe is már lokalizált.
+
+Így a UI kétszer is próbálhat fordítani – ez bizonyos helyzetekben hibát, üres mezőt vagy kevert nyelvű UI-t eredményez.
+
+groupName túlterhelt funkció
+
+Egyszerre szolgál vizuális címként és logikai azonosítóként (a conditional_group_key-hez is kötődik).
+
+Ez nehezen bővíthető, és többnyelvű környezetben inkonzisztens lehet.
+
+Szűrés logika bonyolult és törékeny
+
+A conditional_group_key értékek manuálisan vannak Excelben beállítva.
+
+A feltételes szűrés (useConditionalQuestionFilter) a groupName-re is épül, így a logikai és vizuális rétegek összemosódnak.
+
+🎯 Cél – Az új, egységesített struktúra és működés
+1. Egyszerűsített adatmodell
+
+Az Excel és backend mezők így nézzenek ki:
+
+{
+  "id": "Q12",
+  "title": {
+    "hu": "Kérdés magyarul",
+    "de": "Frage auf Deutsch"
+  },
+  "group": {
+    "key": "electrical_check",
+    "title": {
+      "hu": "Villamos ellenőrzés",
+      "de": "Elektrische Prüfung"
+    }
+  },
+  "conditional_key": "section_A",
+  "type": "yes_no_na"
+}
+
+2. Megjelenítési logika
+
+A frontend csak egyetlen title és group.title objektumot kezel.
+
+Nincs szükség useLanguageContext() hívásra a kérdések rendereléséhez:
+→ a Questionnaire komponens már az adott nyelvhez megfelelő kulcsot (title[lang]) jeleníti meg.
+
+A groupName és conditional_group_key szétválik:
+
+group.key = logikai azonosító
+
+group.title = megjelenítési név
+
+conditional_key = feltételkapcsolat
+
+3. Backend módosítás
+
+A routes.ts formázásban:
+
+Törölni kell a groupNameDe, titleHu, titleDe stb. mezőket.
+
+Új struktúrát kell építeni az Excel-olvasás után:
+
+title: { hu: config.titleHu, de: config.titleDe },
+group: {
+  key: config.groupKey || config.groupName,
+  title: { hu: config.groupName, de: config.groupNameDe }
+}
+
+
+A frontendnek mindig ugyanaz a JSON-struktúra megy vissza.
+
+4. Frontend módosítás
+
+TrueFalseGroup.tsx → csak a group.title[lang] mezőt jelenítse meg.
+
+useConditionalQuestionFilter.tsx → a conditional_key mezőt használja, ne a groupName-t.
+
+A Questionnaire.tsx → a group.key alapján csoportosítson.
+
+💡 Előnyei az új megoldásnak
+Szempont	Jelenlegi rendszer	Új rendszer
+Nyelvi kezelés	Duplikált mezők (titleHu, titleDe)	Egységes title: { hu, de }
+Fordítás	Függ a useLanguageContext()-tól	Nyelvfüggetlen, backendből jön a megfelelő szöveg
+Csoportosítás	groupName keveri a logikát és megjelenítést	group.key és group.title különválik
+Feltételes logika	groupName-hez kötött	conditional_key önálló, tiszta
+Excel-kezelés	Többszörös adatbevitel	Egy helyen szerkeszthető
+Hibalehetőség	Magas (kettős fordítás)	Alacsony (egységes struktúra)
+🪜 Fejlesztési lépések (a Replit-asszisztens számára)
+
+Backend refaktor (routes.ts)
+
+A kérdésformázó részt alakítsd át a fenti struktúrára.
+
+Töröld a groupNameDe, titleHu, titleDe mezőket a response-ból.
+
+Új kulcsok: title.hu, title.de, group.key, group.title.hu, group.title.de.
+
+Frontend módosítás
+
+Questionnaire.tsx:
+
+Csoportosítás group.key szerint, fejléc megjelenítés group.title[lang].
+
+TrueFalseGroup.tsx:
+
+Fejlécben group.title[lang] használata.
+
+A t fordítási függvény eltávolítható a kérdésekhez.
+
+useConditionalQuestionFilter.tsx:
+
+A conditional_key alapján szűrj, ne groupName alapján.
+
+Excel Parser frissítés
+
+A excelParserService-ben építsd be, hogy groupKey mezőt is generáljon (pl. slug formában a groupName alapján).
+
+Transzformációs kompatibilitás
+
+Ideiglenesen támogasd a régi mezőket is (fallback), hogy ne törjön az app:
+
+title: { hu: config.titleHu || config.title, de: config.titleDe || config.title },

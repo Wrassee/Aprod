@@ -229,6 +229,8 @@ export const translations: Record<string, Translation> = {
     outOfRange: "Határértéken kívül (700-9000 mm)",
     viewErrors: "Hibák megtekintése",
     downloadErrorList: "Hibalista letöltése",
+    question: "Kérdés", // <-- ÚJ SOR
+    questionsInGroup: "kérdés ebben a csoportban",
   },
   de: {
     // Start Screen
@@ -343,5 +345,7 @@ export const translations: Record<string, Translation> = {
     outOfRange: "Außerhalb der Grenzwerte (700-9000 mm)",
     viewErrors: "Fehler anzeigen",
     downloadErrorList: "Fehlerliste herunterladen",
+    question: "Frage", // <-- ÚJ SOR
+    questionsInGroup: "Fragen in dieser Gruppe",
   },
 };

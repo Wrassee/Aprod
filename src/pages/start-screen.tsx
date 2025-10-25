@@ -30,19 +30,8 @@ export function StartScreen({ onLanguageSelect }: StartScreenProps) {
       
       {/* Language Selection */}
       <div className="flex space-x-8">
-        {/* Hungarian Flag */}
-        <Button
-          variant="outline"
-          className="flex flex-col items-center p-6 h-auto border-2 border-gray-200 hover:border-otis-blue hover:bg-otis-light-blue transition-all duration-200 transform hover:scale-105"
-          onClick={() => onLanguageSelect('hu')}
-        >
-          <div className="w-20 h-14 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1/3 bg-red-500"></div>
-            <div className="absolute top-1/3 left-0 w-full h-1/3 bg-white"></div>
-            <div className="absolute top-2/3 left-0 w-full h-1/3 bg-green-500"></div>
-          </div>
-          <span className="text-lg font-medium text-gray-700">Magyar</span>
-        </Button>
+        
+        {/* === A KÉT BLOKK FELCSERÉLVE === */}
         
         {/* German Flag */}
         <Button
@@ -57,6 +46,21 @@ export function StartScreen({ onLanguageSelect }: StartScreenProps) {
           </div>
           <span className="text-lg font-medium text-gray-700">Deutsch</span>
         </Button>
+
+        {/* Hungarian Flag */}
+        <Button
+          variant="outline"
+          className="flex flex-col items-center p-6 h-auto border-2 border-gray-200 hover:border-otis-blue hover:bg-otis-light-blue transition-all duration-200 transform hover:scale-105"
+          onClick={() => onLanguageSelect('hu')}
+        >
+          <div className="w-20 h-14 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1/3 bg-red-500"></div>
+            <div className="absolute top-1/3 left-0 w-full h-1/3 bg-white"></div>
+            <div className="absolute top-2/3 left-0 w-full h-1/3 bg-green-500"></div>
+          </div>
+          <span className="text-lg font-medium text-gray-700">Magyar</span>
+        </Button>
+        
       </div>
     </div>
   );

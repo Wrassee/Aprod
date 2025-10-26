@@ -53,7 +53,10 @@
           "text": "Geschwindigkeitsbegrenzer"
         },
         {
-          "id": "OKRow13"
+          "id": "OKRow13",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row1/13"
         },
         {
           "id": "OK1/14",
@@ -122,10 +125,16 @@
           "text": "Die metallische Kabelkanäle "
         },
         {
-          "id": "OKRow15"
+          "id": "OKRow15",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row2/15"
         },
         {
-          "id": "OKRow16"
+          "id": "OKRow16",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row2/16"
         },
         {
           "id": "OK2/17",
@@ -174,10 +183,16 @@
           "text": "Führungsschienen der Kabine"
         },
         {
-          "id": "OKRow10"
+          "id": "OKRow10",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row3/10"
         },
         {
-          "id": "OKRow11"
+          "id": "OKRow11",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row3/11"
         },
         {
           "id": "OK3/12",
@@ -218,10 +233,16 @@
           "text": "Die metallische Kabelkanäle"
         },
         {
-          "id": "OKRow8"
+          "id": "OKRow8",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row4/8"
         },
         {
-          "id": "OKRow9"
+          "id": "OKRow9",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row4/9"
         },
         {
           "id": "OK4/10",
@@ -258,10 +279,16 @@
           "text": "Die Kabinentür-Schwelle "
         },
         {
-          "id": "OKRow5/7"
+          "id": "OKRow5/7",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row5/7"
         },
         {
-          "id": "OKRow5/8"
+          "id": "OKRow5/8",
+          "text": "Benutzerdefinierter Artikel...",
+          "isCustom": true,
+          "pdfTextFieldName": "Row5/8"
         },
         {
           "id": "OK5/9",

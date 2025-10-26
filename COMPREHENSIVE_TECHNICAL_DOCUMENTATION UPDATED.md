@@ -1,16 +1,72 @@
 # 🗃️ OTIS APROD - TELJES TECHNIKAI DOKUMENTÁCIÓ
 
 ## 📖 **TARTALOMJEGYZÉK**
-1.  [Alkalmazás Áttekintés](#alkalmazás-áttekintés)
-2.  [Architektúra és Technológiai Stack](#architektúra-és-technológiai-stack)
-3.  [Adatbázis Séma és Adatmodell](#adatbázis-séma-és-adatmodell)
-4.  [Backend API és Szolgáltatások](#backend-api-és-szolgáltatások)
-5.  [Frontend Komponensek és Oldalak](#frontend-komponensek-és-oldalak)
-6.  [Fájl Struktúra és Szervezés](#fájl-struktúra-és-szervezés)
-7.  [Speciális Funkciók és Modulok](#speciális-funkciók-és-modulok)
-8.  [Deployment és Környezetek](#deployment-és-környezetek)
-9.  [Fejlesztési Útmutató](#fejlesztési-útmutató)
-10. [API Referencia](#api-referencia)
+1.  [Version History](#version-history)
+2.  [Alkalmazás Áttekintés](#alkalmazás-áttekintés)
+3.  [Architektúra és Technológiai Stack](#architektúra-és-technológiai-stack)
+4.  [Adatbázis Séma és Adatmodell](#adatbázis-séma-és-adatmodell)
+5.  [Backend API és Szolgáltatások](#backend-api-és-szolgáltatások)
+6.  [Frontend Komponensek és Oldalak](#frontend-komponensek-és-oldalak)
+7.  [Fájl Struktúra és Szervezés](#fájl-struktúra-és-szervezés)
+8.  [Speciális Funkciók és Modulok](#speciális-funkciók-és-modulok)
+9.  [Deployment és Környezetek](#deployment-és-környezetek)
+10. [Fejlesztési Útmutató](#fejlesztési-útmutató)
+11. [API Referencia](#api-referencia)
+
+---
+
+## 📚 **VERSION HISTORY**
+
+### **VERSION 0.5.0 (2025-10-26) - Conditional Filtering & Mixed-Type Blocks Complete**
+
+#### ✅ **Major Features**
+1. **Conditional Question Filtering Architecture**
+   - **Excel-First Design**: `groupKey` column in Excel defines stable slugs for filtering logic
+   - **Language-Independent**: groupKey remains constant across UI languages (e.g., "treppenhaustur" works in both HU/DE)
+   - **Fallback**: Auto-generation from groupName only when Excel groupKey is missing
+   - **Frontend Logic**: `conditional-question-filter.tsx` compares `conditional_group_key` with `groupKey` (NOT localized groupName)
+   - **Critical Fix**: Conditional questions now show/hide correctly regardless of UI language
+
+2. **Mixed-Type Question Blocks**
+   - **Flexible Rendering**: Supports ANY question type combination (radio, text, select, measurement, calculated, etc.) in single block
+   - **Smart Component Routing**: TrueFalseGroup ONLY for pure boolean blocks; mixed blocks use IsolatedQuestion per question type
+   - **Implementation**: `questionnaire.tsx` routes each question to correct component based on type
+   - **Result**: Mixed blocks render correctly with proper inputs for each question type
+
+3. **Placeholder Localization**
+   - **Database Schema**: Added `placeholderDe` column to support German placeholder text
+   - **Excel Support**: Parser reads both `placeholder` (Hungarian) and `placeholderDE` (German) from Excel
+   - **Language-Aware API**: `routes.ts` returns German placeholders when `language === "de"`, with fallback to Hungarian
+   - **User Experience**: Empty text fields now show correct placeholder based on UI language
+
+4. **Smart "n.a." Handling for Conditional Fields**
+   - **Empty Field Detection**: Only empty fields receive "n.a." value when hidden
+   - **User Data Preservation**: Previously entered data is maintained when questions are hidden/shown
+   - **Auto-Cleanup**: When conditional questions reappear, "n.a." values are cleared to show placeholder
+
+#### 🧹 **Codebase Cleanup & Optimization**
+- **Deleted 70+ temporary files**: 38 Excel test files, 11 PDF test files, 11 deployment markdown files, 11 Vite timestamp files
+- **Removed verbose logging**: Cleaned 6 debug console.log statements from `simple-xml-excel.ts`, 3 from `routes.ts`
+- **Production-Ready Logging**: Kept all console.error and console.warn statements for production monitoring
+- **File Organization**: Removed empty files, debug scripts, and outdated documentation
+
+#### 📝 **Architecture Documentation**
+- **Updated replit.md**: Comprehensive documentation of groupKey architecture, mixed-type rendering logic, and localization patterns
+- **Critical Patterns Documented**:
+  - groupKey (stable slug for filtering) vs groupName (localized for UI display)
+  - TrueFalseGroup vs IsolatedQuestion component selection
+  - Localization pattern: German UI uses *DE columns, Hungarian uses base columns
+
+#### 🔒 **Data Integrity**
+- **Type Safety**: Added `placeholderDe?: string | null` to Question type in `shared/schema.ts`
+- **Parser Enhancement**: `excel-parser.ts` now extracts both placeholder columns with header aliases
+- **Backward Compatibility**: Fallback to Hungarian placeholder when German translation missing
+
+### **VERSION 0.4.9 (2025-08-26) - Final Deployment Success**
+- Production build fixed with complete elimination of Vite import conflicts
+- Email functionality with Resend API integration and user feedback
+- Protocol preview enhancement with PDF in iframe
+- Fully ready for Vercel production deployment
 
 ---
 

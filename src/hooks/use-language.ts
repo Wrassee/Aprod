@@ -4,7 +4,11 @@ import { useState, useEffect, useMemo } from 'react';
 import { translations, Translation } from '@/lib/translations';
 
 export function useLanguage() {
-  const [language, setLanguage] = useState<'hu' | 'de'>('hu');
+  // Betöltjük a mentett nyelvet AZONNAL az inicializáláskor
+  const [language, setLanguage] = useState<'hu' | 'de'>(() => {
+    const saved = localStorage.getItem('otis-protocol-language') as 'hu' | 'de';
+    return (saved === 'hu' || saved === 'de') ? saved : 'hu';
+  });
   
   // === DERIVED STATE: A fordítások közvetlenül a language állapotból ===
   // A useMemo biztosítja, hogy a fordítási objektum azonnal elérhető legyen

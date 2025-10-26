@@ -3,111 +3,6 @@
 ## Overview
 This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
 
-## Recent Changes (2025-10-26)
-### ✅ VERSION 0.5.1 - PDF EXPORT SYSTEM OVERHAUL & ERDUNGSKONTROLLE FIX
-- **Error List PDF Export Completely Rebuilt**: Puppeteer → jsPDF migration
-  - **Problem**: Chromium dependencies (libnspr4.so) unavailable in Replit environment causing corrupted PDFs
-  - **Solution**: Pure JavaScript jsPDF library (already installed, zero new dependencies)
-  - **Unicode Support**: Embedded Roboto-Regular.ttf and Roboto-Bold.ttf fonts for Hungarian characters (ő, ű, á, é)
-  - **Font Loading**: Server reads TTF files from `public/fonts/`, converts to base64, registers with jsPDF VFS
-  - **Professional Layout**: OTIS blue header, color-coded severity badges, automatic page breaks, bilingual support
-  - **Result**: ✅ Error list PDFs now generate correctly with proper Hungarian/German text rendering
-- **Environment-Aware File Path Architecture**: Universal temp directory handling
-  - **Development**: `/home/runner/workspace/temp` - writable local workspace directory
-  - **Production**: `/app/temp` - Vercel serverless compatible path
-  - **Defensive mkdir**: All temp directories created with `recursive: true` to prevent errors
-  - **Fixed Services**: template-loader.ts, pdf-service.ts (LibreOffice), error-export.ts (jsPDF)
-  - **Result**: ✅ All PDF/Excel downloads work in both dev and production environments
-- **Erdungskontrolle German Localization Fix**: Missing custom row metadata
-  - **Problem**: `questions_grounding_de.json` had incomplete custom row definitions (only `id` field)
-  - **Fixed**: Added `isCustom: true`, `text: "Benutzerdefinierter Artikel..."`, and `pdfTextFieldName` to all 9 custom rows
-  - **Affected Rows**: OKRow13, OKRow15, OKRow16, OKRow10, OKRow11, OKRow8, OKRow9, OKRow5/7, OKRow5/8
-  - **Result**: ✅ Switch toggles and custom input fields now appear correctly in German UI
-
-### ✅ VERSION 0.5.0 - CONDITIONAL FILTERING & MIXED-TYPE BLOCKS COMPLETE
-- **Conditional Filtering Architecture**: Stable slug-based system with Excel-defined groupKey
-  - **Excel-First**: `groupKey` column in Excel defines stable slugs for filtering logic
-  - **Fallback**: Auto-generation from groupName only when Excel groupKey is missing
-  - **Frontend Filter**: conditional-question-filter.tsx compares `conditional_group_key` with `groupKey` (NOT localized groupName)
-  - **Language Independence**: groupKey remains constant across UI languages (e.g., "treppenhaustur" works in both HU/DE)
-  - **Result**: ✅ Conditional questions now show/hide correctly regardless of UI language
-- **Mixed-Type Question Blocks**: Complete component rendering overhaul
-  - **Rendering Logic**: TrueFalseGroup ONLY for pure boolean blocks; mixed blocks use IsolatedQuestion per question type
-  - **Support**: Any question type combination (radio, text, select, measurement, calculated, etc.) in single block
-  - **Component Routing**: questionnaire.tsx routes each question to correct component based on type
-  - **Result**: ✅ Mixed blocks render correctly with proper inputs for each question type
-- **Placeholder Localization**: German UI now uses placeholderDE column from Excel
-  - **Column Support**: Parser reads both `placeholder` (Hungarian) and `placeholderDE` (German) from Excel
-  - **Language-Aware**: routes.ts returns German placeholders when `language === "de"`
-  - **Fallback**: Uses Hungarian placeholder when German translation missing
-  - **Result**: ✅ Placeholder text now fully localized for both languages
-
-## Previous Changes (2025-08-26)
-### ✅ VERSION 0.4.9 - FINAL DEPLOYMENT SUCCESS & BUILD CLEANUP
-- **Production Build Fixed**: Complete elimination of Vite import conflicts
-  - **Removed**: server/vite.ts and conflicting server/index.ts files
-  - **Simplified**: Pure Vercel serverless deployment architecture
-  - **Build Success**: Frontend (461kB) + Backend (120kB) both compile perfectly
-  - **Zero Errors**: Production build now completes without any issues
-- **Email Functionality**: Complete Resend API integration with user feedback
-  - **Working**: Email sending with PDF attachments to netkodok@gmail.com
-  - **User Feedback**: Visual status indicators ("Küldés...", "✅ Sikeresen elküldve!", "❌ Sikertelen!")
-  - **Auto-dismiss**: All notifications disappear after 5 seconds
-  - **Multi-location**: Available on both Protocol Preview and Completion pages
-- **Protocol Preview Enhancement**: PDF preview in iframe with download/email buttons
-- **Schema & Types Fixed**: JSON string/object conversion with Zod transforms
-- **Deployment Ready**: ✅ FULLY READY FOR VERCEL PRODUCTION DEPLOYMENT
-
-### ✅ REFACTORING COMPLETE - Project Structure Standardized for Deployment
-- **Backend Refactoring**: Complete relative imports conversion
-  - **Fixed**: All @shared/ aliases replaced with relative paths (../shared/schema.js)
-  - **Fixed**: All local imports now have .js extensions for Node.js ES Module compatibility
-  - **Updated**: server/db.ts, storage.ts, routes.ts, all services with proper relative imports
-- **Environment-Aware File Handling**: Vercel + localhost compatibility 
-  - **Production**: Uses /tmp directory for Vercel serverless functions
-  - **Development**: Uses local uploads directory
-  - **Implemented**: Conditional logic in multer configuration and PDF service
-- **Frontend Structure Fixes**: 
-  - **Moved**: All React components to root /src directory structure
-  - **Updated**: Tailwind config to point to correct paths (./src/**/*..jsx,ts,tsx})
-  - **Fixed**: Static asset paths (OTIS logo renamed to otis-logo.png)
-- **Excel Question Parsing**: Enhanced with debug logging
-  - **Fixed**: Parser now accepts file paths instead of buffers
-  - **Enhanced**: Column detection with multiple possible names
-  - **Debug**: Added comprehensive logging for troubleshooting
-- **Supabase Integration**: Cloud storage ready for production
-  - **Working**: Template uploads to Supabase Storage
-  - **Fallback**: Local storage for development when cloud fails
-  - **Pattern**: Download-first-then-process for cloud files
-
-## Previous Changes (2025-08-21)
-### ✅ ULTIMATE DEPLOYMENT FIX - All Vite Bundling Issues Permanently Resolved
-- **CRITICAL FIX**: COMPLETE - All suggested deployment fixes applied with ultimate solution
-  - **Problem**: Protected `server/vite.ts` file with direct Vite imports causing persistent ESBuild failures
-  - **Ultimate Solution**: Complete bypass of problematic file with production-safe wrapper
-  - **Created**: `server/production-wrapper.ts` - Conditional dynamic imports with full environment detection
-  - **Created**: `server/production-only.ts` - Zero Vite dependencies entry point
-  - **Created**: `deploy-ultimate.sh` - Comprehensive build with ultimate Vite exclusions
-  - **Updated**: All server imports to use production-safe wrappers
-  - **Result**: ✅ Build verified (7.4kb backend, 458kb frontend) in 13ms with zero Vite references
-  - **Status**: ✅ ULTIMATE DEPLOYMENT SUCCESS - Complete Vite elimination, universal compatibility
-- **Supabase Storage**: MŰKÖDŐ cloud storage integráció
-  - Successful file uploads: `https://ojbsmolteoxkvpxljfid.supabase.co/storage/v1/object/public/aprod-templates/...`
-  - Automatic bucket creation with public access
-  - Production-first approach: cloud storage required in production
-- **Vercel Compatibility**: Serverless architecture prepared
-  - `/api/index.ts` entry point updated for production build
-  - Build configuration optimized for serverless deployment
-  - Environment-specific server logic (dev vs production)
-- **Production Safety**: No local file dependencies
-  - Template uploads: Direct to Supabase Storage
-  - Image uploads: Cloud storage with public URLs
-  - Error handling: Graceful fallback only in development
-- **API Endpoints**: All functioning correctly
-  - `/api/questions/hu` - Hungarian question templates ✅
-  - `/api/admin/templates` - Template management ✅
-  - `/api/upload` - Image upload to Supabase ✅
-
 ## User Preferences
 Preferred communication style: Simple, everyday language (Hungarian preferred).
 Frustrated with Vite complexity - prefers solutions that avoid Vite whenever possible.
@@ -132,37 +27,28 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **API Endpoints**: RESTful API for protocols, templates, and question configurations.
 
 ### Key Features & Design Patterns
-- **Multi-language Support**: Hungarian and German localization with dynamic switching.
-  - **Localization Pattern**: German UI uses *DE columns (titleDE, groupNameDE, placeholderDE), Hungarian uses base columns (title, groupName, placeholder)
-  - **groupKey Stability**: Filtering logic uses stable slugs (groupKey) that remain constant across languages, NOT localized groupName
-- **Conditional Question Filtering**: Excel-driven visibility control with stable groupKey architecture
-  - **Excel-First**: `groupKey` column in Excel defines stable slugs for conditional filtering (e.g., "treppenhaustur")
-  - **Auto-Fallback**: Slugify groupName only when Excel groupKey is missing
-  - **Frontend Logic**: conditional-question-filter.tsx compares `conditional_group_key` with `groupKey` (language-independent)
-  - **Critical**: Never compare localized groupName for filtering - breaks when UI language changes
-- **Mixed-Type Question Blocks**: Flexible rendering supporting any question type combination
-  - **TrueFalseGroup**: ONLY for pure boolean radio blocks (all questions type='radio' with true/false/n.a.)
-  - **IsolatedQuestion**: For mixed blocks, each question renders with correct component based on type
-  - **Supported Types**: radio, text, select, measurement, calculated, and any combination thereof
+- **Multi-language Support**: Hungarian and German localization with dynamic switching, using stable `groupKey` slugs for filtering logic.
+- **Conditional Question Filtering**: Excel-driven visibility control using stable `groupKey` architecture for language-independent filtering.
+- **Mixed-Type Question Blocks**: Flexible rendering supporting any combination of question types (radio, text, select, measurement, calculated) within a block.
 - **Template Management System**: Admin interface for uploading, activating, and deleting Excel-based question and protocol templates, supporting unified multilingual templates.
-- **Excel Integration**: XML-based manipulation preserves original formatting, handles unicode, and supports complex cell mapping (multi-row/multi-cell question types). Calculations handled by Excel's formulas.
-- **Dual PDF Generation System**: Two separate engines for different document types
-  - **Protocol PDFs**: LibreOffice conversion for accurate Excel-to-PDF with formula preservation and professional formatting
-  - **Error List PDFs**: jsPDF library with embedded Roboto fonts for Hungarian/German Unicode character support (ő, ű, á, é)
-  - **Environment-Aware Paths**: Automatic detection of dev vs prod temp directories for cross-platform compatibility
-  - **Font Embedding**: TTF files converted to base64 and registered in jsPDF VFS for proper character rendering
+- **Excel Integration**: XML-based manipulation preserving formatting, handling unicode, and supporting complex cell mapping. Calculations handled by Excel's formulas.
+- **Dual PDF Generation System**: 
+  - **Protocol PDFs**: LibreOffice conversion for accurate Excel-to-PDF.
+  - **Error List PDFs**: jsPDF library with embedded Roboto fonts for Hungarian/German Unicode character support.
+  - Environment-aware temp directory handling for cross-platform compatibility.
 - **Data Persistence**: Form data saved to localStorage and PostgreSQL.
 - **Error Documentation**: Allows adding, editing, and deleting protocol errors with image attachments.
 - **Digital Signature**: Canvas-based signature capture with printed name functionality.
-- **Measurement & Calculation**: Supports 'measurement' and 'calculated' question types with a dedicated engine and automatic error detection for out-of-range values.
-- **Excel Template-Based Niedervolt System**: Dynamic device loading from Excel templates with hardcoded fallback, device selection system, custom device creation, and comprehensive FI measurement columns.
+- **Measurement & Calculation**: Supports 'measurement' and 'calculated' question types with a dedicated engine and automatic error detection.
+- **Excel Template-Based Niedervolt System**: Dynamic device loading from Excel templates with custom device creation and FI measurement columns.
 - **Deployment**: Configured for Vercel with serverless API, PWA functionality, and automated deployment scripts.
+- **Authentication**: Supabase integration for user authentication, profiles, and secure API access with JWT token validation and role-based authorization.
 
 ## External Dependencies
 ### Frontend
 - **React Ecosystem**: `react`, `react-dom`
 - **UI Components**: `@radix-ui/react-slot`, `lucide-react`, `class-variance-authority`, `tailwind-merge`
-- **Styling**: `tailwindcss`, `postcss`, `autoprefixer`
+- **Styling**: `tailwindcss`
 - **Data Fetching**: `@tanstack/react-query`
 - **Date Handling**: `date-fns`
 - **Routing**: `wouter`
@@ -173,13 +59,6 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **Database ORM**: `drizzle-orm`, `@neondatabase/serverless` (PostgreSQL driver)
 - **Schema Validation**: `zod`
 - **File Manipulation**: `adm-zip`, `xml2js`, `simple-excel-js`
-- **PDF Generation**: 
-  - `libreoffice-convert` - Protocol PDF conversion from Excel templates
-  - `jspdf` - Error list PDF generation with Unicode font support
-  - Custom Roboto font embedding for Hungarian/German character support
+- **PDF Generation**: `libreoffice-convert`, `jspdf` (with custom Roboto font embedding)
+- **Authentication**: `supabase-js`
 - **Utilities**: `nanoid`
-
-### Development
-- **TypeScript**: `typescript`
-- **Build Tools**: `vite`, `tsx`, `esbuild`
-- **Database Migrations**: `drizzle-kit`

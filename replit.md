@@ -4,6 +4,26 @@
 This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
 
 ## Recent Changes (2025-10-26)
+### ✅ VERSION 0.5.1 - PDF EXPORT SYSTEM OVERHAUL & ERDUNGSKONTROLLE FIX
+- **Error List PDF Export Completely Rebuilt**: Puppeteer → jsPDF migration
+  - **Problem**: Chromium dependencies (libnspr4.so) unavailable in Replit environment causing corrupted PDFs
+  - **Solution**: Pure JavaScript jsPDF library (already installed, zero new dependencies)
+  - **Unicode Support**: Embedded Roboto-Regular.ttf and Roboto-Bold.ttf fonts for Hungarian characters (ő, ű, á, é)
+  - **Font Loading**: Server reads TTF files from `public/fonts/`, converts to base64, registers with jsPDF VFS
+  - **Professional Layout**: OTIS blue header, color-coded severity badges, automatic page breaks, bilingual support
+  - **Result**: ✅ Error list PDFs now generate correctly with proper Hungarian/German text rendering
+- **Environment-Aware File Path Architecture**: Universal temp directory handling
+  - **Development**: `/home/runner/workspace/temp` - writable local workspace directory
+  - **Production**: `/app/temp` - Vercel serverless compatible path
+  - **Defensive mkdir**: All temp directories created with `recursive: true` to prevent errors
+  - **Fixed Services**: template-loader.ts, pdf-service.ts (LibreOffice), error-export.ts (jsPDF)
+  - **Result**: ✅ All PDF/Excel downloads work in both dev and production environments
+- **Erdungskontrolle German Localization Fix**: Missing custom row metadata
+  - **Problem**: `questions_grounding_de.json` had incomplete custom row definitions (only `id` field)
+  - **Fixed**: Added `isCustom: true`, `text: "Benutzerdefinierter Artikel..."`, and `pdfTextFieldName` to all 9 custom rows
+  - **Affected Rows**: OKRow13, OKRow15, OKRow16, OKRow10, OKRow11, OKRow8, OKRow9, OKRow5/7, OKRow5/8
+  - **Result**: ✅ Switch toggles and custom input fields now appear correctly in German UI
+
 ### ✅ VERSION 0.5.0 - CONDITIONAL FILTERING & MIXED-TYPE BLOCKS COMPLETE
 - **Conditional Filtering Architecture**: Stable slug-based system with Excel-defined groupKey
   - **Excel-First**: `groupKey` column in Excel defines stable slugs for filtering logic
@@ -126,7 +146,11 @@ Excel writing functionality must remain untouched to prevent corruption.
   - **Supported Types**: radio, text, select, measurement, calculated, and any combination thereof
 - **Template Management System**: Admin interface for uploading, activating, and deleting Excel-based question and protocol templates, supporting unified multilingual templates.
 - **Excel Integration**: XML-based manipulation preserves original formatting, handles unicode, and supports complex cell mapping (multi-row/multi-cell question types). Calculations handled by Excel's formulas.
-- **PDF Generation**: Uses LibreOffice for accurate Excel-to-PDF conversion, maintaining appearance and layout.
+- **Dual PDF Generation System**: Two separate engines for different document types
+  - **Protocol PDFs**: LibreOffice conversion for accurate Excel-to-PDF with formula preservation and professional formatting
+  - **Error List PDFs**: jsPDF library with embedded Roboto fonts for Hungarian/German Unicode character support (ő, ű, á, é)
+  - **Environment-Aware Paths**: Automatic detection of dev vs prod temp directories for cross-platform compatibility
+  - **Font Embedding**: TTF files converted to base64 and registered in jsPDF VFS for proper character rendering
 - **Data Persistence**: Form data saved to localStorage and PostgreSQL.
 - **Error Documentation**: Allows adding, editing, and deleting protocol errors with image attachments.
 - **Digital Signature**: Canvas-based signature capture with printed name functionality.
@@ -149,7 +173,10 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **Database ORM**: `drizzle-orm`, `@neondatabase/serverless` (PostgreSQL driver)
 - **Schema Validation**: `zod`
 - **File Manipulation**: `adm-zip`, `xml2js`, `simple-excel-js`
-- **PDF Conversion**: `libreoffice-convert` (requires LibreOffice installation)
+- **PDF Generation**: 
+  - `libreoffice-convert` - Protocol PDF conversion from Excel templates
+  - `jspdf` - Error list PDF generation with Unicode font support
+  - Custom Roboto font embedding for Hungarian/German character support
 - **Utilities**: `nanoid`
 
 ### Development

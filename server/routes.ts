@@ -165,7 +165,14 @@ export async function registerRoutes(app: Express) {
         });
       }
       
-      const profile = await storage.createProfile(validationResult.data);
+      // SECURITY FIX: Force role to "user" for self-service creation
+      // Only admins can create profiles with elevated roles (future feature)
+      const sanitizedData = {
+        ...validationResult.data,
+        role: 'user', // Always set to 'user' regardless of client input
+      };
+      
+      const profile = await storage.createProfile(sanitizedData);
       res.status(201).json(profile);
     } catch (error) {
       console.error("❌ Error creating profile:", error);
@@ -188,7 +195,20 @@ export async function registerRoutes(app: Express) {
         });
       }
       
-      const profile = await storage.updateProfile(userId, validationResult.data);
+      // SECURITY FIX: Remove protected fields from user updates
+      // Users cannot change their own role or user_id - only system/admin can do that
+      const sanitizedData = { ...validationResult.data };
+      delete sanitizedData.role; // Strip role from client updates
+      delete sanitizedData.user_id; // Strip user_id to prevent ownership transfer
+      
+      // If no fields left to update after sanitization
+      if (Object.keys(sanitizedData).length === 0) {
+        return res.status(400).json({ 
+          message: "No valid fields to update" 
+        });
+      }
+      
+      const profile = await storage.updateProfile(userId, sanitizedData);
       
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });

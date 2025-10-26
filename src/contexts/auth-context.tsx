@@ -8,8 +8,8 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<Session>;
+  signUp: (email: string, password: string) => Promise<Session>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
@@ -25,7 +25,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Fetch or create user profile
   const fetchProfile = async (userId: string, userEmail: string) => {
     try {
-      const response = await fetch(`/api/profiles/${userId}`);
+      // Get current session to attach auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        console.error('❌ No session available to fetch profile');
+        return;
+      }
+
+      const authHeaders = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      };
+
+      const response = await fetch(`/api/profiles/${userId}`, {
+        headers: authHeaders,
+      });
       
       if (response.ok) {
         const data = await response.json();
@@ -35,7 +50,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('📝 Creating new profile for user:', userEmail);
         const createResponse = await fetch('/api/profiles', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders,
           body: JSON.stringify({
             user_id: userId,
             email: userEmail,
@@ -47,6 +62,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const newProfile = await createResponse.json();
           setProfile(newProfile);
           console.log('✅ Profile created successfully');
+        } else {
+          const errorText = await createResponse.text();
+          console.error('❌ Failed to create profile:', errorText);
         }
       }
     } catch (error) {
@@ -92,9 +110,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
     
+    // SECURITY FIX: Only proceed if session exists
+    if (!data.session) {
+      throw new Error('No session returned from sign in');
+    }
+    
     if (data.user) {
       await fetchProfile(data.user.id, data.user.email || '');
     }
+
+    return data.session;
   };
 
   const signUp = async (email: string, password: string) => {
@@ -109,10 +134,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (error) throw error;
     
-    // If auto-confirmed, fetch profile
-    if (data.session && data.user) {
+    // SECURITY FIX: Only proceed if session exists (email confirmation not required)
+    if (!data.session) {
+      throw new Error('Email confirmation required. Please check your inbox.');
+    }
+    
+    if (data.user) {
       await fetchProfile(data.user.id, data.user.email || '');
     }
+
+    return data.session;
   };
 
   const signOut = async () => {

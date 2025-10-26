@@ -34,7 +34,12 @@ export function Login({ onLoginSuccess }: LoginProps) {
     setLoading(true);
 
     try {
-      await signIn(email, password);
+      // SECURITY FIX: Wait for session before proceeding
+      const session = await signIn(email, password);
+      
+      if (!session) {
+        throw new Error('No session returned after sign in');
+      }
       
       toast({
         title: 'Sikeres bejelentkezés! ✅',
@@ -77,19 +82,38 @@ export function Login({ onLoginSuccess }: LoginProps) {
     setLoading(true);
 
     try {
-      await signUp(email, password);
+      // SECURITY FIX: Wait for session before proceeding
+      const session = await signUp(email, password);
+      
+      if (!session) {
+        // Email confirmation required
+        toast({
+          title: 'Email megerősítés szükséges 📧',
+          description: 'Ellenőrizd az email fiókodat és kattints a megerősítő linkre.',
+        });
+        setIsRegistering(false);
+        setPassword('');
+        return;
+      }
       
       toast({
         title: 'Sikeres regisztráció! 🎉',
-        description: 'Bejelentkezés folyamatban...',
+        description: 'Bejelentkezés sikeres!',
       });
       
-      // Auto-login after registration
+      // Auto-login after registration (only if session exists)
       onLoginSuccess();
     } catch (error: any) {
       console.error('Registration error:', error);
       
-      if (error.message.includes('email_provider_disabled')) {
+      if (error.message.includes('Email confirmation required')) {
+        toast({
+          title: 'Email megerősítés szükséges 📧',
+          description: 'Ellenőrizd az email fiókodat és kattints a megerősítő linkre.',
+        });
+        setIsRegistering(false);
+        setPassword('');
+      } else if (error.message.includes('email_provider_disabled')) {
         toast({
           title: 'Regisztráció ideiglenesen kikapcsolva',
           description: 'Kérlek, használd a bejelentkezést egy meglévő fiókkal.',

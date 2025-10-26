@@ -12,6 +12,12 @@ import { adminRoutes } from "./routes/admin-routes.js";
 import { protocolMappingRoutes } from "./routes/protocol-mapping.js";
 import { errorRoutes } from "./routes/error-routes.js";
 
+// Auth middleware
+import { requireAuth, requireOwnerOrAdmin } from "./middleware/auth.js";
+
+// Zod validation
+import { insertProfileSchema } from "../shared/schema-sqlite.js";
+
 // Gyorsítótár a kérdések tárolására
 let questionsCache: any[] | null = null;
 
@@ -121,8 +127,8 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // Profile endpoints
-  app.get("/api/profiles/:userId", async (req, res) => {
+  // Profile endpoints - PROTECTED with auth middleware
+  app.get("/api/profiles/:userId", requireAuth, requireOwnerOrAdmin, async (req, res) => {
     try {
       const { userId } = req.params;
       const profile = await storage.getProfileByUserId(userId);
@@ -138,10 +144,28 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.post("/api/profiles", async (req, res) => {
+  app.post("/api/profiles", requireAuth, async (req, res) => {
     try {
-      const profileData = req.body;
-      const profile = await storage.createProfile(profileData);
+      // Validate request body with Zod
+      const validationResult = insertProfileSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid profile data", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const authenticatedUser = (req as any).user;
+      
+      // Ensure user can only create their own profile
+      if (validationResult.data.user_id !== authenticatedUser.id) {
+        return res.status(403).json({ 
+          message: "Forbidden - You can only create your own profile" 
+        });
+      }
+      
+      const profile = await storage.createProfile(validationResult.data);
       res.status(201).json(profile);
     } catch (error) {
       console.error("❌ Error creating profile:", error);
@@ -149,11 +173,22 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/profiles/:userId", async (req, res) => {
+  app.patch("/api/profiles/:userId", requireAuth, requireOwnerOrAdmin, async (req, res) => {
     try {
       const { userId } = req.params;
-      const updates = req.body;
-      const profile = await storage.updateProfile(userId, updates);
+      
+      // Validate request body with Zod (partial update)
+      const partialProfileSchema = insertProfileSchema.partial();
+      const validationResult = partialProfileSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        return res.status(400).json({ 
+          message: "Invalid profile update data", 
+          errors: validationResult.error.errors 
+        });
+      }
+      
+      const profile = await storage.updateProfile(userId, validationResult.data);
       
       if (!profile) {
         return res.status(404).json({ message: "Profile not found" });

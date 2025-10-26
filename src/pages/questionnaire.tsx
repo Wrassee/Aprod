@@ -345,10 +345,18 @@ function Questionnaire({
 
             const hasOnlyRadio = radioQuestions.length === currentQuestions.length;
             const hasOnlyMeasurement = measurementQuestions.length === currentQuestions.length;
-            const isMixed = radioQuestions.length > 0 && otherQuestions.length > 0;
+            const isMixed = (radioQuestions.length > 0 || measurementQuestions.length > 0) && otherQuestions.length > 0;
 
-            // If ONLY radio/checkbox questions → use TrueFalseGroup
-            if (hasOnlyRadio) {
+            // If ONLY radio/checkbox questions with standard true/false options → use TrueFalseGroup
+            // (TrueFalseGroup hardcodes true/false/n.a. options, so only use for pure boolean groups)
+            const allRadioAreBoolean = radioQuestions.every(q => 
+              !q.options || q.options.length === 0 || 
+              (Array.isArray(q.options) && q.options.every((opt: string) => 
+                ['true', 'false', 'n.a.', 'yes', 'no', 'igen', 'nem'].includes(opt.toLowerCase())
+              ))
+            );
+            
+            if (hasOnlyRadio && allRadioAreBoolean) {
               return (
                 <TrueFalseGroup
                   questions={radioQuestions}
@@ -371,17 +379,10 @@ function Questionnaire({
               );
             }
 
-            // If MIXED types or other types → render each question individually
+            // If MIXED types OR radio with custom options → render each question individually
+            // This ensures each question type renders with its correct UI component
             return (
               <div className="space-y-6">
-                {radioQuestions.length > 0 && (
-                  <TrueFalseGroup
-                    questions={radioQuestions}
-                    values={localAnswers}
-                    onChange={handleLocalAnswerChange}
-                    groupName={currentGroup?.name || 'Kérdések'}
-                  />
-                )}
                 {measurementQuestions.length > 0 && (
                   <MeasurementBlock
                     questions={measurementQuestions}
@@ -390,9 +391,9 @@ function Questionnaire({
                     onAddError={handleAddError}
                   />
                 )}
-                {otherQuestions.length > 0 && (
+                {(radioQuestions.length > 0 || otherQuestions.length > 0) && (
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    {otherQuestions.map((question: Question) => (
+                    {[...radioQuestions, ...otherQuestions].map((question: Question) => (
                       <IsolatedQuestion
                         key={question.id}
                         question={question}

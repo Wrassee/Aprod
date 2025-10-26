@@ -162,9 +162,13 @@ export function updateAnswersWithDisabled(
   disabledQuestions.forEach(q => {
     // Csak akkor írjuk felül "n.a."-ra, ha NEM vezérlő kérdés
     // A vezérlő kérdéseknek mindig megmarad az eredeti válaszuk
-    // NEW: Check both conditional_key and conditional_group_key for backward compatibility
-    if (!q.conditional_key && !q.conditional_group_key) {
-      disabledAnswers[q.id] = 'n.a.';
+    if (!q.conditional_group_key) {
+      const currentValue = currentAnswers[q.id];
+      // ONLY set "n.a." if the field is empty or undefined
+      // Keep existing user-entered data intact
+      if (!currentValue || currentValue === '') {
+        disabledAnswers[q.id] = 'n.a.';
+      }
     }
   });
 

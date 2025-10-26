@@ -88,17 +88,25 @@ function Questionnaire({
   // Apply conditional filtering
   const { filteredQuestions, filteredCount } = useConditionalQuestionFilter(allQuestions, localAnswers);
 
-  // Auto-set disabled questions to "n.a."
+  // Auto-set disabled questions to "n.a." AND clear "n.a." from re-enabled questions
   useEffect(() => {
     if (allQuestions.length > 0 && filteredQuestions.length > 0) {
       const updatedAnswers = updateAnswersWithDisabled(localAnswers, allQuestions, filteredQuestions);
+      
+      // ADDITIONAL LOGIC: Clear "n.a." from questions that are now visible again
+      filteredQuestions.forEach(q => {
+        // If a question is visible and its value is "n.a.", clear it
+        if (updatedAnswers[q.id] === 'n.a.') {
+          updatedAnswers[q.id] = '';
+        }
+      });
       
       const hasChanges = Object.keys(updatedAnswers).some(key => 
         updatedAnswers[key] !== localAnswers[key]
       );
       
       if (hasChanges) {
-        console.log('🎯 Auto-setting disabled questions to "n.a."', {
+        console.log('🎯 Auto-setting disabled questions to "n.a." and clearing re-enabled questions', {
           totalQuestions: allQuestions.length,
           visibleQuestions: filteredQuestions.length,
           disabledCount: allQuestions.length - filteredQuestions.length

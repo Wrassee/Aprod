@@ -5,6 +5,21 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
+if (!supabaseUrl) {
+  console.error('❌ VITE_SUPABASE_URL is not set!');
+  throw new Error('VITE_SUPABASE_URL environment variable is required');
+}
+
+if (!supabaseServiceKey) {
+  console.error('❌ SUPABASE_SERVICE_ROLE_KEY is not set!');
+  throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
+}
+
+console.log('✅ Supabase Admin Client initialized');
+console.log('📍 Supabase URL:', supabaseUrl);
+console.log('🔑 Service Role Key exists:', supabaseServiceKey.length > 0 ? 'YES' : 'NO');
+console.log('🔑 Service Role Key length:', supabaseServiceKey.length);
+
 // Server-side Supabase client with service role key for admin operations
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 

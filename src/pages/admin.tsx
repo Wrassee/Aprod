@@ -89,7 +89,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       console.error('Error fetching templates:', error);
       toast({
         title: t.error,
-        description: 'Failed to fetch templates',
+        description: t.failedToFetchTemplates,
         variant: 'destructive',
       });
     }
@@ -129,7 +129,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
         const result = await response.json();
         toast({
           title: t.success,
-          description: `Template váltás sikeres: ${result.template?.name || 'Sablon'}`,
+          description: t.templateSwitchSuccess.replace('{name}', result.template?.name || 'Template'),
         });
         fetchHybridTemplates();
       } else {
@@ -139,7 +139,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       console.error('Error selecting template:', error);
       toast({
         title: t.error,
-        description: 'Template váltás sikertelen',
+        description: t.templateSwitchFailed,
         variant: 'destructive',
       });
     } finally {
@@ -168,7 +168,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
     if (!questionsUpload.file || !questionsUpload.name) {
       toast({
         title: t.error,
-        description: language === 'de' ? 'Bitte Namen und Datei angeben' : 'Kérlek add meg a nevet és válassz fájlt',
+        description: t.pleaseProvideNameAndFile,
         variant: 'destructive',
       });
       return;
@@ -190,7 +190,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       if (response.ok) {
         toast({
           title: t.success,
-          description: language === 'de' ? 'Fragenvorlage erfolgreich hochgeladen' : 'Kérdés sablon sikeresen feltöltve',
+          description: t.questionsTemplateUploaded,
         });
         setQuestionsUpload({ name: '', file: null });
         fetchTemplates();
@@ -215,7 +215,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
     if (!protocolUpload.file || !protocolUpload.name) {
       toast({
         title: t.error,
-        description: language === 'de' ? 'Bitte Namen und Datei angeben' : 'Kérlek add meg a nevet és válassz fájlt',
+        description: t.pleaseProvideNameAndFile,
         variant: 'destructive',
       });
       return;
@@ -237,7 +237,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       if (response.ok) {
         toast({
           title: t.success,
-          description: language === 'de' ? 'Protokollvorlage erfolgreich hochgeladen' : 'Protokoll sablon sikeresen feltöltve',
+          description: t.protocolTemplateUploaded,
         });
         setProtocolUpload({ name: '', file: null });
         fetchTemplates();
@@ -267,7 +267,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       if (response.ok) {
         toast({
           title: t.success,
-          description: 'Template activated successfully',
+          description: t.templateActivatedSuccessfully,
         });
         fetchTemplates();
       } else {
@@ -277,7 +277,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       console.error('Error activating template:', error);
       toast({
         title: t.error,
-        description: 'Failed to activate template',
+        description: t.failedToActivateTemplate,
         variant: 'destructive',
       });
     } finally {
@@ -306,7 +306,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       } else {
         toast({
           title: t.error,
-          description: 'Failed to load template preview',
+          description: t.failedToLoadTemplatePreview,
           variant: 'destructive',
         });
       }
@@ -314,7 +314,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       console.error('Error previewing template:', error);
       toast({
         title: t.error,
-        description: 'Error loading template preview',
+        description: t.errorLoadingTemplatePreview,
         variant: 'destructive',
       });
     }
@@ -325,7 +325,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
   };
 
   const handleDelete = async (templateId: string, templateName: string) => {
-    if (!confirm(`Biztosan törölni szeretnéd a(z) "${templateName}" sablont? Ez a művelet nem vonható vissza.`)) {
+    if (!confirm(t.confirmDeleteTemplate.replace('{name}', templateName))) {
       return;
     }
 
@@ -337,7 +337,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       if (response.ok) {
         toast({
           title: t.success,
-          description: 'Sablon sikeresen törölve',
+          description: t.templateDeletedSuccessfully,
         });
         fetchTemplates();
       } else {
@@ -347,7 +347,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
       console.error('Error deleting template:', error);
       toast({
         title: t.error,
-        description: 'Sablon törlése sikertelen',
+        description: t.templateDeleteFailed,
         variant: 'destructive',
       });
     }
@@ -372,7 +372,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   size="sm"
                   onClick={onHome}
                   className="text-gray-600 hover:text-gray-800 mr-4"
-                  title="Kezdőlap"
+                  title={t.homeTooltip}
                 >
                   <Home className="h-4 w-4" />
                 </Button>
@@ -396,11 +396,11 @@ export function Admin({ onBack, onHome }: AdminProps) {
         <Tabs defaultValue="templates" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="templates">{t.templates}</TabsTrigger>
-            <TabsTrigger value="hybrid">Hibrid Sablonok</TabsTrigger>
+            <TabsTrigger value="hybrid">{t.hybridTemplates}</TabsTrigger>
             <TabsTrigger value="upload">{t.uploadTemplate}</TabsTrigger>
             <TabsTrigger value="profile">
               <User className="h-4 w-4 mr-2" />
-              Profil
+              {t.profile}
             </TabsTrigger>
           </TabsList>
 
@@ -417,7 +417,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   {filteredTemplates.length === 0 ? (
                     <div className="text-center py-8 text-gray-500">
                       <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>No templates uploaded</p>
+                      <p>{t.noTemplatesUploaded}</p>
                     </div>
                   ) : (
                     filteredTemplates.map((template) => (
@@ -430,9 +430,9 @@ export function Admin({ onBack, onHome }: AdminProps) {
                             </Badge>
                             <Badge variant="outline">
                               {template.type === 'unified' ? 
-                                (language === 'de' ? 'Fragenvorlage' : 'Kérdés Sablon') :
+                                t.questionTemplate :
                                 template.type === 'protocol' ? 
-                                (language === 'de' ? 'Protokollvorlage' : 'Protokoll Sablon') :
+                                t.protocolTemplateName :
                                 template.type
                               }
                             </Badge>
@@ -491,7 +491,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                                               <Badge key={index} variant="outline">
                                                 {sheet}
                                               </Badge>
-                                            )) || <p className="text-gray-500">{language === 'de' ? 'Kein Blatt' : 'Nincs lap'}</p>}
+                                            )) || <p className="text-gray-500">{t.noSheet}</p>}
                                           </div>
                                         </CardContent>
                                       </Card>
@@ -504,7 +504,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                                             {previewData.questions?.length || 0}
                                           </div>
                                           <p className="text-sm text-gray-500">
-                                            {language === 'de' ? 'aktive Frage' : 'aktív kérdés'}
+                                            {t.activeQuestion}
                                           </p>
                                         </CardContent>
                                       </Card>
@@ -526,7 +526,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                                     <Card>
                                       <CardHeader>
                                         <CardTitle className="text-sm">
-                                          {language === 'de' ? 'Fragen und Excel-Zellzuordnungen' : 'Kérdések és Excel Cella Hozzárendelések'}
+                                          {t.questionsAndExcelMapping}
                                         </CardTitle>
                                       </CardHeader>
                                       <CardContent>
@@ -552,7 +552,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                                                     </div>
                                                     <div>
                                                       <Badge variant="outline" className="text-xs font-mono">
-                                                        {question.cellReference || (language === 'de' ? 'Keine Zelle' : 'Nincs cella')}
+                                                        {question.cellReference || t.noCell}
                                                       </Badge>
                                                     </div>
                                                   </div>
@@ -561,7 +561,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                                             </div>
                                           ) : (
                                             <p className="text-gray-500 text-center py-8">
-                                              {language === 'de' ? 'Keine Fragen definiert' : 'Nincs kérdés definiálva'}
+                                              {t.noQuestionsDefined}
                                             </p>
                                           )}
                                         </ScrollArea>
@@ -593,7 +593,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                             size="sm"
                             onClick={() => handleDelete(template.id, template.name)}
                             className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                            title={language === 'de' ? 'Löschen' : 'Törlés'}
+                            title={t.deleteTooltip}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -612,43 +612,40 @@ export function Admin({ onBack, onHome }: AdminProps) {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FileSpreadsheet className="h-5 w-5 mr-2" />
-                  {language === 'de' ? 'Fragenvorlage hochladen' : 'Kérdés Sablon Feltöltése'}
+                  {t.uploadQuestionsTemplate}
                 </CardTitle>
                 <CardDescription>
-                  {language === 'de' 
-                    ? 'Mehrsprachige Vorlage (HU/DE) mit allen Fragetypen und Zellzuordnungen'
-                    : 'Többnyelvű sablon (HU/DE) az összes kérdéstípussal és cella hozzárendelésekkel'
-                  }
+                  {t.uploadQuestionsDescription}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label className="text-sm font-medium text-gray-700">
-                    {language === 'de' ? 'Vorlagenname' : 'Sablon neve'}
+                    {t.templateName}
                   </Label>
                   <Input
                     value={questionsUpload.name}
                     onChange={(e) => setQuestionsUpload({ ...questionsUpload, name: e.target.value })}
-                    placeholder={language === 'de' ? 'z.B. OTIS Fragenvorlage 2025' : 'pl. OTIS Kérdés Sablon 2025'}
+                    placeholder={t.exampleTemplateName}
                     className="mt-2"
                   />
                 </div>
 
                 <div>
                   <Label className="text-sm font-medium text-gray-700">
-                    {language === 'de' ? 'Excel-Datei auswählen' : 'Excel fájl kiválasztása'}
+                    {t.selectExcel}
                   </Label>
                   <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <FileSpreadsheet className="h-8 w-8 mx-auto text-gray-400 mb-4" />
                     <p className="text-gray-600 mb-2">
-                      {language === 'de' ? 'Excel-Datei mit Fragen hochladen' : 'Kérdéseket tartalmazó Excel fájl feltöltése'}
+                      {t.uploadExcelWithQuestions}
                     </p>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => document.getElementById('questions-excel-upload')?.click()}
                     >
-                      {language === 'de' ? 'Datei auswählen' : 'Fájl kiválasztása'}
+                      {t.selectExcelFile}
                     </Button>
                     <input
                       id="questions-excel-upload"
@@ -659,7 +656,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                     />
                     {questionsUpload.file && (
                       <p className="text-sm text-green-600 mt-2">
-                        {language === 'de' ? 'Ausgewählt' : 'Kiválasztva'}: {questionsUpload.file.name}
+                        {t.selected}: {questionsUpload.file.name}
                       </p>
                     )}
                   </div>
@@ -675,7 +672,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   ) : (
                     <Upload className="h-4 w-4 mr-2" />
                   )}
-                  {loading ? t.loading : (language === 'de' ? 'Fragenvorlage hochladen' : 'Kérdés Sablon Feltöltése')}
+                  {loading ? t.loading : t.uploadQuestionsTemplate}
                 </Button>
               </CardContent>
             </Card>
@@ -685,43 +682,40 @@ export function Admin({ onBack, onHome }: AdminProps) {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <FileText className="h-5 w-5 mr-2" />
-                  {language === 'de' ? 'Protokollvorlage hochladen' : 'Protokoll Sablon Feltöltése'}
+                  {t.uploadProtocolTemplate}
                 </CardTitle>
                 <CardDescription>
-                  {language === 'de' 
-                    ? 'Ausgabe-Formatvorlage für generierte Excel-Protokolle'
-                    : 'Kimeneti formátum sablon a generált Excel protokollokhoz'
-                  }
+                  {t.uploadProtocolDescription}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label className="text-sm font-medium text-gray-700">
-                    {language === 'de' ? 'Vorlagenname' : 'Sablon neve'}
+                    {t.templateName}
                   </Label>
                   <Input
                     value={protocolUpload.name}
                     onChange={(e) => setProtocolUpload({ ...protocolUpload, name: e.target.value })}
-                    placeholder={language === 'de' ? 'z.B. OTIS Protokoll HU' : 'pl. OTIS Protokoll HU'}
+                    placeholder={t.exampleProtocolName}
                     className="mt-2"
                   />
                 </div>
 
                 <div>
                   <Label className="text-sm font-medium text-gray-700">
-                    {language === 'de' ? 'Excel-Datei auswählen' : 'Excel fájl kiválasztása'}
+                    {t.selectExcel}
                   </Label>
                   <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                     <FileText className="h-8 w-8 mx-auto text-gray-400 mb-4" />
                     <p className="text-gray-600 mb-2">
-                      {language === 'de' ? 'Protokoll-Formatvorlage hochladen' : 'Protokoll formátum sablon feltöltése'}
+                      {t.uploadProtocolFormat}
                     </p>
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => document.getElementById('protocol-excel-upload')?.click()}
                     >
-                      {language === 'de' ? 'Datei auswählen' : 'Fájl kiválasztása'}
+                      {t.selectExcelFile}
                     </Button>
                     <input
                       id="protocol-excel-upload"
@@ -732,7 +726,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                     />
                     {protocolUpload.file && (
                       <p className="text-sm text-green-600 mt-2">
-                        {language === 'de' ? 'Ausgewählt' : 'Kiválasztva'}: {protocolUpload.file.name}
+                        {t.selected}: {protocolUpload.file.name}
                       </p>
                     )}
                   </div>
@@ -748,7 +742,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   ) : (
                     <Upload className="h-4 w-4 mr-2" />
                   )}
-                  {loading ? t.loading : (language === 'de' ? 'Protokollvorlage hochladen' : 'Protokoll Sablon Feltöltése')}
+                  {loading ? t.loading : t.uploadProtocolTemplate}
                 </Button>
               </CardContent>
             </Card>
@@ -757,16 +751,16 @@ export function Admin({ onBack, onHome }: AdminProps) {
           <TabsContent value="hybrid" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Hibrid Template Kezelés</CardTitle>
+                <CardTitle>{t.hybridTemplateManagement}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {hybridTemplates && (
                   <div className="space-y-4">
                     <div>
-                      <Label>Helyi Sablonok ({hybridTemplates.local.length})</Label>
+                      <Label>{t.localTemplates} ({hybridTemplates.local.length})</Label>
                       <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Válassz sablont" />
+                          <SelectValue placeholder={t.chooseTemplate} />
                         </SelectTrigger>
                         <SelectContent>
                           {hybridTemplates.local.map((template) => (
@@ -784,15 +778,15 @@ export function Admin({ onBack, onHome }: AdminProps) {
                     </div>
                     
                     <div>
-                      <Label>Betöltési Stratégia</Label>
+                      <Label>{t.loadingStrategy}</Label>
                       <Select value={loadStrategy} onValueChange={setLoadStrategy}>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="local_first">Helyi Először</SelectItem>
-                          <SelectItem value="cache_first">Cache Először</SelectItem>
-                          <SelectItem value="remote_only">Csak Távoli</SelectItem>
+                          <SelectItem value="local_first">{t.localFirst}</SelectItem>
+                          <SelectItem value="cache_first">{t.cacheFirst}</SelectItem>
+                          <SelectItem value="remote_only">{t.remoteOnly}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -802,7 +796,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
                       disabled={loading || !selectedTemplate}
                       className="w-full"
                     >
-                      {loading ? 'Váltás...' : 'Sablon Váltás'}
+                      {loading ? t.switching : t.templateSwitch}
                     </Button>
                   </div>
                 )}

@@ -17,6 +17,7 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **Styling**: TailwindCSS with custom OTIS brand colors.
 - **State Management**: React hooks and context for local state, with localStorage persistence.
 - **Data Fetching**: TanStack Query.
+- **Localization**: Complete Hungarian/German translation system using LanguageProvider context and translation objects (src/lib/translations.ts). All UI components dynamically switch languages based on user preference.
 - **UI/UX Decisions**: Mobile-first, tablet-optimized interface with official OTIS branding. Prioritized input stability, debouncing to prevent cursor jumping, and a global Map cache for radio button functionality. Advanced save system with visual feedback.
 
 ### Backend

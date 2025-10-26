@@ -105,6 +105,50 @@ export interface Translation {
   questionConfiguration: string;
   uploadExcelFile: string;
   selectExcelFile: string;
+  questionsTemplateUploaded: string;
+  protocolTemplateUploaded: string;
+  pleaseProvideNameAndFile: string;
+  templateActivatedSuccessfully: string;
+  failedToActivateTemplate: string;
+  failedToLoadTemplatePreview: string;
+  errorLoadingTemplatePreview: string;
+  confirmDeleteTemplate: string;
+  templateDeletedSuccessfully: string;
+  templateDeleteFailed: string;
+  noTemplatesUploaded: string;
+  hybridTemplates: string;
+  profile: string;
+  hybridTemplateManagement: string;
+  localTemplates: string;
+  chooseTemplate: string;
+  loadingStrategy: string;
+  localFirst: string;
+  cacheFirst: string;
+  remoteOnly: string;
+  switching: string;
+  templateSwitch: string;
+  templateSwitchSuccess: string;
+  templateSwitchFailed: string;
+  homeTooltip: string;
+  failedToFetchTemplates: string;
+  questionTemplate: string;
+  protocolTemplateName: string;
+  noSheet: string;
+  activeQuestion: string;
+  questionsAndExcelMapping: string;
+  noCell: string;
+  noQuestionsDefined: string;
+  deleteTooltip: string;
+  uploadQuestionsTemplate: string;
+  uploadQuestionsDescription: string;
+  uploadProtocolTemplate: string;
+  uploadProtocolDescription: string;
+  exampleTemplateName: string;
+  exampleProtocolName: string;
+  selectExcel: string;
+  uploadExcelWithQuestions: string;
+  uploadProtocolFormat: string;
+  selected: string;
   
   // Page specific translations
   generalData: string;
@@ -220,6 +264,50 @@ export const translations: Record<string, Translation> = {
     questionConfiguration: "Kérdés konfiguráció",
     uploadExcelFile: "Fájl feltöltése",
     selectExcelFile: "Fájl kiválasztása",
+    questionsTemplateUploaded: "Kérdés sablon sikeresen feltöltve",
+    protocolTemplateUploaded: "Protokoll sablon sikeresen feltöltve",
+    pleaseProvideNameAndFile: "Kérlek add meg a nevet és válassz fájlt",
+    templateActivatedSuccessfully: "Sablon sikeresen aktiválva",
+    failedToActivateTemplate: "Sablon aktiválása sikertelen",
+    failedToLoadTemplatePreview: "Sablon előnézet betöltése sikertelen",
+    errorLoadingTemplatePreview: "Hiba a sablon előnézet betöltése során",
+    confirmDeleteTemplate: "Biztosan törölni szeretnéd a(z) \"{name}\" sablont? Ez a művelet nem vonható vissza.",
+    templateDeletedSuccessfully: "Sablon sikeresen törölve",
+    templateDeleteFailed: "Sablon törlése sikertelen",
+    noTemplatesUploaded: "Nincs feltöltött sablon",
+    hybridTemplates: "Hibrid Sablonok",
+    profile: "Profil",
+    hybridTemplateManagement: "Hibrid Template Kezelés",
+    localTemplates: "Helyi Sablonok",
+    chooseTemplate: "Válassz sablont",
+    loadingStrategy: "Betöltési Stratégia",
+    localFirst: "Helyi Először",
+    cacheFirst: "Cache Először",
+    remoteOnly: "Csak Távoli",
+    switching: "Váltás...",
+    templateSwitch: "Sablon Váltás",
+    templateSwitchSuccess: "Template váltás sikeres: {name}",
+    templateSwitchFailed: "Template váltás sikertelen",
+    homeTooltip: "Kezdőlap",
+    failedToFetchTemplates: "Sablonok betöltése sikertelen",
+    questionTemplate: "Kérdés Sablon",
+    protocolTemplateName: "Protokoll Sablon",
+    noSheet: "Nincs lap",
+    activeQuestion: "aktív kérdés",
+    questionsAndExcelMapping: "Kérdések és Excel Cella Hozzárendelések",
+    noCell: "Nincs cella",
+    noQuestionsDefined: "Nincs kérdés definiálva",
+    deleteTooltip: "Törlés",
+    uploadQuestionsTemplate: "Kérdés Sablon Feltöltése",
+    uploadQuestionsDescription: "Tölts fel egy új kérdés sablont az Excel formátumban. Ez a sablon definiálja a protokoll minden kérdését.",
+    uploadProtocolTemplate: "Protokoll Sablon Feltöltése",
+    uploadProtocolDescription: "Tölts fel egy új protokoll formátum sablont Excel formátumban. Ez a sablon tartalmazza a végső protokoll elrendezését.",
+    exampleTemplateName: "pl. OTIS Kérdés Sablon 2025",
+    exampleProtocolName: "pl. OTIS Protokoll HU",
+    selectExcel: "Excel fájl kiválasztása",
+    uploadExcelWithQuestions: "Kérdéseket tartalmazó Excel fájl feltöltése",
+    uploadProtocolFormat: "Protokoll formátum sablon feltöltése",
+    selected: "Kiválasztva",
     
     // Page specific translations
     generalData: "Általános adatok",
@@ -337,6 +425,50 @@ export const translations: Record<string, Translation> = {
     questionConfiguration: "Fragenkonfiguration",
     uploadExcelFile: "Datei hochladen",
     selectExcelFile: "Datei auswählen",
+    questionsTemplateUploaded: "Fragenvorlage erfolgreich hochgeladen",
+    protocolTemplateUploaded: "Protokollvorlage erfolgreich hochgeladen",
+    pleaseProvideNameAndFile: "Bitte Namen und Datei angeben",
+    templateActivatedSuccessfully: "Vorlage erfolgreich aktiviert",
+    failedToActivateTemplate: "Aktivierung der Vorlage fehlgeschlagen",
+    failedToLoadTemplatePreview: "Laden der Vorlagenvorschau fehlgeschlagen",
+    errorLoadingTemplatePreview: "Fehler beim Laden der Vorlagenvorschau",
+    confirmDeleteTemplate: "Möchten Sie die Vorlage \"{name}\" wirklich löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+    templateDeletedSuccessfully: "Vorlage erfolgreich gelöscht",
+    templateDeleteFailed: "Löschen der Vorlage fehlgeschlagen",
+    noTemplatesUploaded: "Keine Vorlagen hochgeladen",
+    hybridTemplates: "Hybride Vorlagen",
+    profile: "Profil",
+    hybridTemplateManagement: "Verwaltung hybrider Vorlagen",
+    localTemplates: "Lokale Vorlagen",
+    chooseTemplate: "Vorlage auswählen",
+    loadingStrategy: "Ladestrategie",
+    localFirst: "Lokal zuerst",
+    cacheFirst: "Cache zuerst",
+    remoteOnly: "Nur Remote",
+    switching: "Wechseln...",
+    templateSwitch: "Vorlagenwechsel",
+    templateSwitchSuccess: "Vorlagenwechsel erfolgreich: {name}",
+    templateSwitchFailed: "Vorlagenwechsel fehlgeschlagen",
+    homeTooltip: "Startseite",
+    failedToFetchTemplates: "Laden der Vorlagen fehlgeschlagen",
+    questionTemplate: "Fragenvorlage",
+    protocolTemplateName: "Protokollvorlage",
+    noSheet: "Kein Blatt",
+    activeQuestion: "aktive Frage",
+    questionsAndExcelMapping: "Fragen und Excel-Zellzuordnungen",
+    noCell: "Keine Zelle",
+    noQuestionsDefined: "Keine Fragen definiert",
+    deleteTooltip: "Löschen",
+    uploadQuestionsTemplate: "Fragenvorlage hochladen",
+    uploadQuestionsDescription: "Laden Sie eine neue Fragenvorlage im Excel-Format hoch. Diese Vorlage definiert alle Fragen des Protokolls.",
+    uploadProtocolTemplate: "Protokollvorlage hochladen",
+    uploadProtocolDescription: "Laden Sie eine neue Protokollformatvorlage im Excel-Format hoch. Diese Vorlage enthält das Layout des endgültigen Protokolls.",
+    exampleTemplateName: "z.B. OTIS Fragenvorlage 2025",
+    exampleProtocolName: "z.B. OTIS Protokoll HU",
+    selectExcel: "Excel-Datei auswählen",
+    uploadExcelWithQuestions: "Excel-Datei mit Fragen hochladen",
+    uploadProtocolFormat: "Protokoll-Formatvorlage hochladen",
+    selected: "Ausgewählt",
     
     // Page specific translations
     generalData: "Allgemeine Daten",

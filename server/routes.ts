@@ -49,10 +49,7 @@ export async function registerRoutes(app: Express) {
       }
 
       // Gyorsítótár ellenőrzése
-      if (questionsCache) {
-        console.log('✅ Serving questions from cache');
-      } else {
-        console.log('ℹ️  Cache is empty, loading template with hybrid loader...');
+      if (!questionsCache) {
         const activeTemplate = await storage.getActiveTemplate("unified", "multilingual");
         
         // Ha nincs aktív sablon az adatbázisban, egy helyi "tartalék" sablont használunk
@@ -62,10 +59,8 @@ export async function registerRoutes(app: Express) {
             questionsCache = await excelParserService.parseQuestionsFromExcel(fallbackResult.filePath);
         } else {
             const templateResult = await hybridTemplateLoader.loadTemplate(activeTemplate.id, "unified", "multilingual");
-            console.log(`📋 Template loaded from: ${templateResult.loadedFrom} (${templateResult.templateInfo.name || templateResult.templateInfo.file_name})`);
             questionsCache = await excelParserService.parseQuestionsFromExcel(templateResult.filePath);
         }
-        console.log(`✅ Parsed ${questionsCache.length} questions.`);
       }
 
       // A válasz formázása a frontend számára - EREDETI STRUKTÚRA

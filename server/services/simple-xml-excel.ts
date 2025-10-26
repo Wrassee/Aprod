@@ -35,7 +35,6 @@ class SimpleXmlExcelService {
     try {
       const zip = await JSZip.loadAsync(templateBuffer);
       const cellMappings = this.createCellMappings(formData, questionConfigs, language);
-      console.log(`Created ${cellMappings.length} XML cell mappings.`);
       
       const sheetFile = Object.keys(zip.files).find(name => name.startsWith('xl/worksheets/') && name.endsWith('.xml'));
       if (!sheetFile) throw new Error('No worksheet files found in Excel template');
@@ -51,7 +50,6 @@ class SimpleXmlExcelService {
         if (cellPattern.test(worksheetXml)) {
           worksheetXml = worksheetXml.replace(cellPattern, `$1<is><t>${escapedValue}</t></is>$3`);
           modifiedCount++;
-          console.log(`XML: Replaced content in cell ${cell}`);
         } else if (worksheetXml.includes(`<c r="${cell}" s="`)) {
           const styleMatch = worksheetXml.match(new RegExp(`<c r="${cell}" s="([^"]+)"/>`));
           if (styleMatch) {
@@ -59,16 +57,13 @@ class SimpleXmlExcelService {
             const replacement = `<c r="${cell}" s="${styleValue}" t="inlineStr"><is><t>${escapedValue}</t></is></c>`;
             worksheetXml = worksheetXml.replace(new RegExp(`<c r="${cell}" s="${styleValue}"/>`), replacement);
             modifiedCount++;
-            console.log(`XML: Set value for empty styled cell ${cell}`);
           }
         } else {
-            console.warn(`XML: Could not find a pattern to replace for cell ${cell}.`);
+            console.warn(`XML: Could not find pattern for cell ${cell}`);
         }
       });
 
-      console.log(`XML: Modified ${modifiedCount} cells in total.`);
       zip.file(sheetFile, worksheetXml);
-
       return await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
     } catch (error) {
       console.error('Error during XML replacement:', error);
@@ -87,11 +82,8 @@ class SimpleXmlExcelService {
         return; 
       }
       
-      // A logoláshoz mentsük el a változókat
       const type = config.type;
       const cellRef = String(config.cellReference);
-      
-      console.log(`Processing: ID="${key}", Type="${type}", CellRef="${cellRef}", Answer="${answer}"`);
       
       // ====================== VÉGSŐ, EGYSZERŰSÍTETT LOGIKA ======================
 
@@ -99,8 +91,6 @@ class SimpleXmlExcelService {
       // Ha a cellahivatkozás vesszőt tartalmaz, azt MINDIG többcellásként kezeljük,
       // függetlenül a típustól és a multiCell flagtől. Ez a legbiztosabb jel.
       if (cellRef.includes(',')) {
-        console.log(`>>> Handling as MULTI-CELL based on cellReference format`);
-        
         const cellRefs = cellRef.split(',').map((c: string) => c.trim());
         if (cellRefs.length >= 2) {
           const [yesCells, noCells, naCells] = cellRefs;
@@ -119,13 +109,11 @@ class SimpleXmlExcelService {
       }
       // 2. ESET: Egycellás 'true/false' (radio)
       else if (type === 'radio') {
-        console.log(`>>> Handling as SINGLE-CELL RADIO (true/false) -> X/-`);
         const cellValue = (answer === 'true' || answer === true) ? 'X' : '-';
         mappings.push({ cell: cellRef, value: cellValue, label: `Question ${key}` });
       } 
       // 3. ESET: Minden más egycellás kérdés (szöveg, szám, egycellás yes_no_na)
       else {
-        console.log(`>>> Handling as standard type: ${type}`);
         const formattedValue = this.formatAnswer(answer, language);
         mappings.push({ cell: cellRef, value: formattedValue, label: `Question ${key}` });
       }

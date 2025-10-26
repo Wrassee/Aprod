@@ -90,6 +90,9 @@ export function Login({ onLoginSuccess }: LoginProps) {
         password,
         options: {
           emailRedirectTo: window.location.origin,
+          data: {
+            email: email,
+          }
         },
       });
 
@@ -98,14 +101,27 @@ export function Login({ onLoginSuccess }: LoginProps) {
       }
 
       if (data.user) {
-        toast({
-          title: 'Sikeres regisztráció! 🎉',
-          description: 'Ellenőrizd az email fiókodat a megerősítő linkért.',
-        });
+        // Check if email confirmation is required
+        const session = data.session;
         
-        // Switch to login mode after successful registration
-        setIsRegistering(false);
-        setPassword('');
+        if (session) {
+          // Auto-confirmed (development mode) - login immediately
+          toast({
+            title: 'Sikeres regisztráció! 🎉',
+            description: 'Automatikusan bejelentkeztettünk.',
+          });
+          onLoginSuccess();
+        } else {
+          // Email confirmation required
+          toast({
+            title: 'Sikeres regisztráció! 🎉',
+            description: 'Ellenőrizd az email fiókodat a megerősítő linkért. (Vagy használj bejelentkezést, ha development módban vagy)',
+          });
+          
+          // Switch to login mode after successful registration
+          setIsRegistering(false);
+          setPassword('');
+        }
       }
     } catch (error: any) {
       console.error('Registration error:', error);

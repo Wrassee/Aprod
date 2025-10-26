@@ -93,7 +93,7 @@ export async function registerRoutes(app: Express) {
           type: correctedType,
           options: options,
           required: config.required,
-          placeholder: config.placeholder,
+          placeholder: language === "de" && config.placeholderDe ? config.placeholderDe : config.placeholder,
           unit: config.unit,
           minValue: config.minValue,
           maxValue: config.maxValue,

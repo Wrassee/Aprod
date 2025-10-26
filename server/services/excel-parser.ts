@@ -11,6 +11,7 @@ export interface ParsedQuestion {
   type: QuestionType;
   required: boolean;
   placeholder?: string;
+  placeholderDe?: string; // NEW: German placeholder text
   cellReference?: string;
   sheetName?: string;
   multiCell?: boolean;
@@ -192,6 +193,7 @@ class ExcelParserService {
         MAX_LENGTH: this.findHeaderIndex(headers, 'maxlength', 'max_length', 'maxLength'), // ÚJ
         REQUIRED: this.findHeaderIndex(headers, 'required', 'kötelező', 'kell'),
         PLACEHOLDER: this.findHeaderIndex(headers, 'placeholder', 'description', 'leírás', 'leiras'),
+        PLACEHOLDER_DE: this.findHeaderIndex(headers, 'placeholderDE', 'placeholder_de', 'német_leírás'),
         CELL_REF: this.findHeaderIndex(headers, 'cell_reference', 'cellReference', 'cella', 'cel'),
         SHEET_NAME: this.findHeaderIndex(headers, 'sheet_name', 'sheetName', 'munkalap'),
         MULTI_CELL: this.findHeaderIndex(headers, 'multi_cell', 'multiCell', 'több_cella'),
@@ -254,6 +256,9 @@ class ExcelParserService {
             : false,
           placeholder: colIndices.PLACEHOLDER !== -1 && row[colIndices.PLACEHOLDER] 
             ? String(row[colIndices.PLACEHOLDER]).trim() 
+            : undefined,
+          placeholderDe: colIndices.PLACEHOLDER_DE !== -1 && row[colIndices.PLACEHOLDER_DE] 
+            ? String(row[colIndices.PLACEHOLDER_DE]).trim() 
             : undefined,
           cellReference: colIndices.CELL_REF !== -1 && row[colIndices.CELL_REF] 
             ? String(row[colIndices.CELL_REF]).trim() 

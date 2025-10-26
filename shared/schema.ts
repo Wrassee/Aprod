@@ -206,6 +206,7 @@ export type Question = QuestionConfig & {
   calculationInputs?: any[] | null;   // alias for calculation_inputs
   unit?: string | null; // Match database type
   placeholder?: string | null;
+  placeholderDe?: string | null; // NEW: German placeholder text
   required?: boolean;
 };
 

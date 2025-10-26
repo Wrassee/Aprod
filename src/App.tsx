@@ -21,12 +21,13 @@ import { Completion } from "./pages/completion.js";
 import { Admin } from "./pages/admin.js";
 import { ProtocolPreview } from "./pages/protocol-preview.js";
 import { Erdungskontrolle } from "./pages/erdungskontrolle.js";
+import { Login } from "./pages/login.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
 /* --------------------  Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema.js";
 
-type Screen = 'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview';
+type Screen = 'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview' | 'login';
 
 // === PROPS INTERFACE A KÉPERNYŐÁLLAPOT ÁTADÁSÁHOZ ===
 interface AppContentProps {
@@ -365,7 +366,12 @@ function AppContent({
     setFormData(prev => ({ ...prev, errors }));
   }, [setFormData]);
 
-  const handleAdminAccess = useCallback(() => setCurrentScreen('admin'), [setCurrentScreen]);
+  const handleAdminAccess = useCallback(() => setCurrentScreen('login'), [setCurrentScreen]);
+
+  const handleLoginSuccess = useCallback(() => {
+    console.log('✅ Login successful - redirecting to admin');
+    setCurrentScreen('admin');
+  }, [setCurrentScreen]);
 
   const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
     setFormData(prev => ({ ...prev, niedervoltMeasurements: measurements }));
@@ -474,6 +480,9 @@ function AppContent({
             language={language}
           />
         );
+        
+      case 'login':
+        return <Login onLoginSuccess={handleLoginSuccess} />;
         
       case 'admin':
         return (

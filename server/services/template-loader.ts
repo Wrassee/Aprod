@@ -30,11 +30,16 @@ export class TemplateLoaderService {
     const storagePath = template.file_path;
     const fileName = template.file_name;
     
-    // The Dockerfile creates this writable temp directory at /app/temp
-    const tempDir = '/app/temp'; 
+    // Environment-aware temp directory: production (/app/temp) vs development (./temp)
+    const tempDir = process.env.NODE_ENV === 'production' 
+      ? '/app/temp' 
+      : path.join(process.cwd(), 'temp');
     const tempFilePath = path.join(tempDir, `download-${Date.now()}-${fileName}`);
 
     try {
+      // Ensure temp directory exists (defensive programming for fresh environments)
+      await fs.mkdir(tempDir, { recursive: true });
+      
       // 2. Download the file from Supabase Storage to the temporary path.
       console.log(`TemplateLoader: Downloading from Supabase ("${storagePath}") to temp file ("${tempFilePath}")...`);
       await supabaseStorage.downloadFile(storagePath, tempFilePath);

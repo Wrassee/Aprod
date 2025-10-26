@@ -19,6 +19,8 @@ console.log('✅ Supabase Admin Client initialized');
 console.log('📍 Supabase URL:', supabaseUrl);
 console.log('🔑 Service Role Key exists:', supabaseServiceKey.length > 0 ? 'YES' : 'NO');
 console.log('🔑 Service Role Key length:', supabaseServiceKey.length);
+console.log('🔑 Service Role Key first 50 chars:', supabaseServiceKey.substring(0, 50));
+console.log('🔑 Service Role Key last 20 chars:', supabaseServiceKey.substring(supabaseServiceKey.length - 20));
 
 // Server-side Supabase client with service role key for admin operations
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);

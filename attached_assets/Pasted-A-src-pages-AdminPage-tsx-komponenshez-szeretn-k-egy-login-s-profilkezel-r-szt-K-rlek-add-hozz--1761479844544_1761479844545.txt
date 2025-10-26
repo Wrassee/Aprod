@@ -1,0 +1,137 @@
+A src/pages/AdminPage.tsx komponenshez szeretnék egy login és profilkezelő részt.
+Kérlek, add hozzá a következő funkciókat:
+
+E-mail/jelszó alapú bejelentkezés a Supabase Authentication-nel.
+
+Profiladatok (név, e-mail, cím, Google Drive azonosító) mentése a Supabase profiles táblába.
+
+Profiladatok betöltése bejelentkezés után.
+
+Ha nincs profil, automatikusan hozzon létre újat.
+
+Adj hozzá egy egyszerű UI-t Tailwind és Shadcn komponensekkel.
+A kódot teljesen kompatibilis formában add meg (ne hagyj ki részeket).”
+
+Ez garantálja, hogy a Replit-asszisztens konkrét, teljes, másolható kódot generál.
+
+🧱 Lépésenkénti fejlesztési terv az adminfelülethez
+
+Itt van a fejlesztési útiterv, amit soronként is kiadhatsz a Replit-asszisztensnek (vagy akár modulonként).
+
+### 1. Supabase Auth integrálása
+
+Cél: bejelentkezés / regisztráció e-mail+jelszó alapon.
+
+🟩 Replit prompt:
+
+Adj hozzá a projekthez Supabase Authentication integrációt.
+
+Hozz létre supabaseClient.ts fájlt a kapcsolat inicializálásához.
+
+Készíts egy LoginForm.tsx komponenst e-mail + jelszó mezőkkel.
+
+Bejelentkezés után irányítson az /admin oldalra.
+
+Használj @supabase/supabase-js klienst.
+
+UI: Shadcn form + Button komponensek.
+
+### 2. Profiladatok mentése és kezelése
+
+Cél: a felhasználó személyes adatai tárolva legyenek és betölthetők.
+
+🟩 Replit prompt:
+
+Bővítsd a bejelentkezett felhasználó számára a ProfileSettings.tsx komponenst.
+
+Töltsd be a profiles táblából a felhasználó adatait (név, e-mail, cím, Google Drive azonosító).
+
+Ha még nincs rekord, hozz létre újat.
+
+Adj lehetőséget az adatok szerkesztésére és mentésére.
+
+Használj react-hook-form és zod validációt.
+
+Mentés után toast üzenet jelenjen meg: “Profil mentve”.
+
+### 3. Fájlkezelés engedélyezése profiladatok alapján
+
+Cél: csak akkor lehessen fájlokat küldeni / menteni, ha a profil ki van töltve.
+
+🟩 Replit prompt:
+
+Frissítsd a fájlkezelési modult úgy, hogy a funkciók (e-mail küldés, Google Drive mentés)
+csak akkor legyenek elérhetők, ha a bejelentkezett felhasználó profiljában minden kötelező adat megvan.
+
+Kötelező mezők: email, google_drive_folder_id.
+
+Ha hiányzik valami, a gomb disabled legyen, és tooltipben jelenjen meg: “Töltsd ki a profilodat az admin felületen.”
+
+### 4. E-mail küldési funkció (SMTP vagy Supabase Edge Function)
+
+Cél: a protokoll vagy hibalista elküldése a felhasználó e-mailjéről.
+
+🟩 Replit prompt:
+
+Készíts egy sendEmail segédfüggvényt (Node + Supabase Edge Function), ami a generált PDF-et elküldi e-mailben.
+
+Használj nodemailer-t vagy Supabase Edge Functions-t.
+
+Küldéskor a felhasználó profiljából vett e-mail címet használd feladónak.
+
+A funkció az admin felületről és a fő appból is hívható legyen.
+
+### 5. Google Drive integráció
+
+Cél: a kitöltött protokollok mentése a felhasználó Drive-jába.
+
+🟩 Replit prompt:
+
+Készíts integrációt a Google Drive API-val.
+
+OAuth2 hitelesítés a felhasználó profiljához tartozó Drive-fiókkal.
+
+Fájlok feltöltése a protokollok mappába.
+
+Mentés után toast üzenet: “Fájl mentve a Drive-ra”.
+
+Hiba esetén kezelőüzenet: “Sikertelen Drive mentés”.
+
+### 6. Saját protokollok megtekintése az admin felületen
+
+Cél: a Supabase-ben mentett protokollokat listázni és megnyitni.
+
+🟩 Replit prompt:
+
+Készíts egy MyProtocols.tsx oldalt az admin felületre.
+
+Töltsd be a Supabase protocols táblából a bejelentkezett felhasználó fájljait.
+
+Listázd őket egy táblázatban: dátum, név, típus, műveletek (megnyitás, letöltés, törlés).
+
+Használj Shadcn Table, Button, DropdownMenu komponenseket.
+
+### 7. (Opcionális, de ajánlott) Admin jogosultsági szint
+
+Cél: bizonyos funkciók (pl. template feltöltés) csak adminoknak legyenek engedélyezettek.
+
+🟩 Replit prompt:
+
+Adj hozzá szerepkör alapú hozzáférést a Supabase Auth-on keresztül.
+
+role mező a profiles táblában (user vagy admin).
+
+Csak az admin láthassa a “Template feltöltés” és “Felhasználók kezelése” menüpontokat.
+
+A ProtectedRoute komponensben vizsgáld a role értéket.
+
+🚀 Extra javaslatok
+
+🔒 Biztonság:
+– Logout gomb + session timeout (pl. 1 óra után újra be kell jelentkezni).
+
+💬 UX fejlesztés:
+– Profiloldalon avatar feltöltés, e-mail ellenőrzés visszajelzése.
+
+📊 Statisztika / naplózás:
+– Admin nézetben látszódhat, hány protokoll készült, mikor ment utoljára.

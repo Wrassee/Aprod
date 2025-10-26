@@ -103,12 +103,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    console.log('🔐 Attempting sign in for email:', email);
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Sign in error:', error.message, error);
+      throw error;
+    }
+    
+    console.log('✅ Sign in successful, session:', data.session ? 'exists' : 'missing');
     
     // SECURITY FIX: Only proceed if session exists
     if (!data.session) {
@@ -123,6 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string) => {
+    console.log('📝 Attempting sign up for email:', email);
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -132,7 +139,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Sign up error:', error.message, error);
+      throw error;
+    }
+    
+    console.log('✅ Sign up response - session:', data.session ? 'exists' : 'missing', 'user:', data.user ? 'exists' : 'missing');
     
     // SECURITY FIX: Only proceed if session exists (email confirmation not required)
     if (!data.session) {

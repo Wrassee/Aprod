@@ -48,9 +48,19 @@ export function Login({ onLoginSuccess }: LoginProps) {
       onLoginSuccess();
     } catch (error: any) {
       console.error('Login error:', error);
+      
+      // More specific error messages
+      let errorMessage = error.message || 'Nem sikerült bejelentkezni. Ellenőrizd az adataidat.';
+      
+      if (error.message?.includes('Invalid login credentials')) {
+        errorMessage = 'Hibás email cím vagy jelszó. Ha még nincs fiókod, először regisztrálj!';
+      } else if (error.message?.includes('Email not confirmed')) {
+        errorMessage = 'Az email címed még nincs megerősítve. Ellenőrizd az email fiókodat.';
+      }
+      
       toast({
         title: 'Bejelentkezési hiba',
-        description: error.message || 'Nem sikerült bejelentkezni. Ellenőrizd az adataidat.',
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {

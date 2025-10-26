@@ -1,7 +1,7 @@
 # OTIS APROD (Acceptance Protocol Document) Application
 
 ## Overview
-This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
+This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German with **complete multilingual support across all interfaces** (main app, admin panel, and authentication screens), aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
 
 ## User Preferences
 Preferred communication style: Simple, everyday language (Hungarian preferred).
@@ -18,6 +18,10 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **State Management**: React hooks and context for local state, with localStorage persistence.
 - **Data Fetching**: TanStack Query.
 - **Localization**: Complete Hungarian/German translation system using LanguageProvider context and translation objects (src/lib/translations.ts). All UI components dynamically switch languages based on user preference.
+  - **Language Persistence**: Language preference stored in localStorage ('otis-protocol-language') and loaded immediately on init
+  - **Multilingual Coverage**: 180+ translation keys covering main app, admin interface, login/registration, and all UI feedback
+  - **Login Page Navigation**: OTIS logo on login page acts as clickable home button, returning users to language selection screen
+  - **Bug Fix (2025-10-26)**: useLanguage hook now initializes with localStorage value immediately instead of defaulting to 'hu' first
 - **UI/UX Decisions**: Mobile-first, tablet-optimized interface with official OTIS branding. Prioritized input stability, debouncing to prevent cursor jumping, and a global Map cache for radio button functionality. Advanced save system with visual feedback.
 
 ### Backend
@@ -46,7 +50,10 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **Authentication & Authorization**: Complete Supabase integration for user authentication with active role-based access control
   - **User Profiles**: PostgreSQL profiles table (user_id, name, email, address, google_drive_folder_id, role)
   - **Session Management**: AuthContext with automatic profile loading and session persistence
-  - **Login System**: Email/password authentication with registration support
+  - **Login System**: Email/password authentication with registration support, fully multilingual (Hungarian/German)
+    - **Multilingual Login/Registration**: 21+ translation keys for login page (titles, labels, error messages, success notifications)
+    - **OTIS Logo Navigation**: Logo clickable on login page to return to language selection screen
+    - **Dynamic Language Support**: Login interface switches between Hungarian/German based on user's language preference
   - **Protected Routes**: ProtectedRoute wrapper component with auth verification and loading states
   - **Profile Management**: ProfileSettings component for user profile editing integrated into admin interface
   - **API Security**: JWT token validation middleware (`requireAuth`, `requireOwnerOrAdmin` with active admin role checking)
@@ -55,8 +62,38 @@ Excel writing functionality must remain untouched to prevent corruption.
     - Admin role assignment via `scripts/set-admin.ts` utility script
     - Visual admin badge (red) displayed in ProfileSettings UI
     - Server-side validation prevents privilege escalation
+    - **Multilingual Admin Interface**: All admin UI text uses translation system (no hardcoded strings)
   - **Privilege Escalation Prevention**: Server-side role and user_id field protection with database-backed role verification
   - **Secure API Calls**: All profile operations use Authorization Bearer headers with Zod validation
+
+## Recent Changes (October 26, 2025)
+### Multilingual System Enhancements
+1. **Complete Login Page Localization**
+   - Added 21+ new translation keys for login/registration interface
+   - All error messages, success notifications, and UI text now fully translated
+   - Supports both Hungarian and German seamlessly
+   
+2. **Language Initialization Bug Fix**
+   - **Critical Fix**: `useLanguage` hook now loads saved language from localStorage immediately on initialization
+   - Previously defaulted to 'hu' before loading preference, causing language flicker
+   - Language preference now persists correctly across hard resets
+   
+3. **Admin Interface Multilingual Support**
+   - All hardcoded strings in admin panel replaced with translation keys
+   - Template management, user profiles, and settings all fully translated
+   - Consistent language experience across entire application
+   
+4. **Login Page UX Improvement**
+   - OTIS logo now clickable as home button
+   - Returns user to language selection screen from login page
+   - Hover effect (opacity transition) for visual feedback
+
+### Files Modified
+- `src/lib/translations.ts`: Added 21+ login page translation keys
+- `src/hooks/use-language.ts`: Fixed initialization to load from localStorage immediately
+- `src/pages/login.tsx`: Full multilingual implementation with OTIS logo home button
+- `src/pages/admin.tsx`: Replaced all hardcoded strings with translation keys
+- `src/App.tsx`: Updated Login component to support home button navigation
 
 ## External Dependencies
 ### Frontend

@@ -1,8 +1,7 @@
 import { ProtocolError } from '../../shared/schema.js';
 import * as XLSX from 'xlsx';
-import puppeteer from 'puppeteer';
-import chromium from '@sparticuz/chromium';
-import fs from 'fs';
+import jsPDF from 'jspdf';
+import { promises as fs } from 'fs';
 import path from 'path';
 
 interface ProtocolData {
@@ -121,94 +120,157 @@ export class ErrorExportService {
 
     const t = translations[language];
 
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8"><title>${t.title}</title>
-        <style>
-          body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-          .header { text-align: center; border-bottom: 2px solid #1f4e79; padding-bottom: 20px; margin-bottom: 30px; }
-          .header h1 { color: #1f4e79; margin: 0; font-size: 24px; }
-          .info-table { width: 100%; margin-bottom: 30px; }
-          .info-table td { padding: 5px; border-bottom: 1px solid #eee; }
-          .error-item { margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px; padding: 15px; page-break-inside: avoid; }
-          .error-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-          .severity { padding: 3px 8px; border-radius: 3px; color: white; font-weight: bold; font-size: 12px; }
-          .severity-critical { background-color: #dc3545; }
-          .severity-medium { background-color: #ffc107; color: #333; }
-          .severity-low { background-color: #17a2b8; }
-          .error-title { font-weight: bold; margin-bottom: 5px; }
-          .error-description { color: #666; line-height: 1.4; }
-          .summary { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 30px; }
-          .photo-count { font-size: 12px; color: #666; }
-        </style>
-      </head>
-      <body>
-        <div class="header"><h1>${t.title}</h1></div>
-        <table class="info-table">
-          <tr><td><strong>${t.building}:</strong></td><td>${protocolData?.buildingAddress || ''}</td></tr>
-          <tr><td><strong>${t.liftId}:</strong></td><td>${protocolData?.liftId || ''}</td></tr>
-          <tr><td><strong>${t.inspector}:</strong></td><td>${protocolData?.inspectorName || ''}</td></tr>
-          <tr><td><strong>${t.date}:</strong></td><td>${new Date().toLocaleDateString()}</td></tr>
-        </table>
-        ${errors.map((error, index) => `
-          <div class="error-item">
-            <div class="error-header">
-              <span><strong>#${index + 1}</strong></span>
-              <div>
-                <span class="severity severity-${error.severity}">${t[error.severity as keyof typeof t] || error.severity}</span>
-                ${error.images?.length ? `<span class="photo-count">${error.images.length} ${t.photos}</span>` : ''}
-              </div>
-            </div>
-            <div class="error-title">${error.title}</div>
-            <div class="error-description">${error.description}</div>
-          </div>
-        `).join('')}
-        <div class="summary">
-          <h3>${t.summary}</h3>
-          <p><strong>${t.totalErrors}:</strong> ${errors.length}</p>
-          <p><strong>${t.critical}:</strong> ${errors.filter(e => e.severity === 'critical').length}</p>
-          <p><strong>${t.medium}:</strong> ${errors.filter(e => e.severity === 'medium').length}</p>
-          <p><strong>${t.low}:</strong> ${errors.filter(e => e.severity === 'low').length}</p>
-          <p><em>${t.generatedOn}: ${new Date().toLocaleString()}</em></p>
-        </div>
-      </body>
-      </html>`;
-
-    let browser = null;
     try {
-      console.log('🎯 PDF Generation: Starting Puppeteer (hybrid mode)');
+      console.log('🎯 PDF Generation: Starting jsPDF with Unicode font support...');
+      
+      // Load Roboto font for Hungarian character support
+      const fontPath = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Regular.ttf');
+      const fontBoldPath = path.join(process.cwd(), 'public', 'fonts', 'Roboto-Bold.ttf');
+      
+      const fontBuffer = await fs.readFile(fontPath);
+      const fontBoldBuffer = await fs.readFile(fontBoldPath);
+      
+      const fontBase64 = fontBuffer.toString('base64');
+      const fontBoldBase64 = fontBoldBuffer.toString('base64');
+      
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+      
+      // Add custom fonts to support Hungarian characters (ő, ű, etc.)
+      doc.addFileToVFS('Roboto-Regular.ttf', fontBase64);
+      doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+      
+      doc.addFileToVFS('Roboto-Bold.ttf', fontBoldBase64);
+      doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+      
+      // Set default font to Roboto
+      doc.setFont('Roboto', 'normal');
 
-      // 🧠 AUTOMATIKUS PLATFORM FELISMERÉS
-      const isWindows = process.platform === 'win32';
+      // Header
+      doc.setFontSize(18);
+      doc.setTextColor(31, 78, 121); // OTIS blue
+      doc.text(t.title, 105, 20, { align: 'center' });
+      
+      doc.setDrawColor(31, 78, 121);
+      doc.setLineWidth(0.5);
+      doc.line(20, 25, 190, 25);
 
-      browser = await puppeteer.launch({
-        headless: true,
-        args: isWindows ? [] : chromium.args,
-        executablePath: isWindows
-          ? 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe'
-          : await chromium.executablePath(),
+      // Protocol Info
+      doc.setFontSize(10);
+      doc.setTextColor(0, 0, 0);
+      let yPos = 35;
+      
+      if (protocolData?.buildingAddress) {
+        doc.text(`${t.building}: ${protocolData.buildingAddress}`, 20, yPos);
+        yPos += 6;
+      }
+      if (protocolData?.liftId) {
+        doc.text(`${t.liftId}: ${protocolData.liftId}`, 20, yPos);
+        yPos += 6;
+      }
+      if (protocolData?.inspectorName) {
+        doc.text(`${t.inspector}: ${protocolData.inspectorName}`, 20, yPos);
+        yPos += 6;
+      }
+      doc.text(`${t.date}: ${new Date().toLocaleDateString()}`, 20, yPos);
+      yPos += 12;
+
+      // Errors
+      errors.forEach((error, index) => {
+        // Check if we need a new page
+        if (yPos > 250) {
+          doc.addPage();
+          yPos = 20;
+        }
+
+        // Error number and severity
+        doc.setFontSize(11);
+        doc.setFont('Roboto', 'bold');
+        doc.text(`#${index + 1}`, 20, yPos);
+        
+        // Severity badge
+        const severityText = t[error.severity as keyof typeof t] as string || error.severity;
+        const severityColors = {
+          critical: [220, 53, 69],
+          medium: [255, 193, 7],
+          low: [23, 162, 184]
+        };
+        const color = severityColors[error.severity as keyof typeof severityColors] || [128, 128, 128];
+        
+        doc.setFillColor(color[0], color[1], color[2]);
+        doc.rect(150, yPos - 4, 35, 6, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.text(severityText, 167, yPos, { align: 'center' });
+        
+        yPos += 8;
+
+        // Error title
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(10);
+        doc.setFont('Roboto', 'bold');
+        const titleLines = doc.splitTextToSize(error.title, 170);
+        doc.text(titleLines, 20, yPos);
+        yPos += titleLines.length * 5;
+
+        // Error description
+        doc.setFont('Roboto', 'normal');
+        doc.setTextColor(102, 102, 102);
+        const descLines = doc.splitTextToSize(error.description, 170);
+        doc.text(descLines, 20, yPos);
+        yPos += descLines.length * 5;
+
+        // Photos count
+        if (error.images?.length) {
+          doc.setFontSize(8);
+          doc.text(`${error.images.length} ${t.photos}`, 20, yPos);
+          yPos += 5;
+        }
+
+        yPos += 8; // Space between errors
       });
 
-      const page = await browser.newPage();
-      await page.setContent(html, { waitUntil: 'networkidle0' });
+      // Summary
+      if (yPos > 230) {
+        doc.addPage();
+        yPos = 20;
+      }
 
-      const pdfData = await page.pdf({
-        format: 'A4',
-        margin: { top: '20mm', right: '15mm', bottom: '20mm', left: '15mm' },
-        printBackground: true,
-      });
+      doc.setFillColor(248, 249, 250);
+      doc.rect(20, yPos, 170, 45, 'F');
+      
+      yPos += 8;
+      doc.setFontSize(12);
+      doc.setFont('Roboto', 'bold');
+      doc.setTextColor(0, 0, 0);
+      doc.text(t.summary, 25, yPos);
+      
+      yPos += 8;
+      doc.setFontSize(10);
+      doc.setFont('Roboto', 'normal');
+      doc.text(`${t.totalErrors}: ${errors.length}`, 25, yPos);
+      yPos += 6;
+      doc.text(`${t.critical}: ${errors.filter(e => e.severity === 'critical').length}`, 25, yPos);
+      yPos += 6;
+      doc.text(`${t.medium}: ${errors.filter(e => e.severity === 'medium').length}`, 25, yPos);
+      yPos += 6;
+      doc.text(`${t.low}: ${errors.filter(e => e.severity === 'low').length}`, 25, yPos);
+      yPos += 8;
+      doc.setFontSize(8);
+      doc.setTextColor(128, 128, 128);
+      doc.text(`${t.generatedOn}: ${new Date().toLocaleString()}`, 25, yPos);
 
-      console.log('✅ PDF Generation OK, size:', pdfData.length);
-      return Buffer.from(pdfData);
+      const pdfBuffer = Buffer.from(doc.output('arraybuffer'));
+      console.log('✅ PDF Generation OK with jsPDF, size:', pdfBuffer.length);
+      return pdfBuffer;
 
     } catch (error) {
-      console.error('❌ PDF Generation Error (Puppeteer hybrid):', error);
-      const message = `<h1>PDF generation failed</h1><pre>${(error as Error).message}</pre>`;
-      return Buffer.from(message, 'utf-8');
-    } finally {
-      if (browser) await browser.close();
+      console.error('❌ PDF Generation Error (jsPDF):', error);
+      const errorMessage = `PDF generation failed: ${(error as Error).message}`;
+      return Buffer.from(errorMessage, 'utf-8');
     }
   }
 }

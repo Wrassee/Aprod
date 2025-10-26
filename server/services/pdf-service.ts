@@ -10,12 +10,18 @@ const execPromise = promisify(exec);
 class PDFService {
 
   async generatePDF(excelBuffer: Buffer): Promise<Buffer> {
-    const tempDir = '/app/temp'; // A Dockerfile-ban létrehozott ideiglenes mappa
+    // Environment-aware temp directory: production (/app/temp) vs development (./temp)
+    const tempDir = process.env.NODE_ENV === 'production' 
+      ? '/app/temp' 
+      : path.join(process.cwd(), 'temp');
     const uniqueId = Date.now();
     const excelPath = path.join(tempDir, `protocol-${uniqueId}.xlsx`);
     const pdfPath = path.join(tempDir, `protocol-${uniqueId}.pdf`);
 
     try {
+      // Ensure temp directory exists
+      await fs.mkdir(tempDir, { recursive: true });
+      
       console.log(`🎯 PDF Service (LibreOffice): Writing Excel buffer to ${excelPath}`);
       // 1. Az Excel puffert kiírjuk egy ideiglenes fájlba
       await fs.writeFile(excelPath, excelBuffer);

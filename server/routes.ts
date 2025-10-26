@@ -121,6 +121,51 @@ export async function registerRoutes(app: Express) {
     }
   });
 
+  // Profile endpoints
+  app.get("/api/profiles/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const profile = await storage.getProfileByUserId(userId);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      console.error("❌ Error fetching profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  app.post("/api/profiles", async (req, res) => {
+    try {
+      const profileData = req.body;
+      const profile = await storage.createProfile(profileData);
+      res.status(201).json(profile);
+    } catch (error) {
+      console.error("❌ Error creating profile:", error);
+      res.status(500).json({ message: "Failed to create profile" });
+    }
+  });
+
+  app.patch("/api/profiles/:userId", async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updates = req.body;
+      const profile = await storage.updateProfile(userId, updates);
+      
+      if (!profile) {
+        return res.status(404).json({ message: "Profile not found" });
+      }
+      
+      res.json(profile);
+    } catch (error) {
+      console.error("❌ Error updating profile:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
   // OPCIONÁLIS: Manuális cache törlés endpoint (fejlesztési/debug célokra)
   app.post("/api/cache/clear", (_req, res) => {
     clearQuestionsCache();

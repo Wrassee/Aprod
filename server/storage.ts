@@ -9,11 +9,14 @@ import {
   type InsertTemplate,
   type QuestionConfig,
   type InsertQuestionConfig,
+  type Profile,
+  type InsertProfile,
   // Re-exported table definitions from the db module – this guarantees
   // the exact same type instances the DB was initialised with.
   protocols,
   templates,
   questionConfigs,
+  profiles,
 } from "./db.js";
 
 import { db } from "./db.js";              // Drizzle connection
@@ -49,6 +52,13 @@ export interface IStorage {
   /* ---------- Supplementary method ---------- */
   /** Retrieves question definitions; if a `language` column exists it is filtered. */
   getQuestions(lang: string): Promise<QuestionConfig[]>;
+
+  /* ---------- Profiles ---------- */
+  getProfile(userId: string): Promise<Profile | undefined>;
+  getProfileByUserId(userId: string): Promise<Profile | undefined>;
+  createProfile(profile: InsertProfile): Promise<Profile>;
+  updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | undefined>;
+  deleteProfile(userId: string): Promise<boolean>;
 }
 
 // ------------------------------------------------------------
@@ -254,6 +264,39 @@ export class DatabaseStorage implements IStorage {
         .where(eq((questionConfigs as any).language, lang));
     }
     return await (db as any).select().from(questionConfigs);
+  }
+
+  /* ---------- Profiles ---------- */
+  async getProfile(userId: string) {
+    const [profile] = await (db as any).select().from(profiles).where(eq(profiles.user_id, userId));
+    return profile ?? undefined;
+  }
+
+  async getProfileByUserId(userId: string) {
+    const [profile] = await (db as any).select().from(profiles).where(eq(profiles.user_id, userId));
+    return profile ?? undefined;
+  }
+
+  async createProfile(profile: InsertProfile) {
+    const [created] = await (db as any).insert(profiles).values(profile).returning();
+    return created;
+  }
+
+  async updateProfile(userId: string, updates: Partial<Profile>) {
+    const [updated] = await (db as any)
+      .update(profiles)
+      .set({ ...updates, updated_at: new Date() })
+      .where(eq(profiles.user_id, userId))
+      .returning();
+    return updated ?? undefined;
+  }
+
+  async deleteProfile(userId: string) {
+    const result = await (db as any)
+      .delete(profiles)
+      .where(eq(profiles.user_id, userId))
+      .returning();
+    return result.length > 0;
   }
 }
 

@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/auth-context';
 import { Loader2, LogIn, UserPlus } from 'lucide-react';
 
 interface LoginProps {
@@ -13,6 +13,7 @@ interface LoginProps {
 
 export function Login({ onLoginSuccess }: LoginProps) {
   const { toast } = useToast();
+  const { signIn, signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,22 +34,13 @@ export function Login({ onLoginSuccess }: LoginProps) {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      await signIn(email, password);
+      
+      toast({
+        title: 'Sikeres bejelentkezés! ✅',
+        description: `Üdvözlünk, ${email}!`,
       });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        toast({
-          title: 'Sikeres bejelentkezés! ✅',
-          description: `Üdvözlünk, ${data.user.email}!`,
-        });
-        onLoginSuccess();
-      }
+      onLoginSuccess();
     } catch (error: any) {
       console.error('Login error:', error);
       toast({
@@ -85,51 +77,31 @@ export function Login({ onLoginSuccess }: LoginProps) {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: window.location.origin,
-          data: {
-            email: email,
-          }
-        },
+      await signUp(email, password);
+      
+      toast({
+        title: 'Sikeres regisztráció! 🎉',
+        description: 'Bejelentkezés folyamatban...',
       });
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        // Check if email confirmation is required
-        const session = data.session;
-        
-        if (session) {
-          // Auto-confirmed (development mode) - login immediately
-          toast({
-            title: 'Sikeres regisztráció! 🎉',
-            description: 'Automatikusan bejelentkeztettünk.',
-          });
-          onLoginSuccess();
-        } else {
-          // Email confirmation required
-          toast({
-            title: 'Sikeres regisztráció! 🎉',
-            description: 'Ellenőrizd az email fiókodat a megerősítő linkért. (Vagy használj bejelentkezést, ha development módban vagy)',
-          });
-          
-          // Switch to login mode after successful registration
-          setIsRegistering(false);
-          setPassword('');
-        }
-      }
+      
+      // Auto-login after registration
+      onLoginSuccess();
     } catch (error: any) {
       console.error('Registration error:', error);
-      toast({
-        title: 'Regisztrációs hiba',
-        description: error.message || 'Nem sikerült a regisztráció. Próbáld újra később.',
-        variant: 'destructive',
-      });
+      
+      if (error.message.includes('email_provider_disabled')) {
+        toast({
+          title: 'Regisztráció ideiglenesen kikapcsolva',
+          description: 'Kérlek, használd a bejelentkezést egy meglévő fiókkal.',
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Regisztrációs hiba',
+          description: error.message || 'Nem sikerült a regisztráció. Próbáld újra később.',
+          variant: 'destructive',
+        });
+      }
     } finally {
       setLoading(false);
     }

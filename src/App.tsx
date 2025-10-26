@@ -11,6 +11,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
 import { LanguageProvider, useLanguageContext } from "./components/language-provider.js";
+import { AuthProvider } from "./contexts/auth-context.js";
 
 /* --------------------  Oldalak / Komponensek -------------------- */
 import { StartScreen } from "./pages/start-screen.js";
@@ -555,20 +556,22 @@ function App() {
   }, [formData]);
 
   return (
-    <LanguageProvider>
-      <AppContent
-        currentScreen={currentScreen}
-        setCurrentScreen={setCurrentScreen}
-        currentQuestionnaireePage={currentQuestionnaireePage}
-        setCurrentQuestionnairePage={setCurrentQuestionnairePage}
-        currentQuestionId={currentQuestionId}
-        setCurrentQuestionId={setCurrentQuestionId}
-        clearTrigger={clearTrigger}
-        setClearTrigger={setClearTrigger}
-        formData={formData}
-        setFormData={setFormData}
-      />
-    </LanguageProvider>
+    <AuthProvider>
+      <LanguageProvider>
+        <AppContent
+          currentScreen={currentScreen}
+          setCurrentScreen={setCurrentScreen}
+          currentQuestionnaireePage={currentQuestionnaireePage}
+          setCurrentQuestionnairePage={setCurrentQuestionnairePage}
+          currentQuestionId={currentQuestionId}
+          setCurrentQuestionId={setCurrentQuestionId}
+          clearTrigger={clearTrigger}
+          setClearTrigger={setClearTrigger}
+          formData={formData}
+          setFormData={setFormData}
+        />
+      </LanguageProvider>
+    </AuthProvider>
   );
 }
 

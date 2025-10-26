@@ -90,7 +90,7 @@ else {
 // ------------------------------------------------------------
 // 6️⃣ Re-export schema tables and types
 // ------------------------------------------------------------
-export const { protocols, templates, questionConfigs } = schema;
+export const { protocols, templates, questionConfigs, profiles } = schema;
 
 export type Protocol = InferSelectModel<typeof protocols>;
 export type InsertProtocol = InferInsertModel<typeof protocols>;
@@ -98,6 +98,8 @@ export type Template = InferSelectModel<typeof templates>;
 export type InsertTemplate = InferInsertModel<typeof templates>;
 export type QuestionConfig = InferSelectModel<typeof questionConfigs>;
 export type InsertQuestionConfig = InferInsertModel<typeof questionConfigs>;
+export type Profile = InferSelectModel<typeof profiles>;
+export type InsertProfile = InferInsertModel<typeof profiles>;
 
 // ------------------------------------------------------------
 // 7️⃣ Exportálás

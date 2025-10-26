@@ -99,6 +99,29 @@ export type InsertQuestionConfig = typeof questionConfigs.$inferInsert;
 export type Question = QuestionConfig;
 
 /* -------------------------------------------------------------------------
+ * Profiles - User authentication and profile data (SQLite)
+ * ----------------------------------------------------------------------- */
+export const profiles = sqliteTable('profiles', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  user_id: text('user_id').notNull().unique(),
+  name: text('name'),
+  email: text('email').notNull(),
+  address: text('address'),
+  google_drive_folder_id: text('google_drive_folder_id'),
+  role: text('role').notNull().default('user'),
+  created_at: integer('created_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
+  updated_at: integer('updated_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
+});
+
+export const insertProfileSchema = createInsertSchema(profiles).omit({ 
+  id: true, 
+  created_at: true, 
+  updated_at: true 
+});
+export type Profile = typeof profiles.$inferSelect;
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
+
+/* -------------------------------------------------------------------------
  * Relations – enables eager loading with Drizzle
  * ----------------------------------------------------------------------- */
 export const templatesRelations = relations(templates, ({ many }) => ({

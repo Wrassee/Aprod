@@ -1,6 +1,7 @@
 // server/middleware/auth.ts
 import { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
+import { storage } from '../storage.js';
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || '';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
@@ -76,8 +77,15 @@ export async function requireOwnerOrAdmin(req: Request, res: Response, next: Nex
       return next();
     }
 
-    // Check if user has admin role (optional - implement if needed)
-    // For now, only allow users to access their own profiles
+    // Check if user has admin role
+    const profile = await storage.getProfile(authenticatedUser.id);
+    
+    if (profile && profile.role === 'admin') {
+      console.log('✅ Admin access granted for user:', authenticatedUser.id);
+      return next();
+    }
+
+    // User is not admin and not accessing own profile
     return res.status(403).json({ 
       message: 'Forbidden - You can only access your own profile' 
     });

@@ -42,14 +42,19 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **Measurement & Calculation**: Supports 'measurement' and 'calculated' question types with a dedicated engine and automatic error detection.
 - **Excel Template-Based Niedervolt System**: Dynamic device loading from Excel templates with custom device creation and FI measurement columns.
 - **Deployment**: Configured for Vercel with serverless API, PWA functionality, and automated deployment scripts.
-- **Authentication & Authorization**: Complete Supabase integration for user authentication
+- **Authentication & Authorization**: Complete Supabase integration for user authentication with active role-based access control
   - **User Profiles**: PostgreSQL profiles table (user_id, name, email, address, google_drive_folder_id, role)
   - **Session Management**: AuthContext with automatic profile loading and session persistence
   - **Login System**: Email/password authentication with registration support
   - **Protected Routes**: ProtectedRoute wrapper component with auth verification and loading states
   - **Profile Management**: ProfileSettings component for user profile editing integrated into admin interface
-  - **API Security**: JWT token validation middleware (`requireAuth`, `requireOwnerOrAdmin`)
-  - **Privilege Escalation Prevention**: Server-side role and user_id field protection
+  - **API Security**: JWT token validation middleware (`requireAuth`, `requireOwnerOrAdmin` with active admin role checking)
+  - **Admin Role Management**: 
+    - Active middleware enforcement: Admins can access all user profiles, regular users only their own
+    - Admin role assignment via `scripts/set-admin.ts` utility script
+    - Visual admin badge (red) displayed in ProfileSettings UI
+    - Server-side validation prevents privilege escalation
+  - **Privilege Escalation Prevention**: Server-side role and user_id field protection with database-backed role verification
   - **Secure API Calls**: All profile operations use Authorization Bearer headers with Zod validation
 
 ## External Dependencies

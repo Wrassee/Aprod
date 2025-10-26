@@ -331,36 +331,80 @@ function Questionnaire({
                 />
               ))}
             </div>
-          ) : (
-            (currentQuestions as Question[]).some(q => q.type === 'radio') ? (
-              <TrueFalseGroup
-                questions={currentQuestions as Question[]}
-                values={localAnswers}
-                onChange={handleLocalAnswerChange}
-                groupName={currentGroup?.name || 'Kérdések'}
-              />
-            ) : (
-              (currentQuestions as Question[]).some((q: Question) => q.type === 'measurement' || q.type === 'calculated') ? (
+          ) : (() => {
+            // FIXED: Smart rendering based on question type composition
+            const radioQuestions = (currentQuestions as Question[]).filter(q => q.type === 'radio' || q.type === 'checkbox' || q.type === 'yes_no_na');
+            const measurementQuestions = (currentQuestions as Question[]).filter(q => q.type === 'measurement' || q.type === 'calculated');
+            const otherQuestions = (currentQuestions as Question[]).filter(q => 
+              q.type !== 'radio' && 
+              q.type !== 'checkbox' && 
+              q.type !== 'yes_no_na' && 
+              q.type !== 'measurement' && 
+              q.type !== 'calculated'
+            );
+
+            const hasOnlyRadio = radioQuestions.length === currentQuestions.length;
+            const hasOnlyMeasurement = measurementQuestions.length === currentQuestions.length;
+            const isMixed = radioQuestions.length > 0 && otherQuestions.length > 0;
+
+            // If ONLY radio/checkbox questions → use TrueFalseGroup
+            if (hasOnlyRadio) {
+              return (
+                <TrueFalseGroup
+                  questions={radioQuestions}
+                  values={localAnswers}
+                  onChange={handleLocalAnswerChange}
+                  groupName={currentGroup?.name || 'Kérdések'}
+                />
+              );
+            }
+
+            // If ONLY measurement/calculated questions → use MeasurementBlock
+            if (hasOnlyMeasurement) {
+              return (
                 <MeasurementBlock
-                  questions={(currentQuestions as Question[]).filter((q: Question) => q.type === 'measurement' || q.type === 'calculated')}
+                  questions={measurementQuestions}
                   values={localAnswers}
                   onChange={handleLocalAnswerChange}
                   onAddError={handleAddError}
                 />
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  {(currentQuestions as Question[]).map((question: Question) => (
-                    <IsolatedQuestion
-                      key={question.id}
-                      question={question}
-                      value={localAnswers[question.id] ?? ""}
-                      onChange={(value) => handleLocalAnswerChange(question.id, value)}
-                    />
-                  ))}
-                </div>
-              )
-            )
-          )}
+              );
+            }
+
+            // If MIXED types or other types → render each question individually
+            return (
+              <div className="space-y-6">
+                {radioQuestions.length > 0 && (
+                  <TrueFalseGroup
+                    questions={radioQuestions}
+                    values={localAnswers}
+                    onChange={handleLocalAnswerChange}
+                    groupName={currentGroup?.name || 'Kérdések'}
+                  />
+                )}
+                {measurementQuestions.length > 0 && (
+                  <MeasurementBlock
+                    questions={measurementQuestions}
+                    values={localAnswers}
+                    onChange={handleLocalAnswerChange}
+                    onAddError={handleAddError}
+                  />
+                )}
+                {otherQuestions.length > 0 && (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {otherQuestions.map((question: Question) => (
+                      <IsolatedQuestion
+                        key={question.id}
+                        question={question}
+                        value={localAnswers[question.id] ?? ""}
+                        onChange={(value) => handleLocalAnswerChange(question.id, value)}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
 
         <div className="mb-8">

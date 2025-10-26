@@ -141,6 +141,31 @@ export type QuestionConfig = typeof questionConfigs.$inferSelect;
 export type InsertQuestionConfig = typeof questionConfigs.$inferInsert;
 
 /* -------------------------------------------------------------------------
+ * Profiles - User authentication and profile data
+ * ----------------------------------------------------------------------- */
+export const profiles = pgTable("profiles", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  user_id: text("user_id").notNull().unique(), // Supabase Auth User ID
+  name: text("name"),
+  email: text("email").notNull(),
+  address: text("address"),
+  google_drive_folder_id: text("google_drive_folder_id"),
+  role: text("role").notNull().default("user"), // "user" or "admin"
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updated_at: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertProfileSchema = createInsertSchema(profiles).omit({ 
+  id: true, 
+  created_at: true, 
+  updated_at: true 
+});
+export type Profile = typeof profiles.$inferSelect;
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
+
+/* -------------------------------------------------------------------------
  * MULTILINGUAL STRUCTURE - Unified language support
  * ----------------------------------------------------------------------- */
 

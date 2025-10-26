@@ -484,7 +484,10 @@ function AppContent({
         );
         
       case 'login':
-        return <Login onLoginSuccess={handleLoginSuccess} />;
+        return <Login 
+          onLoginSuccess={handleLoginSuccess} 
+          onBackToHome={() => setCurrentScreen('start')}
+        />;
         
       case 'admin':
         return (

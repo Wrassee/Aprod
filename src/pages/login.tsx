@@ -10,9 +10,10 @@ import { Loader2, LogIn, UserPlus } from 'lucide-react';
 
 interface LoginProps {
   onLoginSuccess: () => void;
+  onBackToHome?: () => void;
 }
 
-export function Login({ onLoginSuccess }: LoginProps) {
+export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
   const { toast } = useToast();
   const { signIn, signUp } = useAuth();
   const { t } = useLanguageContext();
@@ -151,7 +152,9 @@ export function Login({ onLoginSuccess }: LoginProps) {
             <img 
               src="/otis-logo.png" 
               alt="OTIS Logo" 
-              className="h-16 w-auto"
+              className="h-16 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={onBackToHome}
+              data-testid="button-home-logo"
             />
           </div>
           <div className="text-center">

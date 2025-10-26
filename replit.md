@@ -3,7 +3,26 @@
 ## Overview
 This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
 
-## Recent Changes (2025-08-26)
+## Recent Changes (2025-10-26)
+### ✅ VERSION 0.5.0 - CONDITIONAL FILTERING & MIXED-TYPE BLOCKS COMPLETE
+- **Conditional Filtering Architecture**: Stable slug-based system with Excel-defined groupKey
+  - **Excel-First**: `groupKey` column in Excel defines stable slugs for filtering logic
+  - **Fallback**: Auto-generation from groupName only when Excel groupKey is missing
+  - **Frontend Filter**: conditional-question-filter.tsx compares `conditional_group_key` with `groupKey` (NOT localized groupName)
+  - **Language Independence**: groupKey remains constant across UI languages (e.g., "treppenhaustur" works in both HU/DE)
+  - **Result**: ✅ Conditional questions now show/hide correctly regardless of UI language
+- **Mixed-Type Question Blocks**: Complete component rendering overhaul
+  - **Rendering Logic**: TrueFalseGroup ONLY for pure boolean blocks; mixed blocks use IsolatedQuestion per question type
+  - **Support**: Any question type combination (radio, text, select, measurement, calculated, etc.) in single block
+  - **Component Routing**: questionnaire.tsx routes each question to correct component based on type
+  - **Result**: ✅ Mixed blocks render correctly with proper inputs for each question type
+- **Placeholder Localization**: German UI now uses placeholderDE column from Excel
+  - **Column Support**: Parser reads both `placeholder` (Hungarian) and `placeholderDE` (German) from Excel
+  - **Language-Aware**: routes.ts returns German placeholders when `language === "de"`
+  - **Fallback**: Uses Hungarian placeholder when German translation missing
+  - **Result**: ✅ Placeholder text now fully localized for both languages
+
+## Previous Changes (2025-08-26)
 ### ✅ VERSION 0.4.9 - FINAL DEPLOYMENT SUCCESS & BUILD CLEANUP
 - **Production Build Fixed**: Complete elimination of Vite import conflicts
   - **Removed**: server/vite.ts and conflicting server/index.ts files
@@ -94,6 +113,17 @@ Excel writing functionality must remain untouched to prevent corruption.
 
 ### Key Features & Design Patterns
 - **Multi-language Support**: Hungarian and German localization with dynamic switching.
+  - **Localization Pattern**: German UI uses *DE columns (titleDE, groupNameDE, placeholderDE), Hungarian uses base columns (title, groupName, placeholder)
+  - **groupKey Stability**: Filtering logic uses stable slugs (groupKey) that remain constant across languages, NOT localized groupName
+- **Conditional Question Filtering**: Excel-driven visibility control with stable groupKey architecture
+  - **Excel-First**: `groupKey` column in Excel defines stable slugs for conditional filtering (e.g., "treppenhaustur")
+  - **Auto-Fallback**: Slugify groupName only when Excel groupKey is missing
+  - **Frontend Logic**: conditional-question-filter.tsx compares `conditional_group_key` with `groupKey` (language-independent)
+  - **Critical**: Never compare localized groupName for filtering - breaks when UI language changes
+- **Mixed-Type Question Blocks**: Flexible rendering supporting any question type combination
+  - **TrueFalseGroup**: ONLY for pure boolean radio blocks (all questions type='radio' with true/false/n.a.)
+  - **IsolatedQuestion**: For mixed blocks, each question renders with correct component based on type
+  - **Supported Types**: radio, text, select, measurement, calculated, and any combination thereof
 - **Template Management System**: Admin interface for uploading, activating, and deleting Excel-based question and protocol templates, supporting unified multilingual templates.
 - **Excel Integration**: XML-based manipulation preserves original formatting, handles unicode, and supports complex cell mapping (multi-row/multi-cell question types). Calculations handled by Excel's formulas.
 - **PDF Generation**: Uses LibreOffice for accurate Excel-to-PDF conversion, maintaining appearance and layout.

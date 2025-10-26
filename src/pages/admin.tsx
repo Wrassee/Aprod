@@ -10,8 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguageContext } from '@/components/language-provider';
 import { formatDate } from '@/lib/utils';
-import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2, FileText } from 'lucide-react';
+import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2, FileText, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { ProfileSettings } from '@/components/profile-settings';
 
 interface Template {
   id: string;
@@ -393,10 +394,14 @@ export function Admin({ onBack, onHome }: AdminProps) {
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <Tabs defaultValue="templates" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="templates">{t.templates}</TabsTrigger>
             <TabsTrigger value="hybrid">Hibrid Sablonok</TabsTrigger>
             <TabsTrigger value="upload">{t.uploadTemplate}</TabsTrigger>
+            <TabsTrigger value="profile">
+              <User className="h-4 w-4 mr-2" />
+              Profil
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="templates" className="space-y-6">
@@ -803,6 +808,10 @@ export function Admin({ onBack, onHome }: AdminProps) {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="profile" className="space-y-6">
+            <ProfileSettings />
           </TabsContent>
         </Tabs>
       </main>

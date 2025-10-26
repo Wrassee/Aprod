@@ -23,6 +23,7 @@ import { Admin } from "./pages/admin.js";
 import { ProtocolPreview } from "./pages/protocol-preview.js";
 import { Erdungskontrolle } from "./pages/erdungskontrolle.js";
 import { Login } from "./pages/login.js";
+import { ProtectedRoute } from "./components/protected-route.js";
 import { FormData, MeasurementRow } from "./lib/types.js";
 
 /* --------------------  Shared schema -------------------- */
@@ -487,10 +488,12 @@ function AppContent({
         
       case 'admin':
         return (
-          <Admin 
-            onBack={() => setCurrentScreen('questionnaire')} 
-            onHome={() => setCurrentScreen('start')} 
-          />
+          <ProtectedRoute onUnauthorized={() => setCurrentScreen('login')}>
+            <Admin 
+              onBack={() => setCurrentScreen('questionnaire')} 
+              onHome={() => setCurrentScreen('start')} 
+            />
+          </ProtectedRoute>
         );
         
       case 'protocol-preview':

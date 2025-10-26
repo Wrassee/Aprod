@@ -15,12 +15,7 @@ if (!supabaseServiceKey) {
   throw new Error('SUPABASE_SERVICE_ROLE_KEY environment variable is required');
 }
 
-console.log('✅ Supabase Admin Client initialized');
-console.log('📍 Supabase URL:', supabaseUrl);
-console.log('🔑 Service Role Key exists:', supabaseServiceKey.length > 0 ? 'YES' : 'NO');
-console.log('🔑 Service Role Key length:', supabaseServiceKey.length);
-console.log('🔑 Service Role Key first 50 chars:', supabaseServiceKey.substring(0, 50));
-console.log('🔑 Service Role Key last 20 chars:', supabaseServiceKey.substring(supabaseServiceKey.length - 20));
+console.log('✅ Supabase Admin Client initialized with service role key');
 
 // Server-side Supabase client with service role key for admin operations
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);

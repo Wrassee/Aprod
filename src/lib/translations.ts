@@ -150,6 +150,33 @@ export interface Translation {
   uploadProtocolFormat: string;
   selected: string;
   
+  // Login page
+  loginTitle: string;
+  registerTitle: string;
+  loginDescription: string;
+  registerDescription: string;
+  emailLabel: string;
+  passwordLabel: string;
+  loginButton: string;
+  registerButton: string;
+  switchToRegister: string;
+  switchToLogin: string;
+  missingData: string;
+  pleaseProvideEmailAndPassword: string;
+  loginSuccessful: string;
+  welcomeUser: string;
+  loginError: string;
+  invalidCredentials: string;
+  emailNotConfirmed: string;
+  genericLoginError: string;
+  weakPassword: string;
+  passwordMinLength: string;
+  emailConfirmationRequired: string;
+  checkEmailForConfirmation: string;
+  registrationSuccessful: string;
+  loginSuccessfulAfterRegistration: string;
+  userAlreadyExists: string;
+  
   // Page specific translations
   generalData: string;
   machineRoom: string;
@@ -308,6 +335,33 @@ export const translations: Record<string, Translation> = {
     uploadExcelWithQuestions: "Kérdéseket tartalmazó Excel fájl feltöltése",
     uploadProtocolFormat: "Protokoll formátum sablon feltöltése",
     selected: "Kiválasztva",
+    
+    // Login page
+    loginTitle: "Bejelentkezés",
+    registerTitle: "Regisztráció",
+    loginDescription: "Jelentkezz be a fiókodba a folytatáshoz",
+    registerDescription: "Hozz létre egy új fiókot",
+    emailLabel: "Email cím",
+    passwordLabel: "Jelszó",
+    loginButton: "Bejelentkezés",
+    registerButton: "Regisztráció",
+    switchToRegister: "Nincs még fiókod? Regisztrálj!",
+    switchToLogin: "Van már fiókod? Jelentkezz be!",
+    missingData: "Hiányzó adatok",
+    pleaseProvideEmailAndPassword: "Kérlek, add meg az email címed és a jelszavad.",
+    loginSuccessful: "Sikeres bejelentkezés! ✅",
+    welcomeUser: "Üdvözlünk, {email}!",
+    loginError: "Bejelentkezési hiba",
+    invalidCredentials: "Hibás email cím vagy jelszó. Ha még nincs fiókod, először regisztrálj!",
+    emailNotConfirmed: "Az email címed még nincs megerősítve. Ellenőrizd az email fiókodat.",
+    genericLoginError: "Nem sikerült bejelentkezni. Ellenőrizd az adataidat.",
+    weakPassword: "Gyenge jelszó",
+    passwordMinLength: "A jelszónak legalább 6 karakter hosszúnak kell lennie.",
+    emailConfirmationRequired: "Email megerősítés szükséges 📧",
+    checkEmailForConfirmation: "Ellenőrizd az email fiókodat és kattints a megerősítő linkre.",
+    registrationSuccessful: "Sikeres regisztráció! 🎉",
+    loginSuccessfulAfterRegistration: "Bejelentkezés sikeres!",
+    userAlreadyExists: "Ez az email cím már használatban van.",
     
     // Page specific translations
     generalData: "Általános adatok",
@@ -469,6 +523,33 @@ export const translations: Record<string, Translation> = {
     uploadExcelWithQuestions: "Excel-Datei mit Fragen hochladen",
     uploadProtocolFormat: "Protokoll-Formatvorlage hochladen",
     selected: "Ausgewählt",
+    
+    // Login page
+    loginTitle: "Anmelden",
+    registerTitle: "Registrieren",
+    loginDescription: "Melden Sie sich bei Ihrem Konto an, um fortzufahren",
+    registerDescription: "Erstellen Sie ein neues Konto",
+    emailLabel: "E-Mail-Adresse",
+    passwordLabel: "Passwort",
+    loginButton: "Anmelden",
+    registerButton: "Registrieren",
+    switchToRegister: "Noch kein Konto? Registrieren!",
+    switchToLogin: "Haben Sie bereits ein Konto? Anmelden!",
+    missingData: "Fehlende Daten",
+    pleaseProvideEmailAndPassword: "Bitte geben Sie Ihre E-Mail-Adresse und Ihr Passwort ein.",
+    loginSuccessful: "Anmeldung erfolgreich! ✅",
+    welcomeUser: "Willkommen, {email}!",
+    loginError: "Anmeldefehler",
+    invalidCredentials: "Ungültige E-Mail-Adresse oder Passwort. Wenn Sie noch kein Konto haben, registrieren Sie sich zuerst!",
+    emailNotConfirmed: "Ihre E-Mail-Adresse wurde noch nicht bestätigt. Überprüfen Sie Ihr E-Mail-Postfach.",
+    genericLoginError: "Anmeldung fehlgeschlagen. Überprüfen Sie Ihre Daten.",
+    weakPassword: "Schwaches Passwort",
+    passwordMinLength: "Das Passwort muss mindestens 6 Zeichen lang sein.",
+    emailConfirmationRequired: "E-Mail-Bestätigung erforderlich 📧",
+    checkEmailForConfirmation: "Überprüfen Sie Ihr E-Mail-Postfach und klicken Sie auf den Bestätigungslink.",
+    registrationSuccessful: "Registrierung erfolgreich! 🎉",
+    loginSuccessfulAfterRegistration: "Anmeldung erfolgreich!",
+    userAlreadyExists: "Diese E-Mail-Adresse wird bereits verwendet.",
     
     // Page specific translations
     generalData: "Allgemeine Daten",

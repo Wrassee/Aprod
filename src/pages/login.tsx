@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
+import { useLanguageContext } from '@/components/language-provider';
 import { Loader2, LogIn, UserPlus } from 'lucide-react';
 
 interface LoginProps {
@@ -14,6 +15,7 @@ interface LoginProps {
 export function Login({ onLoginSuccess }: LoginProps) {
   const { toast } = useToast();
   const { signIn, signUp } = useAuth();
+  const { t } = useLanguageContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,8 +26,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
     
     if (!email || !password) {
       toast({
-        title: 'Hiányzó adatok',
-        description: 'Kérlek, add meg az email címed és a jelszavad.',
+        title: t.missingData,
+        description: t.pleaseProvideEmailAndPassword,
         variant: 'destructive',
       });
       return;
@@ -42,24 +44,24 @@ export function Login({ onLoginSuccess }: LoginProps) {
       }
       
       toast({
-        title: 'Sikeres bejelentkezés! ✅',
-        description: `Üdvözlünk, ${email}!`,
+        title: t.loginSuccessful,
+        description: t.welcomeUser.replace('{email}', email),
       });
       onLoginSuccess();
     } catch (error: any) {
       console.error('Login error:', error);
       
       // More specific error messages
-      let errorMessage = error.message || 'Nem sikerült bejelentkezni. Ellenőrizd az adataidat.';
+      let errorMessage = error.message || t.genericLoginError;
       
       if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = 'Hibás email cím vagy jelszó. Ha még nincs fiókod, először regisztrálj!';
+        errorMessage = t.invalidCredentials;
       } else if (error.message?.includes('Email not confirmed')) {
-        errorMessage = 'Az email címed még nincs megerősítve. Ellenőrizd az email fiókodat.';
+        errorMessage = t.emailNotConfirmed;
       }
       
       toast({
-        title: 'Bejelentkezési hiba',
+        title: t.loginError,
         description: errorMessage,
         variant: 'destructive',
       });
@@ -73,8 +75,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
     
     if (!email || !password) {
       toast({
-        title: 'Hiányzó adatok',
-        description: 'Kérlek, add meg az email címed és a jelszavad.',
+        title: t.missingData,
+        description: t.pleaseProvideEmailAndPassword,
         variant: 'destructive',
       });
       return;
@@ -82,8 +84,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
 
     if (password.length < 6) {
       toast({
-        title: 'Gyenge jelszó',
-        description: 'A jelszónak legalább 6 karakter hosszúnak kell lennie.',
+        title: t.weakPassword,
+        description: t.passwordMinLength,
         variant: 'destructive',
       });
       return;
@@ -98,8 +100,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
       if (!session) {
         // Email confirmation required
         toast({
-          title: 'Email megerősítés szükséges 📧',
-          description: 'Ellenőrizd az email fiókodat és kattints a megerősítő linkre.',
+          title: t.emailConfirmationRequired,
+          description: t.checkEmailForConfirmation,
         });
         setIsRegistering(false);
         setPassword('');
@@ -107,8 +109,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
       }
       
       toast({
-        title: 'Sikeres regisztráció! 🎉',
-        description: 'Bejelentkezés sikeres!',
+        title: t.registrationSuccessful,
+        description: t.loginSuccessfulAfterRegistration,
       });
       
       // Auto-login after registration (only if session exists)
@@ -118,21 +120,21 @@ export function Login({ onLoginSuccess }: LoginProps) {
       
       if (error.message.includes('Email confirmation required')) {
         toast({
-          title: 'Email megerősítés szükséges 📧',
-          description: 'Ellenőrizd az email fiókodat és kattints a megerősítő linkre.',
+          title: t.emailConfirmationRequired,
+          description: t.checkEmailForConfirmation,
         });
         setIsRegistering(false);
         setPassword('');
-      } else if (error.message.includes('email_provider_disabled')) {
+      } else if (error.message.includes('User already registered')) {
         toast({
-          title: 'Regisztráció ideiglenesen kikapcsolva',
-          description: 'Kérlek, használd a bejelentkezést egy meglévő fiókkal.',
+          title: t.loginError,
+          description: t.userAlreadyExists,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'Regisztrációs hiba',
-          description: error.message || 'Nem sikerült a regisztráció. Próbáld újra később.',
+          title: t.loginError,
+          description: error.message || t.genericLoginError,
           variant: 'destructive',
         });
       }
@@ -154,12 +156,12 @@ export function Login({ onLoginSuccess }: LoginProps) {
           </div>
           <div className="text-center">
             <CardTitle className="text-2xl font-bold">
-              {isRegistering ? 'Regisztráció' : 'Bejelentkezés'}
+              {isRegistering ? t.registerTitle : t.loginTitle}
             </CardTitle>
             <CardDescription>
               {isRegistering 
-                ? 'Hozz létre egy új fiókot az OTIS APROD rendszerhez' 
-                : 'Jelentkezz be az admin felülethez'}
+                ? t.registerDescription
+                : t.loginDescription}
             </CardDescription>
           </div>
         </CardHeader>
@@ -167,7 +169,7 @@ export function Login({ onLoginSuccess }: LoginProps) {
         <CardContent>
           <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email cím</Label>
+              <Label htmlFor="email">{t.emailLabel}</Label>
               <Input
                 id="email"
                 type="email"
@@ -181,7 +183,7 @@ export function Login({ onLoginSuccess }: LoginProps) {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Jelszó</Label>
+              <Label htmlFor="password">{t.passwordLabel}</Label>
               <Input
                 id="password"
                 type="password"
@@ -203,19 +205,19 @@ export function Login({ onLoginSuccess }: LoginProps) {
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {isRegistering ? 'Regisztráció...' : 'Bejelentkezés...'}
+                  {t.loading}
                 </>
               ) : (
                 <>
                   {isRegistering ? (
                     <>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      Regisztráció
+                      {t.registerButton}
                     </>
                   ) : (
                     <>
                       <LogIn className="mr-2 h-4 w-4" />
-                      Bejelentkezés
+                      {t.loginButton}
                     </>
                   )}
                 </>
@@ -242,8 +244,8 @@ export function Login({ onLoginSuccess }: LoginProps) {
               data-testid="button-toggle-mode"
             >
               {isRegistering 
-                ? 'Van már fiókom - Bejelentkezés' 
-                : 'Új fiók létrehozása - Regisztráció'}
+                ? t.switchToLogin
+                : t.switchToRegister}
             </Button>
           </form>
         </CardContent>

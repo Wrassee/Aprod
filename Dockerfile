@@ -8,8 +8,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 build-e
 COPY package.json package-lock.json ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm ci
+COPY .env.production .env
 
 COPY . .
+
+ARG VITE_SUPABASE_URL
+ARG VITE_SUPABASE_ANON_KEY
+ENV VITE_SUPABASE_URL=$VITE_SUPABASE_URL
+ENV VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY
 RUN npm run build
 RUN npm prune --production
 

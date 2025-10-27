@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3 build-e
 COPY package.json package-lock.json ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm ci
-COPY .env.production .env
 
 COPY . .
 

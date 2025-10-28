@@ -74,17 +74,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize session on mount
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+  const checkAuthAndFetchProfile = async () => {
+    try {
+      // 1. Várjuk meg a session ellenőrzését
+      const { data: { session } } = await supabase.auth.getSession();
+      
       setSession(session);
       setUser(session?.user ?? null);
-      
+
+      // 2. Ha van session, VÁRJUK MEG a profil betöltését is
       if (session?.user) {
-        fetchProfile(session.user.id, session.user.email || '');
+        await fetchProfile(session.user.id, session.user.email || '');
       }
-      
+    } catch (error) {
+      console.error("Error during initial auth check:", error);
+    } finally {
+      // 3. CSAK MIUTÁN MINDEN BEFEJEZŐDÖTT, állítjuk a loading-ot false-ra
       setLoading(false);
-    });
+    }
+  };
+
+  checkAuthAndFetchProfile();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -159,12 +169,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    
-    setUser(null);
-    setSession(null);
-    setProfile(null);
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error('❌ Sign out error:', error);
+    throw error;
+  }
   };
 
   const refreshProfile = async () => {

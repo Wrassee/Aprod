@@ -11,7 +11,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "./components/ui/toaster.js";
 import { TooltipProvider } from "./components/ui/tooltip.js";
 import { LanguageProvider, useLanguageContext } from "./components/language-provider.js";
-import { AuthProvider } from "./contexts/auth-context.js";
+import { AuthProvider, useAuth } from "./contexts/auth-context.js";
 
 /* --------------------  Oldalak / Komponensek -------------------- */
 import { StartScreen } from "./pages/start-screen.js";
@@ -45,7 +45,7 @@ interface AppContentProps {
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 }
 
-// === APPCONTENT KOMPONENS - CSAK A NYELVI CONTEXTET HASZNÁLJA ===
+// === APPCONTENT KOMPONENS - NYELVI ÉS AUTH CONTEXTET HASZNÁLJA ===
 function AppContent({
   currentScreen,
   setCurrentScreen,
@@ -58,8 +58,9 @@ function AppContent({
   formData,
   setFormData,
 }: AppContentProps) {
-  // === HASZNÁLJUK A NYELVI CONTEXTET ===
+  // === HASZNÁLJUK A NYELVI ÉS AZ AUTH CONTEXTET ===
   const { language, setLanguage } = useLanguageContext();
+  const { user } = useAuth(); // ✅ HOZZÁADVA: Auth állapot ellenőrzéséhez
   
   const formDataRef = useRef(formData);
   
@@ -69,7 +70,7 @@ function AppContent({
   }, [formData]);
 
   const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
-    console.log('🌐 App.tsx - Language selected:', selectedLanguage);
+    console.log('🌍 App.tsx - Language selected:', selectedLanguage);
     // === NYELV BEÁLLÍTÁSA A CONTEXTEN KERESZTÜL ===
     setLanguage(selectedLanguage);
     localStorage.setItem('otis-protocol-language', selectedLanguage);
@@ -368,7 +369,18 @@ function AppContent({
     setFormData(prev => ({ ...prev, errors }));
   }, [setFormData]);
 
-  const handleAdminAccess = useCallback(() => setCurrentScreen('login'), [setCurrentScreen]);
+  // === JAVÍTOTT handleAdminAccess - ELLENŐRZI A BEJELENTKEZÉSI ÁLLAPOTOT ===
+  const handleAdminAccess = useCallback(() => {
+    if (user) {
+      // Ha van bejelentkezett felhasználó, menj az admin oldalra
+      console.log('✅ User is logged in - navigating to admin');
+      setCurrentScreen('admin');
+    } else {
+      // Ha nincs, akkor menj a login oldalra
+      console.log('🔐 User not logged in - navigating to login');
+      setCurrentScreen('login');
+    }
+  }, [user, setCurrentScreen]);
 
   const handleLoginSuccess = useCallback(() => {
     console.log('✅ Login successful - redirecting to admin');
@@ -456,7 +468,7 @@ function AppContent({
             signatureName={formData.signatureName || ''}
             onSignatureNameChange={(signatureName) => setFormData(prev => ({ ...prev, signatureName }))}
             onBack={handleSignatureBack}
-            onComplete={handleSignatureComplete} // ✅ Most már fogadja a finalSignerName-et
+            onComplete={handleSignatureComplete}
           />
         );
         

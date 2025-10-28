@@ -1,4 +1,4 @@
-// src/components/profile-settings.tsx - GLASSMORPHISM + MODERN CARD VERZIÓ
+// src/components/profile-settings.tsx - OTIS KÉK ULTRA MODERN VERZIÓ
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Save, User, Mail, MapPin, FolderOpen, Shield, LogOut, Crown, Sparkles, Zap } from 'lucide-react';
+import { Loader2, Save, User, Mail, MapPin, FolderOpen, Shield, LogOut, Crown, Sparkles, Zap, Power } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export function ProfileSettings() {
@@ -120,10 +120,10 @@ export function ProfileSettings() {
 
   return (
     <div className="w-full space-y-6">
-      {/* 🎨 GLASSMORPHISM PROFILE HEADER CARD */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-600 to-fuchsia-600 p-1 shadow-2xl">
+      {/* 🎨 OTIS KÉK GLASSMORPHISM PROFILE HEADER */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-2xl">
         {/* Animated gradient border effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 opacity-50 blur-xl animate-pulse"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse"></div>
         
         <div className="relative bg-white dark:bg-gray-900 rounded-3xl p-6">
           <div className="flex items-start justify-between gap-4">
@@ -131,8 +131,8 @@ export function ProfileSettings() {
             <div className="flex items-center gap-4 flex-1">
               <div className="relative">
                 {/* Avatar with glow effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-400 to-fuchsia-400 rounded-2xl blur-md opacity-60 animate-pulse"></div>
-                <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-500 via-purple-500 to-fuchsia-600 flex items-center justify-center text-white font-bold text-2xl shadow-xl transform hover:scale-110 transition-transform duration-300">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl blur-md opacity-60 animate-pulse"></div>
+                <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 via-sky-500 to-cyan-400 flex items-center justify-center text-white font-bold text-2xl shadow-xl transform hover:scale-110 transition-transform duration-300">
                   {profile?.name?.charAt(0)?.toUpperCase() || profile?.email?.charAt(0)?.toUpperCase() || 'U'}
                   {profile?.role === 'admin' && (
                     <div className="absolute -top-1 -right-1 w-7 h-7 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg">
@@ -143,7 +143,7 @@ export function ProfileSettings() {
               </div>
               
               <div className="flex-1">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-fuchsia-600 bg-clip-text text-transparent mb-1">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent mb-1">
                   {profile?.name || 'Felhasználó'}
                 </h2>
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
@@ -153,60 +153,80 @@ export function ProfileSettings() {
                 <div className="flex items-center gap-2">
                   <Badge 
                     variant={profile?.role === 'admin' ? 'default' : 'secondary'}
-                    className="gap-1 shadow-sm"
+                    className="gap-1 shadow-sm bg-gradient-to-r from-blue-500 to-sky-500 text-white border-0"
                   >
                     <Shield className="h-3 w-3" />
                     {profile?.role || 'user'}
                   </Badge>
                   <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
-                    <Sparkles className="h-3 w-3" />
+                    <Sparkles className="h-3 w-3 text-cyan-500" />
                     <span>Aktív</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 🎨 ULTRA MODERN LOGOUT BUTTON */}
-            <div className="relative group">
+            {/* 🎨 SPECTACULAR LOGOUT BUTTON - OTIS KÉK */}
+            <div className="relative">
               <button
                 onClick={handleSignOut}
                 onMouseEnter={() => setIsHoveringLogout(true)}
                 onMouseLeave={() => setIsHoveringLogout(false)}
-                className="relative overflow-hidden"
+                className="relative overflow-hidden group"
               >
-                {/* Animated gradient background */}
-                <div className={`absolute inset-0 bg-gradient-to-r from-red-500 via-rose-500 to-pink-600 rounded-2xl transition-all duration-500 ${isHoveringLogout ? 'scale-110 opacity-100' : 'scale-100 opacity-90'}`}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-pink-500 opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-300"></div>
-                </div>
+                {/* Outer glow ring */}
+                <div className={`absolute -inset-1 bg-gradient-to-r from-red-500 via-rose-500 to-pink-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition-all duration-500 ${isHoveringLogout ? 'animate-pulse' : ''}`}></div>
                 
-                {/* Button content */}
-                <div className="relative flex items-center gap-2 px-6 py-3 text-white font-semibold">
-                  <LogOut className={`h-5 w-5 transition-transform duration-300 ${isHoveringLogout ? 'rotate-12 scale-110' : ''}`} />
-                  <span className="hidden sm:inline">Kijelentkezés</span>
+                {/* Main button background */}
+                <div className={`relative bg-gradient-to-r from-red-500 via-rose-500 to-pink-600 rounded-2xl transition-all duration-300 ${isHoveringLogout ? 'scale-105' : 'scale-100'}`}>
+                  {/* Animated shine overlay */}
+                  <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 transition-transform duration-700 ${isHoveringLogout ? 'translate-x-full' : '-translate-x-full'}`}></div>
                   
-                  {/* Particle effect on hover */}
-                  {isHoveringLogout && (
-                    <>
-                      <Zap className="absolute -top-1 -right-1 h-4 w-4 text-yellow-300 animate-ping" />
-                      <Sparkles className="absolute -bottom-1 -left-1 h-4 w-4 text-pink-300 animate-pulse" />
-                    </>
-                  )}
+                  {/* Button content */}
+                  <div className="relative flex items-center gap-3 px-6 py-3">
+                    {/* Icon with rotation effect */}
+                    <div className="relative">
+                      <Power className={`h-5 w-5 text-white transition-all duration-300 ${isHoveringLogout ? 'rotate-180 scale-110' : 'rotate-0'}`} />
+                      
+                      {/* Particle effects on hover */}
+                      {isHoveringLogout && (
+                        <>
+                          <Zap className="absolute -top-2 -right-2 h-3 w-3 text-yellow-300 animate-ping" />
+                          <Sparkles className="absolute -bottom-2 -left-2 h-3 w-3 text-pink-300 animate-pulse" />
+                        </>
+                      )}
+                    </div>
+                    
+                    {/* Text with gradient on hover */}
+                    <span className={`text-white font-semibold transition-all duration-300 hidden sm:inline ${isHoveringLogout ? 'tracking-wider' : 'tracking-normal'}`}>
+                      Kijelentkezés
+                    </span>
+                  </div>
+                  
+                  {/* Bottom glow line */}
+                  <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 transition-all duration-300 ${isHoveringLogout ? 'opacity-100' : 'opacity-0'}`}></div>
                 </div>
-                
-                {/* Shine effect */}
-                <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 transition-transform duration-700 ${isHoveringLogout ? 'translate-x-full' : '-translate-x-full'}`}></div>
+
+                {/* Ripple effect on click */}
+                <div className="absolute inset-0 rounded-2xl">
+                  <div className={`absolute inset-0 bg-white rounded-2xl transition-opacity duration-150 ${isHoveringLogout ? 'opacity-0' : 'opacity-0'}`}></div>
+                </div>
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* MAIN FORM CARD */}
-      <Card className="w-full border-2 border-violet-100 dark:border-violet-900/50 shadow-xl">
+      {/* MAIN FORM CARD - OTIS KÉK */}
+      <Card className="w-full border-2 border-blue-100 dark:border-blue-900/50 shadow-xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-violet-600" />
-            Profil Szerkesztése
+            <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-sky-500 text-white">
+              <User className="h-5 w-5" />
+            </div>
+            <span className="bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
+              Profil Szerkesztése
+            </span>
           </CardTitle>
           <CardDescription>
             Add meg vagy frissítsd a profil adataidat
@@ -218,7 +238,7 @@ export function ProfileSettings() {
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <User className="h-4 w-4 text-violet-600" />
+                <User className="h-4 w-4 text-blue-600" />
                 Név
               </Label>
               <div className="relative group">
@@ -228,15 +248,15 @@ export function ProfileSettings() {
                   placeholder="Teljes neved"
                   value={formData.name}
                   onChange={(e) => handleChange('name', e.target.value)}
-                  className="transition-all focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500 pl-4 pr-10 group-hover:border-violet-300"
+                  className="transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 pl-4 pr-10 group-hover:border-blue-300"
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-violet-500 opacity-0 group-focus-within:opacity-100 animate-pulse transition-opacity"></div>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-500 opacity-0 group-focus-within:opacity-100 animate-pulse transition-opacity"></div>
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="address" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <MapPin className="h-4 w-4 text-violet-600" />
+                <MapPin className="h-4 w-4 text-blue-600" />
                 Cím
               </Label>
               <div className="relative group">
@@ -246,15 +266,15 @@ export function ProfileSettings() {
                   placeholder="Utca, házszám, város"
                   value={formData.address}
                   onChange={(e) => handleChange('address', e.target.value)}
-                  className="transition-all focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500 pl-4 pr-10 group-hover:border-violet-300"
+                  className="transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 pl-4 pr-10 group-hover:border-blue-300"
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-violet-500 opacity-0 group-focus-within:opacity-100 animate-pulse transition-opacity"></div>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-500 opacity-0 group-focus-within:opacity-100 animate-pulse transition-opacity"></div>
               </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="google_drive_folder_id" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-                <FolderOpen className="h-4 w-4 text-violet-600" />
+                <FolderOpen className="h-4 w-4 text-blue-600" />
                 Google Drive Mappa ID
               </Label>
               <div className="relative group">
@@ -264,27 +284,27 @@ export function ProfileSettings() {
                   placeholder="1AbC2DeF3GhI4JkL5MnO6PqR..."
                   value={formData.google_drive_folder_id}
                   onChange={(e) => handleChange('google_drive_folder_id', e.target.value)}
-                  className="transition-all focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500 pl-4 pr-10 group-hover:border-violet-300"
+                  className="transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 pl-4 pr-10 group-hover:border-blue-300"
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-violet-500 opacity-0 group-focus-within:opacity-100 animate-pulse transition-opacity"></div>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-500 opacity-0 group-focus-within:opacity-100 animate-pulse transition-opacity"></div>
               </div>
               <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                <Sparkles className="h-3 w-3" />
+                <Sparkles className="h-3 w-3 text-cyan-500" />
                 Az a mappa ID, ahova a protokollokat feltöltjük (opcionális).
               </p>
             </div>
           </div>
 
-          {/* Save Button with particles */}
+          {/* Save Button with OTIS blue gradient */}
           <div className="relative">
             <Button
               data-testid="button-save-profile"
               onClick={handleSave}
               disabled={!hasChanges || loading}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 hover:from-violet-700 hover:via-purple-700 hover:to-fuchsia-700 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed group"
+              className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 hover:from-blue-700 hover:via-sky-600 hover:to-cyan-500 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed group"
             >
-              {/* Animated background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-violet-400 via-fuchsia-400 to-pink-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
+              {/* Animated background glow */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
               
               <span className="relative z-10 flex items-center justify-center gap-2">
                 {loading ? (

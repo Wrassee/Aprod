@@ -78,7 +78,7 @@ export async function requireOwnerOrAdmin(req: Request, res: Response, next: Nex
     }
 
     // Check if user has admin role
-    const profile = await storage.getProfile(authenticatedUser.id);
+    const profile = await storage.getProfileByUserId(authenticatedUser.id);
     
     if (profile && profile.role === 'admin') {
       console.log('✅ Admin access granted for user:', authenticatedUser.id);
@@ -94,5 +94,41 @@ export async function requireOwnerOrAdmin(req: Request, res: Response, next: Nex
     return res.status(500).json({ 
       message: 'Authorization error' 
     });
+  }
+}
+
+/**
+ * --- ÚJ MIDDLEWARE ---
+ * Middleware to ensure only admin users can access certain routes
+ * This should be used AFTER requireAuth middleware
+ */
+export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  const authenticatedUser = (req as any).user;
+
+  // Először ellenőrizzük, hogy van-e bejelentkezett felhasználó
+  if (!authenticatedUser) {
+    console.warn('⚠️ requireAdmin: No authenticated user found');
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  try {
+    // Mindig friss adatbázis adatot használunk a jogosultság ellenőrzéséhez
+    const profile = await storage.getProfileByUserId(authenticatedUser.id);
+
+    if (!profile) {
+      console.warn(`⚠️ requireAdmin: No profile found for user ${authenticatedUser.id}`);
+      return res.status(403).json({ message: 'Forbidden: User profile not found.' });
+    }
+
+    if (profile.role === 'admin') {
+      console.log(`✅ Admin access granted for user: ${authenticatedUser.id}`);
+      next(); // Siker, a felhasználó admin
+    } else {
+      console.warn(`⚠️ requireAdmin: User ${authenticatedUser.id} has role '${profile.role}', admin required`);
+      res.status(403).json({ message: 'Forbidden: Admin access required.' });
+    }
+  } catch (error) {
+    console.error('❌ Error in requireAdmin middleware:', error);
+    res.status(500).json({ message: 'Internal server error during authorization' });
   }
 }

@@ -1,48 +1,17 @@
-import React, { useState, useEffect } from 'react';
+// src/pages/admin.tsx
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useLanguageContext } from '@/components/language-provider';
-import { formatDate } from '@/lib/utils';
-import { Upload, Settings, FileSpreadsheet, CheckCircle, XCircle, Eye, Edit, Home, Trash2, X, Download, Loader2, FileText, User } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
-import { ProfileSettings } from '@/components/profile-settings';
+import { Home, User, FileSpreadsheet, LayoutDashboard, FileText, Shield, Settings, ArrowLeft, Sparkles } from 'lucide-react';
 
-interface Template {
-  id: string;
-  name: string;
-  type: string;
-  language: string;
-  fileName: string;
-  is_active: boolean;
-  uploaded_at: string;
-}
-
-interface LocalTemplate {
-  id: string;
-  name: string;
-  name_de: string;
-  type: string;
-  language: string;
-  path: string;
-  description?: string;
-  description_de?: string;
-}
-
-interface HybridTemplateData {
-  local: LocalTemplate[];
-  remote: Template[];
-  current: {
-    templateId: string;
-    loadStrategy: string;
-  };
-}
+// Komponens importok
+import { UserList } from '@/components/user-list';
+import { TemplateManagement } from '@/components/template-management';
+import { AdminDashboard } from '@/components/admin-dashboard';
+import { AuditLogTable } from '@/components/audit-log-table';
+import { SystemSettings } from '@/components/system-settings';
 
 interface AdminProps {
   onBack: () => void;
@@ -51,761 +20,179 @@ interface AdminProps {
 
 export function Admin({ onBack, onHome }: AdminProps) {
   const { t, language } = useLanguageContext();
-  const { toast } = useToast();
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [activatingId, setActivatingId] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState<any>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  
-  // Külön state a két típusú feltöltéshez
-  const [questionsUpload, setQuestionsUpload] = useState({
-    name: '',
-    file: null as File | null,
-  });
-  
-  const [protocolUpload, setProtocolUpload] = useState({
-    name: '',
-    file: null as File | null,
-  });
-  
-  const [hybridTemplates, setHybridTemplates] = useState<HybridTemplateData | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
-  const [loadStrategy, setLoadStrategy] = useState<string>('local_first');
-
-  useEffect(() => {
-    fetchTemplates();
-    fetchHybridTemplates();
-  }, []);
-
-  const fetchTemplates = async () => {
-    try {
-      const response = await fetch('/api/admin/templates');
-      if (response.ok) {
-        const data = await response.json();
-        setTemplates(data);
-      }
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      toast({
-        title: t.error,
-        description: t.failedToFetchTemplates,
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const fetchHybridTemplates = async () => {
-    try {
-      const response = await fetch('/api/admin/templates/available');
-      if (response.ok) {
-        const data = await response.json();
-        setHybridTemplates(data);
-        setSelectedTemplate(data.current.templateId);
-        setLoadStrategy(data.current.loadStrategy);
-      }
-    } catch (error) {
-      console.error('Error fetching hybrid templates:', error);
-    }
-  };
-
-  const handleTemplateSelect = async () => {
-    if (!selectedTemplate) return;
-
-    setLoading(true);
-    try {
-      const response = await fetch('/api/admin/templates/select', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          templateId: selectedTemplate,
-          loadStrategy: loadStrategy
-        }),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        toast({
-          title: t.success,
-          description: t.templateSwitchSuccess.replace('{name}', result.template?.name || 'Template'),
-        });
-        fetchHybridTemplates();
-      } else {
-        throw new Error('Template selection failed');
-      }
-    } catch (error) {
-      console.error('Error selecting template:', error);
-      toast({
-        title: t.error,
-        description: t.templateSwitchFailed,
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Kérdés sablon fájl kiválasztása
-  const handleQuestionsFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setQuestionsUpload({ ...questionsUpload, file });
-    }
-  };
-
-  // Protokoll sablon fájl kiválasztása
-  const handleProtocolFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setProtocolUpload({ ...protocolUpload, file });
-    }
-  };
-
-  // Kérdés sablon feltöltése
-  const handleQuestionsUpload = async () => {
-    if (!questionsUpload.file || !questionsUpload.name) {
-      toast({
-        title: t.error,
-        description: t.pleaseProvideNameAndFile,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('file', questionsUpload.file);
-    formData.append('name', questionsUpload.name);
-    formData.append('type', 'unified'); // Mindig unified
-    formData.append('language', 'multilingual'); // Mindig multilingual
-
-    try {
-      const response = await fetch('/api/admin/templates/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        toast({
-          title: t.success,
-          description: t.questionsTemplateUploaded,
-        });
-        setQuestionsUpload({ name: '', file: null });
-        fetchTemplates();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Upload failed');
-      }
-    } catch (error: any) {
-      console.error('Error uploading questions template:', error);
-      toast({
-        title: t.error,
-        description: error.message || 'Failed to upload template',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Protokoll sablon feltöltése
-  const handleProtocolUpload = async () => {
-    if (!protocolUpload.file || !protocolUpload.name) {
-      toast({
-        title: t.error,
-        description: t.pleaseProvideNameAndFile,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    setLoading(true);
-    const formData = new FormData();
-    formData.append('file', protocolUpload.file);
-    formData.append('name', protocolUpload.name);
-    formData.append('type', 'protocol'); // Mindig protocol
-    formData.append('language', 'multilingual'); // Mindig multilingual
-
-    try {
-      const response = await fetch('/api/admin/templates/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        toast({
-          title: t.success,
-          description: t.protocolTemplateUploaded,
-        });
-        setProtocolUpload({ name: '', file: null });
-        fetchTemplates();
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Upload failed');
-      }
-    } catch (error: any) {
-      console.error('Error uploading protocol template:', error);
-      toast({
-        title: t.error,
-        description: error.message || 'Failed to upload template',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleActivate = async (templateId: string) => {
-    setActivatingId(templateId);
-    try {
-      const response = await fetch(`/api/admin/templates/${templateId}/activate`, {
-        method: 'POST',
-      });
-
-      if (response.ok) {
-        toast({
-          title: t.success,
-          description: t.templateActivatedSuccessfully,
-        });
-        fetchTemplates();
-      } else {
-        throw new Error('Activation failed');
-      }
-    } catch (error) {
-      console.error('Error activating template:', error);
-      toast({
-        title: t.error,
-        description: t.failedToActivateTemplate,
-        variant: 'destructive',
-      });
-    } finally {
-      setActivatingId(null);
-    }
-  };
-
-  const handlePreview = async (templateId: string) => {
-    try {
-      const [templateResponse, questionsResponse] = await Promise.all([
-        fetch(`/api/admin/templates/${templateId}/preview`),
-        fetch('/api/questions/hu')
-      ]);
-      
-      if (templateResponse.ok) {
-        const templateData = await templateResponse.json();
-        let questionsData = [];
-        
-        if (questionsResponse.ok) {
-          questionsData = await questionsResponse.json();
-        }
-        
-        console.log('Template preview:', templateData);
-        setPreviewData({ ...templateData, questions: questionsData });
-        setPreviewOpen(true);
-      } else {
-        toast({
-          title: t.error,
-          description: t.failedToLoadTemplatePreview,
-          variant: 'destructive',
-        });
-      }
-    } catch (error) {
-      console.error('Error previewing template:', error);
-      toast({
-        title: t.error,
-        description: t.errorLoadingTemplatePreview,
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleDownload = (templateId: string) => {
-    window.location.href = `/api/admin/templates/${templateId}/download`;
-  };
-
-  const handleDelete = async (templateId: string, templateName: string) => {
-    if (!confirm(t.confirmDeleteTemplate.replace('{name}', templateName))) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/admin/templates/${templateId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        toast({
-          title: t.success,
-          description: t.templateDeletedSuccessfully,
-        });
-        fetchTemplates();
-      } else {
-        throw new Error('Delete failed');
-      }
-    } catch (error) {
-      console.error('Error deleting template:', error);
-      toast({
-        title: t.error,
-        description: t.templateDeleteFailed,
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const filteredTemplates = templates;
 
   return (
-    <div className="min-h-screen bg-light-surface">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+
+      {/* Header */}
+      <header className="relative bg-white dark:bg-gray-900 shadow-lg border-b-2 border-blue-100 dark:border-blue-900/50 sticky top-0 z-50">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-950/20 dark:via-transparent dark:to-cyan-950/20 pointer-events-none" />
+        
+        <div className="relative max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <img 
-                src="/otis-elevators-seeklogo_1753525178175.png" 
-                alt="OTIS Logo" 
-                className="h-12 w-12 mr-4"
-              />
+            {/* Logo + Title */}
+            <div className="flex items-center gap-4">
+              {/* OTIS Logo as Home Button */}
               {onHome && (
-                <Button
-                  variant="ghost"
-                  size="sm"
+                <button
                   onClick={onHome}
-                  className="text-gray-600 hover:text-gray-800 mr-4"
-                  title={t.homeTooltip}
+                  className="group relative flex-shrink-0 transition-transform hover:scale-110 active:scale-95 focus:outline-none"
+                  title={language === 'hu' ? 'Kezdőlap' : 'Startseite'}
                 >
-                  <Home className="h-4 w-4" />
-                </Button>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl blur-md opacity-0 group-hover:opacity-40 transition-opacity" />
+                  <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-lg group-hover:shadow-xl transition-shadow">
+                    <div className="w-full h-full bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden">
+                      <img
+                        src="/otis-elevators-seeklogo_1753525178175.png"
+                        alt="OTIS Logo"
+                        className="w-10 h-10 object-contain"
+                      />
+                    </div>
+                  </div>
+                </button>
               )}
 
-              <div className="flex items-center">
-                <span className="text-lg font-medium text-gray-800 mr-3">{t.admin}</span>
-                <Badge variant="outline" className="bg-gray-50 text-gray-600 font-mono text-xs">
-                  v0.7.5
-                </Badge>
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
+                  <Settings className="h-5 w-5 text-blue-600" />
+                  {t.admin}
+                </h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant="outline" className="bg-blue-50 text-blue-600 font-mono text-xs border-blue-200">
+                    v1.0.0
+                  </Badge>
+                  <Sparkles className="h-3 w-3 text-cyan-500" />
+                </div>
               </div>
             </div>
-            <Button variant="outline" onClick={onBack}>
-              {t.back}
-            </Button>
+
+            {/* Back Button */}
+            <button
+              onClick={onBack}
+              className="group relative overflow-hidden px-6 py-2 rounded-xl border-2 border-blue-500 text-blue-600 transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20"
+            >
+              <div className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+                <span className="font-semibold">{t.back}</span>
+              </div>
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        <Tabs defaultValue="templates" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="templates">{t.templates}</TabsTrigger>
-            <TabsTrigger value="hybrid">{t.hybridTemplates}</TabsTrigger>
-            <TabsTrigger value="upload">{t.uploadTemplate}</TabsTrigger>
-            <TabsTrigger value="profile">
+      {/* Main Content */}
+      <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+        <Tabs defaultValue="dashboard" className="w-full">
+          {/* Modern Tab List - 6 columns */}
+          <TabsList className="grid w-full grid-cols-2 md:grid-cols-3 lg:grid-cols-6 bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-2xl shadow-lg mb-8 gap-1">
+            <TabsTrigger 
+              value="dashboard"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+            >
+              <LayoutDashboard className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">{t.Admin?.tabs?.dashboard || 'Dashboard'}</span>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="users"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+            >
               <User className="h-4 w-4 mr-2" />
-              {t.profile}
+              <span className="hidden sm:inline">{t.Admin?.tabs?.users || 'Users'}</span>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="protocols"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">{t.Admin?.tabs?.protocols || 'Protocols'}</span>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="templates"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+            >
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">{t.Admin?.tabs?.templates || 'Templates'}</span>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="audit"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+            >
+              <Shield className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">{t.Admin?.tabs?.audit || 'Audit'}</span>
+            </TabsTrigger>
+            
+            <TabsTrigger 
+              value="settings"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+            >
+              <Settings className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">{t.Admin?.tabs?.settings || 'Settings'}</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="templates" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileSpreadsheet className="h-5 w-5 mr-2" />
-                  {t.templates}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4">
-                  {filteredTemplates.length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
-                      <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                      <p>{t.noTemplatesUploaded}</p>
-                    </div>
-                  ) : (
-                    filteredTemplates.map((template) => (
-                      <div key={template.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="font-medium text-gray-800">{template.name}</h3>
-                            <Badge variant={template.is_active ? "default" : "secondary"}>
-                              {template.is_active ? t.active : t.inactive}
-                            </Badge>
-                            <Badge variant="outline">
-                              {template.type === 'unified' ? 
-                                t.questionTemplate :
-                                template.type === 'protocol' ? 
-                                t.protocolTemplateName :
-                                template.type
-                              }
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-gray-600">{template.fileName}</p>
-                          <p className="text-xs text-gray-500">
-                            {(() => {
-                              try {
-                                const date = new Date(template.uploaded_at);
-                                if (isNaN(date.getTime()) || date.getFullYear() > 2030) {
-                                  return 'Ismeretlen dátum';
-                                }
-                                return formatDate(date, language);
-                              } catch {
-                                return 'Ismeretlen dátum';
-                              }
-                            })()}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDownload(template.id)}
-                            title="Sablon letöltése"
-                            className="text-blue-600 hover:text-blue-800"
-                          >
-                            <Download className="h-4 w-4" />
-                          </Button>
-                          <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handlePreview(template.id)}
-                                title="Előnézet"
-                              >
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="max-w-6xl max-h-[80vh]">
-                              <DialogHeader>
-                                <DialogTitle>Template Előnézet - Kérdések és Cella Hozzárendelések</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                {previewData && (
-                                  <>
-                                    <div className="grid grid-cols-3 gap-4">
-                                      <Card>
-                                        <CardHeader>
-                                          <CardTitle className="text-sm">Munkafüzet lapok</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                          <div className="flex flex-wrap gap-2">
-                                            {previewData.sheets?.map((sheet: string, index: number) => (
-                                              <Badge key={index} variant="outline">
-                                                {sheet}
-                                              </Badge>
-                                            )) || <p className="text-gray-500">{t.noSheet}</p>}
-                                          </div>
-                                        </CardContent>
-                                      </Card>
-                                      <Card>
-                                        <CardHeader>
-                                          <CardTitle className="text-sm">Kérdések száma</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                          <div className="text-2xl font-bold text-otis-blue">
-                                            {previewData.questions?.length || 0}
-                                          </div>
-                                          <p className="text-sm text-gray-500">
-                                            {t.activeQuestion}
-                                          </p>
-                                        </CardContent>
-                                      </Card>
-                                      <Card>
-                                        <CardHeader>
-                                          <CardTitle className="text-sm">Cellák száma</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                          <div className="text-2xl font-bold text-gray-600">
-                                            {previewData.cellReferences?.length || 0}
-                                          </div>
-                                          <p className="text-sm text-gray-500">
-                                            elérhető cella
-                                          </p>
-                                        </CardContent>
-                                      </Card>
-                                    </div>
-                                    
-                                    <Card>
-                                      <CardHeader>
-                                        <CardTitle className="text-sm">
-                                          {t.questionsAndExcelMapping}
-                                        </CardTitle>
-                                      </CardHeader>
-                                      <CardContent>
-                                        <ScrollArea className="h-64">
-                                          {previewData.questions?.length > 0 ? (
-                                            <div className="space-y-3">
-                                              {previewData.questions.map((question: any, index: number) => (
-                                                <div key={index} className="border border-gray-200 rounded-lg p-3">
-                                                  <div className="grid grid-cols-4 gap-3 items-center">
-                                                    <div>
-                                                      <Badge variant="secondary" className="text-xs">
-                                                        ID: {question.id}
-                                                      </Badge>
-                                                    </div>
-                                                    <div className="col-span-2">
-                                                      <p className="font-medium text-sm">{question.title}</p>
-                                                      <p className="text-xs text-gray-500">
-                                                        {language === 'de' ? 
-                                                          `Typ: ${question.type} | Gruppe: ${question.groupName || 'N/A'}` :
-                                                          `Típus: ${question.type} | Csoport: ${question.groupName || 'N/A'}`
-                                                        }
-                                                      </p>
-                                                    </div>
-                                                    <div>
-                                                      <Badge variant="outline" className="text-xs font-mono">
-                                                        {question.cellReference || t.noCell}
-                                                      </Badge>
-                                                    </div>
-                                                  </div>
-                                                </div>
-                                              ))}
-                                            </div>
-                                          ) : (
-                                            <p className="text-gray-500 text-center py-8">
-                                              {t.noQuestionsDefined}
-                                            </p>
-                                          )}
-                                        </ScrollArea>
-                                      </CardContent>
-                                    </Card>
-                                  </>
-                                )}
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                          
-                          {!template.is_active && (
-                            <Button
-                              size="sm"
-                              onClick={() => handleActivate(template.id)}
-                              disabled={activatingId === template.id}
-                              className="bg-otis-blue hover:bg-blue-700 w-[100px]"
-                            >
-                              {activatingId === template.id ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                t.activate
-                              )}
-                            </Button>
-                          )}
-
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(template.id, template.name)}
-                            className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                            title={t.deleteTooltip}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Tab Contents */}
+          <TabsContent value="dashboard">
+            <AdminDashboard />
           </TabsContent>
 
-          <TabsContent value="upload" className="space-y-6">
-            {/* KÉRDÉS SABLON FELTÖLTÉSE */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileSpreadsheet className="h-5 w-5 mr-2" />
-                  {t.uploadQuestionsTemplate}
-                </CardTitle>
-                <CardDescription>
-                  {t.uploadQuestionsDescription}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">
-                    {t.templateName}
-                  </Label>
-                  <Input
-                    value={questionsUpload.name}
-                    onChange={(e) => setQuestionsUpload({ ...questionsUpload, name: e.target.value })}
-                    placeholder={t.exampleTemplateName}
-                    className="mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">
-                    {t.selectExcel}
-                  </Label>
-                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <FileSpreadsheet className="h-8 w-8 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-600 mb-2">
-                      {t.uploadExcelWithQuestions}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('questions-excel-upload')?.click()}
-                    >
-                      {t.selectExcelFile}
-                    </Button>
-                    <input
-                      id="questions-excel-upload"
-                      type="file"
-                      accept=".xlsx,.xls"
-                      className="hidden"
-                      onChange={handleQuestionsFileUpload}
-                    />
-                    {questionsUpload.file && (
-                      <p className="text-sm text-green-600 mt-2">
-                        {t.selected}: {questionsUpload.file.name}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleQuestionsUpload}
-                  disabled={loading || !questionsUpload.file || !questionsUpload.name}
-                  className="w-full bg-otis-blue hover:bg-blue-700"
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Upload className="h-4 w-4 mr-2" />
-                  )}
-                  {loading ? t.loading : t.uploadQuestionsTemplate}
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* PROTOKOLL SABLON FELTÖLTÉSE */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <FileText className="h-5 w-5 mr-2" />
-                  {t.uploadProtocolTemplate}
-                </CardTitle>
-                <CardDescription>
-                  {t.uploadProtocolDescription}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">
-                    {t.templateName}
-                  </Label>
-                  <Input
-                    value={protocolUpload.name}
-                    onChange={(e) => setProtocolUpload({ ...protocolUpload, name: e.target.value })}
-                    placeholder={t.exampleProtocolName}
-                    className="mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label className="text-sm font-medium text-gray-700">
-                    {t.selectExcel}
-                  </Label>
-                  <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                    <FileText className="h-8 w-8 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-600 mb-2">
-                      {t.uploadProtocolFormat}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => document.getElementById('protocol-excel-upload')?.click()}
-                    >
-                      {t.selectExcelFile}
-                    </Button>
-                    <input
-                      id="protocol-excel-upload"
-                      type="file"
-                      accept=".xlsx,.xls"
-                      className="hidden"
-                      onChange={handleProtocolFileUpload}
-                    />
-                    {protocolUpload.file && (
-                      <p className="text-sm text-green-600 mt-2">
-                        {t.selected}: {protocolUpload.file.name}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleProtocolUpload}
-                  disabled={loading || !protocolUpload.file || !protocolUpload.name}
-                  className="w-full bg-gray-700 hover:bg-gray-800"
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  ) : (
-                    <Upload className="h-4 w-4 mr-2" />
-                  )}
-                  {loading ? t.loading : t.uploadProtocolTemplate}
-                </Button>
-              </CardContent>
-            </Card>
+          <TabsContent value="users">
+            <UserList />
           </TabsContent>
 
-          <TabsContent value="hybrid" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>{t.hybridTemplateManagement}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {hybridTemplates && (
-                  <div className="space-y-4">
-                    <div>
-                      <Label>{t.localTemplates} ({hybridTemplates.local.length})</Label>
-                      <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                        <SelectTrigger>
-                          <SelectValue placeholder={t.chooseTemplate} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {hybridTemplates.local.map((template) => (
-                            <SelectItem key={template.id} value={template.id}>
-                              {template.name} (helyi)
-                            </SelectItem>
-                          ))}
-                          {hybridTemplates.remote.map((template) => (
-                            <SelectItem key={template.id} value={template.id}>
-                              {template.name} (távoli)
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+          <TabsContent value="protocols">
+            {/* Coming Soon Card */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-30 animate-pulse" />
+              
+              <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-12">
+                <div className="flex flex-col items-center justify-center text-center">
+                  {/* Icon with glow */}
+                  <div className="relative mb-6">
+                    <div className="absolute inset-0 bg-blue-400 rounded-full blur-2xl opacity-30 animate-pulse" />
+                    <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-xl">
+                      <FileText className="h-10 w-10 text-white" />
                     </div>
-                    
-                    <div>
-                      <Label>{t.loadingStrategy}</Label>
-                      <Select value={loadStrategy} onValueChange={setLoadStrategy}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="local_first">{t.localFirst}</SelectItem>
-                          <SelectItem value="cache_first">{t.cacheFirst}</SelectItem>
-                          <SelectItem value="remote_only">{t.remoteOnly}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <Button 
-                      onClick={handleTemplateSelect} 
-                      disabled={loading || !selectedTemplate}
-                      className="w-full"
-                    >
-                      {loading ? t.switching : t.templateSwitch}
-                    </Button>
                   </div>
-                )}
-              </CardContent>
-            </Card>
+                  
+                  {/* Title */}
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-3 flex items-center gap-2">
+                    {t.Admin?.tabs?.protocols || 'Protocols'}
+                    <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
+                  </h3>
+                  
+                  {/* Description */}
+                  <p className="text-gray-600 dark:text-gray-400 max-w-md">
+                    {language === 'hu' 
+                      ? 'A protokoll kezelési funkciók fejlesztés alatt állnak.'
+                      : 'Protocol management features are under development.'}
+                  </p>
+                  
+                  {/* Badge */}
+                  <Badge className="mt-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-1 border-0">
+                    {language === 'hu' ? 'Hamarosan' : 'Coming Soon'}
+                  </Badge>
+                </div>
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="profile" className="space-y-6">
-            <ProfileSettings />
+          <TabsContent value="templates">
+            <TemplateManagement />
+          </TabsContent>
+
+          <TabsContent value="audit">
+            <AuditLogTable />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <SystemSettings />
           </TabsContent>
         </Tabs>
       </main>

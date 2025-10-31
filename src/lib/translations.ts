@@ -181,13 +181,96 @@ export interface Translation {
   generalData: string;
   machineRoom: string;
   modernizationAffected: string;
-  // JAVÍTVA: Csak egyszer szerepel
   questionsInGroup: string; 
   groupOf: string;
   viewErrors: string;
   downloadErrorList: string;
-  // JAVÍTVA: Hozzáadva az interfészhez
-  question: string; 
+  question: string;
+  
+  // --- FRISSÍTETT ADMIN NESTED STRUCTURE ---
+  Admin: {
+    tabs: {
+      dashboard: string;
+      users: string;
+      protocols: string;
+      templates: string;
+      audit: string;
+      settings: string;
+    };
+    Dashboard: {
+      welcome: string;
+      welcomeDesc: string;
+      noData: string;
+      totalUsers: string;
+      registeredUsers: string;
+      totalProtocols: string;
+      completedProtocols: string;
+      totalTemplates: string;
+      uploadedTemplates: string;
+      activeTemplates: string;
+      currentlyActive: string;
+      systemActivity: string;
+      activityDesc: string;
+      activeUsers: string;
+      recentProtocols: string;
+      systemStatus: string;
+      operational: string;
+      online: string;
+      recentActivity: string;
+      recentProtocolsTable: string;
+      last5Protocols: string;
+      noProtocols: string;
+      protocolNumber: string;
+      completed: string;
+      systemHealth: string;
+      database: string;
+      healthy: string;
+      storage: string;
+      ok: string;
+      quickStats: string;
+      avgProtocolsPerDay: string;
+      templatesPerUser: string;
+      activeRate: string;
+      table: {
+        id: string;
+        created: string;
+        status: string;
+      };
+    };
+    UserManagement: {
+      title: string;
+      description: string;
+      usersCount: string;
+      noUsers: string;
+      errorAuth: string;
+      errorFetch: string;
+      errorDelete: string;
+      deleteSuccess: string;
+      confirmDelete: string;
+      roleAdmin: string;
+      roleUser: string;
+      table: {
+        name: string;
+        email: string;
+        role: string;
+        created: string;
+        actions: string;
+      };
+      buttons: {
+        delete: string;
+        details: string;
+        editRole: string;
+      };
+    };
+    comingSoon: {
+      dashboard: string;
+      dashboardDesc: string;
+      protocols: string;
+      protocolsDesc: string;
+      templates: string;
+      templatesDesc: string;
+    };
+  };
 }
 
 // Fordítási objektumok
@@ -368,7 +451,6 @@ export const translations: Record<string, Translation> = {
     machineRoom: "Gépház",
     modernizationAffected: "Modernizációban érintett",
     measurementData: "Mérési adatok",
-    // JAVÍTVA: Csak egyszer szerepel
     questionsInGroup: "kérdés ebben a csoportban", 
     groupOf: "csoport",
     calculatedValuesValidated: "A számított értékek automatikusan kiszámításra kerülnek. A határértéken kívüli értékek pirossal jelennek meg.",
@@ -377,8 +459,128 @@ export const translations: Record<string, Translation> = {
     outOfRange: "Határértéken kívül (700-9000 mm)",
     viewErrors: "Hibák megtekintése",
     downloadErrorList: "Hibalista letöltése",
-    // JAVÍTVA: Megfelelő helyen van az objektumban
-    question: "Kérdés", 
+    question: "Kérdés",
+    
+    // --- ÚJ: ADMIN NESTED STRUCTURE ---
+    Admin: {
+      tabs: {
+        dashboard: "Dashboard",
+        users: "Felhasználók",
+        protocols: "Protokollok",
+        templates: "Sablonok",
+        audit: "Napló",
+        settings: "Beállítások",
+      },
+      Dashboard: {
+        welcome: "Üdvözöljük az Admin Dashboardon",
+        welcomeDesc: "Rendszer áttekintés és statisztikák",
+        noData: "Nem sikerült betölteni a statisztikákat",
+        totalUsers: "Összes felhasználó",
+        registeredUsers: "Regisztrált fiókok",
+        totalProtocols: "Összes protokoll",
+        completedProtocols: "Létrehozott jegyzőkönyvek",
+        totalTemplates: "Összes sablon",
+        uploadedTemplates: "Feltöltött sablonok",
+        activeTemplates: "Aktív sablonok",
+        currentlyActive: "Jelenleg használatban",
+        recentActivity: "Legutóbbi aktivitás",
+        last5Protocols: "Az utolsó 5 létrehozott protokoll",
+        noProtocols: "Nincs még protokoll létrehozva.",
+        protocolNumber: "Protokoll szám",
+        status: "Státusz",
+        createdAt: "Létrehozva",
+        systemHealth: "Rendszer állapot",
+        activeUsers: "Felhasználói aktivitás",
+        online: "Online",
+        database: "Adatbázis",
+        healthy: "Egészséges",
+        storage: "Tárterület",
+        ok: "OK",
+        quickStats: "Gyors statisztikák",
+        avgProtocolsPerDay: "Átlag protokoll/nap (30 nap)",
+        templatesPerUser: "Sablon/felhasználó arány",
+        activeRate: "Aktív sablon arány",
+        systemActivity: "Rendszer aktivitás",
+        activityDesc: "Gyors áttekintés a rendszer működéséről",
+        recentProtocolsTable: "Legutóbbi protokollok",
+        systemStatus: "Rendszer státusz",
+        operational: "Működik",
+        completed: "Befejezve",
+        table: {
+          id: "ID",
+          created: "Létrehozva",
+          status: "Státusz",
+        },
+      },
+      UserManagement: {
+        title: "Felhasználók Kezelése",
+        description: "Az összes regisztrált felhasználó kezelése",
+        usersCount: "felhasználó",
+        noUsers: "Nincsenek felhasználók.",
+        errorAuth: "Hitelesítés szükséges",
+        errorFetch: "A felhasználók betöltése sikertelen",
+        errorDelete: "A törlés sikertelen",
+        deleteSuccess: "Felhasználó sikeresen törölve",
+        confirmDelete: "Biztosan törölni szeretnéd: {name}?",
+        roleAdmin: "Admin",
+        roleUser: "Felhasználó",
+        table: {
+          name: "Név",
+          email: "Email",
+          role: "Jogosultság",
+          created: "Létrehozva",
+          actions: "Műveletek"
+        },
+        buttons: {
+          delete: "Törlés",
+          details: "Részletek",
+          editRole: "Jogosultság módosítása"
+        }
+      },
+      AuditLog: {
+        title: "Tevékenység napló",
+        description: "Összes adminisztrátori művelet nyomon követése",
+        entries: "bejegyzés",
+        refresh: "Frissítés",
+        noLogs: "Nincs még naplóbejegyzés.",
+        table: {
+          status: "Státusz",
+          action: "Művelet",
+          user: "Felhasználó",
+          resource: "Erőforrás",
+          details: "Részletek",
+          time: "Időpont",
+        },
+      },
+      Settings: {
+        title: "Rendszerbeállítások",
+        description: "Szerver és adatbázis információk, biztonsági mentések",
+        refresh: "Frissítés",
+        refreshed: "Rendszerinformációk frissítve",
+        loadError: "Nem sikerült betölteni az adatokat",
+        systemInfo: "Rendszerinformáció",
+        systemInfoDesc: "A szerver és az adatbázis technikai adatai",
+        environment: "Környezet",
+        platform: "Platform",
+        nodeVersion: "Node.js verzió",
+        databaseSize: "Adatbázis mérete",
+        uptime: "Futási idő",
+        memoryUsage: "Memória használat",
+        backupTitle: "Biztonsági mentés és visszaállítás",
+        backupDesc: "Adatbázis mentése és korábbi állapotok visszaállítása",
+        createBackup: "Mentés készítése",
+        restoreBackup: "Mentés visszaállítása",
+        comingSoon: "Hamarosan elérhető funkció",
+      },
+      comingSoon: {
+        dashboard: "Dashboard hamarosan",
+        dashboardDesc: "Statisztikák és áttekintés hamarosan elérhető.",
+        protocols: "Protokoll Kezelés hamarosan",
+        protocolsDesc: "Ellenőrzési protokollok kezelése itt.",
+        templates: "Sablon Kezelés",
+        templatesDesc: "Helyezd át a régi sablon logikát egy új TemplateManagement komponensbe."
+      }
+    }
   },
   de: {
     // Start Screen
@@ -556,7 +758,6 @@ export const translations: Record<string, Translation> = {
     machineRoom: "Maschinenraum",
     modernizationAffected: "Von Modernisierung betroffen",
     measurementData: "Messdaten",
-    // JAVÍTVA: Csak egyszer szerepel
     questionsInGroup: "Fragen in dieser Gruppe", 
     groupOf: "Gruppe",
     calculatedValuesValidated: "Die berechneten Werte werden automatisch berechnet. Werte außerhalb der Grenzwerte werden rot angezeigt.",
@@ -565,7 +766,110 @@ export const translations: Record<string, Translation> = {
     outOfRange: "Außerhalb der Grenzwerte (700-9000 mm)",
     viewErrors: "Fehler anzeigen",
     downloadErrorList: "Fehlerliste herunterladen",
-    // JAVÍTVA: Megfelelő helyen van az objektumban
-    question: "Frage", 
+    question: "Frage",
+    
+    // --- ÚJ: ADMIN NESTED STRUCTURE ---
+    Admin: {
+      tabs: {
+        dashboard: "Dashboard",
+        users: "Benutzer",
+        protocols: "Protokolle",
+        templates: "Vorlagen",
+        audit: "Protokoll",
+        settings: "Einstellungen",
+      },
+      Dashboard: {
+        totalUsers: "Gesamtbenutzer",
+        registeredUsers: "Anzahl registrierter Benutzer",
+        totalProtocols: "Gesamtprotokolle",
+        completedProtocols: "Erstellte Protokolle",
+        totalTemplates: "Vorlagen",
+        uploadedTemplates: "Hochgeladene Vorlagen",
+        systemActivity: "Systemaktivität",
+        activityDesc: "Schneller Überblick über den Systembetrieb",
+        activeUsers: "Aktive Benutzer",
+        recentProtocols: "Neue Protokolle",
+        systemStatus: "Systemstatus",
+        operational: "Betriebsbereit",
+        recentProtocolsTable: "Letzte Protokolle",
+        last5Protocols: "Die letzten 5 erstellten Protokolle",
+        noData: "Statistiken konnten nicht geladen werden",
+        completed: "Abgeschlossen",
+        table: {
+          id: "ID",
+          created: "Erstellt",
+          status: "Status"
+        }
+      },
+      UserManagement: {
+        title: "Benutzerverwaltung",
+        description: "Verwaltung aller registrierten Benutzer",
+        usersCount: "Benutzer",
+        noUsers: "Keine Benutzer vorhanden.",
+        errorAuth: "Authentifizierung erforderlich",
+        errorFetch: "Fehler beim Laden der Benutzer",
+        errorDelete: "Löschen fehlgeschlagen",
+        deleteSuccess: "Benutzer erfolgreich gelöscht",
+        confirmDelete: "Möchten Sie {name} wirklich löschen?",
+        roleAdmin: "Administrator",
+        roleUser: "Benutzer",
+        table: {
+          name: "Name",
+          email: "E-Mail",
+          role: "Rolle",
+          created: "Erstellt",
+          actions: "Aktionen"
+        },
+        buttons: {
+          delete: "Löschen",
+          details: "Details",
+          editRole: "Rolle ändern"
+        }
+      },
+      AuditLog: {
+        title: "Aktivitätsprotokoll",
+        description: "Verfolgung aller administrativen Aktionen",
+        entries: "Einträge",
+        refresh: "Aktualisieren",
+        noLogs: "Noch keine Protokolleinträge vorhanden.",
+        table: {
+          status: "Status",
+          action: "Aktion",
+          user: "Benutzer",
+          resource: "Ressource",
+          details: "Details",
+          time: "Zeitpunkt",
+        },
+      },
+      Settings: {
+      title: "Systemeinstellungen",
+      description: "Server- und Datenbankinformationen, Backups",
+      refresh: "Aktualisieren",
+      refreshed: "Systeminformationen aktualisiert",
+      loadError: "Daten konnten nicht geladen werden",
+      systemInfo: "Systeminformationen",
+      systemInfoDesc: "Technische Daten des Servers und der Datenbank",
+      environment: "Umgebung",
+      platform: "Plattform",
+      nodeVersion: "Node.js Version",
+      databaseSize: "Datenbankgröße",
+      uptime: "Laufzeit",
+      memoryUsage: "Speichernutzung",
+      backupTitle: "Sicherung und Wiederherstellung",
+      backupDesc: "Datenbank sichern und frühere Zustände wiederherstellen",
+      createBackup: "Sicherung erstellen",
+      restoreBackup: "Sicherung wiederherstellen",
+      comingSoon: "Funktion bald verfügbar",
+    },
+
+    comingSoon: {
+        dashboard: "Dashboard kommt bald",
+        dashboardDesc: "Statistiken und Übersicht demnächst verfügbar.",
+        protocols: "Protokollverwaltung kommt bald",
+        protocolsDesc: "Verwaltung von Prüfprotokollen hier.",
+        templates: "Vorlagenverwaltung",
+        templatesDesc: "Verschieben Sie die alte Vorlagenlogik in eine neue TemplateManagement-Komponente."
+      }
+    }
   },
 };

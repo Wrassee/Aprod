@@ -1,6 +1,6 @@
-// shared/schema.ts - JAVÍTOTT VERZIÓ
+// shared/schema.ts - FRISSÍTETT VERZIÓ (Audit Logs-szal)
 
-import { relations, sql } from "drizzle-orm"; // FONTOS: Az `sql` importálása
+import { relations, sql } from "drizzle-orm";
 import {
   pgTable,
   text,
@@ -29,7 +29,6 @@ export const protocols = pgTable("protocols", {
   signature: text("signature"),
   signature_name: text("signature_name"),
   completed: boolean("completed").notNull().default(false),
-  // JAVÍTVA: .defaultNow() -> .default(sql`CURRENT_TIMESTAMP`)
   created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(), 
 });
 
@@ -66,7 +65,6 @@ export const templates = pgTable("templates", {
   language: text("language")
     .notNull()
     .default("multilingual"),
-  // JAVÍTVA: .defaultNow() -> .default(sql`CURRENT_TIMESTAMP`)
   uploaded_at: timestamp("uploaded_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   is_active: boolean("is_active").notNull().default(false),
 });
@@ -79,8 +77,6 @@ export type InsertTemplate = typeof templates.$inferInsert;
  * Question configurations – single source of truth for questions
  * ----------------------------------------------------------------------- */
 
-// === JAVÍTÁS ITT KEZDŐDIK ===
-// Bővítettük a Zod sémát az összes új kérdéstípussal, amit az excel-parser-ben is bevezettél.
 export const QuestionTypeEnum = z.enum([
   "text", 
   "number", 
@@ -92,7 +88,6 @@ export const QuestionTypeEnum = z.enum([
   "calculated", 
   "true_false", 
   "yes_no_na",
-  // Új típusok hozzáadva:
   "textarea", 
   "phone", 
   "email", 
@@ -100,11 +95,7 @@ export const QuestionTypeEnum = z.enum([
   "multi_select"
 ]);
 
-// A TypeScript típust most már a Zod sémából származtatjuk, hogy ne kelljen kétszer karbantartani.
 export type QuestionType = z.infer<typeof QuestionTypeEnum>;
-
-// === JAVÍTÁS VÉGE ===
-
 
 export const questionConfigs = pgTable("question_configs", {
   id: uuid("id")
@@ -117,7 +108,7 @@ export const questionConfigs = pgTable("question_configs", {
   title: text("title").notNull(),
   title_hu: text("title_hu"),
   title_de: text("title_de"),
-  type: text("type").notNull(), // Ez a mező most már elfogadja a fenti új típusokat is
+  type: text("type").notNull(),
   required: boolean("required").notNull().default(true),
   placeholder: text("placeholder"),
   cell_reference: text("cell_reference"),
@@ -132,7 +123,6 @@ export const questionConfigs = pgTable("question_configs", {
   max_value: integer("max_value"),
   calculation_formula: text("calculation_formula"),
   calculation_inputs: jsonb("calculation_inputs"),
-  // A `created_at` sorod tökéletes, változatlanul hagyva
   created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 
@@ -147,12 +137,12 @@ export const profiles = pgTable("profiles", {
   id: uuid("id")
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  user_id: text("user_id").notNull().unique(), // Supabase Auth User ID
+  user_id: text("user_id").notNull().unique(),
   name: text("name"),
   email: text("email").notNull(),
   address: text("address"),
   google_drive_folder_id: text("google_drive_folder_id"),
-  role: text("role").notNull().default("user"), // "user" or "admin"
+  role: text("role").notNull().default("user"),
   created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
   updated_at: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
@@ -166,72 +156,105 @@ export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 
 /* -------------------------------------------------------------------------
+ * Audit Logs - Activity tracking for admin operations (ÚJ TÁBLA)
+ * ----------------------------------------------------------------------- */
+export const AuditActionEnum = z.enum([
+  // User management
+  "user.create",
+  "user.update",
+  "user.delete",
+  "user.role_change",
+  
+  // Template management
+  "template.upload",
+  "template.activate",
+  "template.deactivate",
+  "template.delete",
+  "template.download",
+  
+  // Protocol management
+  "protocol.create",
+  "protocol.update",
+  "protocol.delete",
+  "protocol.complete",
+  
+  // System
+  "admin.login",
+  "admin.logout",
+  "settings.update",
+]);
+
+export type AuditAction = z.infer<typeof AuditActionEnum>;
+
+export const audit_logs = pgTable("audit_logs", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  
+  // Ki végezte a műveletet
+  user_id: text("user_id").notNull(),
+  user_email: text("user_email"),
+  
+  // Mit csinált
+  action: text("action").notNull(), // pl. "template.upload", "user.delete"
+  resource_type: text("resource_type"), // pl. "template", "user", "protocol"
+  resource_id: text("resource_id"), // Az érintett erőforrás ID-ja
+  
+  // Részletek
+  details: jsonb("details"), // További kontextuális információk
+  ip_address: text("ip_address"), // Kliens IP címe
+  user_agent: text("user_agent"), // Browser információ
+  
+  // Eredmény
+  status: text("status").notNull().default("success"), // "success" | "failure"
+  error_message: text("error_message"), // Ha status="failure"
+  
+  // Időbélyeg
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertAuditLogSchema = createInsertSchema(audit_logs);
+export type AuditLog = typeof audit_logs.$inferSelect;
+export type InsertAuditLog = typeof audit_logs.$inferInsert;
+
+/* -------------------------------------------------------------------------
  * MULTILINGUAL STRUCTURE - Unified language support
  * ----------------------------------------------------------------------- */
 
-/**
- * Localized text object containing both Hungarian and German translations
- * Example: { hu: "Általános adatok", de: "Allgemeine Daten" }
- */
 export interface LocalizedText {
   hu: string;
   de: string;
 }
 
-/**
- * Question group with stable key and localized titles
- * - key: Stable slug for programmatic use (e.g., "general_info", "electrical")
- * - title: Localized display names
- */
 export interface QuestionGroup {
   key: string;
   title: LocalizedText;
 }
 
-// Answer value type - can be string, number, boolean, or array
 export type AnswerValue = string | number | boolean | string[] | null | undefined;
 
-/**
- * Extended Question type with MULTILINGUAL GROUP STRUCTURE
- * 
- * KEY CONCEPTS:
- * - groupKey: STABLE slug for filtering (e.g., "inverter", "electrical") - NOT translated, NOT shown in UI
- * - groupName/groupNameDE: LOCALIZED display names - shown in UI
- * - conditional_group_key: Matches groupKey to control visibility - NOT translated
- * 
- * MIGRATION STRATEGY:
- * Backend sends BOTH old flat fields AND new structured fields during transition.
- * Frontend gradually migrates to use new fields, then we remove legacy fields.
- */
 export type Question = QuestionConfig & {
-  // NEW FIELD: Stable group identifier (NOT translated, used for conditional filtering)
-  groupKey?: string;  // e.g., "inverter", "electrical" - matches conditional_group_key
-  
-  // NEW STRUCTURE: Optional group object with key + localized titles (future)
+  groupKey?: string;
   group?: QuestionGroup;
-  
-  // Options for select/radio questions
   options?: string[];
-  
-  // LEGACY COMPATIBILITY: Keep all existing fields during migration
-  questionId?: string;         // alias for question_id
-  titleHu?: string | null;     // legacy flat field
-  titleDe?: string | null;     // legacy flat field
-  groupName?: string | null;   // LOCALIZED display name (shown in UI)
-  groupNameDe?: string | null; // LOCALIZED display name (shown in UI)
+  questionId?: string;
+  titleHu?: string | null;
+  titleDe?: string | null;
+  groupName?: string | null;
+  groupNameDe?: string | null;
   groupOrder?: number | null;
-  conditionalGroupKey?: string | null; // camelCase alias
-  conditional_group_key?: string | null; // snake_case - matches groupKey for filtering
-  cellReference?: string | null; // alias for cell_reference
-  sheetName?: string | null;   // alias for sheet_name
-  multiCell?: boolean | null;  // alias for multi_cell
-  minValue?: number | null;    // alias for min_value
-  maxValue?: number | null;    // alias for max_value
-  calculationFormula?: string | null; // alias for calculation_formula
-  calculationInputs?: any[] | null;   // alias for calculation_inputs
-  unit?: string | null; // Match database type
+  conditionalGroupKey?: string | null;
+  conditional_group_key?: string | null;
+  cellReference?: string | null;
+  sheetName?: string | null;
+  multiCell?: boolean | null;
+  minValue?: number | null;
+  maxValue?: number | null;
+  calculationFormula?: string | null;
+  calculationInputs?: any[] | null;
+  unit?: string | null;
   placeholder?: string | null;
-  placeholderDe?: string | null; // NEW: German placeholder text
+  placeholderDe?: string | null;
   required?: boolean;
 };
 
@@ -251,3 +274,11 @@ export const questionConfigsRelations = relations(
     }),
   }),
 );
+
+// --- ÚJ RELÁCIÓK AZ AUDIT LOGS-HOZ ---
+export const auditLogsRelations = relations(audit_logs, ({ one }) => ({
+  user: one(profiles, {
+    fields: [audit_logs.user_id],
+    references: [profiles.user_id],
+  }),
+}));

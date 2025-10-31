@@ -11,19 +11,24 @@ import {
   type InsertQuestionConfig,
   type Profile,
   type InsertProfile,
+  // --- ÚJ IMPORT: Audit Logs ---
+  type AuditLog,
+  type InsertAuditLog,
   // Re-exported table definitions from the db module – this guarantees
   // the exact same type instances the DB was initialised with.
   protocols,
   templates,
   questionConfigs,
   profiles,
+  // --- ÚJ TÁBLA IMPORT ---
+  audit_logs,
 } from "./db.js";
 
 import { db } from "./db.js";              // Drizzle connection
-import { eq, and, desc } from "drizzle-orm"; // Drizzle helpers
+import { eq, and, desc, sql } from "drizzle-orm"; // Drizzle helpers + sql for aggregations
 
 // ------------------------------------------------------------
-// 2️⃣ IStorage interface – unchanged
+// 2️⃣ IStorage interface – FRISSÍTVE
 // ------------------------------------------------------------
 export interface IStorage {
   /* ---------- Protocols ---------- */
@@ -54,11 +59,25 @@ export interface IStorage {
   getQuestions(lang: string): Promise<QuestionConfig[]>;
 
   /* ---------- Profiles ---------- */
-  getProfile(userId: string): Promise<Profile | undefined>;
+  // TISZTÍTÁS: A duplikált getProfile() eltávolítva
   getProfileByUserId(userId: string): Promise<Profile | undefined>;
+  // --- ÚJ FÜGGVÉNY AZ INTERFACE-BEN ---
+  getAllProfiles(): Promise<Profile[]>;
+  // --- ÚJ FÜGGVÉNY VÉGE ---
   createProfile(profile: InsertProfile): Promise<Profile>;
   updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | undefined>;
   deleteProfile(userId: string): Promise<boolean>;
+
+  /* ---------- Statistics (ÚJ SZEKCIÓ) ---------- */
+  getUsersCount(): Promise<number>;
+  getProtocolsCount(): Promise<number>;
+  getTemplatesCount(): Promise<number>;
+  getActiveTemplatesCount(): Promise<number>;
+  getRecentProtocols(limit?: number): Promise<Protocol[]>;
+
+  /* ---------- Audit Logs (ÚJ SZEKCIÓ) ---------- */
+  createAuditLog(log: InsertAuditLog): Promise<void>;
+  getAuditLogs(limit?: number): Promise<any[]>;
 }
 
 // ------------------------------------------------------------
@@ -135,7 +154,6 @@ export class DatabaseStorage implements IStorage {
     return tpl ?? undefined;
   }
 
-  // JAVÍTVA: Az SQLite hibát okozó tranzakció helyett két különböző műveletet használunk
   async setActiveTemplate(id: string) {
     const target = await this.getTemplate(id);
     if (!target) throw new Error("Template not found");
@@ -267,15 +285,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   /* ---------- Profiles ---------- */
-  async getProfile(userId: string) {
-    const [profile] = await (db as any).select().from(profiles).where(eq(profiles.user_id, userId));
-    return profile ?? undefined;
-  }
+  // TISZTÍTÁS: A duplikált getProfile() függvény eltávolítva, csak a getProfileByUserId maradt
 
   async getProfileByUserId(userId: string) {
     const [profile] = await (db as any).select().from(profiles).where(eq(profiles.user_id, userId));
     return profile ?? undefined;
   }
+  
+  // --- ÚJ FÜGGVÉNY IMPLEMENTÁCIÓJA ---
+  /**
+   * Lekérdezi az összes felhasználói profilt az adatbázisból.
+   * A legutóbb létrehozott profilok jelennek meg először.
+   * @returns Promise<Profile[]>
+   */
+  async getAllProfiles() {
+    console.log('📋 Fetching all user profiles from database...');
+    const profiles_list = await (db as any)
+      .select()
+      .from(profiles)
+      .orderBy(desc(profiles.created_at));
+    
+    console.log(`✅ Retrieved ${profiles_list.length} user profiles`);
+    return profiles_list;
+  }
+  // --- ÚJ FÜGGVÉNY VÉGE ---
 
   async createProfile(profile: InsertProfile) {
     const [created] = await (db as any).insert(profiles).values(profile).returning();
@@ -292,11 +325,177 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProfile(userId: string) {
+    console.log(`🗑️ Attempting to delete profile for user: ${userId}`);
     const result = await (db as any)
       .delete(profiles)
       .where(eq(profiles.user_id, userId))
       .returning();
-    return result.length > 0;
+    
+    const success = result.length > 0;
+    if (success) {
+      console.log(`✅ Profile deleted successfully for user: ${userId}`);
+    } else {
+      console.warn(`⚠️ No profile found to delete for user: ${userId}`);
+    }
+    return success;
+  }
+
+  /* ---------- Statistics (ÚJ SZEKCIÓ) ---------- */
+  
+  /**
+   * Visszaadja a regisztrált felhasználók teljes számát.
+   * @returns Promise<number>
+   */
+  async getUsersCount(): Promise<number> {
+    try {
+      console.log('📊 Counting total users...');
+      const [result] = await (db as any)
+        .select({ count: sql<number>`count(*)` })
+        .from(profiles);
+      
+      const count = Number(result?.count || 0);
+      console.log(`✅ Total users: ${count}`);
+      return count;
+    } catch (error) {
+      console.error('❌ Error counting users:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Visszaadja a létrehozott protokollok teljes számát.
+   * @returns Promise<number>
+   */
+  async getProtocolsCount(): Promise<number> {
+    try {
+      console.log('📊 Counting total protocols...');
+      const [result] = await (db as any)
+        .select({ count: sql<number>`count(*)` })
+        .from(protocols);
+      
+      const count = Number(result?.count || 0);
+      console.log(`✅ Total protocols: ${count}`);
+      return count;
+    } catch (error) {
+      console.error('❌ Error counting protocols:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Visszaadja a feltöltött sablonok teljes számát.
+   * @returns Promise<number>
+   */
+  async getTemplatesCount(): Promise<number> {
+    try {
+      console.log('📊 Counting total templates...');
+      const [result] = await (db as any)
+        .select({ count: sql<number>`count(*)` })
+        .from(templates);
+      
+      const count = Number(result?.count || 0);
+      console.log(`✅ Total templates: ${count}`);
+      return count;
+    } catch (error) {
+      console.error('❌ Error counting templates:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Visszaadja az aktív sablonok számát.
+   * @returns Promise<number>
+   */
+  async getActiveTemplatesCount(): Promise<number> {
+    try {
+      console.log('📊 Counting active templates...');
+      const [result] = await (db as any)
+        .select({ count: sql<number>`count(*)` })
+        .from(templates)
+        .where(eq(templates.is_active, 1)); // Csak az aktívakat számoljuk
+      
+      const count = Number(result?.count || 0);
+      console.log(`✅ Active templates: ${count}`);
+      return count;
+    } catch (error) {
+      console.error('❌ Error counting active templates:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Lekérdezi a legutóbbi protokollokat.
+   * @param limit - Hány darab protokollt kérünk le (alapértelmezett: 5)
+   * @returns Promise<Protocol[]>
+   */
+  async getRecentProtocols(limit: number = 5): Promise<Protocol[]> {
+    try {
+      console.log(`📊 Fetching ${limit} most recent protocols...`);
+      const recentProtocols = await (db as any)
+        .select()
+        .from(protocols)
+        .orderBy(desc(protocols.created_at))
+        .limit(limit);
+      
+      console.log(`✅ Retrieved ${recentProtocols.length} recent protocols`);
+      return recentProtocols;
+    } catch (error) {
+      console.error('❌ Error fetching recent protocols:', error);
+      return [];
+    }
+  }
+
+  /* ---------- Audit Logs (ÚJ SZEKCIÓ) ---------- */
+
+  /**
+   * Új audit log bejegyzés létrehozása.
+   * @param log - Az audit log adatai
+   * @returns Promise<void>
+   */
+  async createAuditLog(log: InsertAuditLog): Promise<void> {
+    try {
+      console.log(`📝 Creating audit log: ${log.action} by ${log.user_email || log.user_id}`);
+      
+      await (db as any).insert(audit_logs).values(log);
+      
+      console.log(`✅ Audit log created for action: ${log.action}`);
+    } catch (error) {
+      console.error('❌ Error creating audit log:', error);
+      // NEM dobunk hibát tovább, mert a naplózás hibája nem akaszthatja meg a fő műveletet
+    }
+  }
+
+  /**
+   * Audit log bejegyzések lekérdezése felhasználói adatokkal együtt.
+   * Használja a Drizzle ORM relációs lekérdezését a user adatok automatikus JOIN-jához.
+   * @param limit - A lekérdezendő bejegyzések száma (alapértelmezett: 50)
+   * @returns Promise<AuditLog[]>
+   */
+  async getAuditLogs(limit: number = 50): Promise<any[]> {
+    try {
+      console.log(`📜 Fetching last ${limit} audit logs with user data...`);
+      
+      const logs = await (db as any).query.audit_logs.findMany({
+        orderBy: [desc(audit_logs.created_at)],
+        limit: limit,
+        // A 'with' kulcsszó segítségével a Drizzle automatikusan JOIN-olja
+        // a felhasználói adatokat a 'schema.ts'-ben definiált 'auditLogsRelations' alapján.
+        with: {
+          user: {
+            columns: {
+              email: true,
+              name: true,
+            },
+          },
+        },
+      });
+      
+      console.log(`✅ Retrieved ${logs.length} audit log entries with user data`);
+      return logs;
+    } catch (error) {
+      console.error('❌ Error fetching audit logs:', error);
+      return [];
+    }
   }
 }
 

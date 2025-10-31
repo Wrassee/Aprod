@@ -9,7 +9,7 @@ import { TrueFalseGroup } from '@/components/true-false-group';
 import { ErrorList } from '@/components/error-list';
 import { QuestionGroupHeader } from '@/components/question-group-header';
 import { useLanguageContext } from '@/components/language-provider';
-import { ArrowLeft, ArrowRight, Save, Check, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Check, X, Sparkles, Zap } from 'lucide-react';
 import { MeasurementBlock } from '@/components/measurement-block';
 import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
 
@@ -34,25 +34,6 @@ interface QuestionnaireProps {
 
 const math = create(all);
 
-// Fallback questions if no template is loaded
-const FALLBACK_QUESTIONS: Partial<Question>[] = [
-  {
-    id: 'q1',
-    questionId: 'q1',
-    title: 'Receiver name / Átvevő neve',
-    type: 'text' as const,
-    required: true,
-  },
-  {
-    id: 'q2',
-    questionId: 'q2',
-    title: 'Elevator installation complete? / Lift telepítés kész?',
-    type: 'checkbox' as const,
-    required: true,
-  },
-] as Question[];
-
-// === JAVÍTÁS 1: ELTÁVOLÍTOTTUK A memo() WRAPPERT ===
 function Questionnaire({
   receptionDate,
   onReceptionDateChange,
@@ -76,8 +57,6 @@ function Questionnaire({
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
-  
-  // Local answers for immediate UI response
   const [localAnswers, setLocalAnswers] = useState<Record<string, AnswerValue>>(answers);
   
   // Sync with parent answers
@@ -93,9 +72,7 @@ function Questionnaire({
     if (allQuestions.length > 0 && filteredQuestions.length > 0) {
       const updatedAnswers = updateAnswersWithDisabled(localAnswers, allQuestions, filteredQuestions);
       
-      // ADDITIONAL LOGIC: Clear "n.a." from questions that are now visible again
       filteredQuestions.forEach(q => {
-        // If a question is visible and its value is "n.a.", clear it
         if (updatedAnswers[q.id] === 'n.a.') {
           updatedAnswers[q.id] = '';
         }
@@ -106,15 +83,7 @@ function Questionnaire({
       );
       
       if (hasChanges) {
-        console.log('🎯 Auto-setting disabled questions to "n.a." and clearing re-enabled questions', {
-          totalQuestions: allQuestions.length,
-          visibleQuestions: filteredQuestions.length,
-          disabledCount: allQuestions.length - filteredQuestions.length
-        });
-        
         setLocalAnswers(updatedAnswers);
-        
-        // Update parent
         Object.entries(updatedAnswers).forEach(([questionKey, value]) => {
           if (value !== localAnswers[questionKey]) {
             onAnswerChange(questionKey, value);
@@ -133,10 +102,8 @@ function Questionnaire({
         
         if (response.ok) {
           const questionsData = await response.json();
-          console.log('✅ Questions loaded:', questionsData.length);
           setAllQuestions(questionsData);
         } else {
-          console.warn('⚠️ No active template found, using empty question list');
           setAllQuestions([]);
         }
       } catch (error) {
@@ -166,12 +133,10 @@ function Questionnaire({
       return acc;
     }, {} as Record<string, Question[]>);
 
-    // Sort questions by groupOrder
     Object.keys(groups).forEach(groupName => {
       groups[groupName].sort((a: Question, b: Question) => (a.groupOrder || 0) - (b.groupOrder || 0));
     });
 
-    // Convert to array
     const groupsArray = Object.entries(groups)
       .filter(([groupName, questions]) => questions.length > 0)
       .map(([groupName, questions]) => ({
@@ -276,7 +241,7 @@ function Questionnaire({
   const isLastPage = pageFromApp === totalPages - 1;
   const progressPercent = totalPages > 0 ? Math.round(((pageFromApp + 1) / totalPages) * 100) : 0;
 
-  // Save handler
+  // Save handler with animation
   const handleSave = useCallback(() => {
     setSaveStatus('saving');
     try {
@@ -300,8 +265,11 @@ function Questionnaire({
   }, [pageFromApp, onPageChange]);
 
   return (
-    <div className="min-h-screen bg-light-surface relative">
-      {/* === JAVÍTÁS 2: ELTÁVOLÍTOTTUK A FIX TITLE PROPOT === */}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
       <PageHeader
         onHome={onHome}
         onStartNew={onStartNew}
@@ -316,20 +284,56 @@ function Questionnaire({
         errors={errors}
       />
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8 relative z-10">
+        {/* 🎨 MODERN PROGRESS BAR WITH GLOW */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t.progress || 'Haladás'}: {pageFromApp + 1} / {totalPages}
+            </span>
+            <span className="text-sm font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+              {progressPercent}%
+            </span>
+          </div>
+          <div className="relative h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden shadow-inner">
+            <div 
+              className="absolute inset-y-0 left-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 rounded-full transition-all duration-500 ease-out shadow-lg"
+              style={{ width: `${progressPercent}%` }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 🎨 MODERN GROUP HEADER */}
         {questionGroups.length > 0 && currentGroup && (
-          <QuestionGroupHeader
-            groupName={currentGroup.name}
-            questionCount={currentGroup.questionCount}
-            totalGroups={totalPages}
-            currentGroupIndex={pageFromApp}
-            language={language}
-          />
+          <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse"></div>
+            <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                    {pageFromApp + 1}
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                      {currentGroup.name}
+                    </h2>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                      <Sparkles className="h-3 w-3 text-cyan-500" />
+                      {currentGroup.questionCount} {language === 'hu' ? 'kérdés' : 'Fragen'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
+        {/* QUESTIONS CONTENT */}
         <div className="mb-8">
           {pageFromApp === 0 || pageFromApp === 1 ? (
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {(currentQuestions as Question[]).map((question: Question) => (
                 <IsolatedQuestion
                   key={question.id}
@@ -340,7 +344,6 @@ function Questionnaire({
               ))}
             </div>
           ) : (() => {
-            // FIXED: Smart rendering based on question type composition
             const radioQuestions = (currentQuestions as Question[]).filter(q => q.type === 'radio' || q.type === 'checkbox' || q.type === 'yes_no_na');
             const measurementQuestions = (currentQuestions as Question[]).filter(q => q.type === 'measurement' || q.type === 'calculated');
             const otherQuestions = (currentQuestions as Question[]).filter(q => 
@@ -353,10 +356,7 @@ function Questionnaire({
 
             const hasOnlyRadio = radioQuestions.length === currentQuestions.length;
             const hasOnlyMeasurement = measurementQuestions.length === currentQuestions.length;
-            const isMixed = (radioQuestions.length > 0 || measurementQuestions.length > 0) && otherQuestions.length > 0;
 
-            // If ONLY radio/checkbox questions with standard true/false options → use TrueFalseGroup
-            // (TrueFalseGroup hardcodes true/false/n.a. options, so only use for pure boolean groups)
             const allRadioAreBoolean = radioQuestions.every(q => 
               !q.options || q.options.length === 0 || 
               (Array.isArray(q.options) && q.options.every((opt: string) => 
@@ -375,7 +375,6 @@ function Questionnaire({
               );
             }
 
-            // If ONLY measurement/calculated questions → use MeasurementBlock
             if (hasOnlyMeasurement) {
               return (
                 <MeasurementBlock
@@ -387,8 +386,6 @@ function Questionnaire({
               );
             }
 
-            // If MIXED types OR radio with custom options → render each question individually
-            // This ensures each question type renders with its correct UI component
             return (
               <div className="space-y-6">
                 {measurementQuestions.length > 0 && (
@@ -400,7 +397,7 @@ function Questionnaire({
                   />
                 )}
                 {(radioQuestions.length > 0 || otherQuestions.length > 0) && (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {[...radioQuestions, ...otherQuestions].map((question: Question) => (
                       <IsolatedQuestion
                         key={question.id}
@@ -416,6 +413,7 @@ function Questionnaire({
           })()}
         </div>
 
+        {/* ERROR LIST */}
         <div className="mb-8">
           <ErrorList
             errors={errors}
@@ -425,92 +423,100 @@ function Questionnaire({
           />
         </div>
 
-        <div className="flex justify-between items-center">
-  {/* Bal oldali gomb (Vissza) */}
-  <Button
-  variant="outline"
-  onClick={handlePreviousPage}
-  disabled={pageFromApp === 0}
-  className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
->
-  <ArrowLeft className="h-4 w-4 mr-2" />
-  {t.previous}
-</Button>
+        {/* 🎨 MODERN NAVIGATION BUTTONS */}
+        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
+          {/* Back Button */}
+          <button
+            onClick={handlePreviousPage}
+            disabled={pageFromApp === 0}
+            className="group relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20"
+          >
+            <div className="flex items-center justify-center gap-2">
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+              <span className="font-semibold">{t.previous}</span>
+            </div>
+          </button>
 
-  {/* ===== EZ AZ ÚJ, BEILLESZTETT RÉSZ ===== */}
-  {/* Középső gomb (AI) */}
-  <SmartHelpWizard
-    currentPage={pageFromApp + 1}
-    formData={localAnswers}
-    currentQuestionId={currentQuestionId}
-    errors={errors}
-  />
-  {/* ======================================= */}
+          {/* Center AI Button */}
+          <SmartHelpWizard
+            currentPage={pageFromApp + 1}
+            formData={localAnswers}
+            currentQuestionId={currentQuestionId}
+            errors={errors}
+          />
 
-  {/* Jobb oldali gombok (Mentés, Tovább) */}
-  <div className="flex space-x-4">
-    <Button
-  variant="outline"
-  onClick={handleSave}
-  disabled={saveStatus === 'saving'}
-  className={`flex items-center space-x-2 ${
-    saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
-    saveStatus === 'error' ? 'bg-red-100 border-red-300 text-red-700' :
-    'border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white' // EZ AZ ÚJ ALAPÉRTELMEZETT STÍLUS
-  }`}
->
-              {saveStatus === 'saving' ? (
-    <>
-      <div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
-      {t.saving}
-    </>
-  ) : saveStatus === 'saved' ? (
-    <>
-      <Check className="h-4 w-4 mr-2 text-green-600" />
-      {t.saved}
-    </>
-  ) : saveStatus === 'error' ? (
-    <>
-      <X className="h-4 w-4 mr-2 text-red-600" />
-      {t.error}
-    </>
-  ) : (
-    <>
-      <Save className="h-4 w-4 mr-2" />
-      {t.save}
-    </>
-  )}
-</Button>
-            
-            {isLastPage ? (
-              <Button
-    type="button"
-    onClick={onNext}
-    disabled={!canProceed}
-    className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
-      canProceed 
-        ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
-        : 'bg-gray-400 text-white cursor-not-allowed'
-    }`}
-  >
-                {t.next}
-    <ArrowRight className="h-4 w-4 ml-2" />
-  </Button>
-) : (
-  <Button
-    type="button"
-    onClick={handleNextPage}
-    disabled={!canProceed}
-    className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
-      canProceed 
-        ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
-        : 'bg-gray-400 text-white cursor-not-allowed'
-    }`}
-  >
-    {t.next} {canProceed ? '✓' : '✗'}
-    <ArrowRight className="h-4 w-4 ml-2" />
-  </Button>
-            )}
+          {/* Right Side Buttons */}
+          <div className="flex gap-3">
+            {/* Save Button */}
+            <button
+              onClick={handleSave}
+              disabled={saveStatus === 'saving'}
+              className={`relative overflow-hidden px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                saveStatus === 'saved' 
+                  ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
+                  : saveStatus === 'error'
+                  ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+                  : 'bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-600 hover:bg-blue-50'
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {saveStatus === 'saving' ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
+                    <span>{t.saving}</span>
+                  </>
+                ) : saveStatus === 'saved' ? (
+                  <>
+                    <Check className="h-5 w-5" />
+                    <span>{t.saved}</span>
+                  </>
+                ) : saveStatus === 'error' ? (
+                  <>
+                    <X className="h-5 w-5" />
+                    <span>{t.error}</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-5 w-5" />
+                    <span>{t.save}</span>
+                  </>
+                )}
+              </div>
+            </button>
+
+            {/* Next/Complete Button */}
+            <button
+              onClick={isLastPage ? onNext : handleNextPage}
+              disabled={!canProceed}
+              className="group relative overflow-hidden px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {/* Glow effect */}
+              <div className={`absolute inset-0 transition-opacity ${canProceed ? 'opacity-100' : 'opacity-0'}`}>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
+              </div>
+              
+              {/* Disabled state */}
+              {!canProceed && (
+                <div className="absolute inset-0 bg-gray-400"></div>
+              )}
+
+              {/* Content */}
+              <div className="relative z-10 flex items-center gap-2 text-white">
+                <span>{t.next}</span>
+                {canProceed ? (
+                  <>
+                    <Check className="h-5 w-5" />
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </>
+                ) : (
+                  <X className="h-5 w-5" />
+                )}
+              </div>
+
+              {/* Shine effect */}
+              <div className={`absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ${canProceed ? '' : 'hidden'}`}></div>
+            </button>
           </div>
         </div>
       </main>

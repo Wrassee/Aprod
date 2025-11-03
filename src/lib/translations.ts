@@ -56,6 +56,17 @@ export interface Translation {
   printedName: string;
   signatureDate: string;
   
+  // ✅ JAVÍTÁS: Hiányzó Signature kulcsok hozzáadva az interfészhez
+  signatureLastStep: string;
+  signatureOptionalInfo: string;
+  signatureNameAutoSave: string;
+  signatureInfo: string;
+  optional: string;
+  signatureInfoText1: string;
+  signatureInfoText2: string;
+  signatureInfoText3: string;
+  signatureInfoText4: string;
+
   // Completion
   completionTitle: string;
   protocolComplete: string;
@@ -262,6 +273,41 @@ export interface Translation {
         editRole: string;
       };
     };
+    AuditLog: {
+      title: string;
+      description: string;
+      entries: string;
+      refresh: string;
+      noLogs: string;
+      table: {
+        status: string;
+        action: string;
+        user: string;
+        resource: string;
+        details: string;
+        time: string;
+      },
+    };
+    Settings: {
+      title: string;
+      description: string;
+      refresh: string;
+      refreshed: string;
+      loadError: string;
+      systemInfo: string;
+      systemInfoDesc: string;
+      environment: string;
+      platform: string;
+      nodeVersion: string;
+      databaseSize: string;
+      uptime: string;
+      memoryUsage: string;
+      backupTitle: string;
+      backupDesc: string;
+      createBackup: string;
+      restoreBackup: string;
+      comingSoon: string;
+    };
     comingSoon: {
       dashboard: string;
       dashboardDesc: string;
@@ -331,6 +377,17 @@ export const translations: Record<string, Translation> = {
     clear: "Törlés",
     printedName: "Nyomtatott név (opcionális)",
     signatureDate: "Aláírás dátuma: ",
+
+    // ✅ JAVÍTÁS: Hiányzó HU kulcsok hozzáadva
+    signatureLastStep: "Utolsó lépés: Aláírás",
+    signatureOptionalInfo: "Az aláírás opcionális - a protokoll név nélkül is befejezhető",
+    signatureNameAutoSave: "A név automatikusan mentésre kerül",
+    signatureInfo: "Aláírás információ",
+    optional: "Opcionális",
+    signatureInfoText1: "Az aláírás digitálisan kerül rögzítésre",
+    signatureInfoText2: "Automatikus mentés minden változtatásnál",
+    signatureInfoText3: "Az aláírás bekerül a végleges PDF dokumentumba",
+    signatureInfoText4: "A protokoll név nélkül is befejezhető",
     
     // Completion
     completionTitle: "Protokoll befejezve",
@@ -638,6 +695,17 @@ export const translations: Record<string, Translation> = {
     clear: "Löschen",
     printedName: "Gedruckter Name (optional)",
     signatureDate: "Unterschriftsdatum: ",
+
+    // ✅ JAVÍTÁS: Hiányzó DE kulcsok és fordítások hozzáadva
+    signatureLastStep: "Letzter Schritt: Unterschrift",
+    signatureOptionalInfo: "Die Unterschrift ist optional – das Protokoll kann auch ohne Namen abgeschlossen werden",
+    signatureNameAutoSave: "Der Name wird automatisch gespeichert",
+    signatureInfo: "Informationen zur Unterschrift",
+    optional: "Optional",
+    signatureInfoText1: "Die Unterschrift wird digital erfasst",
+    signatureInfoText2: "Automatische Speicherung bei jeder Änderung",
+    signatureInfoText3: "Die Unterschrift wird in das endgültige PDF-Dokument aufgenommen",
+    signatureInfoText4: "Das Protokoll kann auch ohne Namen abgeschlossen werden",
     
     // Completion
     completionTitle: "Protokoll abgeschlossen",
@@ -735,6 +803,7 @@ export const translations: Record<string, Translation> = {
     passwordLabel: "Passwort",
     loginButton: "Anmelden",
     registerButton: "Registrieren",
+    // ✅ JAVÍTÁS: Eltévedt 'G' karakter eltávolítva
     switchToRegister: "Noch kein Konto? Registrieren!",
     switchToLogin: "Haben Sie bereits ein Konto? Anmelden!",
     missingData: "Fehlende Daten",
@@ -779,27 +848,45 @@ export const translations: Record<string, Translation> = {
         settings: "Einstellungen",
       },
       Dashboard: {
+        welcome: "Willkommen beim Admin Dashboard",
+        welcomeDesc: "Systemübersicht und Statistiken",
+        noData: "Statistiken konnten nicht geladen werden",
         totalUsers: "Gesamtbenutzer",
-        registeredUsers: "Anzahl registrierter Benutzer",
+        registeredUsers: "Registrierte Konten",
         totalProtocols: "Gesamtprotokolle",
         completedProtocols: "Erstellte Protokolle",
-        totalTemplates: "Vorlagen",
+        totalTemplates: "Gesamtvorlagen",
         uploadedTemplates: "Hochgeladene Vorlagen",
+        activeTemplates: "Aktive Vorlagen",
+        currentlyActive: "Aktuell verwendet",
+        recentActivity: "Letzte Aktivität",
+        last5Protocols: "Die letzten 5 erstellten Protokolle",
+        noProtocols: "Noch keine Protokolle erstellt.",
+        protocolNumber: "Protokollnummer",
+        status: "Status",
+        createdAt: "Erstellt am",
+        systemHealth: "Systemzustand",
+        activeUsers: "Benutzeraktivität",
+        online: "Online",
+        database: "Datenbank",
+        healthy: "Gesund",
+        storage: "Speicher",
+        ok: "OK",
+        quickStats: "Schnellstatistiken",
+        avgProtocolsPerDay: "Durchschn. Protokolle/Tag (30 Tage)",
+        templatesPerUser: "Vorlagen/Benutzer-Verhältnis",
+        activeRate: "Rate aktiver Vorlagen",
         systemActivity: "Systemaktivität",
         activityDesc: "Schneller Überblick über den Systembetrieb",
-        activeUsers: "Aktive Benutzer",
-        recentProtocols: "Neue Protokolle",
+        recentProtocolsTable: "Letzte Protokolle",
         systemStatus: "Systemstatus",
         operational: "Betriebsbereit",
-        recentProtocolsTable: "Letzte Protokolle",
-        last5Protocols: "Die letzten 5 erstellten Protokolle",
-        noData: "Statistiken konnten nicht geladen werden",
         completed: "Abgeschlossen",
         table: {
           id: "ID",
           created: "Erstellt",
-          status: "Status"
-        }
+          status: "Status",
+        },
       },
       UserManagement: {
         title: "Benutzerverwaltung",
@@ -842,27 +929,26 @@ export const translations: Record<string, Translation> = {
         },
       },
       Settings: {
-      title: "Systemeinstellungen",
-      description: "Server- und Datenbankinformationen, Backups",
-      refresh: "Aktualisieren",
-      refreshed: "Systeminformationen aktualisiert",
-      loadError: "Daten konnten nicht geladen werden",
-      systemInfo: "Systeminformationen",
-      systemInfoDesc: "Technische Daten des Servers und der Datenbank",
-      environment: "Umgebung",
-      platform: "Plattform",
-      nodeVersion: "Node.js Version",
-      databaseSize: "Datenbankgröße",
-      uptime: "Laufzeit",
-      memoryUsage: "Speichernutzung",
-      backupTitle: "Sicherung und Wiederherstellung",
-      backupDesc: "Datenbank sichern und frühere Zustände wiederherstellen",
-      createBackup: "Sicherung erstellen",
-      restoreBackup: "Sicherung wiederherstellen",
-      comingSoon: "Funktion bald verfügbar",
-    },
-
-    comingSoon: {
+        title: "Systemeinstellungen",
+        description: "Server- und Datenbankinformationen, Backups",
+        refresh: "Aktualisieren",
+        refreshed: "Systeminformationen aktualisiert",
+        loadError: "Daten konnten nicht geladen werden",
+        systemInfo: "Systeminformationen",
+        systemInfoDesc: "Technische Daten des Servers und der Datenbank",
+        environment: "Umgebung",
+        platform: "Plattform",
+        nodeVersion: "Node.js verzió",
+        databaseSize: "Datenbankgröße",
+        uptime: "Laufzeit",
+        memoryUsage: "Speichernutzung",
+        backupTitle: "Sicherung und Wiederherstellung",
+        backupDesc: "Datenbank sichern und frühere Zustände wiederherstellen",
+        createBackup: "Sicherung erstellen",
+        restoreBackup: "Sicherung wiederherstellen",
+        comingSoon: "Funktion bald verfügbar",
+      },
+      comingSoon: {
         dashboard: "Dashboard kommt bald",
         dashboardDesc: "Statistiken und Übersicht demnächst verfügbar.",
         protocols: "Protokollverwaltung kommt bald",
@@ -873,3 +959,4 @@ export const translations: Record<string, Translation> = {
     }
   },
 };
+

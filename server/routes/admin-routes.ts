@@ -207,6 +207,89 @@ router.delete('/users/:id',
 });
 
 // ===============================================
+//          PROTOCOL MANAGEMENT
+// ===============================================
+
+// GET /api/admin/protocols - Összes protokoll listázása
+router.get('/protocols', requireAdmin, async (req, res) => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    
+    console.log(`📋 Fetching protocols (Page: ${page}, Limit: ${limit})...`);
+    
+    // Lekérjük a protokollokat a storage-ból
+    // Ha a storage.getRecentProtocols nem felel meg, akkor módosítsd
+    const protocols = await storage.getRecentProtocols(limit);
+    const totalCount = await storage.getProtocolsCount();
+
+    console.log(`✅ Found ${protocols.length} protocols (Total: ${totalCount})`);
+    
+    res.json({
+      items: protocols,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      total: totalCount,
+    });
+  } catch (error) {
+    console.error('❌ Failed to fetch protocols:', error);
+    res.status(500).json({ message: 'Hiba történt a protokollok lekérdezése során.' });
+  }
+});
+
+// GET /api/admin/protocols/:id - Egy protokoll részletes adatai
+router.get('/protocols/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`📄 Fetching protocol details for ID: ${id}`);
+    
+    // Feltételezem, hogy van egy getProtocol függvény a storage-ban
+    // Ha nincs, akkor hozd létre vagy használj más megoldást
+    const protocol = await storage.getProtocol?.(id);
+    
+    if (!protocol) {
+      return res.status(404).json({ message: 'Protokoll nem található.' });
+    }
+    
+    console.log(`✅ Protocol found: ${protocol.protocol_number || id}`);
+    res.json(protocol);
+  } catch (error) {
+    console.error('❌ Failed to fetch protocol:', error);
+    res.status(500).json({ message: 'Hiba történt a protokoll lekérdezése során.' });
+  }
+});
+
+// DELETE /api/admin/protocols/:id - Protokoll törlése (opcionális)
+router.delete('/protocols/:id',
+  requireAdmin,
+  auditLog('protocol.delete', {
+    resourceType: 'protocol',
+    getDetails: (req) => {
+      const { id } = req.params;
+      return { protocol_id: id };
+    }
+  }),
+  async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`🗑️ Attempting to delete protocol: ${id}`);
+    
+    // Feltételezem, hogy van egy deleteProtocol függvény
+    const success = await storage.deleteProtocol?.(id);
+    
+    if (!success) {
+      return res.status(404).json({ message: 'Protokoll nem található.' });
+    }
+    
+    console.log(`✅ Protocol ${id} successfully deleted`);
+    res.json({ success: true, message: 'Protokoll sikeresen törölve.' });
+  } catch (error) {
+    console.error('❌ Failed to delete protocol:', error);
+    res.status(500).json({ message: 'Hiba történt a protokoll törlése során.' });
+  }
+});
+
+// ===============================================
 //          TEMPLATE MANAGEMENT
 // ===============================================
 

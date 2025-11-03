@@ -36,6 +36,7 @@ export interface IStorage {
   createProtocol(protocol: InsertProtocol): Promise<Protocol>;
   updateProtocol(id: string, updates: Partial<Protocol>): Promise<Protocol | undefined>;
   getAllProtocols(): Promise<Protocol[]>;
+  deleteProtocol(id: string): Promise<boolean>;
 
   /* ---------- Templates ---------- */
   getTemplate(id: string): Promise<Template | undefined>;
@@ -108,6 +109,31 @@ export class DatabaseStorage implements IStorage {
     return await (db as any).select().from(protocols).orderBy(desc(protocols.created_at));
   }
 
+  /**
+ * Egy protokoll törlése az adatbázisból.
+ * @param id - A törlendő protokoll azonosítója
+ * @returns Promise<boolean> - true, ha sikeres a törlés
+ */
+async deleteProtocol(id: string): Promise<boolean> {
+  try {
+    console.log(`🗑️ Attempting to delete protocol: ${id}`);
+    const result = await (db as any)
+      .delete(protocols)
+      .where(eq(protocols.id, id))
+      .returning();
+    
+    const success = result.length > 0;
+    if (success) {
+      console.log(`✅ Protocol ${id} deleted successfully`);
+    } else {
+      console.warn(`⚠️ No protocol found with ID: ${id}`);
+    }
+    return success;
+  } catch (error) {
+    console.error(`❌ Error deleting protocol ${id}:`, error);
+    return false;
+  }
+}
   /* ---------- Templates ---------- */
   async getTemplate(id: string) {
     const [tpl] = await (db as any).select().from(templates).where(eq(templates.id, id));

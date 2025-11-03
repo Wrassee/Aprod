@@ -1,9 +1,10 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, SupabaseClient } from '@supabase/supabase-js';
 import type { Profile } from '../../shared/schema';
 
 interface AuthContextType {
+  supabase: SupabaseClient;
   user: User | null;
   session: Session | null;
   profile: Profile | null;
@@ -183,6 +184,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const value = {
+    supabase,
     user,
     session,
     profile,

@@ -35,7 +35,7 @@ export async function registerRoutes(app: Express) {
 
   // --- Moduláris Routerek Regisztrálása ---
   // A bejövő kérések először ezeken a routereken mennek keresztül.
-  app.use("/api/admin", adminRoutes);
+  app.use("/api/admin", requireAuth, adminRoutes);
   app.use("/api/protocols", protocolMappingRoutes);
   app.use("/api/errors", errorRoutes);
 

@@ -1,10 +1,13 @@
+// src/components/error-export.tsx - THEME AWARE VERSION
+
 import { useState } from 'react';
+import { useTheme } from '@/contexts/theme-context'; // ← ÚJ IMPORT
 import { ProtocolError } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Download, Mail, Printer, FileText, Camera, Tag } from 'lucide-react';
+import { Download, Mail, Printer, FileText, Camera, Tag, Sparkles, AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
 import { useLanguageContext } from './language-provider';
 
 interface ErrorExportProps {
@@ -19,6 +22,7 @@ interface ErrorExportProps {
 
 export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   const { t, language } = useLanguageContext();
+  const { theme } = useTheme(); // ← ÚJ HOOK
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -119,7 +123,6 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   };
 
   const sendEmail = async () => {
-    // TODO: Implement email functionality with SendGrid
     alert(language === 'hu' ? 'Email funkció fejlesztés alatt' : 'Email-Funktion in Entwicklung');
   };
 
@@ -127,11 +130,270 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
     window.print();
   };
 
+  // ========================================
+  // MODERN THEME RENDER
+  // ========================================
+  if (theme === 'modern') {
+    if (allErrors.length === 0) {
+      return (
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 p-1 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 opacity-50 blur-xl animate-pulse" />
+          
+          <Card className="relative bg-white border-0 rounded-3xl">
+            <CardContent className="p-8 text-center">
+              <div className="relative inline-block mb-4">
+                <div className="absolute inset-0 bg-green-400 rounded-full blur-xl opacity-30 animate-pulse" />
+                <CheckCircle className="relative h-16 w-16 text-green-500 mx-auto" />
+              </div>
+              
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-500 bg-clip-text text-transparent mb-3">
+                {language === 'hu' ? 'Nincs jelentett hiba' : 'Keine Fehler gemeldet'}
+              </h3>
+              <p className="text-gray-600 flex items-center justify-center gap-2">
+                <Sparkles className="h-4 w-4 text-green-500" />
+                {language === 'hu' 
+                  ? 'Az átvételi protokoll hibamentesen befejezve.'
+                  : 'Das Abnahmeprotokoll wurde fehlerfrei abgeschlossen.'}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-rose-500 to-pink-500 p-1 shadow-2xl">
+          <div className="absolute inset-0 bg-gradient-to-r from-red-400 via-rose-400 to-pink-400 opacity-50 blur-xl animate-pulse" />
+          
+          <Card className="relative bg-white border-0 rounded-3xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-red-600 via-rose-600 to-pink-500 bg-clip-text text-transparent mb-2 flex items-center gap-2">
+                    <AlertTriangle className="h-6 w-6 text-red-600" />
+                    {language === 'hu' ? 'Hibalista Exportálás' : 'Fehlerliste Export'}
+                  </h2>
+                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                    <span className="flex items-center gap-1">
+                      <Sparkles className="h-4 w-4 text-rose-500" />
+                      {allErrors.length} {language === 'hu' ? 'hiba dokumentálva' : 'Fehler dokumentiert'}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Camera className="h-4 w-4 text-rose-500" />
+                      {allErrors.filter(e => e.images?.length > 0).length} {language === 'hu' ? 'fotóval' : 'mit Fotos'}
+                    </span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setShowPreview(true)}
+                  className="relative overflow-hidden border-2 border-blue-500 text-blue-600 hover:bg-blue-50 bg-white group"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  {language === 'hu' ? 'Előnézet' : 'Vorschau'}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-blue-400/10 to-transparent transition-transform duration-700" />
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {/* PDF Button */}
+                <Button
+                  onClick={generatePDF}
+                  disabled={isGenerating}
+                  className="relative overflow-hidden bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-lg hover:shadow-xl transition-all group"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  {isGenerating ? (language === 'hu' ? 'Generálás...' : 'Erstellen...') : 'PDF'}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
+                </Button>
+
+                {/* Excel Button */}
+                <Button
+                  onClick={generateExcel}
+                  disabled={isGenerating}
+                  className="relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all group"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {isGenerating ? (language === 'hu' ? 'Generálás...' : 'Erstellen...') : 'Excel'}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
+                </Button>
+
+                {/* Email Button */}
+                <Button
+                  onClick={sendEmail}
+                  className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white shadow-lg hover:shadow-xl transition-all group"
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  {language === 'hu' ? 'Email' : 'E-Mail'}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
+                </Button>
+
+                {/* Print Button */}
+                <Button
+                  onClick={printReport}
+                  className="relative overflow-hidden border-2 border-purple-500 text-purple-600 hover:bg-purple-50 bg-white shadow-lg hover:shadow-xl transition-all group"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  {language === 'hu' ? 'Nyomtatás' : 'Drucken'}
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-purple-400/10 to-transparent transition-transform duration-700" />
+                </Button>
+              </div>
+
+              {/* Quick Statistics - Modern Cards */}
+              <div className="mt-6 grid grid-cols-3 gap-4">
+                {/* Critical */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-rose-500 p-1 shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-400 to-rose-400 opacity-30 animate-pulse" />
+                  <div className="relative bg-white rounded-2xl p-4 text-center">
+                    <AlertTriangle className="h-6 w-6 text-red-600 mx-auto mb-2" />
+                    <div className="text-3xl font-bold bg-gradient-to-r from-red-600 to-rose-600 bg-clip-text text-transparent">
+                      {allErrors.filter(e => e.severity === 'critical').length}
+                    </div>
+                    <div className="text-sm font-semibold text-red-600 mt-1">{getSeverityText('critical')}</div>
+                  </div>
+                </div>
+
+                {/* Medium */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 p-1 shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 opacity-30 animate-pulse" />
+                  <div className="relative bg-white rounded-2xl p-4 text-center">
+                    <AlertCircle className="h-6 w-6 text-amber-600 mx-auto mb-2" />
+                    <div className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+                      {allErrors.filter(e => e.severity === 'medium').length}
+                    </div>
+                    <div className="text-sm font-semibold text-amber-600 mt-1">{getSeverityText('medium')}</div>
+                  </div>
+                </div>
+
+                {/* Low */}
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 to-sky-500 p-1 shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-sky-400 opacity-30 animate-pulse" />
+                  <div className="relative bg-white rounded-2xl p-4 text-center">
+                    <Info className="h-6 w-6 text-blue-600 mx-auto mb-2" />
+                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
+                      {allErrors.filter(e => e.severity === 'low').length}
+                    </div>
+                    <div className="text-sm font-semibold text-blue-600 mt-1">{getSeverityText('low')}</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Preview Modal - Modern */}
+        <Dialog open={showPreview} onOpenChange={setShowPreview}>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto rounded-3xl border-0 p-0">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse" />
+              
+              <div className="relative bg-white rounded-3xl">
+                <DialogHeader className="p-6 pb-4">
+                  <DialogTitle className="text-2xl bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
+                    <FileText className="h-6 w-6 text-blue-600" />
+                    {language === 'hu' ? 'Hibalista Előnézet' : 'Fehlerliste Vorschau'}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="p-6 pt-0 space-y-6" id="error-report-content">
+                  {/* Header */}
+                  <div className="text-center border-b-2 border-gray-200 pb-4">
+                    <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-3">
+                      OTIS {language === 'hu' ? 'Hibalista' : 'Fehlerliste'}
+                    </h1>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      {protocolData?.buildingAddress && (
+                        <p><strong>{language === 'hu' ? 'Épület:' : 'Gebäude:'}</strong> {protocolData.buildingAddress}</p>
+                      )}
+                      {protocolData?.liftId && (
+                        <p><strong>{language === 'hu' ? 'Lift ID:' : 'Aufzug ID:'}</strong> {protocolData.liftId}</p>
+                      )}
+                      {protocolData?.inspectorName && (
+                        <p><strong>{language === 'hu' ? 'Ellenőr:' : 'Prüfer:'}</strong> {protocolData.inspectorName}</p>
+                      )}
+                      <p><strong>{language === 'hu' ? 'Dátum:' : 'Datum:'}</strong> {new Date().toLocaleDateString()}</p>
+                    </div>
+                  </div>
+
+                  {/* Error List */}
+                  <div className="space-y-4">
+                    {allErrors.map((error, index) => (
+                      <div key={error.id} className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-100 to-gray-50 p-1 shadow-md">
+                        <Card className="relative bg-white border-0 rounded-2xl">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-3">
+                              <div className="flex items-center space-x-3">
+                                <span className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">#{index + 1}</span>
+                                <Badge 
+                                  variant={getSeverityColor(error.severity)}
+                                  className="gap-1"
+                                >
+                                  {error.severity === 'critical' && <AlertTriangle className="h-3 w-3" />}
+                                  {error.severity === 'medium' && <AlertCircle className="h-3 w-3" />}
+                                  {error.severity === 'low' && <Info className="h-3 w-3" />}
+                                  {getSeverityText(error.severity)}
+                                </Badge>
+                              </div>
+                              {error.images?.length > 0 && (
+                                <div className="flex items-center text-sm text-gray-500 gap-1">
+                                  <Camera className="h-4 w-4" />
+                                  {error.images.length} {language === 'hu' ? 'fotó' : 'Foto(s)'}
+                                </div>
+                              )}
+                            </div>
+                            
+                            <h3 className="font-bold text-gray-800 mb-2">{error.title}</h3>
+                            <p className="text-gray-600 mb-3">{error.description}</p>
+                            
+                            {error.images?.length > 0 && (
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                {error.images.map((image: string, imgIndex: number) => (
+                                  <div key={imgIndex} className="relative group">
+                                    <img
+                                      src={image}
+                                      alt={`${language === 'hu' ? 'Hiba fotó' : 'Fehlerfoto'} ${imgIndex + 1}`}
+                                      className="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-md group-hover:shadow-lg transition-all"
+                                    />
+                                    <div className="absolute top-2 right-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold px-2 py-1 rounded-lg shadow">
+                                      {imgIndex + 1}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer */}
+                  <div className="text-center text-sm text-gray-500 border-t-2 border-gray-200 pt-4">
+                    <p className="flex items-center justify-center gap-2">
+                      <Sparkles className="h-4 w-4 text-blue-500" />
+                      {language === 'hu' ? 'Generálva' : 'Erstellt'}: {new Date().toLocaleString()}
+                    </p>
+                    <p className="font-semibold text-gray-700 mt-1">
+                      OTIS APROD - {language === 'hu' ? 'Átvételi Protokoll Alkalmazás' : 'Abnahmeprotokoll Anwendung'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  }
+
+  // ========================================
+  // CLASSIC THEME RENDER
+  // ========================================
   if (allErrors.length === 0) {
     return (
-      <Card className="bg-green-50 border-green-200">
+      <Card className="bg-green-50 border-green-200 border shadow-sm">
         <CardContent className="p-6 text-center">
-          <div className="text-green-600 mb-2">✅</div>
+          <div className="text-green-600 mb-2 text-4xl">✅</div>
           <h3 className="text-lg font-semibold text-green-800 mb-2">
             {language === 'hu' ? 'Nincs jelentett hiba' : 'Keine Fehler gemeldet'}
           </h3>
@@ -163,7 +425,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
             <Button
               onClick={() => setShowPreview(true)}
               variant="outline"
-              className="border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
+              className="border-blue-600 text-blue-600 hover:bg-blue-50"
             >
               <FileText className="h-4 w-4 mr-2" />
               {language === 'hu' ? 'Előnézet' : 'Vorschau'}
@@ -197,32 +459,31 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               {language === 'hu' ? 'Email' : 'E-Mail'}
             </Button>
 
-            {/* Nyomtatás gomb - EGYSÉGES STÍLUS */}
             <Button
               onClick={printReport}
               variant="outline"
-              className="text-otis-blue border-2 border-otis-blue hover:bg-otis-blue hover:text-white active:bg-otis-blue active:text-white transition-colors"
+              className="text-blue-600 border-2 border-blue-600 hover:bg-blue-50"
             >
               <Printer className="h-4 w-4 mr-2" />
               {language === 'hu' ? 'Nyomtatás' : 'Drucken'}
             </Button>
           </div>
 
-          {/* Quick Statistics */}
+          {/* Quick Statistics - Classic */}
           <div className="mt-6 grid grid-cols-3 gap-4">
-            <div className="text-center p-4 bg-red-50 rounded-lg">
+            <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
               <div className="text-2xl font-bold text-red-600">
                 {allErrors.filter(e => e.severity === 'critical').length}
               </div>
               <div className="text-sm text-red-600">{getSeverityText('critical')}</div>
             </div>
-            <div className="text-center p-4 bg-yellow-50 rounded-lg">
+            <div className="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
               <div className="text-2xl font-bold text-yellow-600">
                 {allErrors.filter(e => e.severity === 'medium').length}
               </div>
               <div className="text-sm text-yellow-600">{getSeverityText('medium')}</div>
             </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
+            <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="text-2xl font-bold text-blue-600">
                 {allErrors.filter(e => e.severity === 'low').length}
               </div>
@@ -232,11 +493,11 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
         </CardContent>
       </Card>
 
-      {/* Preview Modal */}
+      {/* Preview Modal - Classic */}
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto border border-gray-300 shadow-lg bg-white">
+          <DialogHeader className="border-b pb-4">
+            <DialogTitle className="text-gray-900">
               {language === 'hu' ? 'Hibalista Előnézet' : 'Fehlerliste Vorschau'}
             </DialogTitle>
           </DialogHeader>
@@ -244,7 +505,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
           <div className="space-y-6" id="error-report-content">
             {/* Header */}
             <div className="text-center border-b pb-4">
-              <h1 className="text-2xl font-bold text-otis-blue mb-2">
+              <h1 className="text-2xl font-bold text-blue-600 mb-2">
                 OTIS {language === 'hu' ? 'Hibalista' : 'Fehlerliste'}
               </h1>
               <div className="text-sm text-gray-600 space-y-1">
@@ -264,7 +525,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
             {/* Error List */}
             <div className="space-y-4">
               {allErrors.map((error, index) => (
-                <Card key={error.id} className="border border-gray-200">
+                <Card key={error.id} className="border border-gray-200 shadow-sm">
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center space-x-3">
@@ -291,7 +552,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                             <img
                               src={image}
                               alt={`${language === 'hu' ? 'Hiba fotó' : 'Fehlerfoto'} ${imgIndex + 1}`}
-                              className="w-full h-32 object-cover rounded border"
+                              className="w-full h-32 object-cover rounded border border-gray-300"
                             />
                             <div className="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
                               {imgIndex + 1}

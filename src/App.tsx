@@ -1,3 +1,5 @@
+// src/App.tsx - JAVÍTOTT VERZIÓ
+
 import React, {
   useState,
   useEffect,
@@ -6,32 +8,32 @@ import React, {
 } from "react";
 
 /* -------------------- 3rd-party -------------------- */
-import { queryClient } from "./lib/queryClient.js";
+import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { Toaster } from "./components/ui/toaster.js";
-import { TooltipProvider } from "./components/ui/tooltip.js";
-import { LanguageProvider, useLanguageContext } from "./components/language-provider.js";
-import { AuthProvider, useAuth } from "./contexts/auth-context.js";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { LanguageProvider, useLanguageContext } from "@/components/language-provider";
+import { AuthProvider, useAuth } from "@/contexts/auth-context";
+import { ThemeProvider } from '@/contexts/theme-context';
 
-/* --------------------  Oldalak / Komponensek -------------------- */
-import { StartScreen } from "./pages/start-screen.js";
-import Questionnaire from "./pages/questionnaire.js";
-import { NiedervoltTable } from "./pages/niedervolt-table.js";
-import { Signature } from "./pages/signature.js";
-import { Completion } from "./pages/completion.js";
-import { Admin } from "./pages/admin.js";
-import { ProtocolPreview } from "./pages/protocol-preview.js";
-import { Erdungskontrolle } from "./pages/erdungskontrolle.js";
-import { Login } from "./pages/login.js";
-import { ProtectedRoute } from "./components/protected-route.js";
-import { FormData, MeasurementRow } from "./lib/types.js";
+/* -------------------- Oldalak / Komponensek -------------------- */
+import { StartScreen } from "@/pages/start-screen";
+import Questionnaire from "@/pages/questionnaire";
+import { NiedervoltTable } from "@/pages/niedervolt-table";
+import { Signature } from "@/pages/signature";
+import { Completion } from "@/pages/completion";
+import { Admin } from "@/pages/admin";
+import { ProtocolPreview } from "@/pages/protocol-preview";
+import { Erdungskontrolle } from "@/pages/erdungskontrolle";
+import { Login } from "@/pages/login";
+import { ProtectedRoute } from "@/components/protected-route";
+import { FormData, MeasurementRow } from "./lib/types";
 
-/* --------------------  Shared schema -------------------- */
-import { AnswerValue, ProtocolError } from "../shared/schema.js";
+/* -------------------- Shared schema -------------------- */
+import { AnswerValue, ProtocolError } from "../shared/schema";
 
 type Screen = 'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview' | 'login';
 
-// === PROPS INTERFACE A KÉPERNYŐÁLLAPOT ÁTADÁSÁHOZ ===
 interface AppContentProps {
   currentScreen: Screen;
   setCurrentScreen: (screen: Screen) => void;
@@ -45,7 +47,6 @@ interface AppContentProps {
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 }
 
-// === APPCONTENT KOMPONENS - NYELVI ÉS AUTH CONTEXTET HASZNÁLJA ===
 function AppContent({
   currentScreen,
   setCurrentScreen,
@@ -58,34 +59,41 @@ function AppContent({
   formData,
   setFormData,
 }: AppContentProps) {
-  // === HASZNÁLJUK A NYELVI ÉS AZ AUTH CONTEXTET ===
+  
   const { language, setLanguage } = useLanguageContext();
-  const { user } = useAuth(); // ✅ HOZZÁADVA: Auth állapot ellenőrzéséhez
+  const { user, supabase } = useAuth();
   
   const formDataRef = useRef(formData);
   
-  // Keep ref updated with latest formData
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
 
-  const handleLanguageSelect = (selectedLanguage: 'hu' | 'de') => {
+  // === Auth helper függvény - CSAK admin műveletekhez ===
+  const getAuthHeaders = async (contentType: string | null = 'application/json') => {
+    if (!supabase) throw new Error("Supabase client not available");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Authentication required");
+    const headers: HeadersInit = { 'Authorization': `Bearer ${session.access_token}` };
+    if (contentType) {
+      headers['Content-Type'] = contentType;
+    }
+    return headers;
+  };
+
+  const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
-    // === NYELV BEÁLLÍTÁSA A CONTEXTEN KERESZTÜL ===
     setLanguage(selectedLanguage);
     localStorage.setItem('otis-protocol-language', selectedLanguage);
     setCurrentScreen('questionnaire');
     setCurrentQuestionnairePage(0);
     localStorage.setItem('questionnaire-current-page', '0');
-    
-    // Clear error list when starting new protocol
     localStorage.removeItem('protocol-errors');
     window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
     window.dispatchEvent(new Event('storage'));
-  };
+  }, [setLanguage, setCurrentScreen, setCurrentQuestionnairePage]);
 
   const handleSaveProgress = useCallback(() => {
-    // Save is handled automatically by useEffect
     console.log('✅ Progress saved automatically');
   }, []);
 
@@ -108,11 +116,9 @@ function AppContent({
     setCurrentScreen('niedervolt');
   };
 
-  // ============================================================================
-  // === JAVÍTOTT handleSignatureComplete - FOGADJA A FINAL SIGNER NAME-ET ===
-  // ============================================================================
+  // === JAVÍTOTT handleSignatureComplete - AUTH NÉLKÜL (publikus művelet) ===
   const handleSignatureComplete = async (finalSignerName: string) => { 
-  console.log('📄 App.tsx: Starting protocol completion process with final name:', finalSignerName);
+    console.log('📄 App.tsx: Starting protocol completion process with final name:', finalSignerName);
     
     // Prevent multiple clicks
     const currentTime = Date.now();
@@ -127,20 +133,20 @@ function AppContent({
       const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
       
       const finalFormData = { 
-    ...formData, 
-    signerName: finalSignerName.trim(), // Használjuk a kapott, garantáltan friss nevet
-    completed: true,
-  };
+        ...formData, 
+        signerName: finalSignerName.trim(),
+        completed: true,
+      };
 
       // 2. FRISSÍTSD A REACT ÁLLAPOTOT
       setFormData(finalFormData);
 
       // 3. AZONNAL MENTSD EL A VÉGLEGES ADATOT A LOCALSTORAGE-BE
-      // Ez felülír minden háttérben futó időzített mentést!
       localStorage.setItem('otis-protocol-form-data', JSON.stringify(finalFormData));
       console.log('💾 App.tsx: GUARANTEED FINAL data saved to localStorage with signerName:', finalSignerName);
       
       // 4. A VÉGLEGES ADATTAL KÜLDD EL A BACKEND-NEK
+      // ✅ PUBLIKUS ENDPOINT - NEM KELL AUTH!
       const protocolData = {
         receptionDate,
         reception_date: receptionDate,
@@ -148,7 +154,7 @@ function AppContent({
         answers: finalFormData.answers,
         errors: finalFormData.errors || [],
         signature: finalFormData.signature || '',
-        signatureName: finalFormData.signerName, // ✅ Garantáltan friss
+        signatureName: finalFormData.signerName,
         completed: true,
       };
       
@@ -165,7 +171,7 @@ function AppContent({
       console.log('📤 Sending protocol to backend...');
       const response = await fetch('/api/protocols', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' }, // ✅ Egyszerű header, nincs auth
         body: JSON.stringify(protocolData),
       });
 
@@ -191,11 +197,13 @@ function AppContent({
     }
   };
 
+  // === ADMIN MŰVELETEK - EZEK IGÉNYLIK AZ AUTH-OT ===
   const handleEmailPDF = async () => {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/protocols/email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ formData, language }),
       });
       
@@ -209,9 +217,10 @@ function AppContent({
 
   const handleSaveToCloud = async () => {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/protocols/cloud-save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ formData, language }),
       });
       
@@ -225,9 +234,10 @@ function AppContent({
 
   const handleDownloadPDF = async () => {
     try {
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/protocols/download', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ formData, language }),
       });
       
@@ -261,9 +271,10 @@ function AppContent({
       
       console.log('Excel download filename:', filename);
 
+      const headers = await getAuthHeaders();
       const response = await fetch('/api/protocols/download-excel', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ formData, language }),
       });
 
@@ -369,14 +380,11 @@ function AppContent({
     setFormData(prev => ({ ...prev, errors }));
   }, [setFormData]);
 
-  // === JAVÍTOTT handleAdminAccess - ELLENŐRZI A BEJELENTKEZÉSI ÁLLAPOTOT ===
   const handleAdminAccess = useCallback(() => {
     if (user) {
-      // Ha van bejelentkezett felhasználó, menj az admin oldalra
       console.log('✅ User is logged in - navigating to admin');
       setCurrentScreen('admin');
     } else {
-      // Ha nincs, akkor menj a login oldalra
       console.log('🔐 User not logged in - navigating to login');
       setCurrentScreen('login');
     }
@@ -576,18 +584,20 @@ function App() {
   return (
     <AuthProvider>
       <LanguageProvider>
-        <AppContent
-          currentScreen={currentScreen}
-          setCurrentScreen={setCurrentScreen}
-          currentQuestionnaireePage={currentQuestionnaireePage}
-          setCurrentQuestionnairePage={setCurrentQuestionnairePage}
-          currentQuestionId={currentQuestionId}
-          setCurrentQuestionId={setCurrentQuestionId}
-          clearTrigger={clearTrigger}
-          setClearTrigger={setClearTrigger}
-          formData={formData}
-          setFormData={setFormData}
-        />
+        <ThemeProvider>
+          <AppContent
+            currentScreen={currentScreen}
+            setCurrentScreen={setCurrentScreen}
+            currentQuestionnaireePage={currentQuestionnaireePage}
+            setCurrentQuestionnairePage={setCurrentQuestionnairePage}
+            currentQuestionId={currentQuestionId}
+            setCurrentQuestionId={setCurrentQuestionId}
+            clearTrigger={clearTrigger}
+            setClearTrigger={setClearTrigger}
+            formData={formData}
+            setFormData={setFormData}
+          />
+        </ThemeProvider>
       </LanguageProvider>
     </AuthProvider>
   );

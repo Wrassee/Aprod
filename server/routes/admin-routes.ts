@@ -1,4 +1,4 @@
-// server/routes/admin-routes.ts
+// server/routes/admin-routes.ts - JAVÍTOTT VERZIÓ (manuális audit log)
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
@@ -9,7 +9,7 @@ import { excelParserService } from '../services/excel-parser.js';
 import { hybridTemplateLoader } from '../services/hybrid-template-loader.js';
 import { clearQuestionsCache } from '../routes.js';
 import { requireAdmin } from '../middleware/auth.js';
-import { auditLog } from '../middleware/audit-logger.js';
+import { createManualAuditLog } from '../middleware/audit-logger.js'; // ✅ MANUÁLIS AUDIT LOG
 import { db } from '../db.js';
 import { sql } from 'drizzle-orm';
 
@@ -25,20 +25,17 @@ const upload = multer({ dest: uploadDir });
 //          SYSTEM SETTINGS & MANAGEMENT
 // ===============================================
 
-// GET /api/admin/system/info - Rendszerinformációk lekérdezése
 router.get('/system/info', requireAdmin, async (_req, res) => {
   try {
     console.log('ℹ️ Fetching system information...');
     
     let databaseSize = 'N/A';
     if (process.env.NODE_ENV === "production") {
-      // PostgreSQL (Neon)
       const result: any[] = await (db as any).execute(sql`SELECT pg_size_pretty(pg_database_size(current_database()))`);
       if (result.length > 0) {
         databaseSize = result[0].pg_size_pretty;
       }
     } else {
-      // SQLite (development)
       const dbPath = path.join(process.cwd(), "data", "otis_aprod.db");
       if (fs.existsSync(dbPath)) {
         const stats = fs.statSync(dbPath);
@@ -46,7 +43,6 @@ router.get('/system/info', requireAdmin, async (_req, res) => {
       }
     }
     
-    // Uptime és memória információk
     const uptimeInSeconds = process.uptime();
     const memory = process.memoryUsage();
     
@@ -70,9 +66,6 @@ router.get('/system/info', requireAdmin, async (_req, res) => {
   }
 });
 
-/**
- * Segédfüggvény a másodpercek formázásához (nap, óra, perc)
- */
 function formatUptime(seconds: number): string {
   const d = Math.floor(seconds / (3600 * 24));
   const h = Math.floor(seconds % (3600 * 24) / 3600);
@@ -82,7 +75,6 @@ function formatUptime(seconds: number): string {
   const hDisplay = h > 0 ? h + (h === 1 ? " óra, " : " óra, ") : "";
   const mDisplay = m > 0 ? m + (m === 1 ? " perc" : " perc") : "";
   
-  // Eltávolítja a felesleges vesszőt a végéről
   let result = (dDisplay + hDisplay + mDisplay).trim();
   if (result.endsWith(',')) {
     result = result.slice(0, -1);
@@ -94,12 +86,10 @@ function formatUptime(seconds: number): string {
 //          ADMIN & AUDIT LOGS
 // ===============================================
 
-// GET /api/admin/stats - Dashboard statisztikák
 router.get('/stats', requireAdmin, async (_req, res) => {
   try {
     console.log('📊 Fetching admin dashboard statistics...');
     
-    // Párhuzamosan kérjük le az összes statisztikát a jobb teljesítmény érdekében
     const [usersCount, protocolsCount, templatesCount, activeTemplatesCount, recentProtocols] = await Promise.all([
       storage.getUsersCount(),
       storage.getProtocolsCount(),
@@ -109,25 +99,12 @@ router.get('/stats', requireAdmin, async (_req, res) => {
     ]);
 
     const stats = {
-      users: {
-        total: usersCount,
-      },
-      protocols: {
-        total: protocolsCount,
-        recent: recentProtocols,
-      },
-      templates: {
-        total: templatesCount,
-        active: activeTemplatesCount,
-      },
+      users: { total: usersCount },
+      protocols: { total: protocolsCount, recent: recentProtocols },
+      templates: { total: templatesCount, active: activeTemplatesCount },
     };
 
-    console.log(`✅ Dashboard stats compiled:`, {
-      users: stats.users.total,
-      protocols: stats.protocols.total,
-      templates: `${stats.templates.active}/${stats.templates.total}`,
-    });
-
+    console.log(`✅ Dashboard stats compiled`);
     res.json(stats);
   } catch (error) {
     console.error('❌ Failed to fetch dashboard stats:', error);
@@ -135,14 +112,11 @@ router.get('/stats', requireAdmin, async (_req, res) => {
   }
 });
 
-// GET /api/admin/audit-logs - Audit naplók lekérdezése
 router.get('/audit-logs', requireAdmin, async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
-    
     console.log(`📜 Fetching audit logs (limit: ${limit})...`);
     const logs = await storage.getAuditLogs(limit);
-    
     console.log(`✅ Retrieved ${logs.length} audit log entries`);
     res.json(logs);
   } catch (error) {
@@ -155,7 +129,6 @@ router.get('/audit-logs', requireAdmin, async (req, res) => {
 //          USER MANAGEMENT
 // ===============================================
 
-// GET /api/admin/users - Összes felhasználó listázása
 router.get('/users', requireAdmin, async (_req, res) => {
   try {
     console.log('📋 Fetching all user profiles...');
@@ -168,25 +141,26 @@ router.get('/users', requireAdmin, async (_req, res) => {
   }
 });
 
-// DELETE /api/admin/users/:id - Egy felhasználó törlése
-router.delete('/users/:id', 
-  requireAdmin, 
-  auditLog('user.delete', {
-    resourceType: 'user',
-    getDetails: (req) => {
-      const { id } = req.params;
-      return { deleted_user_id: id };
-    }
-  }),
-  async (req, res) => {
+// ✅ JAVÍTOTT: USER DELETE - manuális audit log
+router.delete('/users/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const adminPerformingAction = (req as any).user;
 
   console.log(`🗑️ Admin ${adminPerformingAction.id} attempting to delete user ${id}`);
 
-  // Biztonsági ellenőrzés: Admin ne tudja törölni saját magát
   if (id === adminPerformingAction.id) {
     console.warn('⚠️ Admin attempted to delete themselves');
+    
+    await createManualAuditLog(
+      req, 
+      'user.delete', 
+      'user', 
+      id,
+      { reason: 'Admin attempted to delete themselves' },
+      'failure',
+      'Admin nem törölheti saját magát'
+    );
+    
     return res.status(400).json({ message: 'Admin nem törölheti saját magát.' });
   }
 
@@ -195,13 +169,46 @@ router.delete('/users/:id',
 
     if (!success) {
       console.warn(`⚠️ User ${id} not found for deletion`);
+      
+      await createManualAuditLog(
+        req,
+        'user.delete',
+        'user',
+        id,
+        { reason: 'User not found' },
+        'failure',
+        'A felhasználó nem található'
+      );
+      
       return res.status(404).json({ message: 'A felhasználó nem található.' });
     }
 
+    // ✅ SIKER - Audit log
+    await createManualAuditLog(
+      req,
+      'user.delete',
+      'user',
+      id,
+      { deleted_user_id: id },
+      'success'
+    );
+
     console.log(`✅ User ${id} successfully deleted by admin ${adminPerformingAction.id}`);
     res.status(200).json({ message: 'Felhasználó sikeresen törölve.' });
-  } catch (error) {
+    
+  } catch (error: any) {
     console.error(`❌ Failed to delete user ${id}:`, error);
+    
+    await createManualAuditLog(
+      req,
+      'user.delete',
+      'user',
+      id,
+      { error: error.message },
+      'failure',
+      error.message
+    );
+    
     res.status(500).json({ message: 'Hiba történt a felhasználó törlése során.' });
   }
 });
@@ -210,7 +217,6 @@ router.delete('/users/:id',
 //          PROTOCOL MANAGEMENT
 // ===============================================
 
-// GET /api/admin/protocols - Összes protokoll listázása
 router.get('/protocols', requireAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -218,8 +224,6 @@ router.get('/protocols', requireAdmin, async (req, res) => {
     
     console.log(`📋 Fetching protocols (Page: ${page}, Limit: ${limit})...`);
     
-    // Lekérjük a protokollokat a storage-ból
-    // Ha a storage.getRecentProtocols nem felel meg, akkor módosítsd
     const protocols = await storage.getRecentProtocols(limit);
     const totalCount = await storage.getProtocolsCount();
 
@@ -237,14 +241,11 @@ router.get('/protocols', requireAdmin, async (req, res) => {
   }
 });
 
-// GET /api/admin/protocols/:id - Egy protokoll részletes adatai
 router.get('/protocols/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     console.log(`📄 Fetching protocol details for ID: ${id}`);
     
-    // Feltételezem, hogy van egy getProtocol függvény a storage-ban
-    // Ha nincs, akkor hozd létre vagy használj más megoldást
     const protocol = await storage.getProtocol?.(id);
     
     if (!protocol) {
@@ -259,32 +260,55 @@ router.get('/protocols/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// DELETE /api/admin/protocols/:id - Protokoll törlése (opcionális)
-router.delete('/protocols/:id',
-  requireAdmin,
-  auditLog('protocol.delete', {
-    resourceType: 'protocol',
-    getDetails: (req) => {
-      const { id } = req.params;
-      return { protocol_id: id };
-    }
-  }),
-  async (req, res) => {
+// ✅ JAVÍTOTT: PROTOCOL DELETE - manuális audit log
+router.delete('/protocols/:id', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  
   try {
-    const { id } = req.params;
     console.log(`🗑️ Attempting to delete protocol: ${id}`);
     
-    // Feltételezem, hogy van egy deleteProtocol függvény
     const success = await storage.deleteProtocol?.(id);
     
     if (!success) {
+      await createManualAuditLog(
+        req,
+        'protocol.delete',
+        'protocol',
+        id,
+        { reason: 'Protocol not found' },
+        'failure',
+        'Protokoll nem található'
+      );
+      
       return res.status(404).json({ message: 'Protokoll nem található.' });
     }
     
+    // ✅ SIKER - Audit log
+    await createManualAuditLog(
+      req,
+      'protocol.delete',
+      'protocol',
+      id,
+      { protocol_id: id },
+      'success'
+    );
+    
     console.log(`✅ Protocol ${id} successfully deleted`);
     res.json({ success: true, message: 'Protokoll sikeresen törölve.' });
-  } catch (error) {
+    
+  } catch (error: any) {
     console.error('❌ Failed to delete protocol:', error);
+    
+    await createManualAuditLog(
+      req,
+      'protocol.delete',
+      'protocol',
+      id,
+      { error: error.message },
+      'failure',
+      error.message
+    );
+    
     res.status(500).json({ message: 'Hiba történt a protokoll törlése során.' });
   }
 });
@@ -293,16 +317,13 @@ router.delete('/protocols/:id',
 //          TEMPLATE MANAGEMENT
 // ===============================================
 
-// GET /api/admin/templates/available - Helyi és távoli sablonok listázása
 router.get("/templates/available", requireAdmin, async (_req, res) => {
   try {
     const allTemplates = await hybridTemplateLoader.getAllAvailableTemplates();
     const activeTemplate = await storage.getActiveTemplate('unified', 'multilingual');
     res.json({
       ...allTemplates,
-      current: {
-        templateId: activeTemplate?.id,
-      }
+      current: { templateId: activeTemplate?.id }
     });
   } catch (error) {
     console.error("Error fetching available templates:", error);
@@ -310,7 +331,6 @@ router.get("/templates/available", requireAdmin, async (_req, res) => {
   }
 });
 
-// POST /api/admin/templates/select - Sablon kiválasztása
 router.post("/templates/select", requireAdmin, async (req, res) => {
   try {
     const { templateId, loadStrategy } = req.body;
@@ -319,13 +339,9 @@ router.post("/templates/select", requireAdmin, async (req, res) => {
     }
     console.log(`📄 Selecting template: ${templateId} with strategy: ${loadStrategy || 'local_first'}`);
 
-    const templateResult = await hybridTemplateLoader.loadTemplate(
-      templateId,
-      "unified",
-      "multilingual"
-    );
+    const templateResult = await hybridTemplateLoader.loadTemplate(templateId, "unified", "multilingual");
 
-    console.log(`✅ Template selection processed for: ${templateResult.templateInfo.name || templateResult.templateInfo.file_name}`);
+    console.log(`✅ Template selection processed`);
     res.json({ success: true });
   } catch (error) {
     console.error("❌ Error selecting template:", error);
@@ -333,7 +349,6 @@ router.post("/templates/select", requireAdmin, async (req, res) => {
   }
 });
 
-// GET /api/admin/templates - Feltöltött (adatbázisban lévő) sablonok listázása
 router.get("/templates", requireAdmin, async (_req, res) => {
   try {
     const templates = await storage.getAllTemplates();
@@ -344,45 +359,55 @@ router.get("/templates", requireAdmin, async (_req, res) => {
   }
 });
 
-// GET /api/admin/templates/:id/download - Sablon letöltése
-router.get("/templates/:id/download", 
-  requireAdmin,
-  auditLog('template.download', {
-    resourceType: 'template',
-    getDetails: (req) => {
-      const template = (req as any).downloadedTemplate;
-      return template ? {
-        template_name: template.name,
-        file_name: template.file_name
-      } : undefined;
-    }
-  }),
-  async (req, res) => {
+// ✅ JAVÍTOTT: TEMPLATE DOWNLOAD - manuális audit log
+router.get("/templates/:id/download", requireAdmin, async (req, res) => {
+  const templateId = req.params.id;
+  
   try {
-    const templateId = req.params.id;
     console.log(`[DOWNLOAD] Request received for template ID: ${templateId}`);
 
     const template = await storage.getTemplate(templateId);
 
     if (!template) {
       console.error(`[DOWNLOAD] Error: Template not found with ID: ${templateId}`);
+      
+      await createManualAuditLog(
+        req,
+        'template.download',
+        'template',
+        templateId,
+        { reason: 'Template not found' },
+        'failure',
+        'Template not found'
+      );
+      
       return res.status(404).json({ message: "Template not found" });
     }
-    
-    // Az audit log számára eltároljuk a template adatait
-    (req as any).downloadedTemplate = template;
 
     const filePath = template.file_path;
     if (!filePath) {
-      console.error('[DOWNLOAD] Error: file_path is missing for this template.');
-      return res.status(500).json({ message: 'File path is missing for this template.' });
+      console.error('[DOWNLOAD] Error: file_path is missing');
+      return res.status(500).json({ message: 'File path is missing' });
     }
     
     const tempLocalPath = path.join(uploadDir, `download-${Date.now()}-${template.file_name}`);
     
-    console.log(`[DOWNLOAD] Attempting to download from storage path: ${filePath} to ${tempLocalPath}`);
+    console.log(`[DOWNLOAD] Downloading from storage: ${filePath}`);
     await supabaseStorage.downloadFile(filePath, tempLocalPath);
-    console.log(`[DOWNLOAD] File downloaded successfully to temp path.`);
+    console.log(`[DOWNLOAD] File downloaded successfully`);
+
+    // ✅ SIKER - Audit log (res.download ELŐTT!)
+    await createManualAuditLog(
+      req,
+      'template.download',
+      'template',
+      template.id,
+      { 
+        template_name: template.name,
+        file_name: template.file_name 
+      },
+      'success'
+    );
 
     res.download(tempLocalPath, template.file_name, (err) => {
       if (err) {
@@ -391,30 +416,29 @@ router.get("/templates/:id/download",
       
       fs.unlink(tempLocalPath, (unlinkErr) => {
         if (unlinkErr) console.error("Error deleting temp file:", unlinkErr);
-        else console.log(`✅ Cleaned up temporary file: ${tempLocalPath}`);
+        else console.log(`✅ Cleaned up temporary file`);
       });
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error during template download:", error);
+    
+    await createManualAuditLog(
+      req,
+      'template.download',
+      'template',
+      templateId,
+      { error: error.message },
+      'failure',
+      error.message
+    );
+    
     res.status(500).json({ message: "Failed to download template file." });
   }
 });
 
-// POST /api/admin/templates/upload - Új sablon feltöltése
-router.post("/templates/upload", 
-  requireAdmin, 
-  upload.single('file'),
-  auditLog('template.upload', {
-    resourceType: 'template',
-    getResourceId: (req) => (req as any).uploadedTemplateId,
-    getDetails: (req) => ({
-      template_name: req.body.name,
-      template_type: req.body.type,
-      file_name: req.file?.originalname
-    })
-  }),
-  async (req: any, res) => {
+// ✅ JAVÍTOTT: TEMPLATE UPLOAD - manuális audit log
+router.post("/templates/upload", requireAdmin, upload.single('file'), async (req: any, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded." });
@@ -424,31 +448,26 @@ router.post("/templates/upload",
     const { name, type, language } = req.body;
 
     if (!type) {
-      return res.status(400).json({ message: "Template 'type' ('unified' or 'protocol') is required." });
+      return res.status(400).json({ message: "Template 'type' required." });
     }
 
     const storagePath = `templates/${Date.now()}-${originalname}`;
     await supabaseStorage.uploadFile(tempPath, storagePath);
     console.log(`[Upload] File uploaded to Supabase at: ${storagePath}`);
 
-    const templateType = type;
-
     const newTemplate = await storage.createTemplate({
       name: name || originalname,
-      type: templateType,
+      type: type,
       language: language || 'multilingual',
       file_name: originalname,
       file_path: storagePath,
     });
     console.log(`[Upload] DB entry created for template ID: ${newTemplate.id}`);
-    
-    // Az audit log számára eltároljuk a template ID-t
-    (req as any).uploadedTemplateId = newTemplate.id;
 
-    if (templateType === 'unified' || templateType === 'questions') {
-      console.log(`Parsing questions for template of type "${templateType}"...`);
+    if (type === 'unified' || type === 'questions') {
+      console.log(`Parsing questions for template type "${type}"...`);
       const questions = await excelParserService.parseQuestionsFromExcel(tempPath);
-      console.log(`✅ Parsed ${questions.length} questions from template.`);
+      console.log(`✅ Parsed ${questions.length} questions`);
 
       for (const q of questions) {
         if (!q.questionId) {
@@ -464,13 +483,41 @@ router.post("/templates/upload",
         });
       }
     } else {
-      console.log(`Skipping question parsing for template of type "${templateType}".`);
+      console.log(`Skipping question parsing for type "${type}".`);
     }
+
+    // ✅ SIKER - Audit log
+    await createManualAuditLog(
+      req,
+      'template.upload',
+      'template',
+      newTemplate.id,
+      { 
+        template_name: name,
+        template_type: type,
+        file_name: originalname 
+      },
+      'success'
+    );
 
     res.status(201).json({ success: true, template: newTemplate });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("❌ Error uploading template:", error);
+    
+    await createManualAuditLog(
+      req,
+      'template.upload',
+      'template',
+      undefined,
+      { 
+        template_name: req.body.name,
+        error: error.message 
+      },
+      'failure',
+      error.message
+    );
+    
     res.status(500).json({ message: "Failed to upload template." });
   } finally {
     if (req.file && req.file.path) {
@@ -481,61 +528,84 @@ router.post("/templates/upload",
   }
 });
 
-// POST /api/admin/templates/:id/activate - Sablon aktiválása
-router.post("/templates/:id/activate", 
-  requireAdmin,
-  auditLog('template.activate', {
-    resourceType: 'template',
-    getDetails: (req) => {
-      const template = (req as any).activatedTemplate;
-      return template ? {
-        template_name: template.name,
-        template_type: template.type
-      } : undefined;
-    }
-  }),
-  async (req, res) => {
+// ✅ JAVÍTOTT: TEMPLATE ACTIVATE - manuális audit log
+router.post("/templates/:id/activate", requireAdmin, async (req, res) => {
+  const templateId = req.params.id;
+  
   try {
-    const template = await storage.getTemplate(req.params.id);
-    (req as any).activatedTemplate = template;
+    const template = await storage.getTemplate(templateId);
     
-    await storage.setActiveTemplate(req.params.id);
-
+    if (!template) {
+      await createManualAuditLog(
+        req,
+        'template.activate',
+        'template',
+        templateId,
+        { reason: 'Template not found' },
+        'failure',
+        'Template not found'
+      );
+      
+      return res.status(404).json({ message: "Template not found" });
+    }
+    
+    await storage.setActiveTemplate(templateId);
     hybridTemplateLoader.clearCache();
-    console.log('✅ Template cache cleared after activation.');
     clearQuestionsCache();
+    
+    // ✅ SIKER - Audit log
+    await createManualAuditLog(
+      req,
+      'template.activate',
+      'template',
+      template.id,
+      { 
+        template_name: template.name,
+        template_type: template.type 
+      },
+      'success'
+    );
+    
+    console.log('✅ Template activated and cache cleared');
     res.json({ success: true });
-  } catch (error) {
+    
+  } catch (error: any) {
     console.error("Error activating template:", error);
+    
+    await createManualAuditLog(
+      req,
+      'template.activate',
+      'template',
+      templateId,
+      { error: error.message },
+      'failure',
+      error.message
+    );
+    
     res.status(500).json({ message: "Failed to activate template" });
   }
 });
 
-// DELETE /api/admin/templates/:id - Sablon törlése
-router.delete("/templates/:id", 
-  requireAdmin,
-  auditLog('template.delete', {
-    resourceType: 'template',
-    getDetails: (req) => {
-      const template = (req as any).deletedTemplate;
-      return template ? {
-        template_name: template.name,
-        template_type: template.type,
-        file_name: template.file_name
-      } : undefined;
-    }
-  }),
-  async (req, res) => {
+// ✅ JAVÍTOTT: TEMPLATE DELETE - manuális audit log
+router.delete("/templates/:id", requireAdmin, async (req, res) => {
+  const templateId = req.params.id;
+  
   try {
-    const templateId = req.params.id;
     const template = await storage.getTemplate(templateId);
 
     if (!template) {
+      await createManualAuditLog(
+        req,
+        'template.delete',
+        'template',
+        templateId,
+        { reason: 'Template not found' },
+        'failure',
+        'Template not found'
+      );
+      
       return res.status(404).json({ message: "Template to delete not found." });
     }
-    
-    // Az audit log számára eltároljuk a template adatait
-    (req as any).deletedTemplate = template;
 
     await storage.deleteQuestionConfigsByTemplate(templateId);
 
@@ -545,9 +615,36 @@ router.delete("/templates/:id",
 
     await storage.deleteTemplate(templateId);
 
+    // ✅ SIKER - Audit log
+    await createManualAuditLog(
+      req,
+      'template.delete',
+      'template',
+      template.id,
+      { 
+        template_name: template.name,
+        template_type: template.type,
+        file_name: template.file_name 
+      },
+      'success'
+    );
+
+    console.log(`✅ Template ${templateId} deleted successfully`);
     res.json({ success: true });
-  } catch (error) {
+    
+  } catch (error: any) {
     console.error("Error deleting template:", error);
+    
+    await createManualAuditLog(
+      req,
+      'template.delete',
+      'template',
+      templateId,
+      { error: error.message },
+      'failure',
+      error.message
+    );
+    
     res.status(500).json({ message: "Failed to delete template" });
   }
 });

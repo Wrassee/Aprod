@@ -12,15 +12,21 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "./shared"),
     },
   },
-  // === EZ AZ ÚJ RÉSZ ===
+
+  // === JAVÍTOTT RÉSZ ===
+
+  // Beállítások a fejlesztői (dev) szerverhez
   server: {
-    // Engedélyezi a megadott Replit hostot
-    allowedHosts: [
-      'f812feab-a2a3-4e27-872f-1058f90528cb-00-n994xzkf5aps.kirk.replit.dev',
-    ],
-    // Ez a beállítás is gyakran szükséges Replitben,
-    // hogy a szerver elérhető legyen a preview ablakból:
-    host: true, // Vagy '0.0.0.0'
+    host: '0.0.0.0', // Vagy 'true'. Így fejlesztés közben is 0.0.0.0-n fut
+    port: 5000 // Opcionális, ha fix portot akarsz fejlesztés közben
   },
+
+  // Beállítások a production (preview) szerverhez
+  // EZ A LEGFONTOSABB A RENDER SZÁMÁRA!
+  preview: {
+    host: '0.0.0.0', // Ez mondja meg a ViteExpress-nek, hogy 0.0.0.0-n fusson
+    port: Number(process.env.PORT) || 5000 // Render ebből olvassa ki a portot
+  }
+
   // =====================
 });

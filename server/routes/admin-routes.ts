@@ -1,4 +1,4 @@
-// server/routes/admin-routes.ts - JAVÍTOTT VERZIÓ (USER hozzáférés engedélyezve: Settings, Logs, Templates)
+// server/routes/admin-routes.ts - JAVÍTOTT VERZIÓ (loadTemplate hívás javítva)
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
@@ -338,7 +338,7 @@ router.get("/templates/available", async (_req, res) => {
   }
 });
 
-// MÓDOSÍTVA: requireAdmin eltávolítva
+// ✅ JAVÍTÁS: loadTemplate hívás - mind a 4 paraméter átadása
 router.post("/templates/select", async (req, res) => {
   try {
     const { templateId, loadStrategy } = req.body;
@@ -347,7 +347,13 @@ router.post("/templates/select", async (req, res) => {
     }
     console.log(`📄 Selecting template: ${templateId} with strategy: ${loadStrategy || 'local_first'}`);
 
-    const templateResult = await hybridTemplateLoader.loadTemplate(templateId, "unified", "multilingual");
+    // ✅ JAVÍTÁS: Explicit módon átadjuk mind a 4 paramétert
+    const templateResult = await hybridTemplateLoader.loadTemplate(
+      templateId,           // 1. templateId (kötelező)
+      "unified",           // 2. type (opcionális, de átadjuk)
+      "multilingual",      // 3. language (opcionális, de átadjuk)
+      loadStrategy || 'local_first'  // 4. strategy (opcionális, de átadjuk)
+    );
 
     console.log(`✅ Template selection processed`);
     res.json({ success: true });

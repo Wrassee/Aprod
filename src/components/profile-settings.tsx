@@ -1,8 +1,9 @@
-// src/components/profile-settings.tsx - THEME AWARE VERSION
+// src/components/profile-settings.tsx - LOCALIZED & THEME AWARE VERSION
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
-import { useTheme } from '@/contexts/theme-context'; // ← ÚJ IMPORT
+import { useTheme } from '@/contexts/theme-context';
+import { useLanguageContext } from '@/components/language-provider'; // ← ÚJ IMPORT
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -14,7 +15,8 @@ import { Badge } from '@/components/ui/badge';
 export function ProfileSettings() {
   const { user, profile, refreshProfile, signOut, loading: authLoading, supabase } = useAuth();
   const { toast } = useToast();
-  const { theme } = useTheme(); // ← ÚJ HOOK
+  const { theme } = useTheme();
+  const { t, language } = useLanguageContext(); // ← ÚJ HOOK HASZNÁLAT
   const [loading, setLoading] = useState(false);
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   
@@ -39,8 +41,8 @@ export function ProfileSettings() {
   const handleSave = async () => {
     if (!user) {
       toast({
-        title: 'Hiba',
-        description: 'Nincs bejelentkezett felhasználó.',
+        title: t.error || 'Error',
+        description: t.Profile?.noUser || 'No user logged in.',
         variant: 'destructive',
       });
       return;
@@ -59,7 +61,7 @@ export function ProfileSettings() {
     try {
       if (!supabase) throw new Error("Supabase client not available");
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Nincs aktív session');
+      if (!session) throw new Error('No active session');
 
       const response = await fetch(url, {
         method: method,
@@ -72,20 +74,20 @@ export function ProfileSettings() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || `Sikertelen ${isCreating ? 'létrehozás' : 'frissítés'}`);
+        throw new Error(errorData.message || (isCreating ? t.Profile?.createFailed : t.Profile?.updateFailed) || 'Failed');
       }
 
       await refreshProfile();
 
       toast({
-        title: `Sikeres ${isCreating ? 'létrehozás' : 'mentés'}! ✅`,
-        description: `A profil adataid ${isCreating ? 'létrehozva' : 'frissítve'} lettek.`,
+        title: `${isCreating ? (t.Profile?.createSuccessTitle || 'Created!') : (t.Profile?.saveSuccessTitle || 'Saved!')} ✅`,
+        description: isCreating ? (t.Profile?.createSuccessDesc || 'Profile created.') : (t.Profile?.saveSuccessDesc || 'Profile updated.'),
       });
     } catch (error: any) {
       console.error('Profile save/create error:', error);
       toast({
-        title: isCreating ? 'Létrehozási hiba' : 'Frissítési hiba',
-        description: error.message || `Nem sikerült ${isCreating ? 'létrehozni' : 'frissíteni'} a profilt.`,
+        title: isCreating ? (t.Profile?.createErrorTitle || 'Creation Error') : (t.Profile?.saveErrorTitle || 'Update Error'),
+        description: error.message || (isCreating ? t.Profile?.createFailed : t.Profile?.updateFailed) || 'Failed to save profile.',
         variant: 'destructive',
       });
     } finally {
@@ -97,13 +99,13 @@ export function ProfileSettings() {
     try {
       await signOut();
       toast({
-        title: 'Sikeres kijelentkezés',
-        description: 'Viszlát! 👋',
+        title: t.Profile?.logoutSuccessTitle || 'Signed out successfully',
+        description: t.Profile?.logoutSuccessDesc || 'Goodbye! 👋',
       });
     } catch (error) {
       console.error("Failed to sign out:", error);
       toast({
-        title: 'Kijelentkezési hiba',
+        title: t.Profile?.logoutErrorTitle || 'Sign out error',
         variant: 'destructive',
       });
     }
@@ -115,7 +117,7 @@ export function ProfileSettings() {
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-300">Profil betöltése...</p>
+            <p className="text-gray-600 dark:text-gray-300">{t.Profile?.loading || 'Loading profile...'}</p>
           </div>
         </CardContent>
       </Card>
@@ -158,7 +160,7 @@ export function ProfileSettings() {
                 
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent mb-1">
-                    {currentProfile?.name || (isCreating ? 'Új Profil Létrehozása' : 'Felhasználó')}
+                    {currentProfile?.name || (isCreating ? (t.Profile?.createTitle || 'Create New Profile') : (t.Profile?.userRole || 'User'))}
                   </h2>
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
                     <Mail className="h-4 w-4" />
@@ -174,7 +176,7 @@ export function ProfileSettings() {
                     </Badge>
                     <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                       <Sparkles className="h-3 w-3 text-cyan-500" />
-                      <span>{isCreating ? 'Új profil' : 'Aktív'}</span>
+                      <span>{isCreating ? (t.Profile?.statusNew || 'New profile') : (t.Profile?.statusActive || 'Active')}</span>
                     </div>
                   </div>
                 </div>
@@ -205,7 +207,7 @@ export function ProfileSettings() {
                       </div>
                       
                       <span className={`text-white font-semibold transition-all duration-300 hidden sm:inline ${isHoveringLogout ? 'tracking-wider' : 'tracking-normal'}`}>
-                        Kijelentkezés
+                        {t.Profile?.logout || 'Sign out'}
                       </span>
                     </div>
                     
@@ -225,13 +227,13 @@ export function ProfileSettings() {
                 <User className="h-5 w-5" />
               </div>
               <span className="bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
-                {isCreating ? 'Profil Létrehozása' : 'Profil Szerkesztése'}
+                {isCreating ? (t.Profile?.createTitle || 'Create Profile') : (t.Profile?.editTitle || 'Edit Profile')}
               </span>
             </CardTitle>
             <CardDescription>
               {isCreating 
-                ? 'Hozd létre az első profilod az adatok megadásával'
-                : 'Add meg vagy frissítsd a profil adataidat'
+                ? (t.Profile?.createDesc || 'Create your first profile by entering your details')
+                : (t.Profile?.editDesc || 'Enter or update your profile details')
               }
             </CardDescription>
           </CardHeader>
@@ -241,13 +243,13 @@ export function ProfileSettings() {
               <div className="space-y-2">
                 <Label htmlFor="name" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <User className="h-4 w-4 text-blue-600" />
-                  Név
+                  {t.Profile?.nameLabel || 'Name'}
                 </Label>
                 <div className="relative group">
                   <Input
                     id="name"
                     data-testid="input-profile-name"
-                    placeholder="Teljes neved"
+                    placeholder={t.Profile?.namePlaceholder || 'Your full name'}
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
                     className="transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 pl-4 pr-10 group-hover:border-blue-300"
@@ -259,13 +261,13 @@ export function ProfileSettings() {
               <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <MapPin className="h-4 w-4 text-blue-600" />
-                  Cím
+                  {t.Profile?.addressLabel || 'Address'}
                 </Label>
                 <div className="relative group">
                   <Input
                     id="address"
                     data-testid="input-profile-address"
-                    placeholder="Utca, házszám, város"
+                    placeholder={t.Profile?.addressPlaceholder || 'Street, number, city'}
                     value={formData.address}
                     onChange={(e) => handleChange('address', e.target.value)}
                     className="transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 pl-4 pr-10 group-hover:border-blue-300"
@@ -277,7 +279,7 @@ export function ProfileSettings() {
               <div className="space-y-2">
                 <Label htmlFor="google_drive_folder_id" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <FolderOpen className="h-4 w-4 text-blue-600" />
-                  Google Drive Mappa ID
+                  {t.Profile?.driveLabel || 'Google Drive Folder ID'}
                 </Label>
                 <div className="relative group">
                   <Input
@@ -292,7 +294,7 @@ export function ProfileSettings() {
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                   <Sparkles className="h-3 w-3 text-cyan-500" />
-                  Az a mappa ID, ahova a protokollokat feltöltjük (opcionális).
+                  {t.Profile?.driveHelp || 'Folder ID where protocols will be uploaded (optional).'}
                 </p>
               </div>
             </div>
@@ -311,12 +313,12 @@ export function ProfileSettings() {
                   {loading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      {isCreating ? 'Létrehozás...' : 'Mentés...'}
+                      {isCreating ? (t.Profile?.creating || 'Creating...') : (t.Profile?.saving || 'Saving...')}
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4" />
-                      {isCreating ? 'Profil Létrehozása' : 'Profil Mentése'}
+                      {isCreating ? (t.Profile?.createBtn || 'Create Profile') : (t.Profile?.saveBtn || 'Save Profile')}
                     </>
                   )}
                 </span>
@@ -331,7 +333,7 @@ export function ProfileSettings() {
                 <div className="relative flex items-center gap-2 text-xs">
                   <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping absolute"></div>
                   <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                  <span className="text-amber-600 dark:text-amber-400 font-medium">Van mentetlen változtatás</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-medium">{t.Profile?.unsavedChanges || 'Unsaved changes'}</span>
                 </div>
               </div>
             )}
@@ -358,7 +360,7 @@ export function ProfileSettings() {
               
               <div>
                 <CardTitle className="text-gray-900 flex items-center gap-2">
-                  {currentProfile?.name || (isCreating ? 'Új Profil Létrehozása' : 'Felhasználó')}
+                  {currentProfile?.name || (isCreating ? (t.Profile?.createTitle || 'Create New Profile') : (t.Profile?.userRole || 'User'))}
                   {currentProfile?.role === 'admin' && (
                     <Badge className="bg-yellow-500 text-white">
                       <Crown className="h-3 w-3 mr-1" />
@@ -380,7 +382,7 @@ export function ProfileSettings() {
               className="border-red-500 text-red-600 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Kijelentkezés
+              {t.Profile?.logout || 'Sign out'}
             </Button>
           </div>
         </CardHeader>
@@ -389,13 +391,13 @@ export function ProfileSettings() {
           <div className="space-y-2">
             <Label htmlFor="name-classic" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              Név
+              {t.Profile?.nameLabel || 'Name'}
             </Label>
             <Input
               id="name-classic"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder="Teljes neved"
+              placeholder={t.Profile?.namePlaceholder || 'Your full name'}
               className="border-gray-300"
             />
           </div>
@@ -403,13 +405,13 @@ export function ProfileSettings() {
           <div className="space-y-2">
             <Label htmlFor="address-classic" className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
-              Cím
+              {t.Profile?.addressLabel || 'Address'}
             </Label>
             <Input
               id="address-classic"
               value={formData.address}
               onChange={(e) => handleChange('address', e.target.value)}
-              placeholder="Utca, házszám, város"
+              placeholder={t.Profile?.addressPlaceholder || 'Street, number, city'}
               className="border-gray-300"
             />
           </div>
@@ -417,7 +419,7 @@ export function ProfileSettings() {
           <div className="space-y-2">
             <Label htmlFor="drive-classic" className="flex items-center gap-2">
               <FolderOpen className="h-4 w-4" />
-              Google Drive Mappa ID
+              {t.Profile?.driveLabel || 'Google Drive Folder ID'}
             </Label>
             <Input
               id="drive-classic"
@@ -427,7 +429,7 @@ export function ProfileSettings() {
               className="border-gray-300"
             />
             <p className="text-xs text-gray-500">
-              Az a mappa ID, ahova a protokollokat feltöltjük (opcionális).
+              {t.Profile?.driveHelp || 'Folder ID where protocols will be uploaded (optional).'}
             </p>
           </div>
 
@@ -439,19 +441,19 @@ export function ProfileSettings() {
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {isCreating ? 'Létrehozás...' : 'Mentés...'}
+                {isCreating ? (t.Profile?.creating || 'Creating...') : (t.Profile?.saving || 'Saving...')}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                {isCreating ? 'Profil Létrehozása' : 'Profil Mentése'}
+                {isCreating ? (t.Profile?.createBtn || 'Create Profile') : (t.Profile?.saveBtn || 'Save Profile')}
               </>
             )}
           </Button>
 
           {hasChanges && !loading && !isCreating && (
             <p className="text-sm text-amber-600 text-center">
-              ⚠️ Van mentetlen változtatás
+              ⚠️ {t.Profile?.unsavedChanges || 'Unsaved changes'}
             </p>
           )}
         </CardContent>

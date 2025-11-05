@@ -1,3 +1,5 @@
+// src/lib/translations.ts - FRISSÍTETT VERZIÓ (Profile fordításokkal)
+
 // Interface definíciója - MEGHATÁROZZA A SZÜKSÉGES KULCSOKAT
 export interface Translation {
   // Start Screen
@@ -56,7 +58,7 @@ export interface Translation {
   printedName: string;
   signatureDate: string;
   
-  // ✅ JAVÍTÁS: Hiányzó Signature kulcsok hozzáadva az interfészhez
+  // Signature details
   signatureLastStep: string;
   signatureOptionalInfo: string;
   signatureNameAutoSave: string;
@@ -198,7 +200,43 @@ export interface Translation {
   downloadErrorList: string;
   question: string;
   
-  // --- FRISSÍTETT ADMIN NESTED STRUCTURE ---
+  // --- ÚJ: Profile fordítások (hozzáadva az interfészhez) ---
+  Profile: {
+    loading: string;
+    createTitle: string;
+    editTitle: string;
+    createDesc: string;
+    editDesc: string;
+    userRole: string;
+    statusNew: string;
+    statusActive: string;
+    logout: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    addressLabel: string;
+    addressPlaceholder: string;
+    driveLabel: string;
+    driveHelp: string;
+    createBtn: string;
+    saveBtn: string;
+    creating: string;
+    saving: string;
+    unsavedChanges: string;
+    noUser: string;
+    createFailed: string;
+    updateFailed: string;
+    createSuccessTitle: string;
+    createSuccessDesc: string;
+    saveSuccessTitle: string;
+    saveSuccessDesc: string;
+    createErrorTitle: string;
+    saveErrorTitle: string;
+    logoutSuccessTitle: string;
+    logoutSuccessDesc: string;
+    logoutErrorTitle: string;
+  };
+
+  // --- Admin NESTED STRUCTURE ---
   Admin: {
     tabs: {
       dashboard: string;
@@ -378,7 +416,7 @@ export const translations: Record<string, Translation> = {
     printedName: "Nyomtatott név (opcionális)",
     signatureDate: "Aláírás dátuma: ",
 
-    // ✅ JAVÍTÁS: Hiányzó HU kulcsok hozzáadva
+    // Signature details
     signatureLastStep: "Utolsó lépés: Aláírás",
     signatureOptionalInfo: "Az aláírás opcionális - a protokoll név nélkül is befejezhető",
     signatureNameAutoSave: "A név automatikusan mentésre kerül",
@@ -517,8 +555,44 @@ export const translations: Record<string, Translation> = {
     viewErrors: "Hibák megtekintése",
     downloadErrorList: "Hibalista letöltése",
     question: "Kérdés",
+
+    // --- ÚJ: Profile fordítások (magyar) ---
+    Profile: {
+      loading: "Profil betöltése...",
+      createTitle: "Új Profil Létrehozása",
+      editTitle: "Profil Szerkesztése",
+      createDesc: "Hozd létre az első profilod az adatok megadásával",
+      editDesc: "Add meg vagy frissítsd a profil adataidat",
+      userRole: "Felhasználó",
+      statusNew: "Új profil",
+      statusActive: "Aktív",
+      logout: "Kijelentkezés",
+      nameLabel: "Név",
+      namePlaceholder: "Teljes neved",
+      addressLabel: "Cím",
+      addressPlaceholder: "Utca, házszám, város",
+      driveLabel: "Google Drive Mappa ID",
+      driveHelp: "Az a mappa ID, ahova a protokollokat feltöltjük (opcionális).",
+      createBtn: "Profil Létrehozása",
+      saveBtn: "Profil Mentése",
+      creating: "Létrehozás...",
+      saving: "Mentés...",
+      unsavedChanges: "Van mentetlen változtatás",
+      noUser: "Nincs bejelentkezett felhasználó.",
+      createFailed: "Sikertelen létrehozás",
+      updateFailed: "Sikertelen frissítés",
+      createSuccessTitle: "Sikeres létrehozás!",
+      createSuccessDesc: "A profil adataid létre lettek hozva.",
+      saveSuccessTitle: "Sikeres mentés!",
+      saveSuccessDesc: "A profil adataid frissítve lettek.",
+      createErrorTitle: "Létrehozási hiba",
+      saveErrorTitle: "Frissítési hiba",
+      logoutSuccessTitle: "Sikeres kijelentkezés",
+      logoutSuccessDesc: "Viszlát! 👋",
+      logoutErrorTitle: "Kijelentkezési hiba"
+    },
     
-    // --- ÚJ: ADMIN NESTED STRUCTURE ---
+    // Admin NESTED STRUCTURE
     Admin: {
       tabs: {
         dashboard: "Dashboard",
@@ -696,7 +770,7 @@ export const translations: Record<string, Translation> = {
     printedName: "Gedruckter Name (optional)",
     signatureDate: "Unterschriftsdatum: ",
 
-    // ✅ JAVÍTÁS: Hiányzó DE kulcsok és fordítások hozzáadva
+    // Signature details
     signatureLastStep: "Letzter Schritt: Unterschrift",
     signatureOptionalInfo: "Die Unterschrift ist optional – das Protokoll kann auch ohne Namen abgeschlossen werden",
     signatureNameAutoSave: "Der Name wird automatisch gespeichert",
@@ -803,7 +877,6 @@ export const translations: Record<string, Translation> = {
     passwordLabel: "Passwort",
     loginButton: "Anmelden",
     registerButton: "Registrieren",
-    // ✅ JAVÍTÁS: Eltévedt 'G' karakter eltávolítva
     switchToRegister: "Noch kein Konto? Registrieren!",
     switchToLogin: "Haben Sie bereits ein Konto? Anmelden!",
     missingData: "Fehlende Daten",
@@ -837,7 +910,43 @@ export const translations: Record<string, Translation> = {
     downloadErrorList: "Fehlerliste herunterladen",
     question: "Frage",
     
-    // --- ÚJ: ADMIN NESTED STRUCTURE ---
+    // --- ÚJ: Profile fordítások (német) ---
+    Profile: {
+      loading: "Profil wird geladen...",
+      createTitle: "Neues Profil erstellen",
+      editTitle: "Profil bearbeiten",
+      createDesc: "Erstellen Sie Ihr erstes Profil, indem Sie Ihre Daten eingeben",
+      editDesc: "Geben Sie Ihre Profildaten ein oder aktualisieren Sie sie",
+      userRole: "Benutzer",
+      statusNew: "Neues Profil",
+      statusActive: "Aktiv",
+      logout: "Abmelden",
+      nameLabel: "Name",
+      namePlaceholder: "Ihr vollständiger Name",
+      addressLabel: "Adresse",
+      addressPlaceholder: "Straße, Hausnummer, Stadt",
+      driveLabel: "Google Drive Ordner-ID",
+      driveHelp: "Die Ordner-ID, in den die Protokolle hochgeladen werden (optional).",
+      createBtn: "Profil erstellen",
+      saveBtn: "Profil speichern",
+      creating: "Wird erstellt...",
+      saving: "Wird gespeichert...",
+      unsavedChanges: "Ungespeicherte Änderungen",
+      noUser: "Kein Benutzer angemeldet.",
+      createFailed: "Erstellung fehlgeschlagen",
+      updateFailed: "Aktualisierung fehlgeschlagen",
+      createSuccessTitle: "Erfolgreich erstellt!",
+      createSuccessDesc: "Ihre Profildaten wurden erstellt.",
+      saveSuccessTitle: "Erfolgreich gespeichert!",
+      saveSuccessDesc: "Ihre Profildaten wurden aktualisiert.",
+      createErrorTitle: "Fehler bei der Erstellung",
+      saveErrorTitle: "Fehler bei der Aktualisierung",
+      logoutSuccessTitle: "Erfolgreich abgemeldet",
+      logoutSuccessDesc: "Auf Wiedersehen! 👋",
+      logoutErrorTitle: "Fehler bei der Abmeldung"
+    },
+
+    // Admin NESTED STRUCTURE
     Admin: {
       tabs: {
         dashboard: "Dashboard",
@@ -959,4 +1068,3 @@ export const translations: Record<string, Translation> = {
     }
   },
 };
-

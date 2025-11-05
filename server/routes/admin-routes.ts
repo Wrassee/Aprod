@@ -1,4 +1,4 @@
-// server/routes/admin-routes.ts - JAVÍTOTT VERZIÓ (manuális audit log)
+// server/routes/admin-routes.ts - JAVÍTOTT VERZIÓ (USER hozzáférés engedélyezve: Settings, Logs, Templates)
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
@@ -9,7 +9,7 @@ import { excelParserService } from '../services/excel-parser.js';
 import { hybridTemplateLoader } from '../services/hybrid-template-loader.js';
 import { clearQuestionsCache } from '../routes.js';
 import { requireAdmin } from '../middleware/auth.js';
-import { createManualAuditLog } from '../middleware/audit-logger.js'; // ✅ MANUÁLIS AUDIT LOG
+import { createManualAuditLog } from '../middleware/audit-logger.js';
 import { db } from '../db.js';
 import { sql } from 'drizzle-orm';
 
@@ -25,7 +25,8 @@ const upload = multer({ dest: uploadDir });
 //          SYSTEM SETTINGS & MANAGEMENT
 // ===============================================
 
-router.get('/system/info', requireAdmin, async (_req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva, hogy a USER is lássa
+router.get('/system/info', async (_req, res) => {
   try {
     console.log('ℹ️ Fetching system information...');
     
@@ -86,6 +87,7 @@ function formatUptime(seconds: number): string {
 //          ADMIN & AUDIT LOGS
 // ===============================================
 
+// MARADT: requireAdmin (Dashboard csak adminnak)
 router.get('/stats', requireAdmin, async (_req, res) => {
   try {
     console.log('📊 Fetching admin dashboard statistics...');
@@ -112,7 +114,8 @@ router.get('/stats', requireAdmin, async (_req, res) => {
   }
 });
 
-router.get('/audit-logs', requireAdmin, async (req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva, hogy a USER is lássa a naplót
+router.get('/audit-logs', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
     console.log(`📜 Fetching audit logs (limit: ${limit})...`);
@@ -129,6 +132,7 @@ router.get('/audit-logs', requireAdmin, async (req, res) => {
 //          USER MANAGEMENT
 // ===============================================
 
+// MARADT: requireAdmin (Felhasználókezelés csak adminnak)
 router.get('/users', requireAdmin, async (_req, res) => {
   try {
     console.log('📋 Fetching all user profiles...');
@@ -141,7 +145,7 @@ router.get('/users', requireAdmin, async (_req, res) => {
   }
 });
 
-// ✅ JAVÍTOTT: USER DELETE - manuális audit log
+// MARADT: requireAdmin (Felhasználó törlés csak adminnak)
 router.delete('/users/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   const adminPerformingAction = (req as any).user;
@@ -217,6 +221,7 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
 //          PROTOCOL MANAGEMENT
 // ===============================================
 
+// MARADT: requireAdmin (a kérésben nem szerepelt ennek a megnyitása)
 router.get('/protocols', requireAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
@@ -241,6 +246,7 @@ router.get('/protocols', requireAdmin, async (req, res) => {
   }
 });
 
+// MARADT: requireAdmin
 router.get('/protocols/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
@@ -260,7 +266,7 @@ router.get('/protocols/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// ✅ JAVÍTOTT: PROTOCOL DELETE - manuális audit log
+// MARADT: requireAdmin
 router.delete('/protocols/:id', requireAdmin, async (req, res) => {
   const { id } = req.params;
   
@@ -317,7 +323,8 @@ router.delete('/protocols/:id', requireAdmin, async (req, res) => {
 //          TEMPLATE MANAGEMENT
 // ===============================================
 
-router.get("/templates/available", requireAdmin, async (_req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva
+router.get("/templates/available", async (_req, res) => {
   try {
     const allTemplates = await hybridTemplateLoader.getAllAvailableTemplates();
     const activeTemplate = await storage.getActiveTemplate('unified', 'multilingual');
@@ -331,7 +338,8 @@ router.get("/templates/available", requireAdmin, async (_req, res) => {
   }
 });
 
-router.post("/templates/select", requireAdmin, async (req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva
+router.post("/templates/select", async (req, res) => {
   try {
     const { templateId, loadStrategy } = req.body;
     if (!templateId) {
@@ -349,7 +357,8 @@ router.post("/templates/select", requireAdmin, async (req, res) => {
   }
 });
 
-router.get("/templates", requireAdmin, async (_req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva
+router.get("/templates", async (_req, res) => {
   try {
     const templates = await storage.getAllTemplates();
     res.json(templates);
@@ -359,8 +368,8 @@ router.get("/templates", requireAdmin, async (_req, res) => {
   }
 });
 
-// ✅ JAVÍTOTT: TEMPLATE DOWNLOAD - manuális audit log
-router.get("/templates/:id/download", requireAdmin, async (req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva
+router.get("/templates/:id/download", async (req, res) => {
   const templateId = req.params.id;
   
   try {
@@ -437,8 +446,8 @@ router.get("/templates/:id/download", requireAdmin, async (req, res) => {
   }
 });
 
-// ✅ JAVÍTOTT: TEMPLATE UPLOAD - manuális audit log
-router.post("/templates/upload", requireAdmin, upload.single('file'), async (req: any, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva
+router.post("/templates/upload", upload.single('file'), async (req: any, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded." });
@@ -528,8 +537,8 @@ router.post("/templates/upload", requireAdmin, upload.single('file'), async (req
   }
 });
 
-// ✅ JAVÍTOTT: TEMPLATE ACTIVATE - manuális audit log
-router.post("/templates/:id/activate", requireAdmin, async (req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva
+router.post("/templates/:id/activate", async (req, res) => {
   const templateId = req.params.id;
   
   try {
@@ -586,8 +595,8 @@ router.post("/templates/:id/activate", requireAdmin, async (req, res) => {
   }
 });
 
-// ✅ JAVÍTOTT: TEMPLATE DELETE - manuális audit log
-router.delete("/templates/:id", requireAdmin, async (req, res) => {
+// MÓDOSÍTVA: requireAdmin eltávolítva
+router.delete("/templates/:id", async (req, res) => {
   const templateId = req.params.id;
   
   try {

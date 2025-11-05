@@ -33,10 +33,18 @@ import { eq, and, desc, sql } from "drizzle-orm"; // Drizzle helpers + sql for a
 export interface IStorage {
   /* ---------- Protocols ---------- */
   getProtocol(id: string): Promise<Protocol | undefined>;
+  // ✅ JAVÍTÁS: Új, lapozható getProtocols függvény
+  getProtocols(options: { 
+    userId: string; 
+    page: number; 
+    limit: number; 
+    offset: number; 
+  }): Promise<{ items: Protocol[]; total: number; }>;
   createProtocol(protocol: InsertProtocol): Promise<Protocol>;
   updateProtocol(id: string, updates: Partial<Protocol>): Promise<Protocol | undefined>;
   getAllProtocols(): Promise<Protocol[]>;
-  deleteProtocol(id: string): Promise<boolean>;
+  // ✅ JAVÍTÁS: A deleteProtocol már a user_id-t is kéri a biztonságos törléshez
+  deleteProtocol(id: string, userId: string): Promise<boolean>;
 
   /* ---------- Templates ---------- */
   getTemplate(id: string): Promise<Template | undefined>;
@@ -91,6 +99,53 @@ export class DatabaseStorage implements IStorage {
     return protocol ?? undefined;
   }
 
+  // ✅ =========================================================
+  // === 1. JAVÍTÁS: A HIÁNYZÓ `getProtocols` FÜGGVÉNY HOZZÁADÁSA
+  // === (A protocol-mapping.ts hívja meg)
+  // =========================================================
+  /**
+   * Lekérdezi egy adott felhasználó protokolljait lapozva.
+   * @param options - userId, page, limit, offset
+   * @returns Promise<{ items: Protocol[], total: number }>
+   */
+  async getProtocols(options: { 
+    userId: string; 
+    page: number; 
+    limit: number; 
+    offset: number; 
+  }): Promise<{ items: Protocol[]; total: number; }> {
+    
+    try {
+      console.log(`🗄️ Storage: Fetching protocols for user ${options.userId} (Limit: ${options.limit}, Offset: ${options.offset})`);
+      
+      const whereClause = eq(protocols.user_id, options.userId);
+
+      // 1. Lekérjük az adott oldal elemeit
+      const items = await (db as any)
+        .select()
+        .from(protocols)
+        .where(whereClause)
+        .orderBy(desc(protocols.created_at))
+        .limit(options.limit)
+        .offset(options.offset);
+
+      // 2. Lekérjük a teljes darabszámot (ugyanazzal a szűréssel)
+      const [totalResult] = await (db as any)
+        .select({ count: sql<number>`count(*)` })
+        .from(protocols)
+        .where(whereClause);
+      
+      const total = Number(totalResult?.count || 0);
+
+      console.log(`✅ Storage: Found ${items.length} items (Total: ${total})`);
+      return { items, total };
+
+    } catch (error) {
+      console.error('❌ Error in storage.getProtocols:', error);
+      return { items: [], total: 0 };
+    }
+  }
+
   async createProtocol(protocol: InsertProtocol) {
     const [created] = await (db as any).insert(protocols).values(protocol).returning();
     return created;
@@ -109,31 +164,44 @@ export class DatabaseStorage implements IStorage {
     return await (db as any).select().from(protocols).orderBy(desc(protocols.created_at));
   }
 
+  // ✅ =========================================================
+  // === 2. JAVÍTÁS: `deleteProtocol` BIZTONSÁGOSSÁ TÉTELE
+  // === (A protocol-mapping.ts hívja meg)
+  // =========================================================
   /**
- * Egy protokoll törlése az adatbázisból.
- * @param id - A törlendő protokoll azonosítója
- * @returns Promise<boolean> - true, ha sikeres a törlés
- */
-async deleteProtocol(id: string): Promise<boolean> {
-  try {
-    console.log(`🗑️ Attempting to delete protocol: ${id}`);
-    const result = await (db as any)
-      .delete(protocols)
-      .where(eq(protocols.id, id))
-      .returning();
-    
-    const success = result.length > 0;
-    if (success) {
-      console.log(`✅ Protocol ${id} deleted successfully`);
-    } else {
-      console.warn(`⚠️ No protocol found with ID: ${id}`);
+  * Egy protokollt töröl, de csak akkor, ha a user_id egyezik.
+  * @param id - A törlendő protokoll azonosítója
+  * @param userId - A felhasználó (tulajdonos) azonosítója
+  * @returns Promise<boolean> - true, ha sikeres a törlés
+  */
+  async deleteProtocol(id: string, userId: string): Promise<boolean> {
+    try {
+      console.log(`🗑️ Attempting to delete protocol: ${id} by user: ${userId}`);
+      
+      // Biztonsági ellenőrzés: Csak a saját protokollját törölhesse
+      const whereClause = and(
+        eq(protocols.id, id),
+        eq(protocols.user_id, userId)
+      );
+
+      const result = await (db as any)
+        .delete(protocols)
+        .where(whereClause) // Csak ott töröl, ahol az ID ÉS a user_id is egyezik
+        .returning();
+      
+      const success = result.length > 0;
+      if (success) {
+        console.log(`✅ Protocol ${id} deleted successfully by user ${userId}`);
+      } else {
+        console.warn(`⚠️ No protocol found with ID: ${id} owned by user: ${userId}`);
+      }
+      return success;
+    } catch (error) {
+      console.error(`❌ Error deleting protocol ${id}:`, error);
+      return false;
     }
-    return success;
-  } catch (error) {
-    console.error(`❌ Error deleting protocol ${id}:`, error);
-    return false;
   }
-}
+
   /* ---------- Templates ---------- */
   async getTemplate(id: string) {
     const [tpl] = await (db as any).select().from(templates).where(eq(templates.id, id));
@@ -161,7 +229,7 @@ async deleteProtocol(id: string): Promise<boolean> {
   async getActiveTemplate(type: string, language: string) {
     console.log(`🔍 Looking for active template – type=${type}, language=${language}`);
     
-    const isActiveCondition = eq(templates.is_active, 1);
+    const isActiveCondition = eq(templates.is_active, true);
   
     let [tpl] = await (db as any)
       .select()
@@ -251,7 +319,7 @@ async deleteProtocol(id: string): Promise<boolean> {
       // 1. ÁLTALÁNOS: Automatikus snake_case -> camelCase konverzió minden mezőre
       for (const key in newConfig) {
         if (key.includes('_')) {
-          const camelCaseKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+          const camelCaseKey = key.replace(/_([a-z])/g, (g: string) => g[1].toUpperCase());
           // Csak akkor hozzuk létre, ha még nem létezik
           if (!(camelCaseKey in newConfig)) {
             newConfig[camelCaseKey] = newConfig[key];
@@ -438,7 +506,7 @@ async deleteProtocol(id: string): Promise<boolean> {
       const [result] = await (db as any)
         .select({ count: sql<number>`count(*)` })
         .from(templates)
-        .where(eq(templates.is_active, 1)); // Csak az aktívakat számoljuk
+        .where(eq(templates.is_active, true)); // Csak az aktívakat számoljuk
       
       const count = Number(result?.count || 0);
       console.log(`✅ Active templates: ${count}`);

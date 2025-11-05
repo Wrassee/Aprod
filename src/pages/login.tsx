@@ -154,7 +154,7 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
   };
 
   // -------------------------
-  // |    MODERN OTIS TÉMA   |
+  // |   MODERN OTIS TÉMA    |
   // -------------------------
   if (theme === 'modern') {
     return (
@@ -164,7 +164,9 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
         <div className="relative z-10 w-full max-w-md">
-          {/* Back to Home Button */}
+          
+          {/* Back to Home Button - KISZEDVE A KÉRÉS ALAPJÁN */}
+          {/*
           {onBackToHome && (
             <button
               onClick={onBackToHome}
@@ -174,6 +176,7 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
               <span className="text-sm font-medium">Vissza a főoldalra</span>
             </button>
           )}
+          */}
 
           {/* 🎨 MODERN LOGIN CARD */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-2xl">
@@ -184,7 +187,7 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
                 {/* Logo - Clickable */}
                 <div className="flex justify-center">
                   <button
-                    onClick={onBackToHome}
+                    onClick={onBackToHome} // A funkció megmarad a logón
                     className="group relative"
                     data-testid="button-home-logo"
                   >
@@ -332,7 +335,7 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
   }
 
   // -------------------------
-  // |     CLASSIC TÉMA      |
+  // |   CLASSIC TÉMA        |
   // -------------------------
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 dark:from-gray-900 dark:to-gray-800 p-4">
@@ -446,3 +449,4 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
     </div>
   );
 }
+

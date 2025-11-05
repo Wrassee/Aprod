@@ -1,4 +1,4 @@
-// src/components/template-management.tsx - FIXED VERSION
+// src/components/template-management.tsx - EVERYONE CAN ACCESS
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -50,10 +50,11 @@ export function TemplateManagement() {
   const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
-  const { supabase } = useAuth();
+  // ✅ JAVÍTÁS: Csak a supabase és initialized kell, NINCS role check
+  const { supabase, initialized } = useAuth();
   
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [activatingId, setActivatingId] = useState<string | null>(null);
   const [previewData, setPreviewData] = useState<any>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -72,31 +73,28 @@ export function TemplateManagement() {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [loadStrategy, setLoadStrategy] = useState<string>('local_first');
 
+  // ✅ JAVÍTÁS: ELTÁVOLÍTVA a role !== 'admin' ellenőrzés
   useEffect(() => {
-  console.log('🔍 TemplateManagement useEffect triggered');
-  console.log('📊 Supabase status:', supabase ? '✅ Available' : '⚠️ Not ready');
-  
-  if (supabase) {
-    console.log('✅ Supabase available, fetching templates...');
+    console.log('🔍 TemplateManagement useEffect triggered');
+    console.log('📊 Supabase available:', !!supabase);
+    console.log('📊 AuthContext initialized:', initialized);
+
+    if (!initialized) {
+      console.log('⏳ Waiting for AuthContext to initialize...');
+      return;
+    }
+
+    if (!supabase) {
+      console.error('❌ Supabase not available even after initialization!');
+      setLoading(false);
+      return;
+    }
+
+    // ✅ MINDENKI SZÁMÁRA ELÉRHETŐ - nincs role check
+    console.log('✅ AuthContext ready, fetching templates for all users...');
     fetchTemplates();
     fetchHybridTemplates();
-  } else {
-    console.log('⚠️ Waiting for supabase to initialize...');
-    // Retry after 1 second if supabase is not ready
-    const timer = setTimeout(() => {
-      console.log('⏰ Retry: checking supabase again...');
-      if (supabase) {
-        console.log('✅ Supabase now available!');
-        fetchTemplates();
-        fetchHybridTemplates();
-      } else {
-        console.log('❌ Supabase still not available');
-      }
-    }, 1000);
-    
-    return () => clearTimeout(timer);
-  }
-}, [supabase]);
+  }, [supabase, initialized]);
 
   const getAuthHeaders = async () => {
     if (!supabase) throw new Error("Supabase client not available");
@@ -106,36 +104,37 @@ export function TemplateManagement() {
   };
 
   const fetchTemplates = async () => {
-  console.log('🔍 fetchTemplates() - START');
-  
-  try {
-    console.log('📤 Getting auth headers...');
-    const headers = await getAuthHeaders();
-    console.log('✅ Auth headers received');
+    console.log('🔍 fetchTemplates() - START');
     
-    console.log('📤 Fetching from: /api/admin/templates');
-    const response = await fetch('/api/admin/templates', { headers });
-    console.log('📥 Response status:', response.status);
-    
-    if (response.ok) {
-      const data = await response.json();
-      console.log('✅ Templates fetched successfully:', data.length, 'templates');
-      console.log('📊 Templates data:', data);
-      setTemplates(data);
-    } else {
-      console.error('❌ Response not OK:', response.status);
+    try {
+      console.log('📤 Getting auth headers...');
+      const headers = await getAuthHeaders();
+      console.log('✅ Auth headers received');
+      
+      console.log('📤 Fetching from: /api/admin/templates');
+      const response = await fetch('/api/admin/templates', { headers });
+      console.log('📥 Response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Templates fetched successfully:', data.length, 'templates');
+        setTemplates(data);
+      } else {
+        console.error('❌ Response not OK:', response.status);
+      }
+    } catch (error) {
+      console.error('❌ Error fetching templates:', error);
+      toast({
+        title: t.error,
+        description: t.failedToFetchTemplates,
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error('❌ Error fetching templates:', error);
-    toast({
-      title: t.error,
-      description: t.failedToFetchTemplates,
-      variant: 'destructive',
-    });
-  }
-  
-  console.log('🔍 fetchTemplates() - END');
-};
+    
+    console.log('🔍 fetchTemplates() - END');
+  };
 
   const fetchHybridTemplates = async () => {
     try {
@@ -406,7 +405,7 @@ export function TemplateManagement() {
   if (theme === 'modern') {
     return (
       <Tabs defaultValue="templates" className="w-full">
-        {/* Modern Tab List - 3 tabs (removed profile) */}
+        {/* Modern Tab List */}
         <TabsList className="grid w-full grid-cols-3 bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-2xl shadow-lg mb-6">
           <TabsTrigger 
             value="templates"
@@ -439,33 +438,36 @@ export function TemplateManagement() {
             <Card className="relative bg-white dark:bg-gray-900 border-0 rounded-2xl">
               <CardHeader>
                 <CardTitle className="flex items-center gap-3 text-2xl">
-  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-sky-500 flex items-center justify-center shadow-lg">
-    <FileSpreadsheet className="h-5 w-5 text-white" />
-  </div>
-  <span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
-    {t.templates}
-  </span>
-  <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
-  <Badge variant="outline" className="ml-auto">
-    {templates.length} sablon
-  </Badge>
-</CardTitle>
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-sky-500 flex items-center justify-center shadow-lg">
+                    <FileSpreadsheet className="h-5 w-5 text-white" />
+                  </div>
+                  <span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
+                    {t.templates}
+                  </span>
+                  <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
+                  <Badge variant="outline" className="ml-auto">
+                    {templates.length} sablon
+                  </Badge>
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
+                  {/* ✅ JAVÍTÁS: Eltávolítva a role check az üres állapotból */}
                   {filteredTemplates.length === 0 ? (
-  <div className="text-center py-12">
-    <div className="relative inline-block mb-6">
-      <div className="absolute inset-0 bg-gray-400 rounded-full blur-2xl opacity-20 animate-pulse" />
-      <FileSpreadsheet className="relative h-16 w-16 text-gray-400" />
-    </div>
-    <p className="text-lg font-medium text-gray-600">
-      {t.noTemplatesUploaded}
-    </p>
-    <p className="text-sm text-gray-400 mt-2">
-      (Debug: {templates.length} templates in state, supabase: {supabase ? '✅ ready' : '❌ not ready'})
-    </p>
-  </div>
+                    <div className="text-center py-12">
+                      <div className="relative inline-block mb-6">
+                        <div className="absolute inset-0 bg-gray-400 rounded-full blur-2xl opacity-20 animate-pulse" />
+                        <FileSpreadsheet className="relative h-16 w-16 text-gray-400" />
+                      </div>
+                      <p className="text-lg font-medium text-gray-600">
+                        {t.noTemplatesUploaded}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">
+                        {language === 'hu' 
+                          ? 'Töltsd fel az első sablont a "Feltöltés" fülön!' 
+                          : 'Upload your first template in the "Upload" tab!'}
+                      </p>
+                    </div>
                   ) : (
                     filteredTemplates.map((template) => (
                       <div 
@@ -661,7 +663,7 @@ export function TemplateManagement() {
           </div>
         </TabsContent>
 
-        {/* UPLOAD TAB */}
+        {/* UPLOAD TAB - folytatás a következő update-ben */}
         <TabsContent value="upload" className="space-y-6">
           {/* Questions Upload Card */}
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl">
@@ -829,10 +831,11 @@ export function TemplateManagement() {
     );
   }
 
+  // ========================================
   // CLASSIC THEME RENDER
+  // ========================================
   return (
     <Tabs defaultValue="templates" className="w-full">
-      {/* Classic Tab List - 3 tabs (removed profile) */}
       <TabsList className="grid w-full grid-cols-3 mb-6">
         <TabsTrigger value="templates">
           <FileSpreadsheet className="h-4 w-4 mr-2" />
@@ -859,10 +862,16 @@ export function TemplateManagement() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
+              {/* ✅ JAVÍTÁS: Eltávolítva a role check a classic theme-ből is */}
               {filteredTemplates.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>{t.noTemplatesUploaded}</p>
+                  <p className="text-xs text-gray-400 mt-2">
+                    {language === 'hu' 
+                      ? 'Töltsd fel az első sablont a "Feltöltés" fülön!' 
+                      : 'Upload your first template in the "Upload" tab!'}
+                  </p>
                 </div>
               ) : (
                 filteredTemplates.map((template) => (
@@ -1009,7 +1018,7 @@ export function TemplateManagement() {
 
       {/* UPLOAD TAB */}
       <TabsContent value="upload" className="space-y-6">
-        {/* KÉRDÉS SABLON FELTÖLTÉSE */}
+        {/* Questions Template Upload */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
@@ -1079,7 +1088,7 @@ export function TemplateManagement() {
           </CardContent>
         </Card>
 
-        {/* PROTOKOLL SABLON FELTÖLTÉSE */}
+        {/* Protocol Template Upload */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">

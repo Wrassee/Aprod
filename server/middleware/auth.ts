@@ -1,4 +1,4 @@
-// server/middleware/auth.ts
+// server/middleware/auth.ts - JAVÍTOTT VERZIÓ (Automatikus role szinkronizációval)
 import { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { storage } from '../storage.js';
@@ -22,7 +22,8 @@ console.log('✅ Supabase Admin Client initialized with service role key');
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 /**
- * Middleware to verify Supabase JWT token and attach user to request
+ * Middleware to verify Supabase JWT token, attach user to request,
+ * AND synchronize local profile role with Supabase role.
  */
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
@@ -46,8 +47,36 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       });
     }
 
-    // Attach user to request object
-    (req as any).user = user;
+    // === AUTOMATIKUS SZINKRONIZÁCIÓ KEZDETE ===
+    // 1. Supabase role lekérése az app_metadata-ból
+    const supabaseRole = user.app_metadata?.role || 'user';
+
+    // 2. Helyi profil lekérése
+    let localProfile = await storage.getProfileByUserId(user.id);
+
+    // 3. Ha nincs helyi profil, létrehozzuk a helyes role-lal
+    if (!localProfile) {
+      console.log(`🔄 Creating missing local profile for ${user.id} with role: ${supabaseRole}`);
+      localProfile = await storage.createProfile({
+        user_id: user.id,
+        email: user.email!,
+        role: supabaseRole,
+        name: user.user_metadata?.full_name || user.email?.split('@')[0],
+      });
+    }
+    // 4. Ha van helyi profil, de a role eltér, frissítjük
+    else if (localProfile.role !== supabaseRole) {
+       console.log(`🔄 Syncing role for ${user.id}: local=${localProfile.role} -> supabase=${supabaseRole}`);
+       // Frissítjük a profilt és megvárjuk az eredményt
+       const updatedProfile = await storage.updateProfile(user.id, { role: supabaseRole });
+       if (updatedProfile) {
+         localProfile = updatedProfile; // Használjuk a frissített profilt
+       }
+    }
+    // === AUTOMATIKUS SZINKRONIZÁCIÓ VÉGE ===
+
+    // Attach validated (and synced) user profile to request object
+    (req as any).user = localProfile || user;
     next();
   } catch (error) {
     console.error('❌ Auth middleware error:', error);
@@ -64,6 +93,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 export async function requireOwnerOrAdmin(req: Request, res: Response, next: NextFunction) {
   try {
     const requestedUserId = req.params.userId;
+    // Itt már a requireAuth által beállított, szinkronizált user van
     const authenticatedUser = (req as any).user;
     
     if (!authenticatedUser) {
@@ -73,15 +103,16 @@ export async function requireOwnerOrAdmin(req: Request, res: Response, next: Nex
     }
 
     // Allow if user is accessing their own profile
-    if (authenticatedUser.id === requestedUserId) {
+    // Figyelem: a localProfile-ban 'user_id' van, a nyers Supabase userben 'id'
+    const currentUserId = authenticatedUser.user_id || authenticatedUser.id;
+
+    if (currentUserId === requestedUserId) {
       return next();
     }
 
-    // Check if user has admin role
-    const profile = await storage.getProfileByUserId(authenticatedUser.id);
-    
-    if (profile && profile.role === 'admin') {
-      console.log('✅ Admin access granted for user:', authenticatedUser.id);
+    // Check if user has admin role (már szinkronizálva van)
+    if (authenticatedUser.role === 'admin') {
+      console.log('✅ Admin access granted for user:', currentUserId);
       return next();
     }
 
@@ -98,37 +129,24 @@ export async function requireOwnerOrAdmin(req: Request, res: Response, next: Nex
 }
 
 /**
- * --- ÚJ MIDDLEWARE ---
  * Middleware to ensure only admin users can access certain routes
  * This should be used AFTER requireAuth middleware
  */
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
   const authenticatedUser = (req as any).user;
 
-  // Először ellenőrizzük, hogy van-e bejelentkezett felhasználó
   if (!authenticatedUser) {
     console.warn('⚠️ requireAdmin: No authenticated user found');
     return res.status(401).json({ message: 'Authentication required' });
   }
 
-  try {
-    // Mindig friss adatbázis adatot használunk a jogosultság ellenőrzéséhez
-    const profile = await storage.getProfileByUserId(authenticatedUser.id);
-
-    if (!profile) {
-      console.warn(`⚠️ requireAdmin: No profile found for user ${authenticatedUser.id}`);
-      return res.status(403).json({ message: 'Forbidden: User profile not found.' });
-    }
-
-    if (profile.role === 'admin') {
-      console.log(`✅ Admin access granted for user: ${authenticatedUser.id}`);
-      next(); // Siker, a felhasználó admin
-    } else {
-      console.warn(`⚠️ requireAdmin: User ${authenticatedUser.id} has role '${profile.role}', admin required`);
-      res.status(403).json({ message: 'Forbidden: Admin access required.' });
-    }
-  } catch (error) {
-    console.error('❌ Error in requireAdmin middleware:', error);
-    res.status(500).json({ message: 'Internal server error during authorization' });
+  // Mivel a requireAuth már szinkronizálta a role-t, 
+  // itt elég csak a request-re csatolt user objektumot ellenőrizni.
+  if (authenticatedUser.role === 'admin') {
+    console.log(`✅ Admin access granted for user: ${authenticatedUser.user_id || authenticatedUser.id}`);
+    next();
+  } else {
+    console.warn(`⚠️ requireAdmin: User ${authenticatedUser.user_id || authenticatedUser.id} has role '${authenticatedUser.role}', admin required`);
+    res.status(403).json({ message: 'Forbidden: Admin access required.' });
   }
 }

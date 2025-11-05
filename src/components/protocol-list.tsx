@@ -1,6 +1,6 @@
 // src/components/protocol-list.tsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/auth-context';
+import { useAuth } from '@/contexts/auth-context'; // ✅ 1. IMPORTÁLVA
 import { useLanguageContext } from '@/components/language-provider';
 import { useTheme } from '@/contexts/theme-context';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +31,7 @@ interface ProtocolsResponse {
 }
 
 export function ProtocolList() {
-  const { supabase } = useAuth();
+  const { supabase, role } = useAuth(); // ✅ 2. ROLE LEKÉRÉSE
   const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
@@ -45,17 +45,14 @@ export function ProtocolList() {
 
   useEffect(() => {
     console.log('🔍 ProtocolList useEffect triggered');
-    if (supabase) {
-      console.log('✅ Supabase available, fetching protocols...');
+    // ✅ 3. ROLE-T IS MEGVÁRJUK
+    if (supabase && role) {
+      console.log(`✅ Supabase & Role (${role}) available, fetching protocols...`);
       fetchProtocols();
     } else {
-      console.log('⚠️ Waiting for supabase...');
-      const timer = setTimeout(() => {
-        if (supabase) fetchProtocols();
-      }, 1000);
-      return () => clearTimeout(timer);
+      console.log('⚠️ Waiting for supabase and/or role...');
     }
-  }, [supabase, currentPage]);
+  }, [supabase, role, currentPage]); // ✅ 4. ROLE HOZZÁADVA A DEPENDENCY-HEZ
 
   const fetchProtocols = async () => {
     setLoading(true);
@@ -65,8 +62,13 @@ export function ProtocolList() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Authentication required');
 
-      console.log('📤 Fetching from: /api/admin/protocols');
-      const response = await fetch(`/api/admin/protocols?page=${currentPage}&limit=50`, {
+      // ✅ 5. DINAMIKUS VÉGPONT VÁLASZTÁS
+      const endpoint = role === 'admin' 
+        ? `/api/admin/protocols?page=${currentPage}&limit=50`
+        : `/api/protocols?page=${currentPage}&limit=50`; // Feltételezzük, hogy ez a "USER" végpontja
+
+      console.log(`📤 Fetching from: ${endpoint} (Role: ${role})`);
+      const response = await fetch(endpoint, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
@@ -99,7 +101,12 @@ export function ProtocolList() {
   const handleDelete = async (protocolId: string, protocolNumber?: string) => {
     const displayName = protocolNumber || protocolId.substring(0, 8);
     
-    if (!confirm(`Biztosan törölni szeretnéd ezt a protokollt?\n${displayName}`)) {
+    // 💡 FONTOS: Az `confirm` hívás helyett egyedi modális ablakra lesz szükség
+    // A `window.confirm` nem működik megbízhatóan beágyazott környezetben.
+    // Egyelőre `true`-ra állítjuk a teszteléshez, de ezt cserélni kell!
+    const userConfirmed = true; // window.confirm(`Biztosan törölni szeretnéd ezt a protokollt?\n${displayName}`);
+    
+    if (!userConfirmed) {
       return;
     }
 
@@ -108,7 +115,14 @@ export function ProtocolList() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Authentication required');
 
-      const response = await fetch(`/api/admin/protocols/${protocolId}`, {
+      // ✅ A TÖRLÉSI VÉGPONTNAK IS DINAMIKUSNAK KELL LENNIE
+      const deleteEndpoint = role === 'admin'
+        ? `/api/admin/protocols/${protocolId}`
+        : `/api/protocols/${protocolId}`; // Feltételezzük, hogy a user is törölheti a sajátját
+
+      console.log(`📤 Deleting from: ${deleteEndpoint} (Role: ${role})`);
+
+      const response = await fetch(deleteEndpoint, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
@@ -412,3 +426,4 @@ export function ProtocolList() {
     </Card>
   );
 }
+

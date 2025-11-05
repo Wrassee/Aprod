@@ -7,21 +7,96 @@ import { storage } from '../storage.js';
 import { insertProtocolSchema } from '../../shared/schema.js';
 import { pdfService } from '../services/pdf-service.js';
 import { GroundingPdfService } from '../services/grounding-pdf-service.js';
+import { requireAuth } from '../middleware/auth.js'; // ✅ 1. AUTH IMPORTÁLÁSA
 
 const router = Router();
 const upload = multer(); // ✅ Multer inicializálás FormData kezeléshez
 
+// ✅ =========================================================
+// === 6. HIBA JAVÍTÁSA: PROTOKOLLOK LISTÁZÁSA (USER SZÁMÁRA)
+// === Ez kezeli a GET /api/protocols kérést (a protocol-list.tsx hívja)
+// =========================================================
+router.get('/', requireAuth, async (req, res) => {
+  try {
+    const authenticatedUser = (req as any).user;
+    if (!authenticatedUser) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = (page - 1) * limit;
+
+    console.log(`Server: Fetching protocols for USER: ${authenticatedUser.id} (Page: ${page}, Limit: ${limit})`);
+
+    // Feltételezzük, hogy a `storage.getProtocols` létezik és kezeli a szűrést
+    // Ha a `storage.ts`-ben nincs ilyen, ott is módosítani kell.
+    const { items, total } = await storage.getProtocols({
+      userId: authenticatedUser.id, // Csak a saját protokollok szűrése
+      page,
+      limit,
+      offset
+    });
+
+    res.json({
+      items: items || [],
+      total: total || 0,
+      currentPage: page,
+      totalPages: Math.ceil((total || 0) / limit),
+    });
+
+  } catch (error) {
+    console.error("Error fetching user protocols:", error);
+    res.status(500).json({ message: "Failed to fetch protocols" });
+  }
+});
+
 // PROTOKOLL LÉTREHOZÁSA
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => { // ✅ 2. AUTH HOZZÁADVA
   try {
     const protocolData = insertProtocolSchema.parse(req.body);
-    const protocol = await storage.createProtocol(protocolData);
+    const authenticatedUser = (req as any).user;
+
+    // Biztonsági ellenőrzés: A user_id-t mindig a hitelesített felhasználóra állítjuk
+    const dataWithUser = {
+      ...protocolData,
+      user_id: authenticatedUser.id 
+    };
+
+    const protocol = await storage.createProtocol(dataWithUser);
     res.json(protocol);
   } catch (error) {
     console.error("Error creating protocol:", error);
     res.status(400).json({ message: "Invalid protocol data" });
   }
 });
+
+// ✅ =========================================================
+// === 6. HIBA JAVÍTÁSA: PROTOKOLL TÖRLÉSE (USER SZÁMÁRA)
+// === Ez kezeli a DELETE /api/protocols/:id kérést (a protocol-list.tsx hívja)
+// =========================================================
+router.delete('/:id', requireAuth, async (req, res) => {
+  try {
+    const authenticatedUser = (req as any).user;
+    const { id } = req.params;
+
+    console.log(`Server: Deleting protocol ${id} for USER: ${authenticatedUser.id}`);
+
+    // A `storage.deleteProtocol`-nak kell ellenőriznie, hogy az ID-hoz
+    // tartozó `user_id` egyezik-e a `authenticatedUser.id`-vel.
+    const success = await storage.deleteProtocol(id, authenticatedUser.id);
+
+    if (!success) {
+      return res.status(404).json({ message: "Protocol not found or user not authorized" });
+    }
+
+    res.status(200).json({ success: true, message: "Protocol deleted" });
+  } catch (error) {
+    console.error("Error deleting protocol:", error);
+    res.status(500).json({ message: "Failed to delete protocol" });
+  }
+});
+
 
 // EXCEL LETÖLTÉS
 router.post('/download-excel', async (req, res) => {
@@ -171,3 +246,4 @@ router.post(
 );
 
 export { router as protocolMappingRoutes };
+

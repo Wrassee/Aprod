@@ -1,4 +1,4 @@
-// src/components/system-settings.tsx - SYNTAX FIXED
+// src/components/system-settings.tsx - EVERYONE CAN ACCESS
 import React, { useState, useEffect } from 'react';
 import { useLanguageContext } from '@/components/language-provider';
 import { useTheme } from '@/contexts/theme-context';
@@ -42,17 +42,32 @@ export function SystemSettings() {
   const { t, language } = useLanguageContext();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-  const { supabase } = useAuth();
+  // ✅ JAVÍTÁS: Csak supabase és initialized kell, NINCS role check
+  const { supabase, initialized } = useAuth();
   
   const [info, setInfo] = useState<SystemInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // ✅ JAVÍTÁS: ELTÁVOLÍTVA a role !== 'admin' ellenőrzés
   useEffect(() => {
+    console.log('ℹ️ SystemSettings useEffect triggered');
+    console.log('📊 Initialized:', initialized);
+    console.log('📊 Supabase:', !!supabase);
+
+    // Várjuk meg, amíg az AuthContext betöltődik
+    if (!initialized) {
+      console.log('⏳ SystemSettings: Waiting for AuthContext to initialize...');
+      setLoading(false);
+      return;
+    }
+
     if (supabase) {
+      // ✅ MINDENKI SZÁMÁRA ELÉRHETŐ - nincs role check
+      console.log('✅ User authenticated, fetching system info for all users...');
       fetchInfo();
     }
-  }, [supabase]);
+  }, [supabase, initialized]);
 
   const fetchInfo = async () => {
     setLoading(true);
@@ -422,6 +437,12 @@ export function SystemSettings() {
                   <p className="text-lg font-semibold text-red-600">
                     {t.Admin?.Settings?.loadError || 'Nem sikerült betölteni az adatokat'}
                   </p>
+                  {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
+                  <p className="text-xs text-gray-400 mt-2">
+                    {language === 'hu' 
+                      ? 'Próbáld meg frissíteni a Frissítés gombbal' 
+                      : 'Try refreshing with the Refresh button'}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -736,6 +757,12 @@ export function SystemSettings() {
               <p className="text-red-600 font-medium">
                 {t.Admin?.Settings?.loadError || 'Nem sikerült betölteni az adatokat'}
               </p>
+              {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
+              <p className="text-xs text-gray-400 mt-2">
+                {language === 'hu' 
+                  ? 'Próbáld meg frissíteni a Frissítés gombbal' 
+                  : 'Try refreshing with the Refresh button'}
+              </p>
             </div>
           )}
         </CardContent>
@@ -785,4 +812,3 @@ export function SystemSettings() {
     </div>
   );
 }
-

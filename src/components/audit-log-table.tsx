@@ -1,4 +1,4 @@
-// src/components/audit-log-table.tsx - THEME AWARE VERSION
+// src/components/audit-log-table.tsx - EVERYONE CAN ACCESS
 import React, { useState, useEffect } from 'react';
 import { useLanguageContext } from '@/components/language-provider';
 import { useToast } from '@/hooks/use-toast';
@@ -48,18 +48,32 @@ interface AuditLogEntry {
 export function AuditLogTable() {
   const { t, language } = useLanguageContext();
   const { toast } = useToast();
-  const { supabase } = useAuth();
-  const { theme } = useTheme(); // ← THEME HOOK
+  // ✅ JAVÍTÁS: Csak supabase és initialized kell, NINCS role check
+  const { supabase, initialized } = useAuth();
+  const { theme } = useTheme();
   
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [limit, setLimit] = useState(50);
 
+  // ✅ JAVÍTÁS: ELTÁVOLÍTVA a role !== 'admin' ellenőrzés
   useEffect(() => {
+    console.log('📜 AuditLog useEffect triggered');
+    console.log('📊 Initialized:', initialized);
+    console.log('📊 Supabase:', !!supabase);
+
+    // Várjuk meg, amíg az AuthContext betöltődik
+    if (!initialized) {
+      console.log('⏳ AuditLog: Waiting for AuthContext to initialize...');
+      return;
+    }
+
     if (supabase) {
+      // ✅ MINDENKI SZÁMÁRA ELÉRHETŐ - nincs role check
+      console.log('✅ User authenticated, fetching audit logs for all users...');
       fetchLogs();
     }
-  }, [supabase, limit]);
+  }, [supabase, limit, initialized]);
 
   const fetchLogs = async () => {
     setLoading(true);
@@ -224,6 +238,12 @@ export function AuditLogTable() {
               <p className="text-lg font-medium text-gray-600">
                 {t.Admin?.AuditLog?.noLogs || 'Nincs még naplóbejegyzés.'}
               </p>
+              {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
+              <p className="text-xs text-gray-400 mt-2">
+                {language === 'hu' 
+                  ? 'A rendszer tevékenységei itt fognak megjelenni.' 
+                  : 'System activities will appear here.'}
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -247,6 +267,12 @@ export function AuditLogTable() {
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <AlertCircle className="h-12 w-12 mb-4 text-gray-300" />
             <p>{t.Admin?.AuditLog?.noLogs || 'Nincs még naplóbejegyzés.'}</p>
+            {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
+            <p className="text-xs text-gray-400 mt-2">
+              {language === 'hu' 
+                ? 'A rendszer tevékenységei itt fognak megjelenni.' 
+                : 'System activities will appear here.'}
+            </p>
           </div>
         </CardContent>
       </Card>

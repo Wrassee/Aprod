@@ -1,3 +1,5 @@
+// src/contexts/auth-context.tsx - FIXED VERSION
+
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { User, Session, SupabaseClient } from '@supabase/supabase-js';
@@ -9,6 +11,7 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
+  initialized: boolean; // ← ÚJ
   signIn: (email: string, password: string) => Promise<Session>;
   signUp: (email: string, password: string) => Promise<Session>;
   signOut: () => Promise<void>;
@@ -22,17 +25,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false); // ← ÚJ
 
   // Fetch or create user profile
   const fetchProfile = async (userId: string, userEmail: string) => {
     try {
-      // Get current session to attach auth token
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
         console.error('❌ No session available to fetch profile');
         return;
       }
+
+      // ⭐ JAVÍTÁS: Olvasd ki az app_metadata.role értékét
+      const supabaseRole = session.user.app_metadata?.role || 'user';
+      console.log('🔐 User role from Supabase app_metadata:', supabaseRole);
 
       const authHeaders = {
         'Content-Type': 'application/json',
@@ -45,24 +52,45 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (response.ok) {
         const data = await response.json();
-        setProfile(data);
+        
+        // ⭐ JAVÍTÁS: Ha a Supabase szerint admin, felülírjuk a profile.role-t
+        if (supabaseRole !== data.role) {
+          console.log(`🔄 Updating profile role from "${data.role}" to "${supabaseRole}"`);
+          const updateResponse = await fetch(`/api/profiles/${userId}`, {
+            method: 'PATCH',
+            headers: authHeaders,
+            body: JSON.stringify({ role: supabaseRole }),
+          });
+          
+          if (updateResponse.ok) {
+            const updatedProfile = await updateResponse.json();
+            setProfile(updatedProfile);
+            console.log('✅ Profile role updated to:', updatedProfile.role);
+          } else {
+            // Ha a PATCH sikertelen, használjuk az eredeti profilt a Supabase role-lal
+            setProfile({ ...data, role: supabaseRole });
+            console.log('⚠️ Using Supabase role directly:', supabaseRole);
+          }
+        } else {
+          setProfile(data);
+        }
       } else if (response.status === 404) {
-        // Profile doesn't exist - create it
-        console.log('📝 Creating new profile for user:', userEmail);
+        // ⭐ JAVÍTÁS: Új profil létrehozása a Supabase role-lal
+        console.log('📝 Creating new profile with role:', supabaseRole);
         const createResponse = await fetch('/api/profiles', {
           method: 'POST',
           headers: authHeaders,
           body: JSON.stringify({
             user_id: userId,
             email: userEmail,
-            role: 'user',
+            role: supabaseRole, // ← JAVÍTVA
           }),
         });
         
         if (createResponse.ok) {
           const newProfile = await createResponse.json();
           setProfile(newProfile);
-          console.log('✅ Profile created successfully');
+          console.log('✅ Profile created with role:', newProfile.role);
         } else {
           const errorText = await createResponse.text();
           console.error('❌ Failed to create profile:', errorText);
@@ -75,27 +103,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialize session on mount
   useEffect(() => {
-  const checkAuthAndFetchProfile = async () => {
-    try {
-      // 1. Várjuk meg a session ellenőrzését
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      setSession(session);
-      setUser(session?.user ?? null);
+    const checkAuthAndFetchProfile = async () => {
+      try {
+        console.log('🔧 AuthContext - Initializing...');
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        setSession(session);
+        setUser(session?.user ?? null);
 
-      // 2. Ha van session, VÁRJUK MEG a profil betöltését is
-      if (session?.user) {
-        await fetchProfile(session.user.id, session.user.email || '');
+        if (session?.user) {
+          await fetchProfile(session.user.id, session.user.email || '');
+        }
+      } catch (error) {
+        console.error("Error during initial auth check:", error);
+      } finally {
+        setLoading(false);
+        setInitialized(true); // ← ÚJ
+        console.log('✅ AuthContext - Initialized!');
       }
-    } catch (error) {
-      console.error("Error during initial auth check:", error);
-    } finally {
-      // 3. CSAK MIUTÁN MINDEN BEFEJEZŐDÖTT, állítjuk a loading-ot false-ra
-      setLoading(false);
-    }
-  };
+    };
 
-  checkAuthAndFetchProfile();
+    checkAuthAndFetchProfile();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -127,7 +155,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     console.log('✅ Sign in successful, session:', data.session ? 'exists' : 'missing');
     
-    // SECURITY FIX: Only proceed if session exists
     if (!data.session) {
       throw new Error('No session returned from sign in');
     }
@@ -157,7 +184,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     console.log('✅ Sign up response - session:', data.session ? 'exists' : 'missing', 'user:', data.user ? 'exists' : 'missing');
     
-    // SECURITY FIX: Only proceed if session exists (email confirmation not required)
     if (!data.session) {
       throw new Error('Email confirmation required. Please check your inbox.');
     }
@@ -170,11 +196,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-  const { error } = await supabase.auth.signOut();
-  if (error) {
-    console.error('❌ Sign out error:', error);
-    throw error;
-  }
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error('❌ Sign out error:', error);
+      throw error;
+    }
   };
 
   const refreshProfile = async () => {
@@ -183,12 +209,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const role = profile?.role || session?.user?.app_metadata?.role || 'user';
+
   const value = {
     supabase,
     user,
     session,
     profile,
+    role,
     loading,
+    initialized, // ← ÚJ
     signIn,
     signUp,
     signOut,

@@ -1,4 +1,4 @@
-// src/App.tsx - JAVÍTOTT VERZIÓ
+// src/App.tsx - JAVÍTOTT VERZIÓ (401 Unauthorized hiba javítva)
 
 import React, {
   useState,
@@ -8,13 +8,14 @@ import React, {
 } from "react";
 
 /* -------------------- 3rd-party -------------------- */
-import { queryClient } from "./lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider, useLanguageContext } from "@/components/language-provider";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { ThemeProvider } from '@/contexts/theme-context';
+import { Loader2 } from 'lucide-react';
 
 /* -------------------- Oldalak / Komponensek -------------------- */
 import { StartScreen } from "@/pages/start-screen";
@@ -59,27 +60,25 @@ function AppContent({
   formData,
   setFormData,
 }: AppContentProps) {
-  
+
   const { language, setLanguage } = useLanguageContext();
-  const { user, supabase } = useAuth();
-  
+  const { user, supabase, loading: authLoading } = useAuth();
   const formDataRef = useRef(formData);
-  
+  const [languageSelected, setLanguageSelected] = useState(false);
+
+  // === HOOK-OK ===
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
 
-  // === Auth helper függvény - CSAK admin műveletekhez ===
-  const getAuthHeaders = async (contentType: string | null = 'application/json') => {
-    if (!supabase) throw new Error("Supabase client not available");
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw new Error("Authentication required");
-    const headers: HeadersInit = { 'Authorization': `Bearer ${session.access_token}` };
-    if (contentType) {
-      headers['Content-Type'] = contentType;
+  useEffect(() => {
+    if (user && languageSelected && currentScreen === 'start') {
+      console.log('✅ User logged in, language already selected. Redirecting to questionnaire...');
+      setCurrentScreen('questionnaire');
+      setCurrentQuestionnairePage(0);
+      localStorage.setItem('questionnaire-current-page', '0');
     }
-    return headers;
-  };
+  }, [user, languageSelected, currentScreen, setCurrentScreen, setCurrentQuestionnairePage]);
 
   const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
@@ -96,6 +95,152 @@ function AppContent({
   const handleSaveProgress = useCallback(() => {
     console.log('✅ Progress saved automatically');
   }, []);
+
+  const handleStartNew = useCallback(() => {
+    console.log('🆕 Starting new protocol - clearing all data...');
+    
+    const keysToRemove = [
+      'otis-protocol-form-data',
+      'protocol-errors',
+      'questionnaire-current-page',
+      'niedervolt-table-measurements',
+      'niedervolt-selected-devices',
+      'niedervolt-custom-devices',
+    ];
+    
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    if ((window as any).radioCache) (window as any).radioCache.clear();
+    if ((window as any).trueFalseCache) (window as any).trueFalseCache.clear();
+    if ((window as any).stableInputValues) (window as any).stableInputValues = {};
+    if ((window as any).measurementCache) (window as any).measurementCache.clear();
+    if ((window as any).calculatedCache) (window as any).calculatedCache = {};
+    
+    window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
+    
+    setFormData({
+      receptionDate: new Date().toISOString().split('T')[0],
+      answers: {},
+      errors: [],
+      signature: '',
+      signatureName: '',
+      niedervoltMeasurements: [],
+      niedervoltTableMeasurements: {},
+    });
+    
+    setClearTrigger(Date.now());
+    setCurrentScreen('start');
+    setCurrentQuestionnairePage(0);
+    setCurrentQuestionId('');
+    
+    console.log('✅ All data cleared');
+  }, [setFormData, setClearTrigger, setCurrentScreen, setCurrentQuestionnairePage, setCurrentQuestionId]);
+
+  const handleGoHome = useCallback(() => {
+    setCurrentScreen('start');
+    setCurrentQuestionnairePage(0);
+  }, [setCurrentScreen, setCurrentQuestionnairePage]);
+
+  const handleSettings = useCallback(() => {
+    setCurrentScreen('admin');
+  }, [setCurrentScreen]);
+
+  const handleBackToSignature = useCallback(() => {
+    setCurrentScreen('signature');
+  }, [setCurrentScreen]);
+
+  const handleAnswerChange = useCallback((questionId: string, value: AnswerValue) => {
+    setFormData(prev => ({
+      ...prev,
+      answers: { ...prev.answers, [questionId]: value }
+    }));
+  }, [setFormData]);
+
+  const handleReceptionDateChange = useCallback((date: string) => {
+    setFormData(prev => ({ ...prev, receptionDate: date }));
+  }, [setFormData]);
+
+  const handleErrorsChange = useCallback((errors: ProtocolError[]) => {
+    setFormData(prev => ({ ...prev, errors }));
+  }, [setFormData]);
+
+  const handleAdminAccess = useCallback(() => {
+    setCurrentScreen('admin');
+  }, [setCurrentScreen]);
+
+  const handleLoginSuccess = useCallback(() => {
+    console.log('✅ Login successful - redirecting to admin');
+    setCurrentScreen('admin');
+  }, [setCurrentScreen]);
+
+  const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
+    setFormData(prev => ({ ...prev, niedervoltMeasurements: measurements }));
+  }, [setFormData]);
+
+  // === FELTÉTELES KORAI RETURN-OK ===
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
+        <div className="text-center">
+          <div className="relative mb-6">
+            <div className="absolute inset-0 bg-blue-400 rounded-full blur-2xl opacity-30 animate-pulse" />
+            <Loader2 className="relative h-16 w-16 animate-spin text-blue-600 mx-auto" />
+          </div>
+          <p className="text-lg font-medium bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+            {language === 'hu' ? 'Betöltés...' : 'Laden...'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    if (!languageSelected) {
+      return (
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <StartScreen 
+              onLanguageSelect={(selectedLanguage: 'hu' | 'de') => {
+                console.log('🌍 App.tsx (Pre-Login) - Language selected:', selectedLanguage);
+                setLanguage(selectedLanguage);
+                localStorage.setItem('otis-protocol-language', selectedLanguage);
+                setLanguageSelected(true);
+              }} 
+            />
+          </TooltipProvider>
+        </QueryClientProvider>
+      );
+    }
+
+    return (
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Login 
+            onLoginSuccess={() => {
+              console.log('Login component success callback triggered (handled by App effect).');
+            }}
+            onBackToHome={() => {
+              setLanguageSelected(false);
+            }}
+          />
+        </TooltipProvider>
+      </QueryClientProvider>
+    );
+  }
+
+  // === NEM-HOOK HANDLEREK ÉS LOGIKA ===
+  const getAuthHeaders = async (contentType: string | null = 'application/json') => {
+    if (!supabase) throw new Error("Supabase client not available");
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Authentication required");
+    const headers: HeadersInit = { 'Authorization': `Bearer ${session.access_token}` };
+    if (contentType) {
+      headers['Content-Type'] = contentType;
+    }
+    return headers;
+  };
 
   const handleQuestionnaireNext = () => {
     console.log('📄 Questionnaire completed - showing Erdungskontrolle page');
@@ -116,20 +261,20 @@ function AppContent({
     setCurrentScreen('niedervolt');
   };
 
-  // === JAVÍTOTT handleSignatureComplete - AUTH NÉLKÜL (publikus művelet) ===
-  const handleSignatureComplete = async (finalSignerName: string) => { 
+  // ✅ =========================================================
+  // === JAVÍTÁS: handleSignatureComplete - 401 HIBA JAVÍTVA ===
+  // =========================================================
+  const handleSignatureComplete = async (finalSignerName: string) => {
     console.log('📄 App.tsx: Starting protocol completion process with final name:', finalSignerName);
     
-    // Prevent multiple clicks
     const currentTime = Date.now();
     if ((window as any).lastCompleteAttempt && currentTime - (window as any).lastCompleteAttempt < 3000) {
-      console.log('⚠️ Multiple clicks prevented - waiting for previous attempt to complete');
+      console.log('⚠️ Multiple clicks prevented');
       return;
     }
     (window as any).lastCompleteAttempt = currentTime;
     
     try {
-      // 1. VÉGLEGES, GARANTÁLTAN FRISS ADATOBJEKTUM
       const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
       
       const finalFormData = { 
@@ -138,15 +283,10 @@ function AppContent({
         completed: true,
       };
 
-      // 2. FRISSÍTSD A REACT ÁLLAPOTOT
       setFormData(finalFormData);
-
-      // 3. AZONNAL MENTSD EL A VÉGLEGES ADATOT A LOCALSTORAGE-BE
       localStorage.setItem('otis-protocol-form-data', JSON.stringify(finalFormData));
-      console.log('💾 App.tsx: GUARANTEED FINAL data saved to localStorage with signerName:', finalSignerName);
+      console.log('💾 Final data saved with signerName:', finalSignerName);
       
-      // 4. A VÉGLEGES ADATTAL KÜLDD EL A BACKEND-NEK
-      // ✅ PUBLIKUS ENDPOINT - NEM KELL AUTH!
       const protocolData = {
         receptionDate,
         reception_date: receptionDate,
@@ -158,46 +298,35 @@ function AppContent({
         completed: true,
       };
       
-      console.log('✅ Protocol data prepared:', {
-        answerCount: Object.keys(protocolData.answers).length,
-        errorCount: protocolData.errors.length,
-        hasSignature: Boolean(protocolData.signature),
-        hasSignatureName: Boolean(protocolData.signatureName),
-        signerName: protocolData.signatureName,
-        receptionDate: protocolData.receptionDate,
-        language: protocolData.language
-      });
-      
       console.log('📤 Sending protocol to backend...');
+
+      // ✅ JAVÍTÁS: Hitelesítési fejlécek használata
+      const headers = await getAuthHeaders();
+      
       const response = await fetch('/api/protocols', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }, // ✅ Egyszerű header, nincs auth
+        headers: headers, // ✅ A hitelesített headers használata
         body: JSON.stringify(protocolData),
       });
 
-      console.log('📥 Backend response status:', response.status);
-
       if (response.ok) {
         const result = await response.json();
-        console.log('✅ Protocol saved successfully:', result.id);
-        
+        console.log('✅ Protocol saved:', result.id);
         setCurrentScreen('completion');
-        console.log('🎉 Protocol completion successful - navigating to completion screen');
       } else {
         const errorText = await response.text();
         console.error('❌ Protocol creation failed:', errorText);
-        alert(`Protokoll mentési hiba: ${errorText}\n\nKérjük próbálja újra vagy lépjen kapcsolatba a támogatással.`);
+        alert(`Protokoll mentési hiba: ${errorText}`);
         delete (window as any).lastCompleteAttempt;
       }
     } catch (error) {
       console.error('❌ Error completing protocol:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba történt';
-      alert(`Protokoll befejezési hiba: ${errorMessage}\n\nKérjük ellenőrizze az internetkapcsolatot és próbálja újra.`);
+      alert(`Protokoll befejezési hiba: ${error instanceof Error ? error.message : 'Ismeretlen hiba'}`);
       delete (window as any).lastCompleteAttempt;
     }
   };
 
-  // === ADMIN MŰVELETEK - EZEK IGÉNYLIK AZ AUTH-OT ===
+  // === ADMIN MŰVELETEK ===
   const handleEmailPDF = async () => {
     try {
       const headers = await getAuthHeaders();
@@ -212,23 +341,6 @@ function AppContent({
       }
     } catch (error) {
       console.error('Error emailing PDF:', error);
-    }
-  };
-
-  const handleSaveToCloud = async () => {
-    try {
-      const headers = await getAuthHeaders();
-      const response = await fetch('/api/protocols/cloud-save', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ formData, language }),
-      });
-      
-      if (response.ok) {
-        console.log('Saved to cloud successfully');
-      }
-    } catch (error) {
-      console.error('Error saving to cloud:', error);
     }
   };
 
@@ -250,8 +362,6 @@ function AppContent({
         const otisLiftId = formData.answers['7'] || 'Unknown';
         a.download = `AP_${otisLiftId}.pdf`;
         
-        console.log('PDF download filename:', a.download);
-        
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -264,12 +374,8 @@ function AppContent({
 
   const handleDownloadExcel = async () => {
     try {
-      console.log('Starting Excel download with up-to-date formData...');
-      
       const otisLiftId = formData.answers['7'] || 'Unknown';
       const filename = `AP_${otisLiftId}.xlsx`;
-      
-      console.log('Excel download filename:', filename);
 
       const headers = await getAuthHeaders();
       const response = await fetch('/api/protocols/download-excel', {
@@ -295,8 +401,45 @@ function AppContent({
 
     } catch (error) {
       console.error('Error downloading Excel:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      alert(`Excel letöltési hiba: ${errorMessage}\n\nKérjük, próbálja újra.`);
+      alert(`Excel letöltési hiba: ${error instanceof Error ? error.message : 'Ismeretlen hiba'}`);
+    }
+  };
+
+  // ✅ JAVÍTÁS: handleSaveToCloud hozzáadva (hiányzott az eredeti kódból)
+  const handleSaveToCloud = async () => {
+    try {
+      console.log('☁️ Saving protocol to cloud...');
+      const headers = await getAuthHeaders();
+      
+      const protocolData = {
+        receptionDate: formData.receptionDate,
+        reception_date: formData.receptionDate,
+        language,
+        answers: formData.answers,
+        errors: formData.errors || [],
+        signature: formData.signature || '',
+        signatureName: formData.signatureName || '',
+        completed: true,
+      };
+
+      const response = await fetch('/api/protocols', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(protocolData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Protocol saved to cloud:', result.id);
+        alert('Protokoll sikeresen mentve a felhőbe!');
+      } else {
+        const errorText = await response.text();
+        console.error('❌ Cloud save failed:', errorText);
+        alert(`Felhő mentési hiba: ${errorText}`);
+      }
+    } catch (error) {
+      console.error('Error saving to cloud:', error);
+      alert(`Felhő mentési hiba: ${error instanceof Error ? error.message : 'Ismeretlen hiba'}`);
     }
   };
 
@@ -304,104 +447,9 @@ function AppContent({
     setCurrentScreen('protocol-preview');
   };
 
-  const handleStartNew = useCallback(() => {
-    console.log('🆕 Starting new protocol - clearing all data...');
-    
-    // Clear all localStorage keys
-    const keysToRemove = [
-      'otis-protocol-form-data',
-      'protocol-errors',
-      'questionnaire-current-page',
-      'niedervolt-table-measurements',
-      'niedervolt-selected-devices',
-      'niedervolt-custom-devices',
-    ];
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    // Clear global caches
-    if ((window as any).radioCache) (window as any).radioCache.clear();
-    if ((window as any).trueFalseCache) (window as any).trueFalseCache.clear();
-    if ((window as any).stableInputValues) (window as any).stableInputValues = {};
-    if ((window as any).measurementCache) (window as any).measurementCache.clear();
-    if ((window as any).calculatedCache) (window as any).calculatedCache = {};
-    
-    // Notify components
-    window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
-    
-    // Reset form data
-    setFormData({
-      receptionDate: new Date().toISOString().split('T')[0],
-      answers: {},
-      errors: [],
-      signature: '',
-      signatureName: '',
-      niedervoltMeasurements: [],
-      niedervoltTableMeasurements: {},
-    });
-    
-    // Trigger component remount
-    setClearTrigger(Date.now());
-    
-    // Reset navigation state
-    setCurrentScreen('start');
-    setCurrentQuestionnairePage(0);
-    setCurrentQuestionId('');
-    
-    console.log('✅ All data cleared - ready for new protocol');
-  }, [setFormData, setClearTrigger, setCurrentScreen, setCurrentQuestionnairePage, setCurrentQuestionId]);
-
-  const handleGoHome = useCallback(() => {
-    setCurrentScreen('start');
-    setCurrentQuestionnairePage(0);
-  }, [setCurrentScreen, setCurrentQuestionnairePage]);
-
-  const handleSettings = useCallback(() => {
-    setCurrentScreen('admin');
-  }, [setCurrentScreen]);
-
-  const handleBackToSignature = useCallback(() => {
-    setCurrentScreen('signature');
-  }, [setCurrentScreen]);
-
-  // Stable callbacks to prevent recreation
-  const handleAnswerChange = useCallback((questionId: string, value: AnswerValue) => {
-    setFormData(prev => ({
-      ...prev,
-      answers: { ...prev.answers, [questionId]: value }
-    }));
-  }, [setFormData]);
-
-  const handleReceptionDateChange = useCallback((date: string) => {
-    setFormData(prev => ({ ...prev, receptionDate: date }));
-  }, [setFormData]);
-
-  const handleErrorsChange = useCallback((errors: ProtocolError[]) => {
-    setFormData(prev => ({ ...prev, errors }));
-  }, [setFormData]);
-
-  const handleAdminAccess = useCallback(() => {
-    if (user) {
-      console.log('✅ User is logged in - navigating to admin');
-      setCurrentScreen('admin');
-    } else {
-      console.log('🔐 User not logged in - navigating to login');
-      setCurrentScreen('login');
-    }
-  }, [user, setCurrentScreen]);
-
-  const handleLoginSuccess = useCallback(() => {
-    console.log('✅ Login successful - redirecting to admin');
-    setCurrentScreen('admin');
-  }, [setCurrentScreen]);
-
-  const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
-    setFormData(prev => ({ ...prev, niedervoltMeasurements: measurements }));
-  }, [setFormData]);
-
-  // Conditional render without router
+  // === RENDERELÉS ===
   const renderCurrentScreen = () => {
-    console.log('🏠 Rendering screen:', currentScreen, '(language:', language, ')');
+    console.log('🏠 Rendering screen:', currentScreen);
     
     switch (currentScreen) {
       case 'start':
@@ -446,7 +494,7 @@ function AppContent({
             onReceptionDateChange={handleReceptionDateChange}
           />
         );
-        
+
       case 'niedervolt':
         return (
           <NiedervoltTable
@@ -503,27 +551,21 @@ function AppContent({
           />
         );
         
-      case 'login':
-        return <Login 
-          onLoginSuccess={handleLoginSuccess} 
-          onBackToHome={() => setCurrentScreen('start')}
-        />;
-        
       case 'admin':
         return (
-          <ProtectedRoute onUnauthorized={() => setCurrentScreen('login')}>
-            <Admin 
-              onBack={() => setCurrentScreen('questionnaire')} 
-              onHome={() => setCurrentScreen('start')} 
-            />
-          </ProtectedRoute>
+          <Admin 
+            onBack={() => setCurrentScreen('questionnaire')} 
+            onHome={() => setCurrentScreen('start')} 
+          />
         );
         
       case 'protocol-preview':
         return <ProtocolPreview onBack={() => setCurrentScreen('completion')} />;
         
       default:
-        return <StartScreen onLanguageSelect={handleLanguageSelect} />;
+        console.warn(`Reached default case with screen: ${currentScreen}. Redirecting to questionnaire.`);
+        setCurrentScreen('questionnaire');
+        return null;
     }
   };
 
@@ -537,9 +579,8 @@ function AppContent({
   );
 }
 
-// === APP KOMPONENS: ÁLLAPOTOK A LANGUAGEPROVIDER-EN KÍVÜL ===
+// === APP KOMPONENS ===
 function App() {
-  // === ÁLLAPOTOK AZ APP SZINTJÉN - NEM RESETELŐDNEK NYELVVÁLTÁSKOR ===
   const [currentScreen, setCurrentScreen] = useState<Screen>('start');
   const [currentQuestionnaireePage, setCurrentQuestionnairePage] = useState(0);
   const [currentQuestionId, setCurrentQuestionId] = useState<string>('');
@@ -555,13 +596,11 @@ function App() {
     niedervoltTableMeasurements: {},
   });
 
-  // Load saved form data on initialization
   useEffect(() => {
     const saved = localStorage.getItem('otis-protocol-form-data');
     if (saved) {
       try {
         const parsedData = JSON.parse(saved);
-        // If no receptionDate is saved or it's empty, use today's date
         if (!parsedData.receptionDate || parsedData.receptionDate === '') {
           parsedData.receptionDate = new Date().toISOString().split('T')[0];
         }
@@ -572,11 +611,10 @@ function App() {
     }
   }, []);
 
-  // Auto-save formData to localStorage whenever it changes
   useEffect(() => {
     const saveTimer = setTimeout(() => {
       localStorage.setItem('otis-protocol-form-data', JSON.stringify(formData));
-    }, 500); // Debounce 500ms
+    }, 500);
 
     return () => clearTimeout(saveTimer);
   }, [formData]);

@@ -136,9 +136,17 @@ function AppContent({
     console.log('✅ All data cleared');
   }, [setFormData, setClearTrigger, setCurrentScreen, setCurrentQuestionnairePage, setCurrentQuestionId]);
 
+  // Módosított handleGoHome: törli a nyelvet és visszavisz a start képernyőre
   const handleGoHome = useCallback(() => {
+    console.log('🏠 Home button clicked - resetting language and returning to start screen');
+    // Nyelv resetelése
+    setLanguageSelected(false);
+    localStorage.removeItem('otis-protocol-language');
+    
+    // Képernyő és állapot reset
     setCurrentScreen('start');
     setCurrentQuestionnairePage(0);
+    localStorage.setItem('questionnaire-current-page', '0');
   }, [setCurrentScreen, setCurrentQuestionnairePage]);
 
   const handleSettings = useCallback(() => {

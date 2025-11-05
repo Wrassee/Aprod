@@ -43,8 +43,8 @@ export interface IStorage {
   createProtocol(protocol: InsertProtocol): Promise<Protocol>;
   updateProtocol(id: string, updates: Partial<Protocol>): Promise<Protocol | undefined>;
   getAllProtocols(): Promise<Protocol[]>;
-  // ✅ JAVÍTÁS: A deleteProtocol már a user_id-t is kéri a biztonságos törléshez
-  deleteProtocol(id: string, userId: string): Promise<boolean>;
+  // ✅ JAVÍTÁS: userId opcionális lett (admin override támogatás)
+  deleteProtocol(id: string, userId?: string): Promise<boolean>;
 
   /* ---------- Templates ---------- */
   getTemplate(id: string): Promise<Template | undefined>;
@@ -165,35 +165,37 @@ export class DatabaseStorage implements IStorage {
   }
 
   // ✅ =========================================================
-  // === 2. JAVÍTÁS: `deleteProtocol` BIZTONSÁGOSSÁ TÉTELE
-  // === (A protocol-mapping.ts hívja meg)
+  // === 2. JAVÍTÁS: `deleteProtocol` RUGALMASSÁ TÉTELE
+  // === userId opcionális - admin override támogatással
   // =========================================================
   /**
-  * Egy protokollt töröl, de csak akkor, ha a user_id egyezik.
-  * @param id - A törlendő protokoll azonosítója
-  * @param userId - A felhasználó (tulajdonos) azonosítója
-  * @returns Promise<boolean> - true, ha sikeres a törlés
-  */
-  async deleteProtocol(id: string, userId: string): Promise<boolean> {
+   * Egy protokollt töröl. 
+   * Ha a userId meg van adva, csak akkor töröl, ha ő a tulajdonos (biztonságos user törlés).
+   * Ha nincs megadva (admin eset), akkor bármelyiket törli ID alapján.
+   * @param id - A törlendő protokoll azonosítója
+   * @param userId - (Opcionális) A felhasználó azonosítója ellenőrzéshez
+   * @returns Promise<boolean> - true, ha sikeres a törlés
+   */
+  async deleteProtocol(id: string, userId?: string): Promise<boolean> {
     try {
-      console.log(`🗑️ Attempting to delete protocol: ${id} by user: ${userId}`);
+      console.log(`🗑️ Attempting to delete protocol: ${id}${userId ? ` by user: ${userId}` : ' (admin override)'}`);
       
-      // Biztonsági ellenőrzés: Csak a saját protokollját törölhesse
-      const whereClause = and(
-        eq(protocols.id, id),
-        eq(protocols.user_id, userId)
-      );
+      // Ha van userId, szigorúbb szűrés (biztonsági ellenőrzés)
+      // Ha nincs, csak ID alapján törlünk (admin funkció)
+      const whereClause = userId
+        ? and(eq(protocols.id, id), eq(protocols.user_id, userId))
+        : eq(protocols.id, id);
 
       const result = await (db as any)
         .delete(protocols)
-        .where(whereClause) // Csak ott töröl, ahol az ID ÉS a user_id is egyezik
+        .where(whereClause)
         .returning();
       
       const success = result.length > 0;
       if (success) {
-        console.log(`✅ Protocol ${id} deleted successfully by user ${userId}`);
+        console.log(`✅ Protocol ${id} deleted successfully${userId ? ` by user ${userId}` : ' (admin)'}`);
       } else {
-        console.warn(`⚠️ No protocol found with ID: ${id} owned by user: ${userId}`);
+        console.warn(`⚠️ Protocol not found or access denied for deletion (ID: ${id}, User: ${userId || 'admin'})`);
       }
       return success;
     } catch (error) {

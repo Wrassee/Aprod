@@ -9,7 +9,7 @@
     "build:client": "cross-env VITE_SUPABASE_URL=$VITE_SUPABASE_URL VITE_SUPABASE_ANON_KEY=$VITE_SUPABASE_ANON_KEY vite build",
     "build:server": "tsc --project tsconfig.server.json && tsc-alias -p tsconfig.server.json",
     "start": "node dist/server/index.js",
-    "db:push": "drizzle-kit push:pg --config=drizzle.config.pg.ts",
+    "db:push": "drizzle-kit push --config=drizzle.config.pg.ts",
     "db:generate:pg": "drizzle-kit generate --config ./drizzle.config.pg.ts",
     "db:generate": "drizzle-kit generate:pg --config=drizzle.config.pg.ts",
     "db:studio:pg": "drizzle-kit studio --config ./drizzle.config.pg.ts",

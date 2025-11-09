@@ -559,6 +559,7 @@ function AppContent({
             onSignatureNameChange={(signatureName) => setFormData(prev => ({ ...prev, signatureName }))}
             onBack={handleSignatureBack}
             onComplete={handleSignatureComplete}
+            onHome={handleGoHome}
           />
         );
         

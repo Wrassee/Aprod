@@ -60,7 +60,7 @@ router.post('/', requireAuth, async (req, res) => { // ✅ 2. AUTH HOZZÁADVA
     // Biztonsági ellenőrzés: A user_id-t mindig a hitelesített felhasználóra állítjuk
     const dataWithUser = {
       ...protocolData,
-      user_id: authenticatedUser.id 
+      user_id: authenticatedUser.user_id || authenticatedUser.id
     };
 
     const protocol = await storage.createProtocol(dataWithUser);

@@ -454,36 +454,28 @@ export function Completion({
 
           {/* View Protocol */}
           {theme === 'modern' ? (
-            <button
-              onClick={handleDownloadPDF}
-              disabled={isPdfDownloading}
-              className="group relative overflow-hidden p-6 rounded-2xl font-semibold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-fuchsia-600"></div>
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-fuchsia-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative flex flex-col items-center gap-3">
-                {isPdfDownloading ? (
-                  <Loader2 className="h-8 w-8 animate-spin" />
-                ) : (
-                  <Eye className="h-8 w-8" />
-                )}
-                <span className="text-lg">{isPdfDownloading ? t.generating : t.viewProtocol}</span>
-              </div>
-              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
-            </button>
+          <button
+            onClick={onViewProtocol}
+            disabled={false}
+            className="group relative overflow-hidden p-6 rounded-2xl font-semibold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50"
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-fuchsia-600"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500 to-fuchsia-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative flex flex-col items-center gap-3">
+              <Eye className="h-8 w-8" />
+              <span className="text-lg">{t.viewProtocol}</span>
+            </div>
+            <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
+          </button>
           ) : (
             <Button
-              onClick={handleDownloadPDF}
-              disabled={isPdfDownloading}
-              className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
-            >
-              {isPdfDownloading ? (
-                <Loader2 className="h-5 w-5 mr-3 animate-spin" />
-              ) : (
-                <Eye className="h-5 w-5 mr-3" />
-              )}
-              {isPdfDownloading ? t.generating : t.viewProtocol}
-            </Button>
+            onClick={onViewProtocol}
+            disabled={false}
+            className="bg-purple-600 hover:bg-purple-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
+          >
+            <Eye className="h-5 w-5 mr-3" />
+            {t.viewProtocol}
+          </Button>
           )}
         </div>
 

@@ -1,25 +1,25 @@
 // src/components/stable-input.tsx
 import React from "react";
-// ÚJ IMPORT-ok a shadcn/ui komponensekből
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface StableInputProps {
   questionId: string;
-  // Bővítjük a lehetséges típusokat
-  type?: 'text' | 'number' | 'email' | 'phone' | 'textarea' | 'select';
+  type?: 'text' | 'number' | 'email' | 'phone' | 'textarea' | 'select' | 'measurement' | 'multi_select' | 'date' | 'time';
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
   className?: string;
   min?: number;
   max?: number;
-  maxLength?: number; // Új prop a karakter limithez
+  maxLength?: number;
   step?: string | number;
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  options?: string; // Új prop a select opciókhoz (vesszővel elválasztva)
+  options?: string;
   required?: boolean;
+  unit?: string;
+  calculationConfig?: any;
 }
 
 export function StableInput({
@@ -36,6 +36,8 @@ export function StableInput({
   onKeyDown,
   options,
   required,
+  unit,
+  calculationConfig,
 }: StableInputProps) {
 
   // Speciális eseménykezelő a telefonszámhoz
@@ -46,7 +48,18 @@ export function StableInput({
     }
   };
 
-  const baseClassName = "w-full focus:outline-none focus:ring-2 focus:ring-otis-blue focus:border-transparent";
+  // 🎯 EGYSÉGES FÓKUSZ STÍLUS - vastag kék keret minden mezőn
+  const baseClassName = `
+    w-full 
+    border border-gray-300 
+    rounded-md
+    focus:outline-none 
+    focus:ring-2 
+    focus:ring-otis-blue 
+    focus:border-transparent
+    focus:shadow-md
+    transition-all duration-150
+  `;
 
   // A `type` alapján a megfelelő komponenst adjuk vissza
   switch (type) {
@@ -64,6 +77,7 @@ export function StableInput({
       );
 
     case 'select':
+    case 'multi_select':
       const selectOptions = options ? options.split(',') : [];
       return (
         <Select value={value || ''} onValueChange={onChange} required={required}>
@@ -83,14 +97,63 @@ export function StableInput({
     case 'phone':
       return (
         <Input
-          type="tel" // HTML `tel` típus a mobil billentyűzet miatt
+          type="tel"
           value={value || ''}
-          onChange={handlePhoneChange} // Itt használjuk a szűrőt
+          onChange={handlePhoneChange}
           onKeyDown={onKeyDown}
           placeholder={placeholder}
           required={required}
           className={`${baseClassName} ${className || ''}`}
         />
+      );
+    
+    case 'date':
+      return (
+        <Input
+          type="date"
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          required={required}
+          className={`${baseClassName} ${className || ''}`}
+        />
+      );
+    
+    case 'time':
+      return (
+        <Input
+          type="time"
+          value={value || ''}
+          onChange={(e) => onChange(e.target.value)}
+          onKeyDown={onKeyDown}
+          placeholder={placeholder}
+          required={required}
+          className={`${baseClassName} ${className || ''}`}
+        />
+      );
+    
+    case 'measurement':
+      return (
+        <div className="flex items-center gap-2">
+          <Input
+            type="number"
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder={placeholder}
+            min={min}
+            max={max}
+            step={step}
+            required={required}
+            className={`${baseClassName} ${className || ''}`}
+          />
+          {unit && (
+            <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
+              {unit}
+            </span>
+          )}
+        </div>
       );
     
     // Az összes többi `<input>`-alapú típus

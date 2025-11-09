@@ -26,7 +26,7 @@ const IsolatedQuestionComponent = memo(({
   const { t } = useLanguageContext();
   const { theme } = useTheme();
   
-  // Fókusz állapot követése
+  // Fókusz állapot követése - MINDEN kérdésen
   const [isFocused, setIsFocused] = useState(false);
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -141,7 +141,7 @@ const IsolatedQuestionComponent = memo(({
     );
   }, [question, value, onChange, t, theme, handleEnterKeyNavigation]);
 
-  // MODERN THEME RENDER - Dinamikus kék keret fókusz alapján
+  // MODERN THEME RENDER - Vastag kék gradient keret MINDEN kérdésen fókuszban
   if (theme === 'modern') {
     return (
       <div 

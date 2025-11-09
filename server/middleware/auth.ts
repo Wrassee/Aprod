@@ -1,4 +1,4 @@
-// server/middleware/auth.ts - JAVÍTOTT VERZIÓ (Automatikus role szinkronizációval)
+// server/middleware/auth.ts - KIBŐVÍTETT VERZIÓ (Email confirmation support)
 import { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { storage } from '../storage.js';
@@ -23,7 +23,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
 /**
  * Middleware to verify Supabase JWT token, attach user to request,
- * AND synchronize local profile role with Supabase role.
+ * AND synchronize local profile role with Supabase role + email confirmation status.
  */
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
@@ -48,30 +48,45 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
 
     // === AUTOMATIKUS SZINKRONIZÁCIÓ KEZDETE ===
-    // 1. Supabase role lekérése az app_metadata-ból
+    // 1. Supabase role és email confirmation státusz lekérése
     const supabaseRole = user.app_metadata?.role || 'user';
+    const emailConfirmed = user.email_confirmed_at !== null; // ÚJ!
 
     // 2. Helyi profil lekérése
     let localProfile = await storage.getProfileByUserId(user.id);
 
-    // 3. Ha nincs helyi profil, létrehozzuk a helyes role-lal
+    // 3. Ha nincs helyi profil, létrehozzuk a helyes adatokkal
     if (!localProfile) {
-      console.log(`🔄 Creating missing local profile for ${user.id} with role: ${supabaseRole}`);
+      console.log(`🔄 Creating missing local profile for ${user.id} with role: ${supabaseRole}, email_confirmed: ${emailConfirmed}`);
       localProfile = await storage.createProfile({
         user_id: user.id,
         email: user.email!,
         role: supabaseRole,
+        email_confirmed: emailConfirmed, // ÚJ!
         name: user.user_metadata?.full_name || user.email?.split('@')[0],
       });
     }
-    // 4. Ha van helyi profil, de a role eltér, frissítjük
-    else if (localProfile.role !== supabaseRole) {
-       console.log(`🔄 Syncing role for ${user.id}: local=${localProfile.role} -> supabase=${supabaseRole}`);
-       // Frissítjük a profilt és megvárjuk az eredményt
-       const updatedProfile = await storage.updateProfile(user.id, { role: supabaseRole });
-       if (updatedProfile) {
-         localProfile = updatedProfile; // Használjuk a frissített profilt
-       }
+    // 4. Ha van helyi profil, de valami eltér, frissítjük
+    else {
+      const needsUpdate = 
+        localProfile.role !== supabaseRole || 
+        localProfile.email_confirmed !== emailConfirmed; // ÚJ!
+
+      if (needsUpdate) {
+        console.log(`🔄 Syncing profile for ${user.id}:`, {
+          role: `${localProfile.role} -> ${supabaseRole}`,
+          email_confirmed: `${localProfile.email_confirmed} -> ${emailConfirmed}`
+        });
+        
+        const updatedProfile = await storage.updateProfile(user.id, { 
+          role: supabaseRole,
+          email_confirmed: emailConfirmed // ÚJ!
+        });
+        
+        if (updatedProfile) {
+          localProfile = updatedProfile;
+        }
+      }
     }
     // === AUTOMATIKUS SZINKRONIZÁCIÓ VÉGE ===
 
@@ -87,13 +102,33 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 }
 
 /**
+ * ÚJ! Middleware to ensure the user has confirmed their email
+ * This should be used AFTER requireAuth middleware
+ */
+export async function requireEmailConfirmed(req: Request, res: Response, next: NextFunction) {
+  const authenticatedUser = (req as any).user;
+
+  if (!authenticatedUser) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  if (authenticatedUser.email_confirmed === false) {
+    return res.status(403).json({ 
+      message: 'Email confirmation required. Please check your email and confirm your account.',
+      code: 'EMAIL_NOT_CONFIRMED'
+    });
+  }
+
+  next();
+}
+
+/**
  * Middleware to ensure the authenticated user can only access their own profile
  * or they have admin role
  */
 export async function requireOwnerOrAdmin(req: Request, res: Response, next: NextFunction) {
   try {
     const requestedUserId = req.params.userId;
-    // Itt már a requireAuth által beállított, szinkronizált user van
     const authenticatedUser = (req as any).user;
     
     if (!authenticatedUser) {
@@ -102,21 +137,17 @@ export async function requireOwnerOrAdmin(req: Request, res: Response, next: Nex
       });
     }
 
-    // Allow if user is accessing their own profile
-    // Figyelem: a localProfile-ban 'user_id' van, a nyers Supabase userben 'id'
     const currentUserId = authenticatedUser.user_id || authenticatedUser.id;
 
     if (currentUserId === requestedUserId) {
       return next();
     }
 
-    // Check if user has admin role (már szinkronizálva van)
     if (authenticatedUser.role === 'admin') {
       console.log('✅ Admin access granted for user:', currentUserId);
       return next();
     }
 
-    // User is not admin and not accessing own profile
     return res.status(403).json({ 
       message: 'Forbidden - You can only access your own profile' 
     });
@@ -140,8 +171,6 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
     return res.status(401).json({ message: 'Authentication required' });
   }
 
-  // Mivel a requireAuth már szinkronizálta a role-t, 
-  // itt elég csak a request-re csatolt user objektumot ellenőrizni.
   if (authenticatedUser.role === 'admin') {
     console.log(`✅ Admin access granted for user: ${authenticatedUser.user_id || authenticatedUser.id}`);
     next();

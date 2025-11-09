@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 // CLASSIC (bár nem használt a JSX-ben, de az interfész része volt)
 import { SmartHelpWizard } from "@/components/smart-help-wizard";
 // KÖZÖS importok
-import { useLanguageContext } from "@/components/language-provider";
+import { useLanguageContext } from "@/components/language-context";
 // TÉMA import
 import { useTheme } from "@/contexts/theme-context";
 

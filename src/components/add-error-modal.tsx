@@ -21,7 +21,8 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Camera, X, AlertTriangle, AlertCircle, Info, Sparkles, Save } from 'lucide-react';
-import { useLanguageContext } from './language-provider';
+import { useLanguageContext } from "@/components/language-context";
+
 
 interface AddErrorModalProps {
   isOpen: boolean;

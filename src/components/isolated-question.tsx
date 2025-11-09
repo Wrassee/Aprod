@@ -1,10 +1,10 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { Question, AnswerValue } from '../../shared/schema.js';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { StyledRadioGroup } from './StyledRadioGroup';
 import { Camera, Image, Sparkles, AlertCircle } from 'lucide-react';
-import { useLanguageContext } from './language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { StableInput } from './stable-input';
 
@@ -25,6 +25,9 @@ const IsolatedQuestionComponent = memo(({
 }: IsolatedQuestionProps) => {
   const { t } = useLanguageContext();
   const { theme } = useTheme();
+  
+  // Fókusz állapot követése
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -58,7 +61,6 @@ const IsolatedQuestionComponent = memo(({
       switch (question.type) {
         case 'radio':
         case 'true_false':
-          // True/False kérdések - 2 gomb (Igen/Nem)
           options = [
             { value: 'true', label: t.yes || 'Igen' },
             { value: 'false', label: t.no || 'Nem' }
@@ -67,7 +69,6 @@ const IsolatedQuestionComponent = memo(({
           
         case 'checkbox':
         case 'yes_no_na':
-          // Yes/No/N.A. kérdések - 3 gomb
           options = [
             { value: 'yes', label: t.yes || 'Igen' },
             { value: 'no', label: t.no || 'Nem' },
@@ -140,14 +141,26 @@ const IsolatedQuestionComponent = memo(({
     );
   }, [question, value, onChange, t, theme, handleEnterKeyNavigation]);
 
-  // MODERN THEME RENDER
+  // MODERN THEME RENDER - Dinamikus kék keret fókusz alapján
   if (theme === 'modern') {
     return (
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-lg hover:shadow-xl transition-all duration-300">
-        {/* Glow animation */}
-        <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-30 animate-pulse" />
+      <div 
+        className={`relative overflow-hidden rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 ${
+          isFocused 
+            ? 'bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1' 
+            : 'bg-transparent p-0'
+        }`}
+        onFocusCapture={() => setIsFocused(true)}
+        onBlurCapture={() => setIsFocused(false)}
+      >
+        {/* Glow animation - csak fókusz esetén */}
+        {isFocused && (
+          <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-30 animate-pulse" />
+        )}
         
-        <Card className="relative border-0 bg-white rounded-2xl">
+        <Card className={`relative bg-white rounded-2xl transition-all duration-300 ${
+          isFocused ? 'border-0' : 'border-2 border-gray-200 hover:border-blue-300'
+        }`}>
           <CardContent className="p-6">
             <div className="space-y-4">
               <div>

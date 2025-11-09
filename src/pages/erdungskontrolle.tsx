@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Progress } from '@/components/ui/progress';
 import PageHeader from '@/components/PageHeader';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { 
   ArrowLeft, 

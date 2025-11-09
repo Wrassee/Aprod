@@ -1,7 +1,7 @@
 // src/components/protocol-list.tsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context'; // ✅ 1. IMPORTÁLVA
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { Label } from '@/components/ui/label';
 import { Question } from '@shared/schema';
 import { StableInput } from './stable-input';

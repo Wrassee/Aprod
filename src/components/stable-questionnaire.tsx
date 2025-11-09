@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { IsolatedQuestion } from '@/components/isolated-question';
 import { ErrorList } from '@/components/error-list';
 import { ErrorExport } from '@/components/error-export';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { ArrowLeft, ArrowRight, Save, Settings, Home } from 'lucide-react';
 
 interface StableQuestionnaireProps {

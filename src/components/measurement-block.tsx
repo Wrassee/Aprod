@@ -2,7 +2,7 @@
 import React, { useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator, Ruler, AlertTriangle, Sparkles } from 'lucide-react';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context'; // ← HOZZÁADVA!
 
 interface Question {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText, User, Calendar, CheckCircle, AlertTriangle, Mail, Download } from 'lucide-react';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 
 interface Protocol {
   id: string;

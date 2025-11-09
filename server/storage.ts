@@ -26,6 +26,7 @@ import {
 
 import { db } from "./db.js";              // Drizzle connection
 import { eq, and, desc, sql } from "drizzle-orm"; // Drizzle helpers + sql for aggregations
+import { supabaseAdmin } from './supabaseAdmin.js';
 
 // ------------------------------------------------------------
 // 2️⃣ IStorage interface – FRISSÍTVE
@@ -395,15 +396,34 @@ export class DatabaseStorage implements IStorage {
    * @returns Promise<Profile[]>
    */
   async getAllProfiles() {
-    console.log('📋 Fetching all user profiles from database...');
-    const profiles_list = await (db as any)
-      .select()
-      .from(profiles)
-      .orderBy(desc(profiles.created_at));
+  try {
+    console.log('📋 Fetching all users from Supabase Auth...');
     
-    console.log(`✅ Retrieved ${profiles_list.length} user profiles`);
-    return profiles_list;
+    const { data: authData, error } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (error) {
+      console.error('❌ Error fetching users from Supabase Auth:', error);
+      throw error;
+    }
+    
+    // Átalakítjuk a "profile" formátumra a kompatibilitás érdekében
+    const profiles = authData.users.map((user) => ({
+      user_id: user.id,
+      full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || null,
+      email: user.email || null,
+      role: user.user_metadata?.role || user.app_metadata?.role || 'user',
+      created_at: user.created_at,
+      updated_at: user.updated_at || user.created_at,
+    }));
+    
+    console.log(`✅ Retrieved ${profiles.length} user profiles from Supabase Auth`);
+    return profiles;
+    
+  } catch (error) {
+    console.error('❌ Error fetching profiles from Auth:', error);
+    return [];
   }
+}
   // --- ÚJ FÜGGVÉNY VÉGE ---
 
   async createProfile(profile: InsertProfile) {
@@ -443,20 +463,25 @@ export class DatabaseStorage implements IStorage {
    * @returns Promise<number>
    */
   async getUsersCount(): Promise<number> {
-    try {
-      console.log('📊 Counting total users...');
-      const [result] = await (db as any)
-        .select({ count: sql<number>`count(*)` })
-        .from(profiles);
-      
-      const count = Number(result?.count || 0);
-      console.log(`✅ Total users: ${count}`);
-      return count;
-    } catch (error) {
+  try {
+    console.log('📊 Counting users from Supabase Auth...');
+    
+    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (error) {
       console.error('❌ Error counting users:', error);
       return 0;
     }
+    
+    const count = data.users.length;
+    console.log(`✅ Total users: ${count}`);
+    return count;
+    
+  } catch (error) {
+    console.error('❌ Error counting users:', error);
+    return 0;
   }
+}
 
   /**
    * Visszaadja a létrehozott protokollok teljes számát.

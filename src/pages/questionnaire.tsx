@@ -9,7 +9,7 @@ import { IsolatedQuestion } from '@/components/isolated-question';
 import { TrueFalseGroup } from '@/components/true-false-group';
 import { ErrorList } from '@/components/error-list';
 import { QuestionGroupHeader } from '@/components/question-group-header';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context'; // TÉMA IMPORT
 import { ArrowLeft, ArrowRight, Save, Check, X, Sparkles, Zap } from 'lucide-react'; // Összevont importok
 import { MeasurementBlock } from '@/components/measurement-block';

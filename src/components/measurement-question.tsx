@@ -1,6 +1,6 @@
 // src/components/measurement-question.tsx - FIXED VERSION
 import React, { useCallback } from 'react';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { Label } from '@/components/ui/label';
 import { Question } from '@shared/schema';
 import { useTheme } from '@/contexts/theme-context';

@@ -1,6 +1,6 @@
 // src/components/audit-log-table.tsx - EVERYONE CAN ACCESS
 import React, { useState, useEffect } from 'react';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';

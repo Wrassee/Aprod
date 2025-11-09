@@ -1,6 +1,6 @@
 // src/components/system-settings.tsx - EVERYONE CAN ACCESS
 import React, { useState, useEffect } from 'react';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';

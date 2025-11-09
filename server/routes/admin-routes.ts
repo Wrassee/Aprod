@@ -1,9 +1,10 @@
-// server/routes/admin-routes.ts - JAVÍTOTT VERZIÓ (loadTemplate hívás javítva)
+// server/routes/admin-routes.ts - TELJES JAVÍTOTT VERZIÓ
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import * as fs from 'fs';
 import { storage } from '../storage.js';
+import { supabaseAdmin } from '../supabaseAdmin.js'; // ✅ ÚJ IMPORT
 import { supabaseStorage } from '../services/supabase-storage.js';
 import { excelParserService } from '../services/excel-parser.js';
 import { hybridTemplateLoader } from '../services/hybrid-template-loader.js';
@@ -11,7 +12,8 @@ import { clearQuestionsCache } from '../routes.js';
 import { requireAdmin } from '../middleware/auth.js';
 import { createManualAuditLog } from '../middleware/audit-logger.js';
 import { db } from '../db.js';
-import { sql } from 'drizzle-orm';
+import { sql, eq } from 'drizzle-orm'; // ✅ eq HOZZÁADVA
+import { protocols } from '../db.js'; // ✅ ÚJ IMPORT (protokollok törléséhez)
 
 const router = express.Router();
 
@@ -129,29 +131,52 @@ router.get('/audit-logs', async (req, res) => {
 });
 
 // ===============================================
-//          USER MANAGEMENT
+//          USER MANAGEMENT - ✅ JAVÍTOTT VERZIÓ
 // ===============================================
 
 // MARADT: requireAdmin (Felhasználókezelés csak adminnak)
 router.get('/users', requireAdmin, async (_req, res) => {
   try {
-    console.log('📋 Fetching all user profiles...');
-    const users = await storage.getAllProfiles();
-    console.log(`✅ Found ${users.length} users`);
+    console.log('📋 Fetching all users from Supabase Auth...');
+    
+    // ✅ Közvetlenül a Supabase Auth API-ból kérjük le a felhasználókat
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.listUsers();
+    
+    if (authError) {
+      console.error('❌ Failed to fetch users from Supabase Auth:', authError);
+      throw authError;
+    }
+    
+    // ✅ Átalakítjuk a frontend által elvárt formátumra
+    const users = authData.users.map((user) => ({
+      user_id: user.id,
+      full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown',
+      email: user.email || null,
+      role: user.user_metadata?.role || user.app_metadata?.role || 'user',
+      created_at: user.created_at,
+      last_sign_in_at: user.last_sign_in_at || null,
+    }));
+    
+    console.log(`✅ Found ${users.length} users from Supabase Auth`);
     res.json(users);
-  } catch (error) {
+    
+  } catch (error: any) {
     console.error('❌ Failed to fetch users:', error);
-    res.status(500).json({ message: 'Hiba történt a felhasználók lekérdezése során.' });
+    res.status(500).json({ 
+      message: 'Hiba történt a felhasználók lekérdezése során.',
+      error: error.message 
+    });
   }
 });
 
-// MARADT: requireAdmin (Felhasználó törlés csak adminnak)
-router.delete('/users/:id', requireAdmin, async (req, res) => {
+// ✅ VÉGLEGES JAVÍTÁS: Felhasználó törlése (Auth + Protocols)
+router.delete('/users/:id', requireAdmin, async (req, res, next) => {
   const { id } = req.params;
   const adminPerformingAction = (req as any).user;
 
-  console.log(`🗑️ Admin ${adminPerformingAction.id} attempting to delete user ${id}`);
+  console.log(`🗑️ Admin ${adminPerformingAction.id} attempting to PERMANENTLY delete user ${id}`);
 
+  // Biztonsági ellenőrzés: Admin nem törölheti saját magát
   if (id === adminPerformingAction.id) {
     console.warn('⚠️ Admin attempted to delete themselves');
     
@@ -169,36 +194,81 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
   }
 
   try {
-    const success = await storage.deleteProfile(id);
-
-    if (!success) {
-      console.warn(`⚠️ User ${id} not found for deletion`);
+    // ==============================================
+    // 🔥 1. Supabase Auth User Törlése
+    // ==============================================
+    console.log(`🔥 Deleting user ${id} from Supabase Auth...`);
+    
+    const { data, error } = await supabaseAdmin.auth.admin.deleteUser(id);
+    
+    if (error) {
+      console.error(`❌ Failed to delete user ${id} from Supabase Auth:`, error.message);
       
       await createManualAuditLog(
         req,
         'user.delete',
         'user',
         id,
-        { reason: 'User not found' },
+        { error: error.message, source: 'supabase_auth' },
         'failure',
-        'A felhasználó nem található'
+        error.message
       );
       
-      return res.status(404).json({ message: 'A felhasználó nem található.' });
+      return res.status(500).json({ 
+        message: 'Hiba történt a felhasználó törlése során.',
+        error: error.message 
+      });
     }
 
+    console.log(`✅ User ${id} PERMANENTLY deleted from Supabase Auth`);
+
+    // ==============================================
+    // 🔥 2. Kapcsolódó Protokollok Törlése
+    // ==============================================
+    try {
+      console.log(`🗑️ Deleting protocols for user ${id}...`);
+      
+      // Lekérjük a felhasználó összes protokollját
+      const userProtocols = await (db as any)
+        .select({ id: protocols.id })
+        .from(protocols)
+        .where(eq(protocols.user_id, id));
+      
+      if (userProtocols.length > 0) {
+        // Töröljük az összes protokollt
+        await (db as any)
+          .delete(protocols)
+          .where(eq(protocols.user_id, id));
+        
+        console.log(`✅ Deleted ${userProtocols.length} protocols for user ${id}`);
+      } else {
+        console.log(`ℹ️ No protocols found for user ${id}`);
+      }
+    } catch (protocolError: any) {
+      // Nem kritikus hiba - csak logoljuk
+      console.warn(`⚠️ Failed to delete protocols for user ${id}:`, protocolError.message);
+    }
+
+    // ==============================================
     // ✅ SIKER - Audit log
+    // ==============================================
     await createManualAuditLog(
       req,
       'user.delete',
       'user',
       id,
-      { deleted_user_id: id },
+      { 
+        deleted_user_id: id, 
+        method: 'supabase_admin_api',
+        cascade_delete: 'protocols'
+      },
       'success'
     );
 
-    console.log(`✅ User ${id} successfully deleted by admin ${adminPerformingAction.id}`);
-    res.status(200).json({ message: 'Felhasználó sikeresen törölve.' });
+    console.log(`✅ User ${id} and all related data successfully deleted by admin ${adminPerformingAction.id}`);
+    res.status(200).json({ 
+      message: 'Felhasználó és kapcsolódó adatai sikeresen törölve.' 
+    });
     
   } catch (error: any) {
     console.error(`❌ Failed to delete user ${id}:`, error);
@@ -213,7 +283,16 @@ router.delete('/users/:id', requireAdmin, async (req, res) => {
       error.message
     );
     
-    res.status(500).json({ message: 'Hiba történt a felhasználó törlése során.' });
+    // Továbbítjuk a hibát (ha van globális error handler)
+    // Ha nincs, használd: res.status(500).json(...)
+    if (next) {
+      next(error);
+    } else {
+      res.status(500).json({ 
+        message: 'Hiba történt a felhasználó törlése során.',
+        error: error.message 
+      });
+    }
   }
 });
 
@@ -347,12 +426,11 @@ router.post("/templates/select", async (req, res) => {
     }
     console.log(`📄 Selecting template: ${templateId} with strategy: ${loadStrategy || 'local_first'}`);
 
-    // ✅ JAVÍTÁS: Explicit módon átadjuk mind a 4 paramétert
     const templateResult = await hybridTemplateLoader.loadTemplate(
-      templateId,           // 1. templateId (kötelező)
-      "unified",           // 2. type (opcionális, de átadjuk)
-      "multilingual",      // 3. language (opcionális, de átadjuk)
-      loadStrategy || 'local_first'  // 4. strategy (opcionális, de átadjuk)
+      templateId,
+      "unified",
+      "multilingual",
+      loadStrategy || 'local_first'
     );
 
     console.log(`✅ Template selection processed`);

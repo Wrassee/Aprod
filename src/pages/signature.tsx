@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SimpleSignatureCanvas } from '@/components/simple-signature-canvas';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { formatDate } from '@/lib/utils';
 import { 
   ArrowLeft, 

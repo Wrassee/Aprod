@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 // Ikonok mindkét témához
 import { Plus, Edit, Trash2, CheckCircle, AlertTriangle, AlertCircle, Info, Sparkles } from 'lucide-react';
 // Közös komponensek
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { AddErrorModal } from '@/components/add-error-modal';
 // Téma import
 import { useTheme } from '@/contexts/theme-context';

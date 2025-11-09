@@ -2,7 +2,7 @@
 import PageHeader from '@/components/PageHeader';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { ErrorExport } from '@/components/error-export';
 import { ProtocolError } from '@shared/schema';

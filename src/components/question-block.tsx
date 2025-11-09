@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Camera, Image } from 'lucide-react';
-import { useLanguageContext } from './language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { UltraStableInput } from './ultra-stable-input';
 
 interface QuestionBlockProps {

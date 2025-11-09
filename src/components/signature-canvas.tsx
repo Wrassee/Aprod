@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useSignature } from '@/hooks/use-signature';
-import { useLanguageContext } from './language-provider';
+import { useLanguageContext } from "@/components/language-context";
 
 interface SignatureCanvasProps {
   onSignatureChange: (signature: string) => void;

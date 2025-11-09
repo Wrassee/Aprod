@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context'; // ✅ JAVÍTVA: Helyes útvonal
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context'; // ✅ AUTH IMPORT
@@ -310,30 +310,30 @@ export function Admin({ onBack, onHome }: AdminProps) {
 
             {/* ✅ 6. FELTÉTELES TARTALOM (MODERN) */}
             {isAdmin && (
-              <TabsContent value="dashboard">
+              <TabsContent value="dashboard" className="mt-6">
                 <AdminDashboard />
               </TabsContent>
             )}
 
             {isAdmin && (
-              <TabsContent value="users">
+              <TabsContent value="users" className="mt-6">
                 <UserList />
               </TabsContent>
             )}
 
-            <TabsContent value="protocols">
+            <TabsContent value="protocols" className="mt-6">
               <ProtocolList />
             </TabsContent>
 
-            <TabsContent value="templates" className="space-y-6">
+            <TabsContent value="templates" className="space-y-6 mt-6">
               <TemplateManagement />
             </TabsContent>
 
-            <TabsContent value="audit">
+            <TabsContent value="audit" className="mt-6">
               <AuditLogTable />
             </TabsContent>
 
-            <TabsContent value="settings">
+            <TabsContent value="settings" className="mt-6">
               {/* ✅ NESTED TABS WITH STATE */}
               <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
                 <TabsList className="grid w-full grid-cols-2 bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-xl shadow-md mb-6">
@@ -353,11 +353,11 @@ export function Admin({ onBack, onHome }: AdminProps) {
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="profile">
+                <TabsContent value="profile" className="mt-6">
                   <ProfileSettings />
                 </TabsContent>
 
-                <TabsContent value="system">
+                <TabsContent value="system" className="mt-6">
                   <SystemSettings />
                 </TabsContent>
               </Tabs>
@@ -451,30 +451,31 @@ export function Admin({ onBack, onHome }: AdminProps) {
 
         {/* ✅ 6. FELTÉTELES TARTALOM (CLASSIC) */}
         {isAdmin && (
-          <TabsContent value="dashboard">
+          <TabsContent value="dashboard" className="mt-6">
             <AdminDashboard />
           </TabsContent>
         )}
 
         {isAdmin && (
-          <TabsContent value="users">
-            <UserList />
-          </TabsContent>
-        )}
+          <TabsContent value="users" className="mt-6">
+                <UserList />
+              </TabsContent>
+            )}
 
-        <TabsContent value="protocols">
-          <ProtocolList />
-        </TabsContent>
+            <TabsContent value="protocols" className="mt-6">
+              <ProtocolList />
+            </TabsContent>
 
-        <TabsContent value="templates" className="space-y-6">
-          <TemplateManagement />
-        </TabsContent>
+            {/* ========== JAVÍTÁS ITT (Modern) ========== */}
+            <TabsContent value="templates" className="space-y-6 mt-6">
+              <TemplateManagement />
+            </TabsContent>
 
-        <TabsContent value="audit">
-          <AuditLogTable />
-        </TabsContent>
+            <TabsContent value="audit" className="mt-6">
+              <AuditLogTable />
+            </TabsContent>
 
-        <TabsContent value="settings">
+            <TabsContent value="settings" className="mt-6">
           {/* ✅ NESTED TABS WITH STATE */}
           <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
@@ -488,11 +489,11 @@ export function Admin({ onBack, onHome }: AdminProps) {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile">
+            <TabsContent value="profile" className="mt-6">
               <ProfileSettings />
             </TabsContent>
 
-            <TabsContent value="system">
+            <TabsContent value="system" className="mt-6">
               <SystemSettings />
             </TabsContent>
           </Tabs>

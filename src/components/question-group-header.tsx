@@ -1,4 +1,4 @@
-import { useLanguageContext } from '@/components/language-provider';
+import { useLanguageContext } from "@/components/language-context";
 
 interface QuestionGroupHeaderProps {
   groupName: string;

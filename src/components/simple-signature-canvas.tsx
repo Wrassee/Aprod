@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { useLanguageContext } from './language-provider';
+import { useLanguageContext } from "@/components/language-context";
 
 interface SimpleSignatureCanvasProps {
   onSignatureChange: (signature: string) => void;

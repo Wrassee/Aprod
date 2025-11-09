@@ -3,19 +3,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label'; // Classic import
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { useQuery } from '@tanstack/react-query';
-import { useLanguageContext } from '@/components/language-provider';
-import { useToast } from '@/hooks/use-toast'; // Classic import
-import { ArrowLeft, ArrowRight, Save, Settings, Check, Plus, Trash2, Filter, Sparkles, CheckCircle, BarChart3, Zap } from 'lucide-react'; // Egyesített ikonok
+import { useLanguageContext } from "@/components/language-context";
+import { useToast } from '@/hooks/use-toast';
+import { ArrowLeft, ArrowRight, Save, Settings, Check, Plus, Trash2, Filter, Sparkles, CheckCircle, BarChart3, Zap } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import type { NiedervoltMeasurement } from '@/types/niedervolt-devices';
 import { FormData } from '@/lib/types';
 import { InfinityInput } from '@/components/InfinityInput';
 import { TypeSelectorInput } from '@/components/TypeSelectorInput';
-// TÉMA IMPORT
 import { useTheme } from '@/contexts/theme-context';
 
 interface CustomDevice {
@@ -26,7 +25,6 @@ interface CustomDevice {
 interface NiedervoltTableProps {
   formData: FormData;
   setFormData: (data: FormData | ((prev: FormData) => FormData)) => void;
-  
   measurements: Record<string, NiedervoltMeasurement>;
   onMeasurementsChange: (measurements: Record<string, NiedervoltMeasurement>) => void;
   onBack: () => void;
@@ -43,7 +41,6 @@ interface NiedervoltTableProps {
 export function NiedervoltTable({
   formData,
   setFormData,
-  
   measurements,
   onMeasurementsChange,
   onBack,
@@ -56,17 +53,15 @@ export function NiedervoltTable({
   totalProtocolSteps,
   currentProtocolStep,
 }: NiedervoltTableProps) {
-  // === KÖZÖS HOOK-OK ===
   const { t, language } = useLanguageContext();
-  const { theme } = useTheme(); // TÉMA HOOK
-  const { toast } = useToast(); // Classic hook
+  const { theme } = useTheme();
+  const { toast } = useToast();
   
   const { data: niedervoltData, isLoading } = useQuery({
     queryKey: ['/api/niedervolt/devices'],
     retry: 1,
   });
 
-  // === KÖZÖS LOGIKA (megegyezik mindkét fájlban) ===
   const devices = (niedervoltData as any)?.devices || [];
   const dropdownOptions = (niedervoltData as any)?.dropdownOptions || {
     biztositek: [],
@@ -78,7 +73,7 @@ export function NiedervoltTable({
   const [selectedDevices, setSelectedDevices] = useState<Set<string>>(new Set());
   const [customDevices, setCustomDevices] = useState<CustomDevice[]>([]);
   const [showDeviceSelector, setShowDeviceSelector] = useState(false);
-  const [newDeviceName, setNewDeviceName] = useState({ de: '', hu: '' });
+  const [newDeviceName, setNewDeviceName] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -122,7 +117,7 @@ export function NiedervoltTable({
       
       setIsInitialized(true);
     }
-  }, [devices, isInitialized, onMeasurementsChange, measurements]); // measurements hozzáadva a dependency array-hez
+  }, [devices, isInitialized, onMeasurementsChange, measurements]);
 
   useEffect(() => { if (isInitialized) { localStorage.setItem('niedervolt-table-measurements', JSON.stringify(measurements)); } }, [measurements, isInitialized]);
   useEffect(() => { if (isInitialized) { localStorage.setItem('niedervolt-selected-devices', JSON.stringify(Array.from(selectedDevices))); } }, [selectedDevices, isInitialized]);
@@ -132,48 +127,47 @@ export function NiedervoltTable({
     if (device.name && typeof device.name === 'object') {
       return language === 'hu' ? device.name.hu : device.name.de;
     }
-    // Fallback a régi struktúrához (bár a modern már nem használja)
     return language === 'hu' ? (device.nameHU || device.name.hu) : (device.nameDE || device.name.de);
   };
 
   const updateMeasurement = useCallback(
-  (deviceId: string, field: keyof NiedervoltMeasurement, value: string) => {
-    const numericOnlyFields: (keyof NiedervoltMeasurement)[] = [
-      'iccLN',
-      'iccLPE',
-      'fiIn',
-      'fiDin',
-    ];
-    let cleanValue = value;
+    (deviceId: string, field: keyof NiedervoltMeasurement, value: string) => {
+      const numericOnlyFields: (keyof NiedervoltMeasurement)[] = [
+        'iccLN',
+        'iccLPE',
+        'fiIn',
+        'fiDin',
+      ];
+      let cleanValue = value;
 
-    if (numericOnlyFields.includes(field)) {
-      if (value !== '-') {
-        cleanValue = value.replace(/[^0-9.]/g, '');
+      if (numericOnlyFields.includes(field)) {
+        if (value !== '-') {
+          cleanValue = value.replace(/[^0-9.]/g, '');
+        }
       }
-    }
-    
-    const current = measurements[deviceId] || {};
-    const updated: NiedervoltMeasurement = {
-      ...current,
-      deviceId: deviceId,
-      [field]: cleanValue,
-    };
+      
+      const current = measurements[deviceId] || {};
+      const updated: NiedervoltMeasurement = {
+        ...current,
+        deviceId: deviceId,
+        [field]: cleanValue,
+      };
 
-    if (field === 'biztositek' && cleanValue !== '') {
-      updated.kismegszakito = '';
-    }
-    if (field === 'kismegszakito' && cleanValue !== '') {
-      updated.biztositek = '';
-    }
+      if (field === 'biztositek' && cleanValue !== '') {
+        updated.kismegszakito = '';
+      }
+      if (field === 'kismegszakito' && cleanValue !== '') {
+        updated.biztositek = '';
+      }
 
-    const newMeasurements: Record<string, NiedervoltMeasurement> = {
-      ...measurements,
-      [deviceId]: updated,
-    };
-    onMeasurementsChange(newMeasurements);
-  },
-  [measurements, onMeasurementsChange]
-);
+      const newMeasurements: Record<string, NiedervoltMeasurement> = {
+        ...measurements,
+        [deviceId]: updated,
+      };
+      onMeasurementsChange(newMeasurements);
+    },
+    [measurements, onMeasurementsChange]
+  );
     
   const getFieldLabel = (field: string) => {
     const labels = {
@@ -207,12 +201,15 @@ export function NiedervoltTable({
   }, []);
 
   const addCustomDevice = () => {
-    if (newDeviceName.de.trim() && newDeviceName.hu.trim()) {
+    const name = newDeviceName.trim();
+    
+    if (name) {
       const id = `custom-${Date.now()}`;
-      const device: CustomDevice = { id, name: { de: newDeviceName.de.trim(), hu: newDeviceName.hu.trim() } };
+      // Mindkét nyelvhez ugyanazt a nevet használjuk
+      const device: CustomDevice = { id, name: { de: name, hu: name } };
       setCustomDevices(prev => [...prev, device]);
       setSelectedDevices(prev => new Set(prev).add(id));
-      setNewDeviceName({ de: '', hu: '' });
+      setNewDeviceName('');
     }
   };
 
@@ -288,7 +285,6 @@ export function NiedervoltTable({
     }, 500);
   };
 
-  // === TÉMA ALAPÚ BETÖLTÉS NÉZET ===
   if (isLoading) {
     if (theme === 'modern') {
       return (
@@ -300,7 +296,6 @@ export function NiedervoltTable({
         </div>
       );
     }
-    // Classic loading
     return (
       <div className="min-h-screen bg-light-surface flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -308,18 +303,14 @@ export function NiedervoltTable({
     );
   }
 
-  // -------------------------
-  // |    MODERN OTIS TÉMA   |
-  // -------------------------
+  // MODERN THEME
   if (theme === 'modern') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
-        {/* Animated background */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
         <PageHeader
-          // language prop nincs a modern verzióban, a contextből veszi
           receptionDate={receptionDate}
           onReceptionDateChange={onReceptionDateChange}
           onStartNew={onStartNew}
@@ -332,9 +323,7 @@ export function NiedervoltTable({
         />
 
         <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-          {/* 🎨 MODERN STATS CARDS */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Total Devices Card */}
             <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl hover:shadow-2xl transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity"></div>
               <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
@@ -357,7 +346,6 @@ export function NiedervoltTable({
               </div>
             </div>
 
-            {/* Filled Devices Card */}
             <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600 via-emerald-500 to-teal-400 p-1 shadow-xl hover:shadow-2xl transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity"></div>
               <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
@@ -380,7 +368,6 @@ export function NiedervoltTable({
               </div>
             </div>
 
-            {/* Progress Card */}
             <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 via-violet-500 to-fuchsia-400 p-1 shadow-xl hover:shadow-2xl transition-all duration-300">
               <div className="absolute inset-0 bg-gradient-to-r from-violet-400 via-purple-500 to-fuchsia-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity"></div>
               <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
@@ -404,7 +391,6 @@ export function NiedervoltTable({
             </div>
           </div>
 
-          {/* 🎨 MODERN TABLE CARD */}
           <Card className="shadow-2xl border-2 border-blue-100 dark:border-blue-900/50 overflow-hidden">
             <CardHeader className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 text-white p-6">
               <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-30 animate-pulse"></div>
@@ -541,9 +527,7 @@ export function NiedervoltTable({
             </CardContent>
           </Card>
 
-          {/* 🎨 MODERN NAVIGATION */}
           <div className="mt-8 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4">
-            {/* Back Button */}
             <button
               onClick={onBack}
               className="group relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20"
@@ -555,7 +539,6 @@ export function NiedervoltTable({
             </button>
 
             <div className="flex gap-3">
-              {/* Save Button */}
               <button
                 onClick={handleManualSave}
                 disabled={saveStatus === 'saving'}
@@ -585,7 +568,6 @@ export function NiedervoltTable({
                 </div>
               </button>
 
-              {/* Next Button */}
               <button
                 onClick={handleSaveAndProceed}
                 className="group relative overflow-hidden px-8 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
@@ -602,7 +584,6 @@ export function NiedervoltTable({
           </div>
         </main>
 
-        {/* 🎨 MODERN DEVICE SELECTOR DIALOG */}
         <Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
           <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
             <DialogHeader>
@@ -613,7 +594,6 @@ export function NiedervoltTable({
             </DialogHeader>
 
             <div className="flex-grow overflow-y-auto pr-4 -mr-4 space-y-6">
-              {/* Device Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {allDevices.map((device) => (
                   <div
@@ -654,7 +634,6 @@ export function NiedervoltTable({
                 ))}
               </div>
 
-              {/* Add Custom Device Section */}
               <div className="border-t-2 border-blue-100 pt-6">
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl">
                   <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-30 animate-pulse"></div>
@@ -666,25 +645,18 @@ export function NiedervoltTable({
                     <div className="flex flex-col md:flex-row gap-3">
                       <div className="relative group flex-1">
                         <Input
-                          placeholder="Német név (DE)"
-                          value={newDeviceName.de}
-                          onChange={(e) => setNewDeviceName(prev => ({ ...prev, de: e.target.value }))}
-                          className="border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        />
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-500 opacity-0 group-focus-within:opacity-100 animate-pulse"></div>
-                      </div>
-                      <div className="relative group flex-1">
-                        <Input
-                          placeholder="Magyar név (HU)"
-                          value={newDeviceName.hu}
-                          onChange={(e) => setNewDeviceName(prev => ({ ...prev, hu: e.target.value }))}
+                          placeholder={language === 'hu' ? 'Eszköz neve' : 'Gerätename'}
+                          value={newDeviceName}
+                          onChange={(e) => setNewDeviceName(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && addCustomDevice()}
                           className="border-blue-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-500 opacity-0 group-focus-within:opacity-100 animate-pulse"></div>
                       </div>
                       <button
                         onClick={addCustomDevice}
-                        className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                        disabled={!newDeviceName.trim()}
+                        className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                       >
                         <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500"></div>
                         <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -719,13 +691,10 @@ export function NiedervoltTable({
     );
   }
 
-  // -------------------------
-  // |     CLASSIC TÉMA      |
-  // -------------------------
+  // CLASSIC THEME
   return (
     <div className="min-h-screen bg-light-surface">
       <PageHeader
-        // language prop a classic verzióban megvolt
         language={language} 
         receptionDate={receptionDate}
         onReceptionDateChange={onReceptionDateChange}
@@ -736,10 +705,10 @@ export function NiedervoltTable({
         currentStep={currentProtocolStep}
         stepType="niedervolt"
         progressPercent={tableProgressPercent}
-        currentPage={5} // Classic prop
-        formData={{ measurements }} // Classic prop
-        currentQuestionId="niedervolt-table" // Classic prop
-        errors={[]} // Classic prop
+        currentPage={5}
+        formData={{ measurements }}
+        currentQuestionId="niedervolt-table"
+        errors={[]}
       />
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -852,9 +821,7 @@ export function NiedervoltTable({
                                   value={measurement[field as keyof NiedervoltMeasurement] || ''}
                                   onChange={(e) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, e.target.value)}
                                   className={`w-full ${
-                                    ['tipusjelzes', 'iccLN', 'iccLPE', 'fiIn', 'fiDin'].includes(field)
-                                      ? 'text-center' // <-- HA A MEZŐ A LISTÁBAN VAN, KÖZÉPRE IGAZÍTJUK
-                                      : ''
+                                    ['tipusjelzes', 'iccLN', 'iccLPE', 'fiIn', 'fiDin'].includes(field) ? 'text-center' : ''
                                   }`}
                                 />
                               )}
@@ -950,20 +917,19 @@ export function NiedervoltTable({
 
             <div className="border-t pt-4 mt-4 p-1">
               <h4 className="font-medium mb-2">{language === 'hu' ? 'Saját eszköz hozzáadása' : 'Eigenes Gerät hinzufügen'}</h4>
-              <div className="flex flex-col md:flex-row gap-2">
+              <div className="flex gap-2">
                 <Input
-                  placeholder="DE"
-                  value={newDeviceName.de}
-                  onChange={(e) => setNewDeviceName(prev => ({ ...prev, de: e.target.value }))}
+                  placeholder={language === 'hu' ? 'Eszköz neve' : 'Gerätename'}
+                  value={newDeviceName}
+                  onChange={(e) => setNewDeviceName(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addCustomDevice()}
                   className="flex-1"
                 />
-                <Input
-                  placeholder="HU"
-                  value={newDeviceName.hu}
-                  onChange={(e) => setNewDeviceName(prev => ({ ...prev, hu: e.target.value }))}
-                  className="flex-1"
-                />
-                <Button onClick={addCustomDevice} className="flex-shrink-0">
+                <Button 
+                  onClick={addCustomDevice}
+                  disabled={!newDeviceName.trim()}
+                  className="flex-shrink-0"
+                >
                   <Plus className="h-4 w-4 mr-2" />
                   {language === 'hu' ? 'Hozzáadás' : 'Hinzufügen'}
                 </Button>
@@ -983,4 +949,3 @@ export function NiedervoltTable({
     </div>
   );
 }
-

@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download, Mail, Printer, FileText, Camera, Tag, Sparkles, AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
-import { useLanguageContext } from './language-provider';
+import { useLanguageContext } from "@/components/language-context";
 
 interface ErrorExportProps {
   errors: ProtocolError[];

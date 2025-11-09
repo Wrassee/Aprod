@@ -1,35 +1,36 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button'; // Classic gombokhoz
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
-import { useLanguageContext } from '@/components/language-provider';
-// TÉMA IMPORT
+import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
-// Ikonok (egyesítve mindkét verzióból)
-import { Loader2, LogIn, UserPlus, Mail, Lock, Sparkles, ArrowLeft } from 'lucide-react';
+import { Loader2, LogIn, UserPlus, Mail, Lock, Sparkles, HelpCircle } from 'lucide-react';
 
 interface LoginProps {
   onLoginSuccess: () => void;
   onBackToHome?: () => void;
+  onNavigateToForgotPassword: () => void;
 }
 
-export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
-  // === KÖZÖS HOOK-OK ===
+export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword }: LoginProps) {
   const { toast } = useToast();
   const { signIn, signUp } = useAuth();
   const { t } = useLanguageContext();
-  const { theme } = useTheme(); // TÉMA HOOK
+  const { theme } = useTheme();
   
-  // === KÖZÖS STATE ===
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
 
-  // === KÖZÖS LOGIKA: BEJELENTKEZÉS ===
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onNavigateToForgotPassword();
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -45,7 +46,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
     setLoading(true);
 
     try {
-      // SECURITY FIX: Wait for session before proceeding
       const session = await signIn(email, password);
       
       if (!session) {
@@ -60,7 +60,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
     } catch (error: any) {
       console.error('Login error:', error);
       
-      // More specific error messages
       let errorMessage = error.message || t.genericLoginError;
       
       if (error.message?.includes('Invalid login credentials')) {
@@ -79,7 +78,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
     }
   };
 
-  // === KÖZÖS LOGIKA: REGISZTRÁCIÓ ===
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -104,11 +102,9 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
     setLoading(true);
 
     try {
-      // SECURITY FIX: Wait for session before proceeding
       const session = await signUp(email, password);
       
       if (!session) {
-        // Email confirmation required
         toast({
           title: t.emailConfirmationRequired,
           description: t.checkEmailForConfirmation,
@@ -123,7 +119,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
         description: t.loginSuccessfulAfterRegistration,
       });
       
-      // Auto-login after registration (only if session exists)
       onLoginSuccess();
     } catch (error: any) {
       console.error('Registration error:', error);
@@ -159,52 +154,26 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
   if (theme === 'modern') {
     return (
       <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 flex items-center justify-center p-4">
-        {/* Animated background */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
         <div className="relative z-10 w-full max-w-md">
-          
-          {/* Back to Home Button - KISZEDVE A KÉRÉS ALAPJÁN */}
-          {/*
-          {onBackToHome && (
-            <button
-              onClick={onBackToHome}
-              className="group mb-6 flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="text-sm font-medium">Vissza a főoldalra</span>
-            </button>
-          )}
-          */}
-
-          {/* 🎨 MODERN LOGIN CARD */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-2xl">
             <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse"></div>
             
             <div className="relative bg-white dark:bg-gray-900 rounded-3xl">
               <CardHeader className="space-y-6 p-8 pb-6">
-                {/* Logo - Clickable */}
                 <div className="flex justify-center">
-                  <button
-                    onClick={onBackToHome} // A funkció megmarad a logón
-                    className="group relative"
-                    data-testid="button-home-logo"
-                  >
+                  <button onClick={onBackToHome} className="group relative" data-testid="button-home-logo">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-2xl blur-md opacity-0 group-hover:opacity-40 transition-opacity"></div>
                     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-lg group-hover:shadow-xl transition-shadow">
                       <div className="bg-white rounded-xl p-4">
-                        <img 
-                          src="/otis-logo.png" 
-                          alt="OTIS Logo" 
-                          className="h-16 w-auto transition-transform group-hover:scale-105"
-                        />
+                        <img src="/otis-logo.png" alt="OTIS Logo" className="h-16 w-auto transition-transform group-hover:scale-105" />
                       </div>
                     </div>
                   </button>
                 </div>
 
-                {/* Title */}
                 <div className="text-center space-y-2">
                   <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                     {isRegistering ? t.registerTitle : t.loginTitle}
@@ -218,7 +187,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
               
               <CardContent className="p-8 pt-0">
                 <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-5">
-                  {/* Email Input */}
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <Mail className="h-4 w-4 text-blue-600" />
@@ -240,7 +208,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
                     </div>
                   </div>
                   
-                  {/* Password Input */}
                   <div className="space-y-2">
                     <Label htmlFor="password" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <Lock className="h-4 w-4 text-blue-600" />
@@ -260,9 +227,25 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
                       />
                       <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-blue-500 opacity-0 group-focus-within:opacity-100 animate-pulse"></div>
                     </div>
+
+                    {/* ✨ "Elfelejtette a jelszavát?" MODERN GOMB - CSAK LOGIN MÓDBAN ✨ */}
+                    {!isRegistering && (
+                      <div className="flex justify-center pt-1">
+                        <button
+                          type="button"
+                          onClick={handleForgotPassword}
+                          className="group inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                        >
+                          <HelpCircle className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
+                          <span className="relative">
+                            Elfelejtette a jelszavát?
+                            <span className="absolute left-0 right-0 bottom-0 h-px bg-blue-600 dark:bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                          </span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={loading}
@@ -298,7 +281,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
                   </button>
 
-                  {/* Divider */}
                   <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
                       <span className="w-full border-t-2 border-gray-200 dark:border-gray-700" />
@@ -310,7 +292,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
                     </div>
                   </div>
 
-                  {/* Toggle Mode Button */}
                   <button
                     type="button"
                     onClick={() => setIsRegistering(!isRegistering)}
@@ -325,7 +306,6 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
             </div>
           </div>
 
-          {/* Info Text */}
           <p className="text-center text-xs text-gray-500 mt-6">
             © {new Date().getFullYear()} OTIS Elevator Company
           </p>
@@ -355,9 +335,7 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
               {isRegistering ? t.registerTitle : t.loginTitle}
             </CardTitle>
             <CardDescription>
-              {isRegistering 
-                ? t.registerDescription
-                : t.loginDescription}
+              {isRegistering ? t.registerDescription : t.loginDescription}
             </CardDescription>
           </div>
         </CardHeader>
@@ -390,6 +368,23 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
                 required
                 data-testid="input-password"
               />
+
+              {/* "Elfelejtette a jelszavát?" gomb - CSAK LOGIN MÓDBAN */}
+              {!isRegistering && (
+                <div className="flex justify-center pt-1">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="group inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
+                  >
+                    <HelpCircle className="h-3.5 w-3.5" />
+                    <span className="relative">
+                      Elfelejtette a jelszavát?
+                      <span className="absolute left-0 right-0 bottom-0 h-px bg-current scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                    </span>
+                  </button>
+                </div>
+              )}
             </div>
 
             <Button
@@ -425,9 +420,7 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  vagy
-                </span>
+                <span className="bg-background px-2 text-muted-foreground">vagy</span>
               </div>
             </div>
 
@@ -439,9 +432,7 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
               disabled={loading}
               data-testid="button-toggle-mode"
             >
-              {isRegistering 
-                ? t.switchToLogin
-                : t.switchToRegister}
+              {isRegistering ? t.switchToLogin : t.switchToRegister}
             </Button>
           </form>
         </CardContent>
@@ -449,4 +440,3 @@ export function Login({ onLoginSuccess, onBackToHome }: LoginProps) {
     </div>
   );
 }
-

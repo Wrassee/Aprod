@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Question, AnswerValue } from '@shared/schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StyledRadioGroup } from './StyledRadioGroup';
-import { useLanguageContext } from './language-provider';
+import { useLanguageContext } from "@/components/language-context";
 
 interface TrueFalseGroupProps {
   questions: Question[];

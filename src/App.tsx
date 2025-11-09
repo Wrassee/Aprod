@@ -1,4 +1,4 @@
-// src/App.tsx - JAVÍTOTT VERZIÓ (401 Unauthorized hiba javítva)
+// src/App.tsx - JAVÍTOTT VERZIÓ (URL-kezelés, Auth, Import útvonalak)
 
 import React, {
   useState,
@@ -12,7 +12,8 @@ import { queryClient } from "@/lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { LanguageProvider, useLanguageContext } from "@/components/language-provider";
+import { LanguageProvider } from "@/components/language-provider";
+import { useLanguageContext } from "@/components/language-context";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { ThemeProvider } from '@/contexts/theme-context';
 import { Loader2 } from 'lucide-react';
@@ -27,13 +28,16 @@ import { Admin } from "@/pages/admin";
 import { ProtocolPreview } from "@/pages/protocol-preview";
 import { Erdungskontrolle } from "@/pages/erdungskontrolle";
 import { Login } from "@/pages/login";
+import ForgotPassword from "@/pages/forgot-password";
+import ResetPassword from "@/pages/reset-password";
+import AuthCallback from "@/pages/auth-callback";
 import { ProtectedRoute } from "@/components/protected-route";
 import { FormData, MeasurementRow } from "./lib/types";
 
 /* -------------------- Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema";
 
-type Screen = 'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview' | 'login';
+type Screen = 'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview' | 'login' | 'forgot-password' | 'reset-password' | 'auth-callback';
 
 interface AppContentProps {
   currentScreen: Screen;
@@ -72,6 +76,11 @@ function AppContent({
   }, [formData]);
 
   useEffect(() => {
+    const savedLanguage = localStorage.getItem('otis-protocol-language');
+    if (savedLanguage) {
+      setLanguageSelected(true);
+    }
+    
     if (user && languageSelected && currentScreen === 'start') {
       console.log('✅ User logged in, language already selected. Redirecting to questionnaire...');
       setCurrentScreen('questionnaire');
@@ -84,13 +93,20 @@ function AppContent({
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
     setLanguage(selectedLanguage);
     localStorage.setItem('otis-protocol-language', selectedLanguage);
-    setCurrentScreen('questionnaire');
-    setCurrentQuestionnairePage(0);
-    localStorage.setItem('questionnaire-current-page', '0');
+    setLanguageSelected(true);
+    
+    if (user) {
+      setCurrentScreen('questionnaire');
+      setCurrentQuestionnairePage(0);
+      localStorage.setItem('questionnaire-current-page', '0');
+    } else {
+      setCurrentScreen('login');
+    }
+    
     localStorage.removeItem('protocol-errors');
     window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
     window.dispatchEvent(new Event('storage'));
-  }, [setLanguage, setCurrentScreen, setCurrentQuestionnairePage]);
+  }, [setLanguage, setCurrentScreen, setCurrentQuestionnairePage, user]);
 
   const handleSaveProgress = useCallback(() => {
     console.log('✅ Progress saved automatically');
@@ -136,14 +152,10 @@ function AppContent({
     console.log('✅ All data cleared');
   }, [setFormData, setClearTrigger, setCurrentScreen, setCurrentQuestionnairePage, setCurrentQuestionId]);
 
-  // Módosított handleGoHome: törli a nyelvet és visszavisz a start képernyőre
   const handleGoHome = useCallback(() => {
     console.log('🏠 Home button clicked - resetting language and returning to start screen');
-    // Nyelv resetelése
     setLanguageSelected(false);
     localStorage.removeItem('otis-protocol-language');
-    
-    // Képernyő és állapot reset
     setCurrentScreen('start');
     setCurrentQuestionnairePage(0);
     localStorage.setItem('questionnaire-current-page', '0');
@@ -177,8 +189,8 @@ function AppContent({
   }, [setCurrentScreen]);
 
   const handleLoginSuccess = useCallback(() => {
-    console.log('✅ Login successful - redirecting to admin');
-    setCurrentScreen('admin');
+    console.log('✅ Login successful - redirecting to questionnaire');
+    setCurrentScreen('questionnaire');
   }, [setCurrentScreen]);
 
   const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
@@ -186,7 +198,7 @@ function AppContent({
   }, [setFormData]);
 
   // === FELTÉTELES KORAI RETURN-OK ===
-  if (authLoading) {
+  if (authLoading && currentScreen === 'start') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-cyan-50">
         <div className="text-center">
@@ -202,40 +214,20 @@ function AppContent({
     );
   }
 
-  if (!user) {
-    if (!languageSelected) {
-      return (
-        <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
-            <Toaster />
-            <StartScreen 
-              onLanguageSelect={(selectedLanguage: 'hu' | 'de') => {
-                console.log('🌍 App.tsx (Pre-Login) - Language selected:', selectedLanguage);
-                setLanguage(selectedLanguage);
-                localStorage.setItem('otis-protocol-language', selectedLanguage);
-                setLanguageSelected(true);
-              }} 
-            />
-          </TooltipProvider>
-        </QueryClientProvider>
-      );
+  // Nem bejelentkezett user kezelése
+  if (!user && 
+      currentScreen !== 'login' && 
+      currentScreen !== 'auth-callback' && 
+      currentScreen !== 'forgot-password' && 
+      currentScreen !== 'reset-password' &&
+      currentScreen !== 'start'
+    ) {
+    const savedLanguage = localStorage.getItem('otis-protocol-language');
+    if (!savedLanguage) {
+      setCurrentScreen('start');
+    } else {
+      setCurrentScreen('login');
     }
-
-    return (
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Login 
-            onLoginSuccess={() => {
-              console.log('Login component success callback triggered (handled by App effect).');
-            }}
-            onBackToHome={() => {
-              setLanguageSelected(false);
-            }}
-          />
-        </TooltipProvider>
-      </QueryClientProvider>
-    );
   }
 
   // === NEM-HOOK HANDLEREK ÉS LOGIKA ===
@@ -269,9 +261,6 @@ function AppContent({
     setCurrentScreen('niedervolt');
   };
 
-  // ✅ =========================================================
-  // === JAVÍTÁS: handleSignatureComplete - 401 HIBA JAVÍTVA ===
-  // =========================================================
   const handleSignatureComplete = async (finalSignerName: string) => {
     console.log('📄 App.tsx: Starting protocol completion process with final name:', finalSignerName);
     
@@ -308,12 +297,11 @@ function AppContent({
       
       console.log('📤 Sending protocol to backend...');
 
-      // ✅ JAVÍTÁS: Hitelesítési fejlécek használata
       const headers = await getAuthHeaders();
       
       const response = await fetch('/api/protocols', {
         method: 'POST',
-        headers: headers, // ✅ A hitelesített headers használata
+        headers: headers,
         body: JSON.stringify(protocolData),
       });
 
@@ -413,7 +401,6 @@ function AppContent({
     }
   };
 
-  // ✅ JAVÍTÁS: handleSaveToCloud hozzáadva (hiányzott az eredeti kódból)
   const handleSaveToCloud = async () => {
     try {
       console.log('☁️ Saving protocol to cloud...');
@@ -463,6 +450,45 @@ function AppContent({
       case 'start':
         return <StartScreen onLanguageSelect={handleLanguageSelect} />;
         
+      case 'login':
+        return (
+          <Login 
+            onLoginSuccess={handleLoginSuccess}
+            onBackToHome={() => {
+              setLanguageSelected(false);
+              setCurrentScreen('start');
+            }}
+            onNavigateToForgotPassword={() => {
+              setCurrentScreen('forgot-password');
+            }}
+          />
+        );
+
+      case 'forgot-password':
+        return (
+          <ForgotPassword 
+            onBackToLogin={() => setCurrentScreen('login')}
+          />
+        );
+
+      case 'reset-password':
+        return (
+          <ResetPassword 
+            onSuccess={() => setCurrentScreen('login')}
+          />
+        );
+
+      case 'auth-callback':
+        return (
+          <AuthCallback 
+            onSuccess={() => {
+              console.log('✅ Auth callback successful - redirecting to questionnaire');
+              setCurrentScreen('questionnaire');
+            }}
+            onError={() => setCurrentScreen('login')}
+          />
+        );
+
       case 'questionnaire':
         return (
           <Questionnaire
@@ -571,8 +597,12 @@ function AppContent({
         return <ProtocolPreview onBack={() => setCurrentScreen('completion')} />;
         
       default:
-        console.warn(`Reached default case with screen: ${currentScreen}. Redirecting to questionnaire.`);
-        setCurrentScreen('questionnaire');
+        console.warn(`Reached default case with screen: ${currentScreen}. Redirecting...`);
+        if (user) {
+          setCurrentScreen('questionnaire');
+        } else {
+          setCurrentScreen('start');
+        }
         return null;
     }
   };
@@ -603,6 +633,21 @@ function App() {
     niedervoltMeasurements: [],
     niedervoltTableMeasurements: {},
   });
+
+  // URL-ellenőrző hook (csak egyszer fut le)
+  useEffect(() => {
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+    console.log(`[App.tsx] Initial URL check: Path=${path}, Hash=${hash}`);
+
+    if (path.startsWith('/auth/callback') || hash.includes('type=signup')) {
+      console.log('[App.tsx] URL indicates Auth Callback. Setting screen.');
+      setCurrentScreen('auth-callback');
+    } else if (hash.includes('type=recovery')) {
+      console.log('[App.tsx] URL indicates Password Recovery. Setting screen.');
+      setCurrentScreen('reset-password');
+    }
+  }, []);
 
   useEffect(() => {
     const saved = localStorage.getItem('otis-protocol-form-data');

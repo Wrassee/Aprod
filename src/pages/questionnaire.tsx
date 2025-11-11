@@ -10,8 +10,8 @@ import { TrueFalseGroup } from '@/components/true-false-group';
 import { ErrorList } from '@/components/error-list';
 import { QuestionGroupHeader } from '@/components/question-group-header';
 import { useLanguageContext } from "@/components/language-context";
-import { useTheme } from '@/contexts/theme-context'; // TÉMA IMPORT
-import { ArrowLeft, ArrowRight, Save, Check, X, Sparkles, Zap } from 'lucide-react'; // Összevont importok
+import { useTheme } from '@/contexts/theme-context';
+import { ArrowLeft, ArrowRight, Save, Check, X, Sparkles, Zap } from 'lucide-react';
 import { MeasurementBlock } from '@/components/measurement-block';
 import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
 
@@ -55,9 +55,8 @@ function Questionnaire({
   currentQuestionId,
 }: QuestionnaireProps) {
   const { t } = useLanguageContext();
-  const { theme } = useTheme(); // TÉMA HOOK
+  const { theme } = useTheme();
 
-  // --- KEZDET: KÖZÖS LOGIKA (Mindkét fájlban azonos volt) ---
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -256,7 +255,7 @@ function Questionnaire({
   }, [currentQuestions, localAnswers]);
 
   const isLastPage = pageFromApp === totalPages - 1;
-  const progressPercent = totalPages > 0 ? Math.round(((pageFromApp + 1) / totalPages) * 100) : 0; // Ez a PageHeader-nek kell
+  const progressPercent = totalPages > 0 ? Math.round(((pageFromApp + 1) / totalPages) * 100) : 0;
 
   // Save handler
   const handleSave = useCallback(() => {
@@ -280,32 +279,18 @@ function Questionnaire({
   const handlePreviousPage = useCallback(() => {
     onPageChange?.(Math.max(0, pageFromApp - 1));
   }, [pageFromApp, onPageChange]);
-  
-  // --- VÉGE: KÖZÖS LOGIKA ---
 
+  // ✅ JAVÍTOTT SZERKEZET: PageHeader KÍVÜL van
   return (
-    <div className={`min-h-screen relative overflow-hidden ${
-      theme === 'modern'
-        ? 'bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20'
-        : 'bg-light-surface'
-    }`}>
-      
-      {/* Modern animált háttér */}
-      {theme === 'modern' && (
-        <>
-          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        </>
-      )}
-
-      {/* PageHeader (Közös) - Ez tartalmazza a saját progress bar-ját */}
+    <div className="min-h-screen">
+      {/* ✅ PageHeader KÍVÜL (sticky működhet) */}
       <PageHeader
         onHome={onHome}
         onStartNew={onStartNew}
         onAdminAccess={onAdminAccess}
         receptionDate={receptionDate}
         onReceptionDateChange={onReceptionDateChange}
-        totalSteps={totalPages + 1} // +1 a Niedervolt oldal miatt
+        totalSteps={totalPages + 1}
         currentStep={pageFromApp}
         stepType="questionnaire"
         currentPage={pageFromApp + 1}
@@ -313,322 +298,332 @@ function Questionnaire({
         errors={errors}
       />
 
-      <main className={`max-w-7xl mx-auto px-6 py-8 ${theme === 'modern' ? 'relative z-10' : ''}`}>
+      {/* ✅ Görgethető tartalom (overflow-hidden itt van, de NEM takarja a headert) */}
+      <div className={`min-h-screen relative overflow-hidden ${
+        theme === 'modern'
+          ? 'bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20'
+          : 'bg-light-surface'
+      }`}>
         
-        {/* === JAVÍTÁS ===
-            Az extra "Modern" progress bar-t eltávolítottuk innen,
-            mert a PageHeader már kezeli.
-        */}
+        {/* Modern animált háttér */}
+        {theme === 'modern' && (
+          <>
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          </>
+        )}
 
-        {/* Csoport fejléc (Téma-függő) */}
-        {questionGroups.length > 0 && currentGroup && (
-          theme === 'modern' ? (
-            // Modern Group Header
-            <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse"></div>
-              <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                      {pageFromApp + 1}
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                        {currentGroup.name}
-                      </h2>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                        <Sparkles className="h-3 w-3 text-cyan-500" />
-                        {currentGroup.questionCount} {language === 'hu' ? 'kérdés' : 'Fragen'}
-                      </p>
+        <main className={`max-w-7xl mx-auto px-6 py-8 ${theme === 'modern' ? 'relative z-10' : ''}`}>
+          
+          {/* Csoport fejléc */}
+          {questionGroups.length > 0 && currentGroup && (
+            theme === 'modern' ? (
+              // Modern Group Header
+              <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse"></div>
+                <div className="relative bg-white dark:bg-gray-900 rounded-2xl p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                        {pageFromApp + 1}
+                      </div>
+                      <div>
+                        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                          {currentGroup.name}
+                        </h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
+                          <Sparkles className="h-3 w-3 text-cyan-500" />
+                          {currentGroup.questionCount} {language === 'hu' ? 'kérdés' : 'Fragen'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            // Classic Group Header
-            <QuestionGroupHeader
-              groupName={currentGroup.name}
-              questionCount={currentGroup.questionCount}
-              totalGroups={totalPages}
-              currentGroupIndex={pageFromApp}
-              language={language}
-            />
-          )
-        )}
+            ) : (
+              // Classic Group Header
+              <QuestionGroupHeader
+                groupName={currentGroup.name}
+                questionCount={currentGroup.questionCount}
+                totalGroups={totalPages}
+                currentGroupIndex={pageFromApp}
+                language={language}
+              />
+            )
+          )}
 
-        {/* Kérdések renderelése (Közös) */}
-        <div className="mb-8">
-          {pageFromApp === 0 || pageFromApp === 1 ? (
-            <div className={`grid gap-8 ${theme === 'modern' ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-2'}`}>
-              {(currentQuestions as Question[]).map((question: Question) => (
-                <IsolatedQuestion
-                  key={question.id}
-                  question={question}
-                  value={localAnswers[question.id] ?? ""}
-                  onChange={(value) => handleLocalAnswerChange(question.id, value)}
-                />
-              ))}
-            </div>
-          ) : (() => {
-            const radioQuestions = (currentQuestions as Question[]).filter(q => q.type === 'radio' || q.type === 'checkbox' || q.type === 'yes_no_na');
-            const measurementQuestions = (currentQuestions as Question[]).filter(q => q.type === 'measurement' || q.type === 'calculated');
-            const otherQuestions = (currentQuestions as Question[]).filter(q => 
-              q.type !== 'radio' && 
-              q.type !== 'checkbox' && 
-              q.type !== 'yes_no_na' && 
-              q.type !== 'measurement' && 
-              q.type !== 'calculated'
-            );
-
-            const hasOnlyRadio = radioQuestions.length === currentQuestions.length;
-            const hasOnlyMeasurement = measurementQuestions.length === currentQuestions.length;
-
-            const allRadioAreBoolean = radioQuestions.every(q => 
-              !q.options || q.options.length === 0 || 
-              (Array.isArray(q.options) && q.options.every((opt: string) => 
-                ['true', 'false', 'n.a.', 'yes', 'no', 'igen', 'nem'].includes(opt.toLowerCase())
-              ))
-            );
-            
-            if (hasOnlyRadio && allRadioAreBoolean) {
-              return (
-                <TrueFalseGroup
-                  questions={radioQuestions}
-                  values={localAnswers}
-                  onChange={handleLocalAnswerChange}
-                  groupName={currentGroup?.name || 'Kérdések'}
-                />
+          {/* Kérdések renderelése */}
+          <div className="mb-8">
+            {pageFromApp === 0 || pageFromApp === 1 ? (
+              <div className={`grid gap-8 ${theme === 'modern' ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-2'}`}>
+                {(currentQuestions as Question[]).map((question: Question) => (
+                  <IsolatedQuestion
+                    key={question.id}
+                    question={question}
+                    value={localAnswers[question.id] ?? ""}
+                    onChange={(value) => handleLocalAnswerChange(question.id, value)}
+                  />
+                ))}
+              </div>
+            ) : (() => {
+              const radioQuestions = (currentQuestions as Question[]).filter(q => q.type === 'radio' || q.type === 'checkbox' || q.type === 'yes_no_na');
+              const measurementQuestions = (currentQuestions as Question[]).filter(q => q.type === 'measurement' || q.type === 'calculated');
+              const otherQuestions = (currentQuestions as Question[]).filter(q => 
+                q.type !== 'radio' && 
+                q.type !== 'checkbox' && 
+                q.type !== 'yes_no_na' && 
+                q.type !== 'measurement' && 
+                q.type !== 'calculated'
               );
-            }
 
-            if (hasOnlyMeasurement) {
-              return (
-                <MeasurementBlock
-                  questions={measurementQuestions}
-                  values={localAnswers}
-                  onChange={handleLocalAnswerChange}
-                  onAddError={handleAddError}
-                />
+              const hasOnlyRadio = radioQuestions.length === currentQuestions.length;
+              const hasOnlyMeasurement = measurementQuestions.length === currentQuestions.length;
+
+              const allRadioAreBoolean = radioQuestions.every(q => 
+                !q.options || q.options.length === 0 || 
+                (Array.isArray(q.options) && q.options.every((opt: string) => 
+                  ['true', 'false', 'n.a.', 'yes', 'no', 'igen', 'nem'].includes(opt.toLowerCase())
+                ))
               );
-            }
+              
+              if (hasOnlyRadio && allRadioAreBoolean) {
+                return (
+                  <TrueFalseGroup
+                    questions={radioQuestions}
+                    values={localAnswers}
+                    onChange={handleLocalAnswerChange}
+                    groupName={currentGroup?.name || 'Kérdések'}
+                  />
+                );
+              }
 
-            return (
-              <div className="space-y-6">
-                {measurementQuestions.length > 0 && (
+              if (hasOnlyMeasurement) {
+                return (
                   <MeasurementBlock
                     questions={measurementQuestions}
                     values={localAnswers}
                     onChange={handleLocalAnswerChange}
                     onAddError={handleAddError}
                   />
-                )}
-                {(radioQuestions.length > 0 || otherQuestions.length > 0) && (
-                  <div className={`grid gap-8 ${theme === 'modern' ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-1 lg:grid-cols-2'}`}>
-                    {[...radioQuestions, ...otherQuestions].map((question: Question) => (
-                      <IsolatedQuestion
-                        key={question.id}
-                        question={question}
-                        value={localAnswers[question.id] ?? ""}
-                        onChange={(value) => handleLocalAnswerChange(question.id, value)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-        </div>
+                );
+              }
 
-        {/* Hibalista (Közös) */}
-        <div className="mb-8">
-          <ErrorList
-            errors={errors}
-            onAddError={handleAddError}
-            onEditError={handleEditError}
-            onDeleteError={handleDeleteError}
-          />
-        </div>
+              return (
+                <div className="space-y-6">
+                  {measurementQuestions.length > 0 && (
+                    <MeasurementBlock
+                      questions={measurementQuestions}
+                      values={localAnswers}
+                      onChange={handleLocalAnswerChange}
+                      onAddError={handleAddError}
+                    />
+                  )}
+                  {(radioQuestions.length > 0 || otherQuestions.length > 0) && (
+                    <div className={`grid gap-8 ${theme === 'modern' ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-1 lg:grid-cols-2'}`}>
+                      {[...radioQuestions, ...otherQuestions].map((question: Question) => (
+                        <IsolatedQuestion
+                          key={question.id}
+                          question={question}
+                          value={localAnswers[question.id] ?? ""}
+                          onChange={(value) => handleLocalAnswerChange(question.id, value)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
 
-        {/* Navigáció (Téma-függő) */}
-        <div className={`flex justify-between ${
-          theme === 'modern' 
-            ? 'flex-col sm:flex-row items-stretch sm:items-center gap-4' 
-            : 'items-center'
-        }`}>
-          {/* Bal oldali gomb (Vissza) */}
-          {theme === 'modern' ? (
-            <button
-              onClick={handlePreviousPage}
-              disabled={pageFromApp === 0}
-              className="group relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20"
-            >
-              <div className="flex items-center justify-center gap-2">
-                <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                <span className="font-semibold">{t.previous}</span>
-              </div>
-            </button>
-          ) : (
-            <Button
-              variant="outline"
-              onClick={handlePreviousPage}
-              disabled={pageFromApp === 0}
-              className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t.previous}
-            </Button>
-          )}
+          {/* Hibalista */}
+          <div className="mb-8">
+            <ErrorList
+              errors={errors}
+              onAddError={handleAddError}
+              onEditError={handleEditError}
+              onDeleteError={handleDeleteError}
+            />
+          </div>
 
-          {/* Középső gomb (AI) (Közös) */}
-          <SmartHelpWizard
-            currentPage={pageFromApp + 1}
-            formData={localAnswers}
-            currentQuestionId={currentQuestionId}
-            errors={errors}
-          />
-
-          {/* Jobb oldali gombok (Mentés, Tovább) */}
-          <div className={`flex ${theme === 'modern' ? 'gap-3' : 'space-x-4'}`}>
-            {/* Mentés gomb */}
+          {/* Navigáció */}
+          <div className={`flex justify-between ${
+            theme === 'modern' 
+              ? 'flex-col sm:flex-row items-stretch sm:items-center gap-4' 
+              : 'items-center'
+          }`}>
+            {/* Vissza gomb */}
             {theme === 'modern' ? (
               <button
-                onClick={handleSave}
-                disabled={saveStatus === 'saving'}
-                className={`relative overflow-hidden px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 ${
-                  saveStatus === 'saved' 
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
-                    : saveStatus === 'error'
-                    ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
-                    : 'bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-600 hover:bg-blue-50'
-                }`}
+                onClick={handlePreviousPage}
+                disabled={pageFromApp === 0}
+                className="group relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20"
               >
-                <div className="flex items-center gap-2">
-                  {saveStatus === 'saving' ? (
-                    <>
-                      <div className="animate-spin h-4 w-4 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
-                      <span>{t.saving}</span>
-                    </>
-                  ) : saveStatus === 'saved' ? (
-                    <>
-                      <Check className="h-5 w-5" />
-                      <span>{t.saved}</span>
-                    </>
-                  ) : saveStatus === 'error' ? (
-                    <>
-                      <X className="h-5 w-5" />
-                      <span>{t.error}</span>
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-5 w-5" />
-                      <span>{t.save}</span>
-                    </>
-                  )}
+                <div className="flex items-center justify-center gap-2">
+                  <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
+                  <span className="font-semibold">{t.previous}</span>
                 </div>
               </button>
             ) : (
               <Button
                 variant="outline"
-                onClick={handleSave}
-                disabled={saveStatus === 'saving'}
-                className={`flex items-center space-x-2 ${
-                  saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
-                  saveStatus === 'error' ? 'bg-red-100 border-red-300 text-red-700' :
-                  'border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white'
-                }`}
+                onClick={handlePreviousPage}
+                disabled={pageFromApp === 0}
+                className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
               >
-                {saveStatus === 'saving' ? (
-                  <>
-                    <div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
-                    {t.saving}
-                  </>
-                ) : saveStatus === 'saved' ? (
-                  <>
-                    <Check className="h-4 w-4 mr-2 text-green-600" />
-                    {t.saved}
-                  </>
-                ) : saveStatus === 'error' ? (
-                  <>
-                    <X className="h-4 w-4 mr-2 text-red-600" />
-                    {t.error}
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    {t.save}
-                  </>
-                )}
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                {t.previous}
               </Button>
             )}
-            
-            {/* Tovább / Befejezés gomb */}
-            {theme === 'modern' ? (
-              <button
-                onClick={isLastPage ? onNext : handleNextPage}
-                disabled={!canProceed}
-                className="group relative overflow-hidden px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <div className={`absolute inset-0 transition-opacity ${canProceed ? 'opacity-100' : 'opacity-0'}`}>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
-                </div>
-                
-                {!canProceed && (
-                  <div className="absolute inset-0 bg-gray-400"></div>
-                )}
 
-                <div className="relative z-10 flex items-center gap-2 text-white">
-                  <span>{t.next}</span>
-                  {canProceed ? (
-                    <>
-                      <Check className="h-5 w-5" />
-                      <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </>
-                  ) : (
-                    <X className="h-5 w-5" />
-                  )}
-                </div>
+            {/* AI segítség */}
+            <SmartHelpWizard
+              currentPage={pageFromApp + 1}
+              formData={localAnswers}
+              currentQuestionId={currentQuestionId}
+              errors={errors}
+            />
 
-                <div className={`absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ${canProceed ? 'pointer-events-none' : 'hidden'}`}></div>
-              </button>
-            ) : (
-              isLastPage ? (
-                <Button
-                  type="button"
-                  onClick={onNext}
-                  disabled={!canProceed}
-                  className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
-                    canProceed 
-                      ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
-                      : 'bg-gray-400 text-white cursor-not-allowed'
+            {/* Mentés és Tovább gombok */}
+            <div className={`flex ${theme === 'modern' ? 'gap-3' : 'space-x-4'}`}>
+              {/* Mentés */}
+              {theme === 'modern' ? (
+                <button
+                  onClick={handleSave}
+                  disabled={saveStatus === 'saving'}
+                  className={`relative overflow-hidden px-6 py-3 rounded-xl font-semibold transition-all shadow-lg hover:shadow-xl transform hover:scale-105 ${
+                    saveStatus === 'saved' 
+                      ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white' 
+                      : saveStatus === 'error'
+                      ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white'
+                      : 'bg-white dark:bg-gray-800 border-2 border-blue-500 text-blue-600 hover:bg-blue-50'
                   }`}
                 >
-                  {t.next}
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
+                  <div className="flex items-center gap-2">
+                    {saveStatus === 'saving' ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
+                        <span>{t.saving}</span>
+                      </>
+                    ) : saveStatus === 'saved' ? (
+                      <>
+                        <Check className="h-5 w-5" />
+                        <span>{t.saved}</span>
+                      </>
+                    ) : saveStatus === 'error' ? (
+                      <>
+                        <X className="h-5 w-5" />
+                        <span>{t.error}</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="h-5 w-5" />
+                        <span>{t.save}</span>
+                      </>
+                    )}
+                  </div>
+                </button>
               ) : (
                 <Button
-                  type="button"
-                  onClick={handleNextPage}
-                  disabled={!canProceed}
-                  className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
-                    canProceed 
-                      ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
-                      : 'bg-gray-400 text-white cursor-not-allowed'
+                  variant="outline"
+                  onClick={handleSave}
+                  disabled={saveStatus === 'saving'}
+                  className={`flex items-center space-x-2 ${
+                    saveStatus === 'saved' ? 'bg-green-100 border-green-300 text-green-700' :
+                    saveStatus === 'error' ? 'bg-red-100 border-red-300 text-red-700' :
+                    'border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white'
                   }`}
                 >
-                  {t.next} {canProceed ? '✓' : '✗'}
-                  <ArrowRight className="h-4 w-4 ml-2" />
+                  {saveStatus === 'saving' ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
+                      {t.saving}
+                    </>
+                  ) : saveStatus === 'saved' ? (
+                    <>
+                      <Check className="h-4 w-4 mr-2 text-green-600" />
+                      {t.saved}
+                    </>
+                  ) : saveStatus === 'error' ? (
+                    <>
+                      <X className="h-4 w-4 mr-2 text-red-600" />
+                      {t.error}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      {t.save}
+                    </>
+                  )}
                 </Button>
-              )
-            )}
+              )}
+              
+              {/* Tovább gomb */}
+              {theme === 'modern' ? (
+                <button
+                  onClick={isLastPage ? onNext : handleNextPage}
+                  disabled={!canProceed}
+                  className="group relative overflow-hidden px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className={`absolute inset-0 transition-opacity ${canProceed ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
+                  </div>
+                  
+                  {!canProceed && (
+                    <div className="absolute inset-0 bg-gray-400"></div>
+                  )}
+
+                  <div className="relative z-10 flex items-center gap-2 text-white">
+                    <span>{t.next}</span>
+                    {canProceed ? (
+                      <>
+                        <Check className="h-5 w-5" />
+                        <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                      </>
+                    ) : (
+                      <X className="h-5 w-5" />
+                    )}
+                  </div>
+
+                  <div className={`absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ${canProceed ? 'pointer-events-none' : 'hidden'}`}></div>
+                </button>
+              ) : (
+                isLastPage ? (
+                  <Button
+                    type="button"
+                    onClick={onNext}
+                    disabled={!canProceed}
+                    className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
+                      canProceed 
+                        ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
+                        : 'bg-gray-400 text-white cursor-not-allowed'
+                    }`}
+                  >
+                    {t.next}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    onClick={handleNextPage}
+                    disabled={!canProceed}
+                    className={`flex items-center border border-otis-blue disabled:bg-gray-400 disabled:cursor-not-allowed ${
+                      canProceed 
+                        ? 'bg-otis-blue text-white hover:bg-white hover:text-otis-blue cursor-pointer' 
+                        : 'bg-gray-400 text-white cursor-not-allowed'
+                    }`}
+                  >
+                    {t.next} {canProceed ? '✓' : '✗'}
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                )
+              )}
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
 
 export default Questionnaire;
-

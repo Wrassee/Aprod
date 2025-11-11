@@ -1,84 +1,102 @@
+// src/pages/protocol-preview.tsx
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, User, Calendar, CheckCircle, AlertTriangle, Mail, Download } from 'lucide-react';
+import { ArrowLeft, FileText, User, Calendar, CheckCircle, AlertTriangle, Mail, Download, Loader2 } from 'lucide-react';
 import { useLanguageContext } from "@/components/language-context";
 
-interface Protocol {
-  id: string;
-  receptionDate: string;
-  answers: Record<string, any>;
-  errors: Array<{
-    id: string;
-    description: string;
-    severity: 'low' | 'medium' | 'high';
-    images?: string[];
-  }>;
-  signature: string;
-  signatureName: string;
-  createdAt: string;
-  updatedAt: string;
-}
+// JAVÍTÁS: Importáld a FormData típust
+import type { FormData } from '../lib/types';
 
-interface Question {
-  id: string;
-  title: string;
-  type: string;
-}
+// JAVÍTÁS: A Protocol interface most már a FormData-ra épül
+interface Protocol extends FormData {}
 
 interface ProtocolPreviewProps {
   onBack: () => void;
+  formData: FormData; // JAVÍTÁS: Prop fogadása
+  language: 'hu' | 'de'; // JAVÍTÁS: Prop fogadása
 }
 
-export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
+export function ProtocolPreview({ onBack, formData, language }: ProtocolPreviewProps) {
   const { t } = useLanguageContext();
-  const [protocol, setProtocol] = useState<Protocol | null>(null);
+  
+  // JAVÍTÁS: Nincs szükség külön 'protocol' state-re, használjuk a prop-ot
+  const protocol = formData;
+
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Ez most már csak a PDF-re vonatkozik
   const [error, setError] = useState<string | null>(null);
   const [emailStatus, setEmailStatus] = useState<string>('');
   const [isEmailSending, setIsEmailSending] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false); // JAVÍTÁS: Letöltés állapota
 
   useEffect(() => {
-    const fetchData = async () => {
+    setLoading(true);
+    const generatePreview = async () => {
       try {
-        // Fetch protocol and generate PDF preview
-        const protocolResponse = await fetch('/api/protocols/preview');
-        if (!protocolResponse.ok) {
-          throw new Error('Failed to fetch protocol');
+        console.log('🔍 PDF preview generation started');
+        
+        // JAVÍTÁS: Olvassuk ki a legfrissebb adatot a localStorage-ból,
+        // ugyanúgy, ahogy a 'completion.tsx' 'handleDownloadPDF' funkciója teszi.
+        const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
+        
+        console.log('📦 Data loaded from localStorage:', savedData.answers ? 'OK' : 'EMPTY');
+        
+        if (!savedData.answers) {
+          throw new Error("Nincs mentett adat a localStorage-ban az előnézethez.");
         }
-        const protocolData = await protocolResponse.json();
-        setProtocol(protocolData);
 
-        // Generate PDF for preview
-        try {
-          const pdfResponse = await fetch('/api/protocols/download-pdf', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ language: 'hu' })
-          });
+        // JAVÍTÁS: Az előnézet a '/preview-pdf' végpontot hívja
+        const pdfResponse = await fetch('/api/protocols/preview-pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          // JAVÍTÁS: A 'savedData'-t küldjük el, nem a 'formData' prop-ot
+          body: JSON.stringify({ formData: savedData, language: language })
+        });
+        
+        console.log('📡 PDF response status:', pdfResponse.status);
+        
+        if (pdfResponse.ok) {
+          const blob = await pdfResponse.blob();
+          console.log('📦 PDF blob size:', blob.size, 'bytes');
           
-          if (pdfResponse.ok) {
-            const blob = await pdfResponse.blob();
-            const url = URL.createObjectURL(blob);
-            setPdfUrl(url);
-          } else {
-            console.error('PDF generation failed:', await pdfResponse.text());
+          if (blob.size < 1000) {
+            throw new Error('A generált PDF túl kicsi, valószínűleg üres vagy hibás.');
           }
-        } catch (pdfError) {
-          console.error('PDF fetch error:', pdfError);
+          
+          const url = URL.createObjectURL(blob);
+          setPdfUrl(url);
+          setError(null);
+          console.log('✅ PDF preview URL created successfully');
+        } else {
+          const errorText = await pdfResponse.text();
+          console.error('❌ PDF generation failed:', errorText);
+          setError(`PDF generálása sikertelen: ${errorText}`);
         }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+      } catch (pdfError) {
+        console.error('❌ PDF fetch error:', pdfError);
+        setError(pdfError instanceof Error ? pdfError.message : 'Ismeretlen PDF hiba');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, []);
+    // Nincs szükség a 'formData' ellenőrzésére, azonnal futtatjuk
+    generatePreview();
+    
+    // Cleanup funkció
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  // JAVÍTÁS: A függőségi lista most már csak a 'language'-t tartalmazza
+  }, [language]);
 
   const handleEmailSend = async () => {
-    if (!protocol) return;
+    if (!formData) {
+      console.error('No formData available for email');
+      return;
+    }
     
     setIsEmailSending(true);
     setEmailStatus('Email küldése folyamatban...');
@@ -87,9 +105,10 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
       const response = await fetch('/api/protocols/email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        // JAVÍTÁS: A propok használata
         body: JSON.stringify({
-          formData: protocol,
-          language: 'hu',
+          formData: formData,
+          language: language,
           recipient: 'netkodok@gmail.com'
         })
       });
@@ -98,6 +117,8 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
         setEmailStatus('✅ Email sikeresen elküldve a netkodok@gmail.com címre!');
         setTimeout(() => setEmailStatus(''), 5000);
       } else {
+        const errorData = await response.json();
+        console.error('Email send failed:', errorData);
         setEmailStatus('❌ Email küldése sikertelen!');
         setTimeout(() => setEmailStatus(''), 5000);
       }
@@ -111,13 +132,20 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
   };
 
   const handleDownloadPdf = async () => {
-    if (!protocol) return;
+    if (!formData) {
+      console.error('No formData available for download');
+      return;
+    }
     
+    setIsDownloading(true);
     try {
+      console.log('⬇️ Starting PDF download...');
+      
       const response = await fetch('/api/protocols/download-pdf', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ language: 'hu' })
+        // JAVÍTÁS: A propok használata
+        body: JSON.stringify({ formData: formData, language: language })
       });
       
       if (response.ok) {
@@ -125,34 +153,46 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `OTIS-Protocol-${protocol.receptionDate}.pdf`;
+        // JAVÍTÁS: Használjunk egyedi azonosítót a fájlnévben
+        const liftId = formData.answers?.['7'] 
+          ? String(formData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_')
+          : 'Unknown';
+        a.download = `OTIS_Protocol_${liftId}_${formData.receptionDate || new Date().toISOString().split('T')[0]}.pdf`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+        console.log('✅ PDF download completed');
+      } else {
+        console.error('❌ PDF download failed:', await response.text());
       }
     } catch (error) {
-      console.error('Download error:', error);
+      console.error('❌ Download error:', error);
+    } finally {
+      setIsDownloading(false);
     }
   };
 
+  // JAVÍTÁS: A 'loading' állapot most már csak a PDF betöltésére vár
   if (loading) {
     return (
       <div className="min-h-screen bg-light-surface flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-otis-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Protokoll betöltése...</p>
+          <Loader2 className="animate-spin h-12 w-12 text-otis-blue mx-auto mb-4" />
+          <p className="text-gray-600">Protokoll előnézet generálása...</p>
         </div>
       </div>
     );
   }
 
+  // JAVÍTÁS: Ha a PDF generálás hibára futott
   if (error || !protocol) {
     return (
       <div className="min-h-screen bg-light-surface flex items-center justify-center">
-        <div className="text-center">
+        <div className="text-center p-4">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">Hiba a protokoll betöltésekor</p>
+          <p className="text-gray-800 font-semibold mb-2">Hiba az előnézet generálásakor</p>
+          <p className="text-gray-600 mb-4 text-sm max-w-md">{error || 'Ismeretlen hiba'}</p>
           <Button onClick={onBack} variant="outline">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Vissza
@@ -162,6 +202,7 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
     );
   }
 
+  // JAVÍTÁS: A JSX most már a 'formData' propot használja
   return (
     <div className="min-h-screen bg-light-surface">
       {/* Header */}
@@ -171,7 +212,7 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
             <Button
               onClick={onBack}
               variant="ghost"
-              className="mr-4 p-2"
+              className="mr-4 p-2 hover:bg-gray-100"
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
@@ -184,7 +225,10 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
             </div>
             <div>
               <h1 className="text-xl font-semibold text-gray-800">Protokoll Előnézet</h1>
-              <p className="text-sm text-gray-600">ID: {protocol.id}</p>
+              {/* JAVÍTÁS: Használjunk egyedi azonosítót */}
+              <p className="text-sm text-gray-600">
+                Lift ID: {formData.answers?.['7'] || 'N/A'}
+              </p>
             </div>
           </div>
         </div>
@@ -195,7 +239,7 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200">
           {/* Protocol Header */}
           <div className="border-b border-gray-200 p-6">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center">
                 <FileText className="h-8 w-8 text-otis-blue mr-3" />
                 <div>
@@ -204,7 +248,7 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
                   </h2>
                   <div className="flex items-center mt-2 text-sm text-gray-600">
                     <Calendar className="h-4 w-4 mr-2" />
-                    Dátum: {protocol.receptionDate}
+                    Dátum: {formData.receptionDate || new Date().toLocaleDateString('hu-HU')}
                   </div>
                 </div>
               </div>
@@ -218,27 +262,38 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
                   <Button 
                     onClick={handleEmailSend}
                     disabled={isEmailSending}
-                    className="bg-otis-blue hover:bg-otis-blue/90 text-white"
+                    className="bg-otis-blue hover:bg-otis-blue/90 text-white disabled:opacity-50"
                     size="sm"
                   >
-                    <Mail className="h-4 w-4 mr-2" />
+                    {isEmailSending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Mail className="h-4 w-4 mr-2" />
+                    )}
                     {isEmailSending ? 'Küldés...' : 'Email'}
                   </Button>
                   
                   <Button 
                     onClick={handleDownloadPdf}
+                    disabled={isDownloading}
                     variant="outline"
-                    className="border-otis-blue text-otis-blue hover:bg-otis-blue/10"
+                    className="border-otis-blue text-otis-blue hover:bg-otis-blue/10 disabled:opacity-50"
                     size="sm"
                   >
-                    <Download className="h-4 w-4 mr-2" />
-                    PDF
+                    {isDownloading ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4 mr-2" />
+                    )}
+                    {isDownloading ? 'Letöltés...' : 'PDF'}
                   </Button>
                 </div>
                 
                 {emailStatus && (
-                  <div className={`text-sm mt-2 px-3 py-1 rounded ${
-                    emailStatus.includes('✅') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                  <div className={`text-sm mt-2 px-3 py-1 rounded transition-all ${
+                    emailStatus.includes('✅') 
+                      ? 'bg-green-100 text-green-700 border border-green-300' 
+                      : 'bg-red-100 text-red-700 border border-red-300'
                   }`}>
                     {emailStatus}
                   </div>
@@ -249,12 +304,14 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
 
           {/* PDF Preview Section */}
           <div className="p-6 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">OTIS Protokoll PDF Előnézet</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              OTIS Protokoll PDF Előnézet
+            </h3>
             {pdfUrl ? (
-              <div className="bg-gray-50 rounded-lg overflow-hidden">
+              <div className="bg-gray-50 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
                 <iframe 
                   src={pdfUrl} 
-                  className="w-full h-96 border-0"
+                  className="w-full h-[700px] border-0"
                   title="Protocol PDF Preview"
                 />
                 <div className="p-4 bg-gray-100 border-t border-gray-200">
@@ -272,13 +329,20 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
           </div>
 
           {/* Errors Section */}
-          {protocol.errors && protocol.errors.length > 0 && (
+          {formData.errors && formData.errors.length > 0 && (
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">Hibák</h3>
               <div className="space-y-3">
-                {(Array.isArray(protocol.errors) ? protocol.errors : JSON.parse(protocol.errors || '[]')).map((error: any) => (
-                  <div key={error.id} className="flex items-start p-3 bg-red-50 rounded-lg">
-                    <div className={`w-3 h-3 rounded-full mt-1 mr-3 ${
+                {/* JAVÍTÁS: Biztonságosabb JSON.parse */}
+                {(Array.isArray(formData.errors) 
+                  ? formData.errors 
+                  : JSON.parse(formData.errors || '[]')
+                ).map((error: any, index: number) => (
+                  <div 
+                    key={error.id || index} 
+                    className="flex items-start p-3 bg-red-50 rounded-lg border border-red-100"
+                  >
+                    <div className={`w-3 h-3 rounded-full mt-1 mr-3 flex-shrink-0 ${
                       error.severity === 'high' ? 'bg-red-500' :
                       error.severity === 'medium' ? 'bg-yellow-500' : 'bg-blue-500'
                     }`} />
@@ -302,22 +366,24 @@ export function ProtocolPreview({ onBack }: ProtocolPreviewProps) {
           {/* Signature Section */}
           <div className="p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Aláírás</h3>
-            <div className="flex items-center">
+            <div className="flex items-center mb-4">
               <User className="h-5 w-5 text-gray-400 mr-3" />
               <div>
-                <p className="text-gray-800 font-medium">{protocol.signatureName}</p>
+                <p className="text-gray-800 font-medium">
+                  {formData.signerName || formData.signatureName || 'N/A'}
+                </p>
                 <p className="text-sm text-gray-600">
-                  Létrehozva: {new Date(protocol.createdAt).toLocaleString('hu-HU')}
+                  Létrehozva: {new Date(formData.receptionDate || Date.now()).toLocaleString('hu-HU')}
                 </p>
               </div>
             </div>
-            {protocol.signature && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+            {formData.signature && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-sm text-gray-600 mb-2">Digitális aláírás:</p>
                 <img 
-                  src={protocol.signature} 
+                  src={formData.signature} 
                   alt="Aláírás" 
-                  className="max-w-xs h-20 border border-gray-300 bg-white"
+                  className="max-w-xs h-20 border border-gray-300 bg-white rounded"
                 />
               </div>
             )}

@@ -595,7 +595,11 @@ function AppContent({
         );
         
       case 'protocol-preview':
-        return <ProtocolPreview onBack={() => setCurrentScreen('completion')} />;
+        return <ProtocolPreview 
+                onBack={() => setCurrentScreen('completion')} 
+                formData={formData}
+                language={language}
+              />;
         
       default:
         console.warn(`Reached default case with screen: ${currentScreen}. Redirecting...`);

@@ -81,6 +81,10 @@ export interface Translation {
   home: string;
   downloadGroundingPDF: string;
   generating: string;
+  previewGeneratingTitle: string;
+  previewGeneratingWait: string;
+  previewErrorTitle: string;
+  previewCloseWindow: string;
   
   // Validation
   requiredField: string;
@@ -246,6 +250,7 @@ export interface Translation {
       audit: string;
       settings: string;
     };
+    
     Dashboard: {
       welcome: string;
       welcomeDesc: string;
@@ -439,6 +444,7 @@ export const translations: Record<string, Translation> = {
     home: "Kezdőlap",
     downloadGroundingPDF: "Földelésmérési jegyzőkönyv",
     generating: "Generálás...",
+    pdfGeneratingWait: "PDF generálása, kérem várjon...",
     
     // Validation
     requiredField: "Ez a mező kötelező",
@@ -711,7 +717,11 @@ export const translations: Record<string, Translation> = {
         templates: "Sablon Kezelés",
         templatesDesc: "Helyezd át a régi sablon logikát egy új TemplateManagement komponensbe."
       }
-    }
+    },
+    previewGeneratingTitle: "PDF generálása...",
+    previewGeneratingWait: "Kérem várjon, ez 10-15 másodpercet vehet igénybe.",
+    previewErrorTitle: "Hiba",
+    previewCloseWindow: "Ablak bezárása",
   },
   de: {
     // Start Screen
@@ -793,6 +803,7 @@ export const translations: Record<string, Translation> = {
     home: "Startseite",
     downloadGroundingPDF: "Erdungsprotokoll",
     generating: "Generieren...",
+    pdfGeneratingWait: "PDF wird generiert, bitte warten...",
     
     // Validation
     requiredField: "Dieses Feld ist erforderlich",
@@ -1065,6 +1076,10 @@ export const translations: Record<string, Translation> = {
         templates: "Vorlagenverwaltung",
         templatesDesc: "Verschieben Sie die alte Vorlagenlogik in eine neue TemplateManagement-Komponente."
       }
-    }
+    },
+    previewGeneratingTitle: "PDF wird generiert...",
+    previewGeneratingWait: "Bitte warten, dies kann 10-15 Sekunden dauern.",
+    previewErrorTitle: "Fehler",
+    previewCloseWindow: "Fenster schließen",
   },
 };

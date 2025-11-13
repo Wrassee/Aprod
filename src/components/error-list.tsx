@@ -150,7 +150,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                     </h2>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Sparkles className="h-3 w-3" />
-                      {safeErrors.length} {safeErrors.length === 1 ? 'hiba' : 'hibák'}
+                      {safeErrors.length} {safeErrors.length === 1 ? t.errorSingular : t.errorPlural}
                     </p>
                   </div>
                 </div>
@@ -179,7 +179,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                     </div>
                   </div>
                   <p className="text-gray-600 font-medium">{t.noErrors}</p>
-                  <p className="text-sm text-gray-500 mt-1">Minden rendben van! ✨</p>
+                  <p className="text-sm text-gray-500 mt-1">{t.allGood} ✨</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -247,7 +247,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                                           <line x1="12" y1="8" x2="12" y2="12"></line>
                                           <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                         </svg>
-                                        <span>Automatikus hibák nem szerkeszthetők!</span>
+                                        <span>${t.autoErrorNotEditable}</span>
                                       </div>
                                     `;
                                     toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(to right, #f59e0b, #d97706);color:white;padding:12px 20px;border-radius:12px;z-index:9999;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,0.2);';
@@ -280,7 +280,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                           <polyline points="20 6 9 17 4 12"></polyline>
                                         </svg>
-                                        <span>Hiba sikeresen törölve!</span>
+                                        <span>${t.errorDeletedSuccessfully}</span>
                                       </div>
                                     `;
                                     toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(to right, #ef4444, #dc2626);color:white;padding:12px 20px;border-radius:12px;z-index:9999;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,0.2);';
@@ -418,7 +418,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                           // Boundary errors (automatically generated) cannot be edited
                           if (error.id.startsWith('boundary-')) {
                             const toast = document.createElement('div');
-                            toast.textContent = 'Automatikus hibák nem szerkeszthetők!';
+                            toast.textContent = t.autoErrorNotEditable;
                             toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#f59e0b;color:white;padding:12px 24px;border-radius:8px;z-index:9999;font-weight:500;';
                             document.body.appendChild(toast);
                             setTimeout(() => document.body.removeChild(toast), 2000);
@@ -451,7 +451,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                             
                             // Show confirmation toast
                             const toast = document.createElement('div');
-                            toast.textContent = 'Hiba törölve a hibalistából!';
+                            toast.textContent = t.errorDeletedFromList;
                             toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:12px 24px;border-radius:8px;z-index:9999;font-weight:500;';
                             document.body.appendChild(toast);
                             setTimeout(() => document.body.removeChild(toast), 2000);
@@ -484,4 +484,3 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
     </>
   );
 }
-

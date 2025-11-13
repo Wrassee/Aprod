@@ -8,6 +8,7 @@ import { insertProtocolSchema } from '../../shared/schema.js';
 import { pdfService } from '../services/pdf-service.js';
 import { GroundingPdfService } from '../services/grounding-pdf-service.js';
 import { requireAuth } from '../middleware/auth.js';
+import { emailService } from '../services/email-service.js';
 
 const router = Router();
 const upload = multer();
@@ -271,5 +272,66 @@ router.post(
     }
   }
 );
+
+// =========================================================
+// === EMAIL KÜLDÉS (A HIÁNYZÓ VÉGPONT)
+// =========================================================
+router.post('/email', requireAuth, async (req, res) => {
+  try {
+    console.log("📧 Email sending request received");
+
+    // 1. Adatok kinyerése a kérésből (az App.tsx küldi)
+    const { formData, language } = req.body;
+    
+    // 2. Hitelesített felhasználó adatainak kinyerése (a requireAuth middleware-ből)
+    const authenticatedUser = (req as any).user;
+
+    // Alapvető validáció
+    if (!formData) {
+      return res.status(400).json({ message: "Form data is required" });
+    }
+    if (!authenticatedUser || !authenticatedUser.email) {
+      return res.status(401).json({ message: "Authenticated user email not found" });
+    }
+
+    // 3. Adatok kinyerése a formData-ból az email service számára
+    const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
+    const recipientEmail = authenticatedUser.email; // A címzett a bejelentkezett felhasználó lesz
+
+    // 4. Excel generálás (a többi PDF endpoint mintájára)
+    // Megjegyzés: a simpleXmlExcelService importálása a függvényen belül van a többi route-nál is
+    const { simpleXmlExcelService } = await import('../services/simple-xml-excel.js');
+    const excelBuffer = await simpleXmlExcelService.generateExcelFromTemplate(formData, language || 'hu');
+    
+    // 5. PDF generálás az Excel bufferből
+    console.log("Generating PDF from Excel buffer for email...");
+    const pdfBuffer = await pdfService.generatePDF(excelBuffer);
+
+    // 6. Opcionális: Hiba lista PDF generálása (ha van rá logika)
+    // Jelenleg null-t adunk át, de az emailService képes kezelni.
+    const errorListPdf = null; 
+    
+    // 7. Email küldése a service-en keresztül
+    console.log(`Sending email for user ${recipientEmail}...`);
+    await emailService.sendProtocolEmail({
+      recipient: recipientEmail, // Ezt használja az interface
+      language: language || 'hu',
+      protocolPdf: pdfBuffer,
+      errorListPdf: errorListPdf, 
+      receptionDate: receptionDate
+    });
+
+    console.log("✅ Email sent successfully");
+    res.status(200).json({ message: "Email sent successfully" });
+
+  } catch (error) {
+    console.error("❌ Error during email sending:", error);
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+    res.status(500).json({ 
+      message: "Failed to send email", 
+      error: errorMessage 
+    });
+  }
+});
 
 export { router as protocolMappingRoutes };

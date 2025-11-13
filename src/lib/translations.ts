@@ -1,4 +1,4 @@
-// src/lib/translations.ts - FRISSÍTETT VERZIÓ (Profile fordításokkal)
+// src/lib/translations.ts - FRISSÍTETT VERZIÓ (Minden új fordítással)
 
 // Interface definíciója - MEGHATÁROZZA A SZÜKSÉGES KULCSOKAT
 export interface Translation {
@@ -35,6 +35,13 @@ export interface Translation {
   editError: string;
   deleteError: string;
   errorRegistrationRequired: string;
+  // ÚJ: error-list.tsx fordítások
+  errorSingular: string;
+  errorPlural: string;
+  allGood: string;
+  autoErrorNotEditable: string;
+  errorDeletedSuccessfully: string;
+  errorDeletedFromList: string;
   
   // Error Modal
   addErrorTitle: string;
@@ -85,6 +92,25 @@ export interface Translation {
   previewGeneratingWait: string;
   previewErrorTitle: string;
   previewCloseWindow: string;
+  // ÚJ: completion.tsx fordítások
+  emailSending: string;
+  emailSentSuccess: string;
+  emailSentError: string;
+  sending: string;
+  noFormDataError: string;
+  pdfGenerationError: string;
+  popupBlockedTitle: string;
+  popupBlockedDescription: string;
+  noSavedDataForPreview: string;
+  pdfGenerationServerError: string;
+  errorOccurred: string;
+  closeWindow: string;
+  noGroundingDataError: string;
+  groundingPdfGenerationError: string;
+  downloadSuccessTitle: string;
+  groundingProtocolDownloaded: string;
+  downloadErrorTitle: string;
+  groundingProtocolDownloadError: string;
   
   // Validation
   requiredField: string;
@@ -203,6 +229,9 @@ export interface Translation {
   viewErrors: string;
   downloadErrorList: string;
   question: string;
+  // ÚJ: questionnaire.tsx fordítások
+  questionsSuffix: string;
+  questions: string;
   
   // --- ÚJ: Profile fordítások (hozzáadva az interfészhez) ---
   Profile: {
@@ -398,6 +427,13 @@ export const translations: Record<string, Translation> = {
     editError: "Szerkesztés",
     deleteError: "Törlés",
     errorRegistrationRequired: "Hiba rögzítése szükséges",
+    // ÚJ: error-list.tsx fordítások
+    errorSingular: "hiba",
+    errorPlural: "hibák",
+    allGood: "Minden rendben van!",
+    autoErrorNotEditable: "Automatikus hibák nem szerkeszthetők!",
+    errorDeletedSuccessfully: "Hiba sikeresen törölve!",
+    errorDeletedFromList: "Hiba törölve a hibalistából!",
     
     // Error Modal
     addErrorTitle: "Új hiba hozzáadása",
@@ -443,8 +479,30 @@ export const translations: Record<string, Translation> = {
     viewProtocol: "Protokoll előnézete",
     home: "Kezdőlap",
     downloadGroundingPDF: "Földelésmérési jegyzőkönyv",
-    generating: "Generálás...",
-    pdfGeneratingWait: "PDF generálása, kérem várjon...",
+    generating: "Generálás",
+    previewGeneratingTitle: "PDF generálása...",
+    previewGeneratingWait: "Kérem várjon, ez 10-15 másodpercet vehet igénybe.",
+    previewErrorTitle: "Előnézeti hiba",
+    previewCloseWindow: "Ablak bezárása",
+    // ÚJ: completion.tsx fordítások
+    emailSending: "Email küldése folyamatban...",
+    emailSentSuccess: "Email sikeresen elküldve!",
+    emailSentError: "Email küldése sikertelen!",
+    sending: "Küldés...",
+    noFormDataError: "Nincs mentett adat a PDF generálásához.",
+    pdfGenerationError: "A PDF generálása sikertelen a szerveren.",
+    popupBlockedTitle: "Felugró ablak letiltva",
+    popupBlockedDescription: "A böngésző letiltotta a felugró ablakot. Kérlek, engedélyezd az oldalon.",
+    noSavedDataForPreview: "Nincs mentett adat a localStorage-ban az előnézethez.",
+    pdfGenerationServerError: "PDF generálása sikertelen a szerveren.",
+    errorOccurred: "Hiba történt",
+    closeWindow: "Ablak bezárása",
+    noGroundingDataError: "Nincsenek földelési adatok a PDF generálásához.",
+    groundingPdfGenerationError: "A földelési PDF generálása sikertelen.",
+    downloadSuccessTitle: "Sikeres letöltés",
+    groundingProtocolDownloaded: "A földelési jegyzőkönyv sikeresen letöltve.",
+    downloadErrorTitle: "Letöltési hiba",
+    groundingProtocolDownloadError: "A földelési jegyzőkönyv letöltése sikertelen. Kérjük próbálja újra.",
     
     // Validation
     requiredField: "Ez a mező kötelező",
@@ -561,6 +619,9 @@ export const translations: Record<string, Translation> = {
     viewErrors: "Hibák megtekintése",
     downloadErrorList: "Hibalista letöltése",
     question: "Kérdés",
+    // ÚJ: questionnaire.tsx fordítások
+    questionsSuffix: "kérdés",
+    questions: "Kérdések",
 
     // --- ÚJ: Profile fordítások (magyar) ---
     Profile: {
@@ -718,10 +779,6 @@ export const translations: Record<string, Translation> = {
         templatesDesc: "Helyezd át a régi sablon logikát egy új TemplateManagement komponensbe."
       }
     },
-    previewGeneratingTitle: "PDF generálása...",
-    previewGeneratingWait: "Kérem várjon, ez 10-15 másodpercet vehet igénybe.",
-    previewErrorTitle: "Hiba",
-    previewCloseWindow: "Ablak bezárása",
   },
   de: {
     // Start Screen
@@ -757,6 +814,13 @@ export const translations: Record<string, Translation> = {
     editError: "Bearbeiten",
     deleteError: "Löschen",
     errorRegistrationRequired: "Fehlerregistrierung erforderlich",
+    // ÚJ: error-list.tsx fordítások
+    errorSingular: "Fehler",
+    errorPlural: "Fehler",
+    allGood: "Alles in Ordnung!",
+    autoErrorNotEditable: "Automatische Fehler können nicht bearbeitet werden!",
+    errorDeletedSuccessfully: "Fehler erfolgreich gelöscht!",
+    errorDeletedFromList: "Fehler aus der Liste gelöscht!",
     
     // Error Modal
     addErrorTitle: "Neuen Fehler hinzufügen",
@@ -802,8 +866,30 @@ export const translations: Record<string, Translation> = {
     viewProtocol: "Protokoll-Vorschau",
     home: "Startseite",
     downloadGroundingPDF: "Erdungsprotokoll",
-    generating: "Generieren...",
-    pdfGeneratingWait: "PDF wird generiert, bitte warten...",
+    generating: "Generieren",
+    previewGeneratingTitle: "PDF wird generiert...",
+    previewGeneratingWait: "Bitte warten, dies kann 10-15 Sekunden dauern.",
+    previewErrorTitle: "Vorschaufehler",
+    previewCloseWindow: "Fenster schließen",
+    // ÚJ: completion.tsx fordítások
+    emailSending: "E-Mail wird gesendet...",
+    emailSentSuccess: "E-Mail erfolgreich gesendet!",
+    emailSentError: "E-Mail-Versand fehlgeschlagen!",
+    sending: "Senden...",
+    noFormDataError: "Keine gespeicherten Daten zum Generieren des PDFs.",
+    pdfGenerationError: "PDF-Generierung auf dem Server fehlgeschlagen.",
+    popupBlockedTitle: "Popup blockiert",
+    popupBlockedDescription: "Der Browser hat das Popup blockiert. Bitte erlauben Sie Popups für diese Seite.",
+    noSavedDataForPreview: "Keine gespeicherten Daten im localStorage für die Vorschau.",
+    pdfGenerationServerError: "PDF-Generierung auf dem Server fehlgeschlagen.",
+    errorOccurred: "Ein Fehler ist aufgetreten",
+    closeWindow: "Fenster schließen",
+    noGroundingDataError: "Keine Erdungsdaten zum Generieren des PDFs.",
+    groundingPdfGenerationError: "Die Generierung des Erdungs-PDFs ist fehlgeschlagen.",
+    downloadSuccessTitle: "Download erfolgreich",
+    groundingProtocolDownloaded: "Das Erdungsprotokoll wurde erfolgreich heruntergeladen.",
+    downloadErrorTitle: "Download-Fehler",
+    groundingProtocolDownloadError: "Das Erdungsprotokoll konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.",
     
     // Validation
     requiredField: "Dieses Feld ist erforderlich",
@@ -920,6 +1006,9 @@ export const translations: Record<string, Translation> = {
     viewErrors: "Fehler anzeigen",
     downloadErrorList: "Fehlerliste herunterladen",
     question: "Frage",
+    // ÚJ: questionnaire.tsx fordítások
+    questionsSuffix: "Fragen",
+    questions: "Fragen",
     
     // --- ÚJ: Profile fordítások (német) ---
     Profile: {
@@ -1058,7 +1147,7 @@ export const translations: Record<string, Translation> = {
         systemInfoDesc: "Technische Daten des Servers und der Datenbank",
         environment: "Umgebung",
         platform: "Plattform",
-        nodeVersion: "Node.js verzió",
+        nodeVersion: "Node.js Version",
         databaseSize: "Datenbankgröße",
         uptime: "Laufzeit",
         memoryUsage: "Speichernutzung",
@@ -1077,9 +1166,5 @@ export const translations: Record<string, Translation> = {
         templatesDesc: "Verschieben Sie die alte Vorlagenlogik in eine neue TemplateManagement-Komponente."
       }
     },
-    previewGeneratingTitle: "PDF wird generiert...",
-    previewGeneratingWait: "Bitte warten, dies kann 10-15 Sekunden dauern.",
-    previewErrorTitle: "Fehler",
-    previewCloseWindow: "Fenster schließen",
   },
 };

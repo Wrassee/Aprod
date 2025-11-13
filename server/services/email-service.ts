@@ -46,7 +46,7 @@ class EmailService {
       // Send email via Resend (test mode: only to verified email)
       const result = await resend.emails.send({
         from: 'onboarding@resend.dev', // Use Resend's test domain
-        to: 'netkodok@gmail.com', // Test mode restriction
+        to: options.recipient, // Test mode restriction
         subject: emailContent.subject,
         html: emailContent.body,
         attachments: attachments as any,

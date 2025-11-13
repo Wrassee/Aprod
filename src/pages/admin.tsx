@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLanguageContext } from "@/components/language-context";
-import { useTheme } from '@/contexts/theme-context'; // ✅ JAVÍTVA: Helyes útvonal
+import { useTheme } from '@/contexts/theme-context';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/contexts/auth-context'; // ✅ AUTH IMPORT
+import { useAuth } from '@/contexts/auth-context';
 import { 
   Home, User, FileSpreadsheet, LayoutDashboard, FileText, 
   Shield, Settings, ArrowLeft, Sparkles, Upload, Loader2 
@@ -32,24 +32,20 @@ export function Admin({ onBack, onHome }: AdminProps) {
   const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
-  const { role } = useAuth(); // ✅ 1. SZEREPKÖR LEKÉRÉSE
-  const isAdmin = role === 'admin'; // ✅ 2. VÁLTOZÓ LÉTREHOZÁSA
+  const { role } = useAuth();
+  const isAdmin = role === 'admin';
 
   const [loading, setLoading] = useState(false);
 
-  const [activeMainTab, setActiveMainTab] = useState('dashboard'); // Alapértelmezett
+  const [activeMainTab, setActiveMainTab] = useState('dashboard');
   const [activeSettingsTab, setActiveSettingsTab] = useState('profile');
 
-  // ✅ 3. ALAPÉRTELMEZETT FÜL KEZELÉSE SZEREPKÖR ALAPJÁN
   useEffect(() => {
-    // Ha a szerepkör betöltődött, és NEM admin,
-    // de a "védett" fülön van, irányítsuk át a protokollokra.
     if (role && !isAdmin && (activeMainTab === 'dashboard' || activeMainTab === 'users')) {
       setActiveMainTab('protocols');
     }
   }, [role, isAdmin, activeMainTab]);
 
-  // Külön state a két típusú feltöltéshez
   const [questionsUpload, setQuestionsUpload] = useState({
     name: '',
     file: null as File | null,
@@ -60,7 +56,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
     file: null as File | null,
   });
 
-  // Kérdés sablon fájl kiválasztása
   const handleQuestionsFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -68,7 +63,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  // Protokoll sablon fájl kiválasztása
   const handleProtocolFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -76,7 +70,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  // Kérdés sablon feltöltése
   const handleQuestionsUpload = async () => {
     if (!questionsUpload.file || !questionsUpload.name) {
       toast({
@@ -121,7 +114,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-  // Protokoll sablon feltöltése
   const handleProtocolUpload = async () => {
     if (!protocolUpload.file || !protocolUpload.name) {
       toast({
@@ -166,8 +158,6 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
-
-  // ✅ 4. BETÖLTŐ KÉPERNYŐ, AMÍG A SZEREPKÖR TÖLTŐDIK
   if (!role) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20">
@@ -179,17 +169,11 @@ export function Admin({ onBack, onHome }: AdminProps) {
     );
   }
 
-  // ========================================
-  // MODERN THEME
-  // ========================================
+  // ✅ JAVÍTOTT SZERKEZET - MODERN THEME
   if (theme === 'modern') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
-        {/* Animated background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
-
-        {/* Header */}
+      <div className="min-h-screen">
+        {/* ✅ Header KÍVÜL (sticky működhet) */}
         <header className="relative bg-white dark:bg-gray-900 shadow-lg border-b-2 border-blue-100 dark:border-blue-900/50 sticky top-0 z-50">
           <div className="absolute inset-0 bg-gradient-to-r from-blue-50/50 via-transparent to-cyan-50/50 dark:from-blue-950/20 dark:via-transparent dark:to-cyan-950/20 pointer-events-none" />
           
@@ -244,137 +228,139 @@ export function Admin({ onBack, onHome }: AdminProps) {
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-          <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
-            {/* ✅ 5. DINAMIKUS RÁCS ÉS FELTÉTELES FÜLEK (MODERN) */}
-            <TabsList 
-              className={`grid w-full ${
-                isAdmin 
-                  ? 'grid-cols-3 md:grid-cols-3 lg:grid-cols-6' 
-                  : 'grid-cols-2 md:grid-cols-4'
-              } bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-2xl shadow-lg mb-8 gap-1`}
-            >
-              {isAdmin && (
-                <TabsTrigger 
-                  value="dashboard"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
-                >
-                  <LayoutDashboard className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">{t.Admin?.tabs?.dashboard || 'Dashboard'}</span>
-                </TabsTrigger>
-              )}
-              
-              {isAdmin && (
-                <TabsTrigger 
-                  value="users"
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
-                >
-                  <User className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">{t.Admin?.tabs?.users || 'Users'}</span>
-                </TabsTrigger>
-              )}
-              
-              <TabsTrigger 
-                value="protocols"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+        {/* ✅ Görgethető tartalom (overflow-hidden itt van, de NEM takarja a headert) */}
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
+          {/* Animated background */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+
+          {/* Main Content */}
+          <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+            <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
+              <TabsList 
+                className={`grid w-full ${
+                  isAdmin 
+                    ? 'grid-cols-3 md:grid-cols-3 lg:grid-cols-6' 
+                    : 'grid-cols-2 md:grid-cols-4'
+                } bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-2xl shadow-lg mb-8 gap-1`}
               >
-                <FileText className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t.Admin?.tabs?.protocols || 'Protocols'}</span>
-              </TabsTrigger>
-              
-              <TabsTrigger 
-                value="templates"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
-              >
-                <FileSpreadsheet className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t.Admin?.tabs?.templates || 'Templates'}</span>
-              </TabsTrigger>
-              
-              <TabsTrigger 
-                value="audit"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
-              >
-                <Shield className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t.Admin?.tabs?.audit || 'Audit'}</span>
-              </TabsTrigger>
-              
-              <TabsTrigger 
-                value="settings"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                <span className="hidden sm:inline">{t.Admin?.tabs?.settings || 'Settings'}</span>
-              </TabsTrigger>
-            </TabsList>
-
-            {/* ✅ 6. FELTÉTELES TARTALOM (MODERN) */}
-            {isAdmin && (
-              <TabsContent value="dashboard" className="mt-6">
-                <AdminDashboard />
-              </TabsContent>
-            )}
-
-            {isAdmin && (
-              <TabsContent value="users" className="mt-6">
-                <UserList />
-              </TabsContent>
-            )}
-
-            <TabsContent value="protocols" className="mt-6">
-              <ProtocolList />
-            </TabsContent>
-
-            <TabsContent value="templates" className="space-y-6 mt-6">
-              <TemplateManagement />
-            </TabsContent>
-
-            <TabsContent value="audit" className="mt-6">
-              <AuditLogTable />
-            </TabsContent>
-
-            <TabsContent value="settings" className="mt-6">
-              {/* ✅ NESTED TABS WITH STATE */}
-              <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
-                <TabsList className="grid w-full grid-cols-2 bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-xl shadow-md mb-6">
+                {isAdmin && (
                   <TabsTrigger 
-                    value="profile"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-lg"
+                    value="dashboard"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+                  >
+                    <LayoutDashboard className="h-4 w-4 mr-2" />
+                    <span className="hidden sm:inline">{t.Admin?.tabs?.dashboard || 'Dashboard'}</span>
+                  </TabsTrigger>
+                )}
+                
+                {isAdmin && (
+                  <TabsTrigger 
+                    value="users"
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
                   >
                     <User className="h-4 w-4 mr-2" />
-                    {t.profile || 'Profil'}
+                    <span className="hidden sm:inline">{t.Admin?.tabs?.users || 'Users'}</span>
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="system"
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-lg"
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    {language === 'hu' ? 'Rendszerbeállítások' : 'System Settings'}
-                  </TabsTrigger>
-                </TabsList>
+                )}
+                
+                <TabsTrigger 
+                  value="protocols"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+                >
+                  <FileText className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">{t.Admin?.tabs?.protocols || 'Protocols'}</span>
+                </TabsTrigger>
+                
+                <TabsTrigger 
+                  value="templates"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+                >
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">{t.Admin?.tabs?.templates || 'Templates'}</span>
+                </TabsTrigger>
+                
+                <TabsTrigger 
+                  value="audit"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">{t.Admin?.tabs?.audit || 'Audit'}</span>
+                </TabsTrigger>
+                
+                <TabsTrigger 
+                  value="settings"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 data-[state=active]:shadow-lg py-3"
+                >
+                  <Settings className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">{t.Admin?.tabs?.settings || 'Settings'}</span>
+                </TabsTrigger>
+              </TabsList>
 
-                <TabsContent value="profile" className="mt-6">
-                  <ProfileSettings />
+              {isAdmin && (
+                <TabsContent value="dashboard" className="mt-6">
+                  <AdminDashboard />
                 </TabsContent>
+              )}
 
-                <TabsContent value="system" className="mt-6">
-                  <SystemSettings />
+              {isAdmin && (
+                <TabsContent value="users" className="mt-6">
+                  <UserList />
                 </TabsContent>
-              </Tabs>
-            </TabsContent>
-          </Tabs>
-        </main>
+              )}
+
+              <TabsContent value="protocols" className="mt-6">
+                <ProtocolList />
+              </TabsContent>
+
+              <TabsContent value="templates" className="space-y-6 mt-6">
+                <TemplateManagement />
+              </TabsContent>
+
+              <TabsContent value="audit" className="mt-6">
+                <AuditLogTable />
+              </TabsContent>
+
+              <TabsContent value="settings" className="mt-6">
+                <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-xl shadow-md mb-6">
+                    <TabsTrigger 
+                      value="profile"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-lg"
+                    >
+                      <User className="h-4 w-4 mr-2" />
+                      {t.profile || 'Profil'}
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="system"
+                      className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-lg"
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      {language === 'hu' ? 'Rendszerbeállítások' : 'System Settings'}
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="profile" className="mt-6">
+                    <ProfileSettings />
+                  </TabsContent>
+
+                  <TabsContent value="system" className="mt-6">
+                    <SystemSettings />
+                  </TabsContent>
+                </Tabs>
+              </TabsContent>
+            </Tabs>
+          </main>
+        </div>
       </div>
     );
   }
 
-  // ========================================
-  // CLASSIC THEME
-  // ========================================
+  // ✅ JAVÍTOTT SZERKEZET - CLASSIC THEME
   return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+    <div className="min-h-screen">
+      {/* ✅ Header KÍVÜL (sticky működhet) */}
+      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
@@ -408,99 +394,97 @@ export function Admin({ onBack, onHome }: AdminProps) {
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-6 py-8">
-      <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
-        {/* ✅ 5. DINAMIKUS RÁCS ÉS FELTÉTELES FÜLEK (CLASSIC) */}
-        <TabsList 
-          className={`grid w-full ${
-            isAdmin 
-              ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6' 
-              : 'grid-cols-2 md:grid-cols-4'
-          } mb-6`}
-        >
-          {isAdmin && (
-            <TabsTrigger value="dashboard">
-              <LayoutDashboard className="h-4 w-4 mr-2" />
-              {t.Admin?.tabs?.dashboard || 'Dashboard'}
-            </TabsTrigger>
-          )}
-          {isAdmin && (
-            <TabsTrigger value="users">
-              <User className="h-4 w-4 mr-2" />
-              {t.Admin?.tabs?.users || 'Users'}
-            </TabsTrigger>
-          )}
-          <TabsTrigger value="protocols">
-            <FileText className="h-4 w-4 mr-2" />
-            {t.Admin?.tabs?.protocols || 'Protocols'}
-          </TabsTrigger>
-          <TabsTrigger value="templates">
-            <FileSpreadsheet className="h-4 w-4 mr-2" />
-            {t.Admin?.tabs?.templates || 'Templates'}
-          </TabsTrigger>
-          <TabsTrigger value="audit">
-            <Shield className="h-4 w-4 mr-2" />
-            {t.Admin?.tabs?.audit || 'Audit Log'}
-          </TabsTrigger>
-          <TabsTrigger value="settings">
-            <Settings className="h-4 w-4 mr-2" />
-            {t.Admin?.tabs?.settings || 'Beállítások'}
-          </TabsTrigger>
-        </TabsList>
-
-        {/* ✅ 6. FELTÉTELES TARTALOM (CLASSIC) */}
-        {isAdmin && (
-          <TabsContent value="dashboard" className="mt-6">
-            <AdminDashboard />
-          </TabsContent>
-        )}
-
-        {isAdmin && (
-          <TabsContent value="users" className="mt-6">
-                <UserList />
-              </TabsContent>
-            )}
-
-            <TabsContent value="protocols" className="mt-6">
-              <ProtocolList />
-            </TabsContent>
-
-            {/* ========== JAVÍTÁS ITT (Modern) ========== */}
-            <TabsContent value="templates" className="space-y-6 mt-6">
-              <TemplateManagement />
-            </TabsContent>
-
-            <TabsContent value="audit" className="mt-6">
-              <AuditLogTable />
-            </TabsContent>
-
-            <TabsContent value="settings" className="mt-6">
-          {/* ✅ NESTED TABS WITH STATE */}
-          <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="profile">
-                <User className="h-4 w-4 mr-2" />
-                {t.profile || 'Profil'}
+      {/* ✅ Görgethető tartalom */}
+      <div className="min-h-screen bg-white">
+        {/* Main Content */}
+        <main className="max-w-7xl mx-auto px-6 py-8">
+          <Tabs value={activeMainTab} onValueChange={setActiveMainTab} className="w-full">
+            <TabsList 
+              className={`grid w-full ${
+                isAdmin 
+                  ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6' 
+                  : 'grid-cols-2 md:grid-cols-4'
+              } mb-6`}
+            >
+              {isAdmin && (
+                <TabsTrigger value="dashboard">
+                  <LayoutDashboard className="h-4 w-4 mr-2" />
+                  {t.Admin?.tabs?.dashboard || 'Dashboard'}
+                </TabsTrigger>
+              )}
+              {isAdmin && (
+                <TabsTrigger value="users">
+                  <User className="h-4 w-4 mr-2" />
+                  {t.Admin?.tabs?.users || 'Users'}
+                </TabsTrigger>
+              )}
+              <TabsTrigger value="protocols">
+                <FileText className="h-4 w-4 mr-2" />
+                {t.Admin?.tabs?.protocols || 'Protocols'}
               </TabsTrigger>
-              <TabsTrigger value="system">
+              <TabsTrigger value="templates">
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                {t.Admin?.tabs?.templates || 'Templates'}
+              </TabsTrigger>
+              <TabsTrigger value="audit">
+                <Shield className="h-4 w-4 mr-2" />
+                {t.Admin?.tabs?.audit || 'Audit Log'}
+              </TabsTrigger>
+              <TabsTrigger value="settings">
                 <Settings className="h-4 w-4 mr-2" />
-                {language === 'hu' ? 'Rendszerbeállítások' : 'System Settings'}
+                {t.Admin?.tabs?.settings || 'Beállítások'}
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="profile" className="mt-6">
-              <ProfileSettings />
+            {isAdmin && (
+              <TabsContent value="dashboard" className="mt-6">
+                <AdminDashboard />
+              </TabsContent>
+            )}
+
+            {isAdmin && (
+              <TabsContent value="users" className="mt-6">
+                <UserList />
+              </TabsContent>
+            )}
+
+            <TabsContent value="protocols" className="mt-6">
+              <ProtocolList />
             </TabsContent>
 
-            <TabsContent value="system" className="mt-6">
-              <SystemSettings />
+            <TabsContent value="templates" className="space-y-6 mt-6">
+              <TemplateManagement />
+            </TabsContent>
+
+            <TabsContent value="audit" className="mt-6">
+              <AuditLogTable />
+            </TabsContent>
+
+            <TabsContent value="settings" className="mt-6">
+              <Tabs value={activeSettingsTab} onValueChange={setActiveSettingsTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="profile">
+                    <User className="h-4 w-4 mr-2" />
+                    {t.profile || 'Profil'}
+                  </TabsTrigger>
+                  <TabsTrigger value="system">
+                    <Settings className="h-4 w-4 mr-2" />
+                    {language === 'hu' ? 'Rendszerbeállítások' : 'System Settings'}
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="profile" className="mt-6">
+                  <ProfileSettings />
+                </TabsContent>
+
+                <TabsContent value="system" className="mt-6">
+                  <SystemSettings />
+                </TabsContent>
+              </Tabs>
             </TabsContent>
           </Tabs>
-        </TabsContent>
-      </Tabs>
-    </main>
+        </main>
+      </div>
     </div>
   );
 }
-

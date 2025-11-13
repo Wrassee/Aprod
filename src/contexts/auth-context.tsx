@@ -1,15 +1,25 @@
-// src/contexts/auth-context.tsx - SIMPLIFIED WITHOUT PROFILES TABLE
+// src/contexts/auth-context.tsx - VÉGLEGES, JAVÍTOTT VERZIÓ (API-val)
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { User, Session, SupabaseClient, AuthError } from '@supabase/supabase-js';
 
-// ✅ EGYSZERŰSÍTETT: Nincs Profile tábla, csak Supabase Auth
+// Ez a "Profile" objektum típusa, ahogy az adatbázisban van
+interface Profile {
+  user_id: string;
+  email: string;
+  role: string;
+  name?: string;
+  address?: string;
+  google_drive_folder_id?: string;
+  // Bármi más, ami a 'profiles' táblában van
+}
+
 interface AuthContextType {
   supabase: SupabaseClient;
   user: User | null;
   session: Session | null;
-  profile: any | null; // ← Backward compatibility (mindig null lesz)
+  profile: Profile | null; // ← VALÓDI PROFIL OBJEKTUM
   loading: boolean;
   initialized: boolean;
   signIn: (email: string, password: string) => Promise<Session>;
@@ -17,8 +27,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   resetPasswordForEmail: (email: string) => Promise<{ error: AuthError | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: AuthError | null }>;
-  refreshProfile: () => Promise<void>; // ← Backward compatibility (üres függvény)
-  // ✅ Role és email_confirmed közvetlenül a User objektumból
+  refreshProfile: () => Promise<void>; // ← VALÓDI FÜGGVÉNY
   role: string;
   emailConfirmed: boolean;
 }
@@ -28,8 +37,44 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
+
+  // ============================================
+  // ✅ JAVÍTOTT PROFIL FRISSÍTŐ FÜGGVÉNY (FETCH-csel az API-ból)
+  // ============================================
+  const refreshProfile = async (currentUser: User | null = user, currentSession: Session | null = session) => {
+    if (currentUser && currentSession) {
+      console.log('🔄 AuthContext - Refreshing profile from API for user:', currentUser.id);
+      try {
+        // ✅ A backend /api/profiles/:userId végpontját hívjuk
+        const response = await fetch(`/api/profiles/${currentUser.id}`, {
+          headers: {
+            'Authorization': `Bearer ${currentSession.access_token}`
+          }
+        });
+
+        if (response.ok) {
+          const profileData = await response.json();
+          console.log('✅ AuthContext - Profile loaded from API:', profileData);
+          setProfile(profileData);
+        } else if (response.status === 404) {
+           console.log('ℹ️ Profile not found in DB (user might need to create it).');
+           setProfile(null);
+        } else {
+          console.warn(`⚠️ Error fetching profile (Status: ${response.status}). Setting profile to null for now.`);
+          setProfile(null);
+        }
+      } catch (apiError) {
+        console.error('❌ API Error fetching profile:', apiError);
+        setProfile(null);
+      }
+    } else {
+      console.log('ℹ️ No user, clearing profile.');
+      setProfile(null);
+    }
+  };
 
   // Initialize session on mount
   useEffect(() => {
@@ -42,6 +87,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
+          // ✅ Profil betöltése az API-n keresztül
+          await refreshProfile(session.user, session); 
           console.log('✅ User authenticated:', {
             email: session.user.email,
             role: session.user.app_metadata?.role || 'user',
@@ -60,10 +107,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       console.log('🔐 Auth state changed:', _event);
       setSession(session);
       setUser(session?.user ?? null);
+
+      // ✅ JAVÍTVA: Profil frissítése be- és kijelentkezéskor
+      if (_event === 'SIGNED_IN' || _event === 'INITIAL_SESSION' || _event === 'USER_UPDATED') {
+        await refreshProfile(session?.user ?? null, session);
+      }
+      if (_event === 'SIGNED_OUT') {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -85,21 +140,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     
     console.log('✅ Sign in successful');
-    
-    if (!data.session) {
-      throw new Error('No session returned from sign in');
-    }
+    if (!data.session) throw new Error('No session returned from sign in');
 
+    // ✅ Profil betöltése bejelentkezés után az API-ból
+    await refreshProfile(data.user, data.session);
     return data.session;
   };
 
   // ============================================
-  // REGISZTRÁCIÓ (Email Confirmation támogatással)
+  // REGISZTRÁCIÓ
   // ============================================
   const signUp = async (email: string, password: string) => {
     console.log('📝 Attempting sign up for email:', email);
-    
-    // ✅ Automatikus URL detektálás
     const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
     
     const { data, error } = await supabase.auth.signUp({
@@ -118,11 +170,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     console.log('✅ Sign up response - session:', data.session ? 'exists' : 'missing', 'user:', data.user ? 'exists' : 'missing');
     
-    // Ha nincs session, akkor email megerősítésre vár
     if (!data.session) {
       throw new Error('Email confirmation required. Please check your inbox.');
     }
 
+    // ✅ Profil betöltése regisztráció után (a backend middleware már létrehozta)
+    await refreshProfile(data.user, data.session);
     return data.session;
   };
 
@@ -136,16 +189,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.error('❌ Sign out error:', error);
       throw error;
     }
+    setProfile(null); // Profil törlése
     console.log('✅ Sign out successful');
   };
 
   // ============================================
-  // ✅ ELFELEJTETT JELSZÓ - Email küldése
+  // ELFELEJTETT JELSZÓ
   // ============================================
   const resetPasswordForEmail = async (email: string) => {
     try {
       const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
-      
       console.log('📧 Sending password reset email to:', email, 'with redirect:', `${appUrl}/reset-password`);
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -157,7 +210,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         console.log('✅ Password reset email sent to:', email);
       }
-
       return { error };
     } catch (error) {
       console.error('Reset password error:', error);
@@ -166,22 +218,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // ============================================
-  // ✅ JELSZÓ FRISSÍTÉSE (Reset link után)
+  // JELSZÓ FRISSÍTÉSE
   // ============================================
   const updatePassword = async (newPassword: string) => {
     try {
       console.log('🔐 Updating password for user');
-
       const { error } = await supabase.auth.updateUser({
         password: newPassword,
       });
-
       if (error) {
         console.error('❌ Update password error:', error);
       } else {
         console.log('✅ Password updated successfully');
       }
-
       return { error };
     } catch (error) {
       console.error('Update password error:', error);
@@ -190,21 +239,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // ============================================
-  // ✅ COMPUTED VALUES - közvetlenül a User objektumból
+  // ✅ COMPUTED VALUES - Elsődlegesen a profilból, fallback az auth
   // ============================================
-  const role = user?.app_metadata?.role || user?.user_metadata?.role || 'user';
+  const role = profile?.role || user?.app_metadata?.role || 'user';
   const emailConfirmed = user?.email_confirmed_at !== null;
-
-  // ✅ Backward compatibility: refreshProfile üres függvény
-  const refreshProfile = async () => {
-    console.log('ℹ️ refreshProfile called (no-op - no profiles table)');
-  };
 
   const value = {
     supabase,
     user,
     session,
-    profile: null, // ← Backward compatibility
+    profile: profile, // ✅ JAVÍTVA
     loading,
     initialized,
     signIn,
@@ -212,7 +256,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     signOut,
     resetPasswordForEmail,
     updatePassword,
-    refreshProfile, // ← Backward compatibility
+    refreshProfile: () => refreshProfile(user, session), // ✅ JAVÍTVA
     role,
     emailConfirmed,
   };

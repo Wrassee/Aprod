@@ -55,7 +55,7 @@ export function ProfileSettings() {
     const url = isCreating ? '/api/profiles' : `/api/profiles/${profile.user_id}`;
     
     const bodyPayload = isCreating 
-      ? { ...formData, user_id: user.id } 
+      ? { ...formData, user_id: user.id, email: user.email, role: user.role } 
       : formData;
 
     try {

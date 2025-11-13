@@ -115,7 +115,20 @@ function Questionnaire({
         if (response.ok) {
           const questionsData = await response.json();
           console.log('✅ Questions loaded:', questionsData.length);
-          setAllQuestions(questionsData);
+
+          // === JAVÍTÁS: Nyelvi placeholder beállítása ===
+          const langSuffix = language.toUpperCase(); // 'HU' vagy 'DE'
+          const placeholderKey = `placeholder${langSuffix}`; // 'placeholderHU' vagy 'placeholderDE'
+
+          const transformedQuestions = questionsData.map((q: any) => ({
+            ...q,
+            // Felülírjuk/létrehozzuk a 'placeholder' kulcsot
+            // a megfelelő nyelvi verzióval (pl. q.placeholderHU)
+            placeholder: q[placeholderKey] || q.placeholder || ''
+          }));
+
+          setAllQuestions(transformedQuestions);
+          // === JAVÍTÁS VÉGE ===
         } else {
           console.warn('⚠️ No active template found, using empty question list');
           setAllQuestions([]);
@@ -333,7 +346,7 @@ function Questionnaire({
                         </h2>
                         <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                           <Sparkles className="h-3 w-3 text-cyan-500" />
-                          {currentGroup.questionCount} {language === 'hu' ? 'kérdés' : 'Fragen'}
+                          {currentGroup.questionCount} {t.questionsSuffix}
                         </p>
                       </div>
                     </div>
@@ -392,7 +405,7 @@ function Questionnaire({
                     questions={radioQuestions}
                     values={localAnswers}
                     onChange={handleLocalAnswerChange}
-                    groupName={currentGroup?.name || 'Kérdések'}
+                    groupName={currentGroup?.name || t.questions}
                   />
                 );
               }

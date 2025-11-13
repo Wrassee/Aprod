@@ -65,14 +65,14 @@ export function Completion({
 
   const handleEmailClick = async () => {
     setIsEmailSending(true);
-    setEmailStatus('Email küldése folyamatban...');
+    setEmailStatus(t.emailSending);
 
     try {
       await onEmailPDF();
-      setEmailStatus('✅ Email sikeresen elküldve!');
+      setEmailStatus(`✅ ${t.emailSentSuccess}`);
       setTimeout(() => setEmailStatus(''), 5000);
     } catch (error) {
-      setEmailStatus('❌ Email küldése sikertelen!');
+      setEmailStatus(`❌ ${t.emailSentError}`);
       setTimeout(() => setEmailStatus(''), 5000);
     } finally {
       setIsEmailSending(false);
@@ -86,7 +86,7 @@ export function Completion({
 
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.answers) {
-        throw new Error('No form data found in localStorage to generate PDF.');
+        throw new Error(t.noFormDataError || 'No form data found in localStorage to generate PDF.');
       }
 
       const response = await fetch('/api/protocols/download-pdf', {
@@ -100,7 +100,7 @@ export function Completion({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to generate PDF on the server.');
+        throw new Error(errorData.message || t.pdfGenerationError || 'Failed to generate PDF on the server.');
       }
 
       const blob = await response.blob();
@@ -133,10 +133,8 @@ export function Completion({
     const newTab = window.open('', '_blank');
     if (!newTab) {
       toast({
-        title: language === 'hu' ? 'Felugró ablak letiltva' : 'Popup blocked',
-        description: language === 'hu' 
-          ? 'A böngésző letiltotta a felugró ablakot. Kérlek, engedélyezd az oldalon.' 
-          : 'Der Browser hat das Popup blockiert. Bitte erlauben Sie Popups für diese Seite.',
+        title: t.popupBlockedTitle,
+        description: t.popupBlockedDescription,
         variant: 'destructive',
         duration: 5000,
       });
@@ -147,7 +145,7 @@ export function Completion({
     newTab.document.write(`
       <html>
         <head>
-          <title>${t.previewGeneratingTitle || 'PDF generálása...'}</title>
+          <title>${t.previewGeneratingTitle}</title>
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -178,7 +176,7 @@ export function Completion({
         <body>
           <div class="spinner"></div>
           <h2>${t.generating}...</h2>
-          <p>${t.previewGeneratingWait || 'Kérem várjon, ez 10-15 másodpercet vehet igénybe.'}</p>
+          <p>${t.previewGeneratingWait}</p>
         </body>
       </html>
     `);
@@ -186,7 +184,7 @@ export function Completion({
     try {
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.answers) {
-        throw new Error('Nincs mentett adat a localStorage-ban az előnézethez.');
+        throw new Error(t.noSavedDataForPreview);
       }
 
       const response = await fetch('/api/protocols/preview-pdf', {
@@ -200,7 +198,7 @@ export function Completion({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'PDF generálása sikertelen a szerveren.');
+        throw new Error(errorData.message || t.pdfGenerationServerError);
       }
 
       const blob = await response.blob();
@@ -215,7 +213,7 @@ export function Completion({
       newTab.document.write(`
         <html>
           <head>
-            <title>Hiba</title>
+            <title>${t.errorTitle}</title>
             <style>
               body {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -245,15 +243,15 @@ export function Completion({
             </style>
           </head>
           <body>
-            <h2>❌ Hiba történt</h2>
+            <h2>❌ ${t.errorOccurred}</h2>
             <p>${(error as Error).message}</p>
-            <button onclick="window.close()">Ablak bezárása</button>
+            <button onclick="window.close()">${t.closeWindow}</button>
           </body>
         </html>
       `);
       
       toast({
-        title: language === 'hu' ? 'Előnézeti hiba' : 'Preview Error',
+        title: t.previewErrorTitle,
         description: (error as Error).message,
         variant: 'destructive',
         duration: 5000,
@@ -270,7 +268,7 @@ export function Completion({
 
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.groundingCheckAnswers) {
-        throw new Error('Nincsenek földelési adatok a PDF generálásához.');
+        throw new Error(t.noGroundingDataError);
       }
       
       const plz = savedData.answers?.['3'] || '';
@@ -315,7 +313,7 @@ export function Completion({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'A földelési PDF generálása sikertelen.');
+        throw new Error(errorData.message || t.groundingPdfGenerationError);
       }
 
       const blob = await response.blob();
@@ -335,27 +333,23 @@ export function Completion({
       console.log('Grounding PDF download initiated successfully.');
       
       toast({
-        title: language === 'hu' ? 'Sikeres letöltés' : 'Download erfolgreich',
-        description: language === 'hu' 
-          ? 'A földelési jegyzőkönyv sikeresen letöltve.' 
-          : 'Das Erdungsprotokoll wurde erfolgreich heruntergeladen.',
+        title: t.downloadSuccessTitle,
+        description: t.groundingProtocolDownloaded,
         duration: 3000,
       });
 
     } catch (error) {
       console.error('Hiba a földelési PDF letöltése során:', error);
       toast({
-        title: language === 'hu' ? 'Letöltési hiba' : 'Download Fehler',
-        description: (error as Error).message || (language === 'hu'
-          ? 'A földelési jegyzőkönyv letöltése sikertelen. Kérjük próbálja újra.'
-          : 'Das Erdungsprotokoll konnte nicht heruntergeladen werden. Bitte versuchen Sie es erneut.'),
+        title: t.downloadErrorTitle,
+        description: (error as Error).message || t.groundingProtocolDownloadError,
         variant: 'destructive',
         duration: 5000,
       });
     } finally {
       setIsGroundingPdfDownloading(false);
     }
-  }, [language, toast]);
+  }, [language, toast, t]);
 
   const errorList = errors.length > 0 ? errors : JSON.parse(localStorage.getItem('protocol-errors') || '[]');
   const hasErrors = errorList.length > 0;
@@ -442,7 +436,7 @@ export function Completion({
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="relative flex flex-col items-center gap-3">
                     <Mail className="h-8 w-8" />
-                    <span className="text-lg">{isEmailSending ? 'Küldés...' : t.emailPDF}</span>
+                    <span className="text-lg">{isEmailSending ? t.sending : t.emailPDF}</span>
                   </div>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
                 </button>
@@ -453,14 +447,14 @@ export function Completion({
                   className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center py-4 h-auto w-full disabled:opacity-50"
                 >
                   <Mail className="h-5 w-5 mr-3" />
-                  {isEmailSending ? 'Küldés...' : t.emailPDF}
+                  {isEmailSending ? t.sending : t.emailPDF}
                 </Button>
               )}
 
               {emailStatus && (
                 <div className={`${theme === 'modern' ? 'mt-2' : 'absolute top-full mt-2 left-0 right-0'} text-sm px-3 py-2 rounded-lg text-center font-medium ${
                   emailStatus.includes('✅') ? 'bg-green-100 text-green-700 border border-green-300' : 
-                  emailStatus.includes('folyamatban') ? 'bg-blue-100 text-blue-700 border border-blue-300' :
+                  emailStatus.includes(t.emailSending) ? 'bg-blue-100 text-blue-700 border border-blue-300' :
                   'bg-red-100 text-red-700 border border-red-300'
                 }`}>
                   {emailStatus}
@@ -694,7 +688,7 @@ export function Completion({
               >
                 <div className="flex items-center gap-2">
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="font-semibold">{language === 'hu' ? 'Vissza' : 'Zurück'}</span>
+                  <span className="font-semibold">{t.back}</span>
                 </div>
               </button>
             ) : (
@@ -704,7 +698,7 @@ export function Completion({
                 className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {language === 'hu' ? 'Vissza' : 'Zurück'}
+                {t.back}
               </Button>
             )}
           </div>

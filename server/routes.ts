@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express) {
       const authenticatedUser = (req as any).user;
       
       // Ensure user can only create their own profile
-      if (validationResult.data.user_id !== authenticatedUser.id) {
+      if (validationResult.data.user_id !== authenticatedUser.user_id) {
         return res.status(403).json({ 
           message: "Forbidden - You can only create your own profile" 
         });
@@ -167,18 +167,29 @@ export async function registerRoutes(app: Express) {
       
       // SECURITY FIX: Force role to "user" for self-service creation
       // Only admins can create profiles with elevated roles (future feature)
-      const sanitizedData = {
-        ...validationResult.data,
-        role: 'user', // Always set to 'user' regardless of client input
-      };
+      // const sanitizedData = {
+       // ...validationResult.data,
+        //role: 'user', // Always set to 'user' regardless of client input
+      //};
       
-      const profile = await storage.createProfile(sanitizedData);
-      res.status(201).json(profile);
-    } catch (error) {
-      console.error("❌ Error creating profile:", error);
-      res.status(500).json({ message: "Failed to create profile" });
-    }
-  });
+      // const profile = await storage.createProfile(sanitizedData);
+
+      // A validationResult.data tartalmazza a user_id, email, role, name stb. mezőket.
+
+    const profileDataFromClient = validationResult.data;
+
+    // A user_id alapján frissítjük a profilt
+    const updatedProfile = await storage.updateProfile(
+        profileDataFromClient.user_id, 
+        profileDataFromClient
+    );
+    
+    res.status(201).json(updatedProfile); // 201 (Created) helyett 200 (OK) is lehetne, de így is jó
+  } catch (error) {
+    console.error("❌ Error creating/updating profile:", error); // <-- Átírtam a log üzenetet
+    res.status(500).json({ message: "Failed to create or update profile" });
+  }
+});
 
   app.patch("/api/profiles/:userId", requireAuth, requireOwnerOrAdmin, async (req, res) => {
     try {

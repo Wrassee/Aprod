@@ -22,18 +22,26 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_APP_URL': JSON.stringify(env.VITE_APP_URL),
     },
 
-    // --- ITT A JAVÍTÁS ---
+    // --- MÓDOSÍTÁS: KONKRÉT STRINGEK TÖMBJE ---
     server: {
       host: "0.0.0.0",
       port: 5173,
-      // Ez engedélyezi a Renderes (és bármilyen) címet:
-      allowedHosts: true, 
+      // A "true" helyett most felsoroljuk őket, így nem tud belekötni:
+      allowedHosts: [
+        "aprod-app-kkcr.onrender.com",
+        "aprod.onrender.com",
+        "localhost"
+      ],
     },
     preview: {
       host: "0.0.0.0",
       port: 4173,
-      allowedHosts: true,
+      allowedHosts: [
+        "aprod-app-kkcr.onrender.com",
+        "aprod.onrender.com",
+        "localhost"
+      ],
     },
-    // ---------------------
+    // ------------------------------------------
   };
 });

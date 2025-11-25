@@ -1,7 +1,7 @@
-// src/components/add-error-modal.tsx - THEME AWARE VERSION
+// src/components/add-error-modal.tsx - JAVÍTOTT DIZÁJN ÉS NYELV
 
 import { useState, useEffect } from 'react';
-import { useTheme } from '@/contexts/theme-context'; // ← ÚJ IMPORT
+import { useTheme } from '@/contexts/theme-context';
 import { ProtocolError, ErrorSeverity } from '@shared/schema';
 import {
   Dialog,
@@ -33,7 +33,7 @@ interface AddErrorModalProps {
 
 export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErrorModalProps) {
   const { t } = useLanguageContext();
-  const { theme } = useTheme(); // ← ÚJ HOOK
+  const { theme } = useTheme();
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -94,7 +94,12 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
   if (theme === 'modern') {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl border-0 p-0">
+        {/* 🔥 DIZÁJN JAVÍTÁS: 
+           Hozzáadtam: bg-transparent shadow-none
+           Ez eltünteti a fehér "dobozt" a színes keret mögül, így eltűnnek a fehér sarkok.
+        */}
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl border-0 p-0 bg-transparent shadow-none">
+          
           {/* Gradient Border Wrapper */}
           <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 via-rose-500 to-pink-500 p-1 shadow-2xl">
             <div className="absolute inset-0 bg-gradient-to-r from-red-400 via-rose-400 to-pink-400 opacity-50 blur-xl animate-pulse" />
@@ -106,7 +111,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                     <AlertTriangle className="h-5 w-5 text-white" />
                   </div>
                   <span className="bg-gradient-to-r from-red-600 via-rose-600 to-pink-500 bg-clip-text text-transparent">
-                    {t.addErrorTitle}
+                    {t("addErrorTitle")}
                   </span>
                 </DialogTitle>
               </DialogHeader>
@@ -116,7 +121,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-3">
                     <Sparkles className="h-4 w-4 text-rose-500" />
-                    {t.severity}
+                    {t("severity")}
                   </Label>
                   <div className="grid grid-cols-3 gap-3">
                     {/* Critical */}
@@ -132,7 +137,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                       <AlertTriangle className={`h-6 w-6 mx-auto mb-2 ${
                         severity === 'critical' ? 'text-white' : 'text-red-500'
                       }`} />
-                      <p className="font-semibold text-sm">{t.critical}</p>
+                      <p className="font-semibold text-sm">{t("critical")}</p>
                     </button>
 
                     {/* Medium */}
@@ -148,7 +153,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                       <AlertCircle className={`h-6 w-6 mx-auto mb-2 ${
                         severity === 'medium' ? 'text-white' : 'text-amber-500'
                       }`} />
-                      <p className="font-semibold text-sm">{t.medium}</p>
+                      <p className="font-semibold text-sm">{t("medium")}</p>
                     </button>
 
                     {/* Low */}
@@ -164,7 +169,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                       <Info className={`h-6 w-6 mx-auto mb-2 ${
                         severity === 'low' ? 'text-white' : 'text-blue-500'
                       }`} />
-                      <p className="font-semibold text-sm">{t.low}</p>
+                      <p className="font-semibold text-sm">{t("low")}</p>
                     </button>
                   </div>
                 </div>
@@ -173,13 +178,13 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-rose-500" />
-                    {t.errorTitle}
+                    {t("errorTitle")}
                   </Label>
                   <div className="relative group">
                     <Input
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      placeholder="Brief description of the error"
+                      placeholder={t("errorTitlePlaceholder")} // 🔥 NYELVI JAVÍTÁS
                       className="h-12 border-2 border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/30 rounded-xl transition-all"
                     />
                     <div className="absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-rose-500 opacity-0 group-focus-within:opacity-100 animate-pulse transition-opacity" />
@@ -190,12 +195,12 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-2">
                     <Sparkles className="h-4 w-4 text-rose-500" />
-                    {t.errorDescription}
+                    {t("errorDescription")}
                   </Label>
                   <Textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Provide detailed information about the error"
+                    placeholder={t("errorDescriptionPlaceholder")} // 🔥 NYELVI JAVÍTÁS
                     rows={4}
                     className="border-2 border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/30 rounded-xl resize-none transition-all"
                   />
@@ -205,7 +210,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2 mb-2">
                     <Camera className="h-4 w-4 text-rose-500" />
-                    {t.attachPhotos}
+                    {t("attachPhotos")}
                   </Label>
                   <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-rose-100 to-pink-50 border-2 border-dashed border-rose-300 p-8 text-center hover:border-rose-400 transition-all">
                     <div className="absolute inset-0 bg-gradient-to-r from-rose-400/0 via-rose-400/5 to-rose-400/0" />
@@ -216,14 +221,14 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                         <Camera className="relative h-12 w-12 mx-auto text-rose-500 mb-4" />
                       </div>
                       
-                      <p className="text-gray-700 font-medium mb-4">{t.uploadPhotos}</p>
+                      <p className="text-gray-700 font-medium mb-4">{t("uploadPhotos")}</p>
                       <Button
                         type="button"
                         onClick={() => document.getElementById('error-image-upload')?.click()}
                         className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transition-all"
                       >
                         <Camera className="h-4 w-4 mr-2" />
-                        {t.selectFiles}
+                        {t("selectFiles")}
                       </Button>
                       <input
                         id="error-image-upload"
@@ -267,7 +272,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                     onClick={onClose}
                     className="px-6 border-2 border-gray-300 hover:bg-gray-50 rounded-xl"
                   >
-                    {t.cancel}
+                    {t("cancel")}
                   </Button>
                   <Button
                     onClick={handleSave}
@@ -276,7 +281,7 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                   >
                     <span className="relative z-10 flex items-center gap-2">
                       <Save className="h-4 w-4" />
-                      {t.saveError}
+                      {t("saveError")}
                     </span>
                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
                   </Button>
@@ -298,14 +303,14 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
         <DialogHeader className="border-b pb-4">
           <DialogTitle className="flex items-center gap-2 text-gray-900">
             <AlertTriangle className="h-5 w-5 text-red-600" />
-            {t.addErrorTitle}
+            {t("addErrorTitle")}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 pt-4">
           {/* Severity Level */}
           <div>
-            <Label className="text-sm font-medium text-gray-700">{t.severity}</Label>
+            <Label className="text-sm font-medium text-gray-700">{t("severity")}</Label>
             <Select value={severity} onValueChange={(value: ErrorSeverity) => setSeverity(value)}>
               <SelectTrigger className="w-full mt-2 border-gray-300">
                 <SelectValue />
@@ -314,19 +319,19 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
                 <SelectItem value="critical">
                   <div className="flex items-center gap-2">
                     <AlertTriangle className="h-4 w-4 text-red-600" />
-                    {t.critical}
+                    {t("critical")}
                   </div>
                 </SelectItem>
                 <SelectItem value="medium">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="h-4 w-4 text-amber-600" />
-                    {t.medium}
+                    {t("medium")}
                   </div>
                 </SelectItem>
                 <SelectItem value="low">
                   <div className="flex items-center gap-2">
                     <Info className="h-4 w-4 text-blue-600" />
-                    {t.low}
+                    {t("low")}
                   </div>
                 </SelectItem>
               </SelectContent>
@@ -335,22 +340,22 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
 
           {/* Error Title */}
           <div>
-            <Label className="text-sm font-medium text-gray-700">{t.errorTitle}</Label>
+            <Label className="text-sm font-medium text-gray-700">{t("errorTitle")}</Label>
             <Input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Brief description of the error"
+              placeholder={t("errorTitlePlaceholder")} // 🔥 NYELVI JAVÍTÁS
               className="mt-2 border-gray-300"
             />
           </div>
 
           {/* Error Description */}
           <div>
-            <Label className="text-sm font-medium text-gray-700">{t.errorDescription}</Label>
+            <Label className="text-sm font-medium text-gray-700">{t("errorDescription")}</Label>
             <Textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Provide detailed information about the error"
+              placeholder={t("errorDescriptionPlaceholder")} // 🔥 NYELVI JAVÍTÁS
               rows={4}
               className="mt-2 resize-none border-gray-300"
             />
@@ -358,17 +363,17 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
 
           {/* Photo Upload */}
           <div>
-            <Label className="text-sm font-medium text-gray-700">{t.attachPhotos}</Label>
+            <Label className="text-sm font-medium text-gray-700">{t("attachPhotos")}</Label>
             <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50">
               <Camera className="h-8 w-8 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600 mb-2">{t.uploadPhotos}</p>
+              <p className="text-gray-600 mb-2">{t("uploadPhotos")}</p>
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => document.getElementById('error-image-upload')?.click()}
                 className="border-gray-300"
               >
-                {t.selectFiles}
+                {t("selectFiles")}
               </Button>
               <input
                 id="error-image-upload"
@@ -407,14 +412,14 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
           {/* Modal Actions */}
           <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
             <Button variant="outline" onClick={onClose} className="border-gray-300">
-              {t.cancel}
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleSave}
               disabled={!title.trim() || !description.trim()}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {t.saveError}
+              {t("saveError")}
             </Button>
           </div>
         </div>

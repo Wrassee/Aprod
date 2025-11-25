@@ -1,4 +1,4 @@
-// src/components/user-list.tsx - THEME AWARE VERSION
+// src/components/user-list.tsx - JAVÍTOTT FORDÍTÁSOK (DOT NOTATION)
 import React, { useState, useEffect } from 'react';
 import { useLanguageContext } from "@/components/language-context";
 import { useToast } from '@/hooks/use-toast';
@@ -24,7 +24,7 @@ export function UserList() {
   const { t, language } = useLanguageContext();
   const { toast } = useToast();
   const { supabase } = useAuth();
-  const { theme } = useTheme(); // ← THEME HOOK
+  const { theme } = useTheme();
   
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,7 +45,8 @@ export function UserList() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        throw new Error(t.Admin?.UserManagement?.errorAuth || 'Authentication required');
+        // JAVÍTVA: Dot notation
+        throw new Error(t("Admin.UserManagement.errorAuth"));
       }
 
       const response = await fetch('/api/admin/users', {
@@ -57,7 +58,8 @@ export function UserList() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || t.Admin?.UserManagement?.errorFetch || 'Failed to fetch users');
+        // JAVÍTVA: Dot notation
+        throw new Error(errorData.message || t("Admin.UserManagement.errorFetch"));
       }
       
       const data = await response.json();
@@ -66,7 +68,7 @@ export function UserList() {
     } catch (error: any) {
       console.error('❌ Error fetching users:', error);
       toast({
-        title: t.error || 'Hiba',
+        title: t("error"),
         description: error.message,
         variant: 'destructive',
       });
@@ -76,8 +78,9 @@ export function UserList() {
   };
 
   const handleDeleteUser = async (userId: string, userName: string | null) => {
-    const confirmMessage = t.Admin?.UserManagement?.confirmDelete?.replace('{name}', userName || 'ezt a felhasználót') 
-      || `Biztosan törölni szeretnéd: ${userName || 'ezt a felhasználót'}?`;
+    // JAVÍTVA: Dot notation és biztonságos string kezelés
+    const template = t("Admin.UserManagement.confirmDelete");
+    const confirmMessage = template.replace('{name}', userName || 'ezt a felhasználót');
     
     if (!window.confirm(confirmMessage)) {
       return;
@@ -92,7 +95,8 @@ export function UserList() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        throw new Error(t.Admin?.UserManagement?.errorAuth || 'Authentication required');
+        // JAVÍTVA
+        throw new Error(t("Admin.UserManagement.errorAuth"));
       }
 
       const response = await fetch(`/api/admin/users/${userId}`, {
@@ -106,7 +110,8 @@ export function UserList() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message || t.Admin?.UserManagement?.errorDelete || 'Failed to delete user');
+        // JAVÍTVA
+        throw new Error(result.message || t("Admin.UserManagement.errorDelete"));
       }
       
       console.log(`✅ User ${userId} deleted successfully`);
@@ -114,14 +119,15 @@ export function UserList() {
       setUsers(prevUsers => prevUsers.filter(user => user.user_id !== userId));
       
       toast({
-        title: t.success || 'Siker',
-        description: result.message || t.Admin?.UserManagement?.deleteSuccess || 'Felhasználó sikeresen törölve.',
+        title: t("success"),
+        // JAVÍTVA
+        description: result.message || t("Admin.UserManagement.deleteSuccess"),
       });
 
     } catch (error: any) {
       console.error(`❌ Error deleting user ${userId}:`, error);
       toast({
-        title: t.error || 'Hiba',
+        title: t("error"),
         description: error.message,
         variant: 'destructive',
       });
@@ -145,7 +151,8 @@ export function UserList() {
                 <Users className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                {t.Admin?.UserManagement?.title || 'Felhasználók Kezelése'}
+                {/* JAVÍTVA */}
+                {t("Admin.UserManagement.title")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -156,7 +163,7 @@ export function UserList() {
                 <Loader2 className="relative h-12 w-12 animate-spin text-blue-600" />
               </div>
               <p className="mt-4 text-gray-600">
-                {language === 'hu' ? 'Betöltés...' : 'Loading...'}
+                {t("loading")}...
               </p>
             </div>
           </CardContent>
@@ -174,7 +181,8 @@ export function UserList() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <User className="h-5 w-5 mr-2 text-blue-600" />
-            {t.Admin?.UserManagement?.title || 'Felhasználók Kezelése'}
+            {/* JAVÍTVA */}
+            {t("Admin.UserManagement.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -201,7 +209,8 @@ export function UserList() {
                 <Users className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                {t.Admin?.UserManagement?.title || 'Felhasználók Kezelése'}
+                {/* JAVÍTVA */}
+                {t("Admin.UserManagement.title")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -212,7 +221,8 @@ export function UserList() {
                 <AlertCircle className="relative h-16 w-16 text-gray-400" />
               </div>
               <p className="text-lg font-medium text-gray-600">
-                {t.Admin?.UserManagement?.noUsers || 'Nincsenek felhasználók.'}
+                {/* JAVÍTVA */}
+                {t("Admin.UserManagement.noUsers")}
               </p>
             </div>
           </CardContent>
@@ -230,13 +240,15 @@ export function UserList() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <User className="h-5 w-5 mr-2 text-blue-600" />
-            {t.Admin?.UserManagement?.title || 'Felhasználók Kezelése'}
+            {/* JAVÍTVA */}
+            {t("Admin.UserManagement.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <AlertCircle className="h-12 w-12 mb-4 text-gray-300" />
-            <p>{t.Admin?.UserManagement?.noUsers || 'Nincsenek felhasználók.'}</p>
+            {/* JAVÍTVA */}
+            <p>{t("Admin.UserManagement.noUsers")}</p>
           </div>
         </CardContent>
       </Card>
@@ -258,15 +270,18 @@ export function UserList() {
                 <Users className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                {t.Admin?.UserManagement?.title || 'Felhasználók Kezelése'}
+                {/* JAVÍTVA */}
+                {t("Admin.UserManagement.title")}
               </span>
               <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
             </CardTitle>
             <CardDescription className="flex items-center gap-2 text-base mt-2">
-              {t.Admin?.UserManagement?.description || 'Az összes regisztrált felhasználó kezelése'}
+              {/* JAVÍTVA */}
+              {t("Admin.UserManagement.description")}
               {' • '}
               <Badge className="bg-gradient-to-r from-blue-500 to-sky-500 text-white border-0 px-3 py-1">
-                {users.length} {t.Admin?.UserManagement?.usersCount || 'felhasználó'}
+                {/* JAVÍTVA */}
+                {users.length} {t("Admin.UserManagement.usersCount")}
               </Badge>
             </CardDescription>
           </CardHeader>
@@ -278,26 +293,31 @@ export function UserList() {
                     <TableHead className="font-bold text-gray-700">
                       <div className="flex items-center gap-2">
                         <User className="h-4 w-4 text-blue-600" />
-                        {t.Admin?.UserManagement?.table?.name || 'Név'}
+                        {/* JAVÍTVA */}
+                        {t("Admin.UserManagement.table.name")}
                       </div>
                     </TableHead>
                     <TableHead className="font-bold text-gray-700">
-                      {t.Admin?.UserManagement?.table?.email || 'Email'}
+                      {/* JAVÍTVA */}
+                      {t("Admin.UserManagement.table.email")}
                     </TableHead>
                     <TableHead className="font-bold text-gray-700">
                       <div className="flex items-center gap-2">
                         <Shield className="h-4 w-4 text-blue-600" />
-                        {t.Admin?.UserManagement?.table?.role || 'Jogosultság'}
+                        {/* JAVÍTVA */}
+                        {t("Admin.UserManagement.table.role")}
                       </div>
                     </TableHead>
                     <TableHead className="font-bold text-gray-700">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-blue-600" />
-                        {t.Admin?.UserManagement?.table?.created || 'Létrehozva'}
+                        {/* JAVÍTVA */}
+                        {t("Admin.UserManagement.table.created")}
                       </div>
                     </TableHead>
                     <TableHead className="text-right font-bold text-gray-700">
-                      {t.Admin?.UserManagement?.table?.actions || 'Műveletek'}
+                      {/* JAVÍTVA */}
+                      {t("Admin.UserManagement.table.actions")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>
@@ -322,8 +342,9 @@ export function UserList() {
                           } px-3 py-1 shadow-md`}
                         >
                           {user.role === 'admin' 
-                            ? (t.Admin?.UserManagement?.roleAdmin || 'Admin')
-                            : (t.Admin?.UserManagement?.roleUser || 'Felhasználó')
+                            // JAVÍTVA
+                            ? t("Admin.UserManagement.roleAdmin")
+                            : t("Admin.UserManagement.roleUser")
                           }
                         </Badge>
                       </TableCell>
@@ -346,7 +367,7 @@ export function UserList() {
                             onClick={() => handleDeleteUser(user.user_id, user.full_name)}
                             disabled={deletingUserId === user.user_id}
                             className="group relative px-4 py-2 rounded-lg border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            title={t.Admin?.UserManagement?.buttons?.delete || 'Törlés'}
+                            title={t("Admin.UserManagement.buttons.delete")} // JAVÍTVA
                           >
                             {deletingUserId === user.user_id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -375,14 +396,17 @@ export function UserList() {
       <CardHeader>
         <CardTitle className="flex items-center">
           <User className="h-5 w-5 mr-2 text-blue-600" />
-          {t.Admin?.UserManagement?.title || 'Felhasználók Kezelése'}
+          {/* JAVÍTVA */}
+          {t("Admin.UserManagement.title")}
         </CardTitle>
         <CardDescription>
-          {t.Admin?.UserManagement?.description || 'Az összes regisztrált felhasználó kezelése'}
+          {/* JAVÍTVA */}
+          {t("Admin.UserManagement.description")}
           {' • '}
           <span className="font-semibold">{users.length}</span>
           {' '}
-          {t.Admin?.UserManagement?.usersCount || 'felhasználó'}
+          {/* JAVÍTVA */}
+          {t("Admin.UserManagement.usersCount")}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -390,12 +414,12 @@ export function UserList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t.Admin?.UserManagement?.table?.name || 'Név'}</TableHead>
-                <TableHead>{t.Admin?.UserManagement?.table?.email || 'Email'}</TableHead>
-                <TableHead>{t.Admin?.UserManagement?.table?.role || 'Jogosultság'}</TableHead>
-                <TableHead>{t.Admin?.UserManagement?.table?.created || 'Létrehozva'}</TableHead>
+                <TableHead>{t("Admin.UserManagement.table.name")}</TableHead> {/* JAVÍTVA */}
+                <TableHead>{t("Admin.UserManagement.table.email")}</TableHead> {/* JAVÍTVA */}
+                <TableHead>{t("Admin.UserManagement.table.role")}</TableHead> {/* JAVÍTVA */}
+                <TableHead>{t("Admin.UserManagement.table.created")}</TableHead> {/* JAVÍTVA */}
                 <TableHead className="text-right">
-                  {t.Admin?.UserManagement?.table?.actions || 'Műveletek'}
+                  {t("Admin.UserManagement.table.actions")} {/* JAVÍTVA */}
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -414,8 +438,9 @@ export function UserList() {
                       className={user.role === 'admin' ? 'bg-blue-600' : ''}
                     >
                       {user.role === 'admin' 
-                        ? (t.Admin?.UserManagement?.roleAdmin || 'Admin')
-                        : (t.Admin?.UserManagement?.roleUser || 'Felhasználó')
+                        // JAVÍTVA
+                        ? t("Admin.UserManagement.roleAdmin")
+                        : t("Admin.UserManagement.roleUser")
                       }
                     </Badge>
                   </TableCell>
@@ -440,7 +465,7 @@ export function UserList() {
                         onClick={() => handleDeleteUser(user.user_id, user.full_name)}
                         disabled={deletingUserId === user.user_id}
                         className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                        title={t.Admin?.UserManagement?.buttons?.delete || 'Törlés'}
+                        title={t("Admin.UserManagement.buttons.delete")} // JAVÍTVA
                       >
                         {deletingUserId === user.user_id ? (
                           <Loader2 className="h-4 w-4 animate-spin" />

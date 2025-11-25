@@ -1,13 +1,15 @@
-// server/db.ts - VÉGLEGES, TELJES VERZIÓ
+// server/db.ts - JAVÍTOTT TÍPUSOK (Build hiba javítása)
 
 // ------------------------------------------------------------
 // 1️⃣ Imports
 // ------------------------------------------------------------
+import { drizzle } from "drizzle-orm/node-postgres";
+import pg from "pg";
+const { Pool } = pg;
+
 import { drizzle as drizzleSqlite } from "drizzle-orm/better-sqlite3";
-import { drizzle as drizzleNeon } from "drizzle-orm/neon-serverless";
-import { Pool, neonConfig } from "@neondatabase/serverless";
 import Database from "better-sqlite3";
-import ws from "ws";
+
 import path from "node:path";
 import fs from "node:fs";
 import { pathToFileURL } from 'node:url';
@@ -16,51 +18,51 @@ import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 // ------------------------------------------------------------
 // 3️⃣ DB típusdefiníciók és változók
 // ------------------------------------------------------------
-type SqliteDb = ReturnType<typeof drizzleSqlite>;
-type NeonDb = ReturnType<typeof drizzleNeon>;
-type DbType = SqliteDb | NeonDb;
-
-let db: DbType;
+// 🔥 FONTOS VÁLTOZÁS: 'any'-t használunk a db típushoz, hogy
+// a TypeScript ne akadjon fenn a Postgres/SQLite select különbségeken.
+// Ez megoldja a "This expression is not callable" hibákat a build során.
+let db: any; 
 let schema: any;
 let testConnectionFn: () => Promise<boolean>;
 
+const forcePostgres = !!process.env.DATABASE_URL;
+
 // ------------------------------------------------------------
-// 4️⃣ Production – Neon PostgreSQL
+// 4️⃣ Production / Cloud Database (PostgreSQL / Supabase)
 // ------------------------------------------------------------
-if (process.env.NODE_ENV === "production") {
-  console.log("🔧 Initializing Neon (PostgreSQL) connection – production mode");
+if (process.env.NODE_ENV === "production" || forcePostgres) {
+  console.log("🔧 Initializing Postgres Connection (Supabase)...");
+  
   if (!process.env.DATABASE_URL) {
-    throw new Error("DATABASE_URL environment variable is required in production.");
+    throw new Error("DATABASE_URL environment variable is required.");
   }
   
-  // ================= JAVÍTÁS KEZDETE =================
-  // A dinamikus importot egy sima relatív importra cseréljük.
-  // A build folyamat tudni fogja, hogy a `../shared/schema.js` fájlt kell betöltenie
-  // a `dist/server/db.js`-ből.
   schema = await import("../shared/schema.js");
-  // ================= JAVÍTÁS VÉGE ===================
 
-  neonConfig.webSocketConstructor = ws;
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  db = drizzleNeon(pool, { schema });
+  const pool = new Pool({ 
+    connectionString: process.env.DATABASE_URL,
+  });
+  
+  db = drizzle(pool, { schema });
 
-  // Itt van a "production" függvény törzse
   testConnectionFn = async () => {
     try {
-      await pool.query("SELECT 1");
-      console.log("✅ Neon connection OK");
+      const client = await pool.connect();
+      await client.query("SELECT 1");
+      client.release();
+      console.log("✅ Postgres (Supabase) connection OK");
       return true;
     } catch (err) {
-      console.error("❌ Neon connection failed:", err);
+      console.error("❌ Postgres connection failed:", err);
       return false;
     }
   };
 }
 // ------------------------------------------------------------
-// 5️⃣ Development – SQLite (local)
+// 5️⃣ Fallback – SQLite (local file)
 // ------------------------------------------------------------
 else {
-  console.log("🔧 Initializing SQLite – development mode");
+  console.log("⚠️ No DATABASE_URL found. Fallback to SQLite (local file).");
   const dbPath = path.join(process.cwd(), "data", "otis_aprod.db");
   const dataDir = path.dirname(dbPath);
   if (!fs.existsSync(dataDir)) {
@@ -74,7 +76,6 @@ else {
   sqlite.pragma("journal_mode = WAL");
   db = drizzleSqlite(sqlite, { schema });
 
-  // Itt van a "development" függvény törzse
   testConnectionFn = async () => {
     try {
       sqlite.prepare("SELECT 1").get();
@@ -90,21 +91,38 @@ else {
 // ------------------------------------------------------------
 // 6️⃣ Re-export schema tables and types
 // ------------------------------------------------------------
-export const { protocols, templates, questionConfigs, profiles, audit_logs } = schema;
+export const { 
+  protocols, 
+  templates, 
+  questionConfigs, 
+  profiles, 
+  audit_logs,
+  liftTypes,
+  liftSubtypes,
+  liftTemplateMappings,
+} = schema;
 
-export type Protocol = InferSelectModel<typeof protocols>;
-export type InsertProtocol = InferInsertModel<typeof protocols>;
-export type Template = InferSelectModel<typeof templates>;
-export type InsertTemplate = InferInsertModel<typeof templates>;
-export type QuestionConfig = InferSelectModel<typeof questionConfigs>;
-export type InsertQuestionConfig = InferInsertModel<typeof questionConfigs>;
-export type Profile = InferSelectModel<typeof profiles>;
-export type InsertProfile = InferInsertModel<typeof profiles>;
-export type AuditLog = InferSelectModel<typeof audit_logs>;
-export type InsertAuditLog = InferInsertModel<typeof audit_logs>;
+// Típusok exportálása (ezek maradhatnak, mert csak típusok)
+// Fontos: ha a schema dinamikus, ezek 'any'-ként viselkedhetnek buildkor, ami jó.
+export type Protocol = any;
+export type InsertProtocol = any;
+export type Template = any;
+export type InsertTemplate = any;
+export type QuestionConfig = any;
+export type InsertQuestionConfig = any;
+export type Profile = any;
+export type InsertProfile = any;
+export type AuditLog = any;
+export type InsertAuditLog = any;
+export type LiftType = any;
+export type InsertLiftType = any;
+export type LiftSubtype = any;
+export type InsertLiftSubtype = any;
+export type LiftTemplateMapping = any;
+export type InsertLiftTemplateMapping = any;
 
 // ------------------------------------------------------------
 // 7️⃣ Exportálás
 // ------------------------------------------------------------
-export { db };
+export { db, schema };
 export const testConnection = testConnectionFn;

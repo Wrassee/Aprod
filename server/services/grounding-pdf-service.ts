@@ -1,4 +1,4 @@
-// server/services/grounding-pdf-service.ts – VÉGLEGES, DEPLOY-BIZTOS VERZIÓ (v10)
+// server/services/grounding-pdf-service.ts – JAVÍTOTT NYELVKEZELÉS (v11)
 
 import { PDFDocument, PDFTextField, PDFButton } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
@@ -8,10 +8,11 @@ import { groundingPdfMapping } from '../config/grounding-pdf-mapping.js';
 import { GroundingAnswer, FormData } from '../../shared/types.js';
 
 export class GroundingPdfService {
-  static async generateFilledPdf(formData: FormData): Promise<Buffer> {
-    console.log('--- FUT A DEPLOY-BIZTOS, VASTAG BETŰS VERZIÓ! v10 ---');
+  // 🔥 MÓDOSÍTÁS: Hozzáadtuk a 'language' paramétert (alapértelmezett: 'hu')
+  static async generateFilledPdf(formData: FormData, language: string = 'hu'): Promise<Buffer> {
+    console.log(`--- FUT A PDF GENERÁTOR (Nyelv: ${language}) ---`);
 
-    // 1️⃣ PDF és betűtípusok előkészítése (Helyes sorrend)
+    // 1️⃣ PDF és betűtípusok előkészítése
     const templatePath = path.resolve(process.cwd(), 'public/templates/Erdungskontrolle.pdf');
     const pdfBytes = fs.readFileSync(templatePath);
     const pdfDoc = await PDFDocument.load(pdfBytes);
@@ -28,7 +29,6 @@ export class GroundingPdfService {
     const form = pdfDoc.getForm();
 
     // 2️⃣ Alapadatok és egyéni szövegek kitöltése
-    // Összegyűjtjük az összes kitöltendő szöveges mezőt
     const allTextFields: { [key: string]: string | undefined } = { ...formData.customGroundingTexts };
     groundingPdfMapping.metadata.forEach(meta => {
         if (meta.appDataKey !== 'signature' && (formData as any)[meta.appDataKey]) {
@@ -36,33 +36,31 @@ export class GroundingPdfService {
         }
     });
 
-    // Ciklus a szöveges mezők kitöltésére a sima betűtípussal
     for (const [pdfFieldName, textValue] of Object.entries(allTextFields)) {
         if (textValue && typeof textValue === 'string') {
             try {
                 const field = form.getTextField(pdfFieldName);
                 field.setText(textValue);
-                field.updateAppearances(robotoFont); // Sima betűtípus a fejléchez és egyéni szövegekhez
+                field.updateAppearances(robotoFont);
             } catch (e) {
-                console.warn(`⚠️ Szöveges mező nem található vagy nem kompatibilis: "${pdfFieldName}"`);
+                console.warn(`⚠️ Szöveges mező nem található: "${pdfFieldName}"`);
             }
         }
     }
     
-    // 3️⃣ Aláírás beillesztése (külön kezelve)
+    // 3️⃣ Aláírás beillesztése
     const signatureValue = formData.signature;
     if (signatureValue && typeof signatureValue === 'string' && signatureValue.startsWith('data:image/png;base64,')) {
         try {
             const pngImage = await pdfDoc.embedPng(signatureValue);
             const imageField = form.getButton('signature');
             imageField.setImage(pngImage);
-            console.log('✅ Signature image inserted');
         } catch(e) {
             console.warn(`⚠️ Hiba az aláíráskép beillesztésekor:`, e);
         }
     }
 
-    // 4️⃣ Földelési kérdések (OK / nicht OK / -) - NYELVFÜGGŐ HIBAKIÍRÁSSAL
+    // 4️⃣ Földelési kérdések (OK / nicht OK / -)
     const remarks: { punkt: string; bemerkung: string }[] = [];
     groundingPdfMapping.answers.forEach(({ questionId, okFieldName, notOkFieldName }) => {
       const answer = formData.groundingCheckAnswers?.[questionId];
@@ -76,23 +74,22 @@ export class GroundingPdfService {
 
             const field = form.getTextField(fieldName);
             field.setText(textToSet);
-            // ✅ A GARANTÁLTAN MŰKÖDŐ METÓDUS: Csak a VASTAG betűtípust adjuk át
             field.updateAppearances(robotoBold); 
             
             if (isNotOk) {
                 const punkt = okFieldName.replace('OK', '');
                 
-                // --- ÚJ LOGIKA: NYELVFÜGGŐ HIBALEÍRÁS ---
-                // 1. Keressük meg a konkrét hibát a formData.errors tömbben az aktuális questionId alapján
+                // Nyelvfüggő hiba leírás keresése
                 const specificError = formData.errors?.find(err => (err as any).context === questionId);
 
-                // 2. A hiba leírása a 'bemerkung' mezőbe. Ha nem találunk konkrét hibát, egy általános szöveg lesz a tartalék.
-                let bemerkungText = `Hiba a ${punkt} pontnál.`; // Alapértelmezett, tartalék szöveg
+                let bemerkungText = language === 'hu' 
+                    ? `Hiba a ${punkt} pontnál.` 
+                    : `Fehler bei Punkt ${punkt}.`;
+
                 if (specificError && specificError.description) {
-                    bemerkungText = specificError.description; // Felülírjuk a konkrét, nyelvfüggő leírással
+                    bemerkungText = specificError.description;
                 }
 
-                // 3. A remarks tömbhöz már a dinamikus szöveget adjuk hozzá
                 remarks.push({ punkt, bemerkung: bemerkungText });
             }
         }
@@ -101,19 +98,20 @@ export class GroundingPdfService {
       }
     });
 
-    // 5️⃣ Bemerkung mezők kitöltése
+    // 5️⃣ Bemerkung mezők kitöltése - 🔥 JAVÍTOTT RÉSZ
     if (remarks.length >= 1) {
         try {
             const row1 = groundingPdfMapping.remarks[0];
             const punktField1 = form.getTextField(row1.punktField);
             punktField1.setText(remarks[0].punkt);
-            punktField1.updateAppearances(robotoBold); // Legyen a hiba is vastag
+            punktField1.updateAppearances(robotoBold);
 
             const bemerkungField1 = form.getTextField(row1.bemerkungField);
             bemerkungField1.setText(remarks[0].bemerkung);
             bemerkungField1.updateAppearances(robotoBold);
         } catch (e) { console.warn(`⚠️ Hiba a Bemerkung 1. sor beírásakor.`); }
     }
+    
     if (remarks.length >= 2) {
         try {
             const row2 = groundingPdfMapping.remarks[1];
@@ -121,7 +119,12 @@ export class GroundingPdfService {
             const bemerkungField2 = form.getTextField(row2.bemerkungField);
 
             if (remarks.length > 2) {
-                bemerkungField2.setText('A további hibákat keresd a közös hibalistában');
+                // 🔥 ITT VOLT A HIBA - MOST MÁR NYELVFÜGGŐ
+                const limitText = language === 'hu' 
+                    ? 'A további hibákat keresd a közös hibalistában' 
+                    : 'Weitere Fehler finden Sie in der gemeinsamen Fehlerliste';
+                
+                bemerkungField2.setText(limitText);
                 punktField2.setText('');
             } else {
                 punktField2.setText(remarks[1].punkt);
@@ -132,13 +135,8 @@ export class GroundingPdfService {
         } catch (e) { console.warn(`⚠️ Hiba a Bemerkung 2. sor beírásakor.`); }
     }
     
-    // ====================================================================
-    // ✅ ÚJ BLOKK: EREDMÉNY MEZŐK AUTOMATIKUS KITÖLTÉSE (EGYEDI LOGIKÁVAL)
-    // ====================================================================
+    // 6️⃣ Eredmény mezők automatikus kitöltése
     try {
-        console.log('📊 Eredmény mezők kiértékelése...');
-
-        // Segédfüggvény: van-e hiba egy adott csoportban
         const hasErrorInGroup = (groupPrefix: string) => {
             const questionsInGroup = groundingPdfMapping.answers.filter(
                 q => q.questionId.startsWith(groupPrefix)
@@ -148,57 +146,39 @@ export class GroundingPdfService {
             );
         };
 
-        // X1: Hiba van az OK1/ (Maschinenraum) csoportban
-        const hasErrorInX1 = hasErrorInGroup('OK1/');
-        if (hasErrorInX1) {
-            console.log(`❗️ Hiba észlelve az OK1/ csoportban. X1 mező bejelölése.`);
+        // X1: OK1/ (Maschinenraum)
+        if (hasErrorInGroup('OK1/')) {
             const field = form.getTextField('X1');
             field.setText('X');
             field.updateAppearances(robotoBold);
         }
 
-        // X2: Hiba van az OK2/ - OK5/ BÁRMELYIK csoportban
-        const hasErrorInX2 = hasErrorInGroup('OK2/') || 
-                             hasErrorInGroup('OK3/') || 
-                             hasErrorInGroup('OK4/') || 
-                             hasErrorInGroup('OK5/');
+        // X2: OK2/ - OK5/
+        const hasErrorInX2 = hasErrorInGroup('OK2/') || hasErrorInGroup('OK3/') || hasErrorInGroup('OK4/') || hasErrorInGroup('OK5/');
         if (hasErrorInX2) {
-            console.log(`❗️ Hiba észlelve az OK2/-OK5/ csoportok valamelyikében. X2 mező bejelölése.`);
             const field = form.getTextField('X2');
             field.setText('X');
             field.updateAppearances(robotoBold);
         }
 
-        // X3: Hiba van az OK1/ ÉS (OK2/ - OK5/ valamelyikében)
-        const hasErrorInX3 = hasErrorInX1 && hasErrorInX2;
-        if (hasErrorInX3) {
-            console.log(`❗️ Hiba észlelve az OK1/ ÉS OK2/-OK5/ csoportokban. X3 mező bejelölése.`);
+        // X3: OK1 ÉS (OK2...OK5)
+        if (hasErrorInGroup('OK1/') && hasErrorInX2) {
             const field = form.getTextField('X3');
             field.setText('X');
             field.updateAppearances(robotoBold);
         }
 
-        // X4: Hiba van BÁRMELYIK csoportban (OK1/ - OK5/)
-        const hasErrorInX4 = hasErrorInGroup('OK1/') || 
-                             hasErrorInGroup('OK2/') || 
-                             hasErrorInGroup('OK3/') || 
-                             hasErrorInGroup('OK4/') || 
-                             hasErrorInGroup('OK5/');
-        if (hasErrorInX4) {
-            console.log(`❗️ Hiba észlelve valamelyik csoportban. X4 mező bejelölése.`);
+        // X4: Bármelyik
+        if (hasErrorInGroup('OK1/') || hasErrorInX2) {
             const field = form.getTextField('X4');
             field.setText('X');
             field.updateAppearances(robotoBold);
         }
 
-        // X5: Nincs automatikus logika - kézi kitöltésre hagyva
-        console.log('ℹ️ X5 mező kézi kitöltésre hagyva (utóellenőrzés).');
-
     } catch (e) {
-        console.warn(`⚠️ Hiba történt az eredmény mezők automatikus kitöltése során.`, e);
+        console.warn(`⚠️ Hiba az eredmény mezők kitöltésekor.`, e);
     }
     
-    // 6️⃣ Véglegesítés és mentés
     form.flatten();
     const filledPdfBytes = await pdfDoc.save();
     return Buffer.from(filledPdfBytes);

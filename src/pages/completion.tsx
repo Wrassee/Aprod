@@ -1,4 +1,5 @@
-// src/pages/completion.tsx - THEME AWARE VERSION WITH PDF PREVIEW & STICKY HEADER FIX
+// src/pages/completion.tsx - JAVÍTOTT NYELV ÁTADÁS A FÖLDELÉSI PDF-HEZ
+
 import PageHeader from '@/components/PageHeader';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
@@ -65,14 +66,14 @@ export function Completion({
 
   const handleEmailClick = async () => {
     setIsEmailSending(true);
-    setEmailStatus(t.emailSending);
+    setEmailStatus(t("emailSending"));
 
     try {
       await onEmailPDF();
-      setEmailStatus(`✅ ${t.emailSentSuccess}`);
+      setEmailStatus(`✅ ${t("emailSentSuccess")}`);
       setTimeout(() => setEmailStatus(''), 5000);
     } catch (error) {
-      setEmailStatus(`❌ ${t.emailSentError}`);
+      setEmailStatus(`❌ ${t("emailSentError")}`);
       setTimeout(() => setEmailStatus(''), 5000);
     } finally {
       setIsEmailSending(false);
@@ -86,7 +87,7 @@ export function Completion({
 
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.answers) {
-        throw new Error(t.noFormDataError || 'No form data found in localStorage to generate PDF.');
+        throw new Error(t("noFormDataError") || 'No form data found in localStorage to generate PDF.');
       }
 
       const response = await fetch('/api/protocols/download-pdf', {
@@ -100,7 +101,7 @@ export function Completion({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || t.pdfGenerationError || 'Failed to generate PDF on the server.');
+        throw new Error(errorData.message || t("pdfGenerationError") || 'Failed to generate PDF on the server.');
       }
 
       const blob = await response.blob();
@@ -133,8 +134,8 @@ export function Completion({
     const newTab = window.open('', '_blank');
     if (!newTab) {
       toast({
-        title: t.popupBlockedTitle,
-        description: t.popupBlockedDescription,
+        title: t("popupBlockedTitle"),
+        description: t("popupBlockedDescription"),
         variant: 'destructive',
         duration: 5000,
       });
@@ -145,7 +146,7 @@ export function Completion({
     newTab.document.write(`
       <html>
         <head>
-          <title>${t.previewGeneratingTitle}</title>
+          <title>${t("previewGeneratingTitle")}</title>
           <style>
             body {
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -175,8 +176,8 @@ export function Completion({
         </head>
         <body>
           <div class="spinner"></div>
-          <h2>${t.generating}...</h2>
-          <p>${t.previewGeneratingWait}</p>
+          <h2>${t("generating")}...</h2>
+          <p>${t("previewGeneratingWait")}</p>
         </body>
       </html>
     `);
@@ -184,7 +185,7 @@ export function Completion({
     try {
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.answers) {
-        throw new Error(t.noSavedDataForPreview);
+        throw new Error(t("noSavedDataForPreview"));
       }
 
       const response = await fetch('/api/protocols/preview-pdf', {
@@ -198,7 +199,7 @@ export function Completion({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || t.pdfGenerationServerError);
+        throw new Error(errorData.message || t("pdfGenerationServerError"));
       }
 
       const blob = await response.blob();
@@ -213,7 +214,7 @@ export function Completion({
       newTab.document.write(`
         <html>
           <head>
-            <title>${t.errorTitle}</title>
+            <title>${t("errorTitle")}</title>
             <style>
               body {
                 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -243,15 +244,15 @@ export function Completion({
             </style>
           </head>
           <body>
-            <h2>❌ ${t.errorOccurred}</h2>
+            <h2>❌ ${t("errorOccurred")}</h2>
             <p>${(error as Error).message}</p>
-            <button onclick="window.close()">${t.closeWindow}</button>
+            <button onclick="window.close()">${t("closeWindow")}</button>
           </body>
         </html>
       `);
       
       toast({
-        title: t.previewErrorTitle,
+        title: t("previewErrorTitle"),
         description: (error as Error).message,
         variant: 'destructive',
         duration: 5000,
@@ -268,7 +269,7 @@ export function Completion({
 
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
       if (!savedData.groundingCheckAnswers) {
-        throw new Error(t.noGroundingDataError);
+        throw new Error(t("noGroundingDataError"));
       }
       
       const plz = savedData.answers?.['3'] || '';
@@ -305,6 +306,9 @@ export function Completion({
       formData.append('visum', payload.visum);
       formData.append('signature', savedData.signature || '');
       formData.append('customTexts', JSON.stringify(savedData.customGroundingTexts || '{}'));
+      
+      // 🔥🔥🔥 ÚJ SOR: NYELV ÁTADÁSA 🔥🔥🔥
+      formData.append('language', language);
 
       const response = await fetch('/api/protocols/download-grounding-pdf', {
         method: 'POST',
@@ -313,7 +317,7 @@ export function Completion({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || t.groundingPdfGenerationError);
+        throw new Error(errorData.message || t("groundingPdfGenerationError"));
       }
 
       const blob = await response.blob();
@@ -333,16 +337,16 @@ export function Completion({
       console.log('Grounding PDF download initiated successfully.');
       
       toast({
-        title: t.downloadSuccessTitle,
-        description: t.groundingProtocolDownloaded,
+        title: t("downloadSuccessTitle"),
+        description: t("groundingProtocolDownloaded"),
         duration: 3000,
       });
 
     } catch (error) {
       console.error('Hiba a földelési PDF letöltése során:', error);
       toast({
-        title: t.downloadErrorTitle,
-        description: (error as Error).message || t.groundingProtocolDownloadError,
+        title: t("downloadErrorTitle"),
+        description: (error as Error).message || t("groundingProtocolDownloadError"),
         variant: 'destructive',
         duration: 5000,
       });
@@ -400,11 +404,11 @@ export function Completion({
                 </div>
 
                 <h2 className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
-                  {t.protocolComplete}
+                  {t("protocolComplete")}
                 </h2>
                 <p className="text-lg text-gray-600 dark:text-gray-400 flex items-center justify-center gap-2">
                   <Sparkles className="h-5 w-5 text-emerald-500" />
-                  {t.completionMessage}
+                  {t("completionMessage")}
                 </p>
               </div>
             </div>
@@ -413,10 +417,10 @@ export function Completion({
               <div className="mb-8">
                 <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
                 <h2 className="text-3xl font-semibold text-gray-800 mb-4">
-                  {t.protocolComplete}
+                  {t("protocolComplete")}
                 </h2>
                 <p className="text-gray-600">
-                  {t.completionMessage}
+                  {t("completionMessage")}
                 </p>
               </div>
             </div>
@@ -436,7 +440,7 @@ export function Completion({
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                   <div className="relative flex flex-col items-center gap-3">
                     <Mail className="h-8 w-8" />
-                    <span className="text-lg">{isEmailSending ? t.sending : t.emailPDF}</span>
+                    <span className="text-lg">{isEmailSending ? t("sending") : t("emailPDF")}</span>
                   </div>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
                 </button>
@@ -447,14 +451,14 @@ export function Completion({
                   className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center py-4 h-auto w-full disabled:opacity-50"
                 >
                   <Mail className="h-5 w-5 mr-3" />
-                  {isEmailSending ? t.sending : t.emailPDF}
+                  {isEmailSending ? t("sending") : t("emailPDF")}
                 </Button>
               )}
 
               {emailStatus && (
                 <div className={`${theme === 'modern' ? 'mt-2' : 'absolute top-full mt-2 left-0 right-0'} text-sm px-3 py-2 rounded-lg text-center font-medium ${
                   emailStatus.includes('✅') ? 'bg-green-100 text-green-700 border border-green-300' : 
-                  emailStatus.includes(t.emailSending) ? 'bg-blue-100 text-blue-700 border border-blue-300' :
+                  emailStatus.includes(t("emailSending")) ? 'bg-blue-100 text-blue-700 border border-blue-300' :
                   'bg-red-100 text-red-700 border border-red-300'
                 }`}>
                   {emailStatus}
@@ -472,7 +476,7 @@ export function Completion({
                 <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative flex flex-col items-center gap-3">
                   <Cloud className="h-8 w-8" />
-                  <span className="text-lg">{t.saveToCloud}</span>
+                  <span className="text-lg">{t("saveToCloud")}</span>
                 </div>
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
               </button>
@@ -482,7 +486,7 @@ export function Completion({
                 className="bg-green-600 hover:bg-green-700 text-white flex items-center justify-center py-4 h-auto"
               >
                 <Cloud className="h-5 w-5 mr-3" />
-                {t.saveToCloud}
+                {t("saveToCloud")}
               </Button>
             )}
 
@@ -501,7 +505,7 @@ export function Completion({
                   ) : (
                     <Download className="h-8 w-8" />
                   )}
-                  <span className="text-lg">{isPdfDownloading ? t.generating : t.downloadPDF}</span>
+                  <span className="text-lg">{isPdfDownloading ? t("generating") : t("downloadPDF")}</span>
                 </div>
               </button>
             ) : (
@@ -515,7 +519,7 @@ export function Completion({
                 ) : (
                   <Download className="h-5 w-5 mr-3" />
                 )}
-                {isPdfDownloading ? t.generating : t.downloadPDF}
+                {isPdfDownloading ? t("generating") : t("downloadPDF")}
               </Button>
             )}
 
@@ -533,7 +537,7 @@ export function Completion({
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative flex flex-col items-center gap-3">
                   <FileText className="h-8 w-8" />
-                  <span className="text-lg">{t.downloadExcel}</span>
+                  <span className="text-lg">{t("downloadExcel")}</span>
                 </div>
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
               </button>
@@ -549,7 +553,7 @@ export function Completion({
                 className="bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center py-4 h-auto"
               >
                 <Download className="h-5 w-5 mr-3" />
-                {t.downloadExcel}
+                {t("downloadExcel")}
               </Button>
             )}
 
@@ -568,7 +572,7 @@ export function Completion({
                   ) : (
                     <Zap className="h-8 w-8" />
                   )}
-                  <span className="text-lg">{isGroundingPdfDownloading ? t.generating : t.downloadGroundingPDF}</span>
+                  <span className="text-lg">{isGroundingPdfDownloading ? t("generating") : t("downloadGroundingPDF")}</span>
                 </div>
               </button>
             ) : (
@@ -582,7 +586,7 @@ export function Completion({
                 ) : (
                   <Download className="h-5 w-5 mr-3" />
                 )}
-                {isGroundingPdfDownloading ? t.generating : t.downloadGroundingPDF}
+                {isGroundingPdfDownloading ? t("generating") : t("downloadGroundingPDF")}
               </Button>
             )}
 
@@ -601,7 +605,7 @@ export function Completion({
                   ) : (
                     <Eye className="h-8 w-8" />
                   )}
-                  <span className="text-lg">{isPdfPreviewing ? t.generating : t.viewProtocol}</span>
+                  <span className="text-lg">{isPdfPreviewing ? t("generating") : t("viewProtocol")}</span>
                 </div>
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
               </button>
@@ -616,7 +620,7 @@ export function Completion({
                 ) : (
                   <Eye className="h-5 w-5 mr-3" />
                 )}
-                {isPdfPreviewing ? t.generating : t.viewProtocol}
+                {isPdfPreviewing ? t("generating") : t("viewProtocol")}
               </Button>
             )}
           </div>
@@ -665,7 +669,7 @@ export function Completion({
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
                 <div className="relative flex items-center gap-2">
                   <Plus className="h-5 w-5" />
-                  <span>{t.startNew}</span>
+                  <span>{t("startNew")}</span>
                 </div>
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
               </button>
@@ -676,7 +680,7 @@ export function Completion({
                 className="text-blue-600 border-2 border-blue-600 hover:bg-blue-600 hover:text-white active:bg-blue-600 active:text-white flex items-center justify-center px-8 py-3 h-auto transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                {t.startNew}
+                {t("startNew")}
               </Button>
             )}
 
@@ -688,7 +692,7 @@ export function Completion({
               >
                 <div className="flex items-center gap-2">
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="font-semibold">{t.back}</span>
+                  <span className="font-semibold">{t("back")}</span>
                 </div>
               </button>
             ) : (
@@ -698,7 +702,7 @@ export function Completion({
                 className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t.back}
+                {t("back")}
               </Button>
             )}
           </div>

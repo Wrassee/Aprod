@@ -1,4 +1,5 @@
-// server/routes/protocol-mapping.ts
+// server/routes/protocol-mapping.ts - JAVÍTOTT NYELV ÁTADÁS (Földelési PDF)
+
 import { Router } from 'express';
 import multer from 'multer';
 import { z } from 'zod';
@@ -220,6 +221,8 @@ router.post(
       const groundingCheckAnswersString = req.body.groundingCheckAnswers;
       const customTextsString = req.body.customTexts;
       const errorsString = req.body.errors;
+      // 🔥 ÚJ: Nyelv kinyerése a kérésből (ha nincs megadva, alapértelmezett 'hu')
+      const language = req.body.language || 'hu';
 
       if (!groundingCheckAnswersString) {
         return res.status(400).json({ 
@@ -233,6 +236,7 @@ router.post(
       
       console.log('📝 Custom texts received:', Object.keys(customGroundingTexts).length, 'entries');
       console.log('❗️ Errors received:', JSON.stringify(errors, null, 2));
+      console.log('🌍 Language:', language); // Logoljuk a nyelvet
 
       const servicePayload = {
         liftId: req.body.liftId || '',
@@ -251,7 +255,8 @@ router.post(
         niedervoltTableMeasurements: {},
       };
       
-      const pdfBuffer = await GroundingPdfService.generateFilledPdf(servicePayload);
+      // 🔥 ÚJ: A nyelv átadása a generáló service-nek
+      const pdfBuffer = await GroundingPdfService.generateFilledPdf(servicePayload, language);
 
       const safeFileName = servicePayload.liftId.replace(/[^a-zA-Z0-9]/g, '_') || 'jegyzokonyv';
       const filename = `Erdungskontrolle_${safeFileName}_${servicePayload.receptionDate || new Date().toISOString().split('T')[0]}.pdf`;

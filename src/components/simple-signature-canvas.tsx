@@ -199,7 +199,7 @@ export function SimpleSignatureCanvas({ onSignatureChange, initialSignature }: S
   return (
     <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 bg-gray-50">
       <div className="text-center">
-        <p className="text-gray-600 mb-4">{t.signaturePrompt}</p>
+        <p className="text-gray-600 mb-4">{t("signaturePrompt")}</p>
         
         <div className="mb-4">
           <canvas
@@ -225,7 +225,7 @@ export function SimpleSignatureCanvas({ onSignatureChange, initialSignature }: S
           onClick={clearSignature}
           className="text-gray-600 border-gray-300 hover:bg-gray-50"
         >
-          {t.clear}
+          {t("clear")}
         </Button>
       </div>
     </div>

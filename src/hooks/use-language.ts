@@ -1,63 +1,76 @@
 // src/hooks/use-language.ts
-
-import { useState, useEffect, useMemo } from 'react';
-import { translations, Translation } from '@/lib/translations';
+import { useState, useEffect, useMemo } from "react";
+import { translations } from "@/lib/translations";
 
 export function useLanguage() {
-  // Betöltjük a mentett nyelvet AZONNAL az inicializáláskor
-  const [language, setLanguage] = useState<'hu' | 'de'>(() => {
-    const saved = localStorage.getItem('otis-protocol-language') as 'hu' | 'de';
-    return (saved === 'hu' || saved === 'de') ? saved : 'hu';
+  const [language, setLanguage] = useState<"hu" | "de">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("otis-protocol-language");
+      // Biztosítjuk, hogy csak érvényes nyelvet töltsünk vissza
+      return saved === "de" ? "de" : "hu";
+    }
+    return "hu";
   });
-  
-  // === DERIVED STATE: A fordítások közvetlenül a language állapotból ===
-  // A useMemo biztosítja, hogy a fordítási objektum azonnal elérhető legyen
-  // a renderelési fázisban, nem kell várni egy következő render ciklusra.
-  const t = useMemo(() => {
-    console.log(`✅ Translations derived for language: ${language}`);
-    // A localStorage mentést is itt végezzük, csak akkor, ha a nyelv változik
-    localStorage.setItem('otis-protocol-language', language);
-    return translations[language];
-  }, [language]);
 
-  // Load saved language on initialization and listen for storage changes
-  useEffect(() => {
-    const checkLanguage = () => {
-      const saved = localStorage.getItem('otis-protocol-language') as 'hu' | 'de';
-      if (saved && (saved === 'hu' || saved === 'de') && saved !== language) {
-        console.log('📥 Loading/updating saved language:', saved, 'current:', language);
-        setLanguage(saved);
+  // ----- TRANSLATION FUNCTION -----
+  const t = useMemo(() => {
+    localStorage.setItem("otis-protocol-language", language);
+
+    const translate = (key: string): string => {
+      if (!key) return "";
+      
+      const langSet = translations[language] as any;
+      
+      try {
+        // 1. Próbáljuk meg pontos egyezéssel
+        let value = key.split('.').reduce((acc, currentKey) => {
+          return acc ? acc[currentKey] : undefined;
+        }, langSet);
+
+        // 2. Ha nem találtuk, próbáljuk meg a "csoport" nevét nagybetűsíteni (pl. admin -> Admin)
+        // Ez segít, ha a kódban kisbetűvel van, de a szótárban nagybetűvel
+        if (value === undefined && key.includes('.')) {
+            const parts = key.split('.');
+            // Csak az első elemet nagybetűsítjük (pl. admin -> Admin)
+            parts[0] = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
+            const upperKey = parts.join('.');
+            
+            value = upperKey.split('.').reduce((acc, currentKey) => {
+                return acc ? acc[currentKey] : undefined;
+            }, langSet);
+        }
+
+        if (typeof value === 'string') {
+            return value;
+        }
+
+        // DEBUG: Ha itt tartunk, akkor NINCS meg a fordítás
+        // Csak fejlesztés alatt hasznos, production buildben kivehető
+        if (process.env.NODE_ENV === 'development') {
+            console.warn(`[i18n] Hiányzó fordítás (${language}): "${key}"`);
+        }
+
+        return key; // Visszaadjuk a kulcsot, hogy legalább látszódjon valami
+      } catch (e) {
+        return key;
       }
     };
-    
-    // Check immediately on mount
-    checkLanguage();
-    
-    // Check periodically to catch localStorage changes
-    const interval = setInterval(checkLanguage, 500);
-    
-    // Listen for localStorage changes from other parts of the app
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'otis-protocol-language' && e.newValue) {
-        const newLang = e.newValue as 'hu' | 'de';
-        if (newLang === 'hu' || newLang === 'de') {
-          console.log('🔄 Storage event language change:', newLang);
-          setLanguage(newLang);
+
+    return translate;
+  }, [language]);
+
+  // ----- LOCAL STORAGE SYNC -----
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === "otis-protocol-language" && e.newValue) {
+        if (e.newValue === "hu" || e.newValue === "de") {
+          setLanguage(e.newValue);
         }
       }
     };
-    
-    window.addEventListener('storage', handleStorageChange);
-    
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, [language]);
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
-  return {
-    language,
-    setLanguage,
-    t, // Most már azonnal elérhető a helyes fordítás
-  };
+  return { language, setLanguage, t };
 }

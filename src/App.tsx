@@ -1,4 +1,4 @@
-// src/App.tsx - JAVÍTOTT VERZIÓ (URL-kezelés, Auth, Import útvonalak)
+// src/App.tsx - JAVÍTOTT VERZIÓ (Lift Selector Home Loop Fix)
 
 import React, {
   useState,
@@ -20,6 +20,7 @@ import { Loader2 } from 'lucide-react';
 
 /* -------------------- Oldalak / Komponensek -------------------- */
 import { StartScreen } from "@/pages/start-screen";
+import LiftSelector from "@/pages/lift-selector";
 import Questionnaire from "@/pages/questionnaire";
 import { NiedervoltTable } from "@/pages/niedervolt-table";
 import { Signature } from "@/pages/signature";
@@ -31,13 +32,26 @@ import { Login } from "@/pages/login";
 import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import AuthCallback from "@/pages/auth-callback";
-import { ProtectedRoute } from "@/components/protected-route";
+// import { ProtectedRoute } from "@/components/protected-route"; // Nem használt
 import { FormData, MeasurementRow } from "./lib/types";
 
 /* -------------------- Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema";
 
-type Screen = 'start' | 'questionnaire' | 'erdungskontrolle' | 'niedervolt' | 'signature' | 'completion' | 'admin' | 'protocol-preview' | 'login' | 'forgot-password' | 'reset-password' | 'auth-callback';
+type Screen = 
+  | 'start' 
+  | 'lift-selector'
+  | 'questionnaire' 
+  | 'erdungskontrolle' 
+  | 'niedervolt' 
+  | 'signature' 
+  | 'completion' 
+  | 'admin' 
+  | 'protocol-preview' 
+  | 'login' 
+  | 'forgot-password' 
+  | 'reset-password' 
+  | 'auth-callback';
 
 interface AppContentProps {
   currentScreen: Screen;
@@ -75,19 +89,22 @@ function AppContent({
     formDataRef.current = formData;
   }, [formData]);
 
+  // 🔥 JAVÍTOTT LOGIKA: Csak akkor irányítunk át, ha a localStorage-ban VALÓBAN van adat
   useEffect(() => {
     const savedLanguage = localStorage.getItem('otis-protocol-language');
+    
     if (savedLanguage) {
       setLanguageSelected(true);
+    } else {
+      setLanguageSelected(false);
     }
     
-    if (user && languageSelected && currentScreen === 'start') {
-      console.log('✅ User logged in, language already selected. Redirecting to questionnaire...');
-      setCurrentScreen('questionnaire');
-      setCurrentQuestionnairePage(0);
-      localStorage.setItem('questionnaire-current-page', '0');
+    // Szigorúbb ellenőrzés: savedLanguage megléte kötelező a redirecthez
+    if (user && savedLanguage && currentScreen === 'start') {
+      console.log('✅ User logged in, language saved. Redirecting to lift selector...');
+      setCurrentScreen('lift-selector');
     }
-  }, [user, languageSelected, currentScreen, setCurrentScreen, setCurrentQuestionnairePage]);
+  }, [user, currentScreen, setCurrentScreen]); // Kivettem a languageSelected-et a függőségek közül a loop elkerülése végett
 
   const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
@@ -96,17 +113,19 @@ function AppContent({
     setLanguageSelected(true);
     
     if (user) {
-      setCurrentScreen('questionnaire');
-      setCurrentQuestionnairePage(0);
-      localStorage.setItem('questionnaire-current-page', '0');
+      console.log('📋 Navigating to lift selector...');
+      setCurrentScreen('lift-selector');
     } else {
+      console.log('🔐 No user, navigating to login...');
       setCurrentScreen('login');
     }
     
+    // Clear old protocol data
     localStorage.removeItem('protocol-errors');
+    localStorage.removeItem('liftSelection');
     window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
     window.dispatchEvent(new Event('storage'));
-  }, [setLanguage, setCurrentScreen, setCurrentQuestionnairePage, user]);
+  }, [setLanguage, setCurrentScreen, user]);
 
   const handleSaveProgress = useCallback(() => {
     console.log('✅ Progress saved automatically');
@@ -122,6 +141,7 @@ function AppContent({
       'niedervolt-table-measurements',
       'niedervolt-selected-devices',
       'niedervolt-custom-devices',
+      'liftSelection',
     ];
     
     keysToRemove.forEach(key => localStorage.removeItem(key));
@@ -152,14 +172,21 @@ function AppContent({
     console.log('✅ All data cleared');
   }, [setFormData, setClearTrigger, setCurrentScreen, setCurrentQuestionnairePage, setCurrentQuestionId]);
 
+  // 🔥 JAVÍTOTT FÜGGVÉNY: setLanguage(null) ELTÁVOLÍTVA
   const handleGoHome = useCallback(() => {
     console.log('🏠 Home button clicked - resetting language and returning to start screen');
+    
     setLanguageSelected(false);
     localStorage.removeItem('otis-protocol-language');
+    localStorage.removeItem('liftSelection');
+    
+    // ❌ EZT A SORT TÖRÖLTÜK, MERT EZ OKOZTA A HIBÁKAT ÉS A LOOP-OT:
+    // setLanguage(null as any);
+
     setCurrentScreen('start');
     setCurrentQuestionnairePage(0);
     localStorage.setItem('questionnaire-current-page', '0');
-  }, [setCurrentScreen, setCurrentQuestionnairePage]);
+  }, [setCurrentScreen, setCurrentQuestionnairePage]); // setLanguage már nem kell dependency-nek
 
   const handleSettings = useCallback(() => {
     setCurrentScreen('admin');
@@ -189,8 +216,8 @@ function AppContent({
   }, [setCurrentScreen]);
 
   const handleLoginSuccess = useCallback(() => {
-    console.log('✅ Login successful - redirecting to questionnaire');
-    setCurrentScreen('questionnaire');
+    console.log('✅ Login successful - redirecting to lift selector');
+    setCurrentScreen('lift-selector');
   }, [setCurrentScreen]);
 
   const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
@@ -220,7 +247,8 @@ function AppContent({
       currentScreen !== 'auth-callback' && 
       currentScreen !== 'forgot-password' && 
       currentScreen !== 'reset-password' &&
-      currentScreen !== 'start'
+      currentScreen !== 'start' &&
+      currentScreen !== 'lift-selector'
     ) {
     const savedLanguage = localStorage.getItem('otis-protocol-language');
     if (!savedLanguage) {
@@ -449,6 +477,17 @@ function AppContent({
     switch (currentScreen) {
       case 'start':
         return <StartScreen onLanguageSelect={handleLanguageSelect} />;
+      
+      case 'lift-selector':
+        return (
+          <LiftSelector 
+            onNavigate={(screen: Screen) => {
+              console.log('🚀 LiftSelector navigation requested:', screen);
+              setCurrentScreen(screen);
+            }}
+            onHome={handleGoHome}
+          />
+        );
         
       case 'login':
         return (
@@ -482,8 +521,8 @@ function AppContent({
         return (
           <AuthCallback 
             onSuccess={() => {
-              console.log('✅ Auth callback successful - redirecting to questionnaire');
-              setCurrentScreen('questionnaire');
+              console.log('✅ Auth callback successful - redirecting to lift selector');
+              setCurrentScreen('lift-selector');
             }}
             onError={() => setCurrentScreen('login')}
           />
@@ -604,7 +643,7 @@ function AppContent({
       default:
         console.warn(`Reached default case with screen: ${currentScreen}. Redirecting...`);
         if (user) {
-          setCurrentScreen('questionnaire');
+          setCurrentScreen('lift-selector');
         } else {
           setCurrentScreen('start');
         }

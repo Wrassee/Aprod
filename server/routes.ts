@@ -1,4 +1,4 @@
-// server/routes.ts - VÉGLEGES, MODULÁRIS VERZIÓ
+// server/routes.ts - VÉGLEGES, MODULÁRIS VERZIÓ (LIFT APIS HOZZÁADVA)
 
 import type { Express } from "express";
 import { storage } from "./storage.js";
@@ -12,8 +12,19 @@ import { adminRoutes } from "./routes/admin-routes.js";
 import { protocolMappingRoutes } from "./routes/protocol-mapping.js";
 import { errorRoutes } from "./routes/error-routes.js";
 
+// ===== ÚJ: LIFT TYPE SELECTION ROUTES =====
+import liftTypesRoutes from "./routes/lift-types.js";
+import liftSubtypesRoutes from "./routes/lift-subtypes.js";
+import liftMappingsRoutes from "./routes/lift-mappings.js";
+import liftAvailableRoutes from "./routes/lift-available.js";
+// ==========================================
+
 // Auth middleware
-import { requireAuth, requireOwnerOrAdmin } from "./middleware/auth.js";
+import { 
+  requireAuth, 
+  requireOwnerOrAdmin, 
+  requireAdmin 
+} from "./middleware/auth.js";
 
 // Zod validation
 import { insertProfileSchema } from "../shared/schema-sqlite.js";
@@ -39,6 +50,16 @@ export async function registerRoutes(app: Express) {
   app.use("/api/protocols", protocolMappingRoutes);
   app.use("/api/errors", errorRoutes);
 
+  // ===== ÚJ: LIFT TYPE SELECTION API REGISZTRÁCIÓ =====
+  // Admin routes (védett, requireAuth middleware szükséges)
+  app.use("/api/admin", requireAdmin, liftTypesRoutes);
+  app.use("/api/admin", requireAdmin, liftSubtypesRoutes);
+  app.use("/api/admin", requireAdmin, liftMappingsRoutes);
+  
+  // Public route (nem védett, frontend használja a lift választó képernyőn)
+  app.use(liftAvailableRoutes);
+  // ====================================================
+
   // --- Fő (nem kiszervezett) útvonalak ---
 
   // Health check a rendszer állapotának ellenőrzésére
@@ -46,55 +67,98 @@ export async function registerRoutes(app: Express) {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
   });
 
-  // Kérdések lekérése az aktív sablonból
+  // Kérdések lekérése az aktív sablonból (FRISSÍTVE: templateId support)
   app.get("/api/questions/:language", async (req, res) => {
     try {
       const { language } = req.params;
+      const { templateId } = req.query; // 🔥 ÚJ: Template ID query parameter
+      
       if (language !== "hu" && language !== "de") {
         return res.status(400).json({ message: "Invalid language specified" });
       }
 
-      // Gyorsítótár ellenőrzése
-      if (!questionsCache) {
-        const activeTemplate = await storage.getActiveTemplate("unified", "multilingual");
+      let questionsToFormat: any[] = [];
+
+      // 🔥 ÚJ: Ha templateId meg van adva, azt használjuk (bypass cache)
+      if (templateId && typeof templateId === "string") {
+        console.log(`📦 Loading questions from template: ${templateId}`);
         
-        // Ha nincs aktív sablon az adatbázisban, egy helyi "tartalék" sablont használunk
-        if (!activeTemplate) {
-            console.warn('⚠️ No active template found in DB, using local fallback.');
-            const fallbackResult = await hybridTemplateLoader.loadTemplate('alap_egysegu', 'unified', 'multilingual');
-            questionsCache = await excelParserService.parseQuestionsFromExcel(fallbackResult.filePath);
-        } else {
-            const templateResult = await hybridTemplateLoader.loadTemplate(activeTemplate.id, "unified", "multilingual");
-            questionsCache = await excelParserService.parseQuestionsFromExcel(templateResult.filePath);
+        try {
+          const templateResult = await hybridTemplateLoader.loadTemplate(
+            templateId,
+            "unified",
+            "multilingual"
+          );
+          
+          questionsToFormat = await excelParserService.parseQuestionsFromExcel(
+            templateResult.filePath
+          );
+          
+          console.log(`✅ Loaded ${questionsToFormat.length} questions from template ${templateId}`);
+        } catch (error) {
+          console.error(`❌ Error loading template ${templateId}:`, error);
+          return res.status(404).json({ message: "Template not found or invalid" });
         }
+      } else {
+        // EREDETI LOGIKA: Cache-elt aktív sablon használata
+        if (!questionsCache) {
+          const activeTemplate = await storage.getActiveTemplate("unified", "multilingual");
+          
+          if (!activeTemplate) {
+            console.warn('⚠️ No active template found in DB, using local fallback.');
+            const fallbackResult = await hybridTemplateLoader.loadTemplate(
+              'alap_egysegu', 
+              'unified', 
+              'multilingual'
+            );
+            questionsCache = await excelParserService.parseQuestionsFromExcel(
+              fallbackResult.filePath
+            );
+          } else {
+            const templateResult = await hybridTemplateLoader.loadTemplate(
+              activeTemplate.id, 
+              "unified", 
+              "multilingual"
+            );
+            questionsCache = await excelParserService.parseQuestionsFromExcel(
+              templateResult.filePath
+            );
+          }
+        }
+        questionsToFormat = questionsCache;
       }
 
-      // A válasz formázása a frontend számára - EREDETI STRUKTÚRA
-      const formattedQuestions = questionsCache.map((config) => {
-        let groupName = language === "de" && config.groupNameDe ? config.groupNameDe : config.groupName;
+      // A válasz formázása a frontend számára
+      const formattedQuestions = questionsToFormat.map((config) => {
+        let groupName = language === "de" && config.groupNameDe 
+          ? config.groupNameDe 
+          : config.groupName;
+        
         const typeStr = config.type as string;
         if (typeStr === "measurement" || typeStr === "calculated") {
           groupName = language === "de" ? "Messdaten" : "Mérési adatok";
         }
 
-        // JAVÍTOTT: Robusztusabb type korrekció és options generálás
         let correctedType = config.type;
-        let options: string[] | undefined = config.options; // Alapértelmezett átvétel
+        let options: string[] | undefined = config.options;
 
-        // Először a specifikus placeholder-t ellenőrizzük
         if (correctedType === 'radio') {
-            options = ['true', 'false', 'n.a.'];
+          options = ['true', 'false', 'n.a.'];
         }
 
         return {
           id: config.questionId,
-          title: language === "hu" ? (config.titleHu || config.title) : (config.titleDe || config.title),
+          title: language === "hu" 
+            ? (config.titleHu || config.title) 
+            : (config.titleDe || config.title),
           groupName: groupName,
-          groupKey: config.groupKey, // NEW: Stable slug for filtering (NOT translated)
+          groupKey: config.groupKey,
           type: correctedType,
           options: options,
           required: config.required,
-          placeholder: language === "de" && config.placeholderDe ? config.placeholderDe : config.placeholder,
+          placeholder: language === "de" && config.placeholderDe 
+            ? config.placeholderDe 
+            : config.placeholder,
           unit: config.unit,
           minValue: config.minValue,
           maxValue: config.maxValue,
@@ -103,14 +167,14 @@ export async function registerRoutes(app: Express) {
           groupOrder: config.groupOrder,
           cellReference: config.cellReference,
           sheetName: config.sheetName,
-          conditional_group_key: config.conditionalGroupKey, // CRITICAL FIX: Send conditional key to frontend
+          conditional_group_key: config.conditionalGroupKey,
         };
       });
 
       res.json(formattedQuestions);
     } catch (error) {
       console.error("❌ Error fetching questions:", error);
-      questionsCache = null; // Hiba esetén töröljük a cache-t
+      questionsCache = null;
       res.status(500).json({ message: "Failed to fetch questions" });
     }
   });
@@ -171,9 +235,7 @@ export async function registerRoutes(app: Express) {
        // ...validationResult.data,
         //role: 'user', // Always set to 'user' regardless of client input
       //};
-      
       // const profile = await storage.createProfile(sanitizedData);
-
       // A validationResult.data tartalmazza a user_id, email, role, name stb. mezőket.
 
     const profileDataFromClient = validationResult.data;
@@ -185,10 +247,10 @@ export async function registerRoutes(app: Express) {
     );
     
     res.status(201).json(updatedProfile); // 201 (Created) helyett 200 (OK) is lehetne, de így is jó
-  } catch (error) {
-    console.error("❌ Error creating/updating profile:", error); // <-- Átírtam a log üzenetet
-    res.status(500).json({ message: "Failed to create or update profile" });
-  }
+  } catch (error) {
+    console.error("❌ Error creating/updating profile:", error); // <-- Átírtam a log üzenetet
+    res.status(500).json({ message: "Failed to create or update profile" });
+  }
 });
 
   app.patch("/api/profiles/:userId", requireAuth, requireOwnerOrAdmin, async (req, res) => {

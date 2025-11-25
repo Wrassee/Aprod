@@ -125,8 +125,8 @@ export function TemplateManagement() {
     } catch (error) {
       console.error('❌ Error fetching templates:', error);
       toast({
-        title: t.error,
-        description: t.failedToFetchTemplates,
+        title: t("error"),
+        description: t("failedToFetchTemplates"),
         variant: 'destructive',
       });
     } finally {
@@ -169,8 +169,8 @@ export function TemplateManagement() {
       if (response.ok) {
         const result = await response.json();
         toast({
-          title: t.success,
-          description: t.templateSwitchSuccess.replace('{name}', result.template?.name || 'Template'),
+          title: t("success"),
+          description: t("templateSwitchSuccess.replace")('{name}', result.template?.name || 'Template'),
         });
         fetchHybridTemplates();
       } else {
@@ -179,8 +179,8 @@ export function TemplateManagement() {
     } catch (error) {
       console.error('Error selecting template:', error);
       toast({
-        title: t.error,
-        description: t.templateSwitchFailed,
+        title: t("error"),
+        description: t("templateSwitchFailed"),
         variant: 'destructive',
       });
     } finally {
@@ -205,8 +205,8 @@ export function TemplateManagement() {
   const handleQuestionsUpload = async () => {
     if (!questionsUpload.file || !questionsUpload.name) {
       toast({
-        title: t.error,
-        description: t.pleaseProvideNameAndFile,
+        title: t("error"),
+        description: t("pleaseProvideNameAndFile"),
         variant: 'destructive',
       });
       return;
@@ -229,8 +229,8 @@ export function TemplateManagement() {
 
       if (response.ok) {
         toast({
-          title: t.success,
-          description: t.questionsTemplateUploaded,
+          title: t("success"),
+          description: t("questionsTemplateUploaded"),
         });
         setQuestionsUpload({ name: '', file: null });
         fetchTemplates();
@@ -241,7 +241,7 @@ export function TemplateManagement() {
     } catch (error: any) {
       console.error('Error uploading questions template:', error);
       toast({
-        title: t.error,
+        title: t("error"),
         description: error.message || 'Failed to upload template',
         variant: 'destructive',
       });
@@ -253,8 +253,8 @@ export function TemplateManagement() {
   const handleProtocolUpload = async () => {
     if (!protocolUpload.file || !protocolUpload.name) {
       toast({
-        title: t.error,
-        description: t.pleaseProvideNameAndFile,
+        title: t("error"),
+        description: t("pleaseProvideNameAndFile"),
         variant: 'destructive',
       });
       return;
@@ -277,8 +277,8 @@ export function TemplateManagement() {
 
       if (response.ok) {
         toast({
-          title: t.success,
-          description: t.protocolTemplateUploaded,
+          title: t("success"),
+          description: t("protocolTemplateUploaded"),
         });
         setProtocolUpload({ name: '', file: null });
         fetchTemplates();
@@ -289,7 +289,7 @@ export function TemplateManagement() {
     } catch (error: any) {
       console.error('Error uploading protocol template:', error);
       toast({
-        title: t.error,
+        title: t("error"),
         description: error.message || 'Failed to upload template',
         variant: 'destructive',
       });
@@ -309,8 +309,8 @@ export function TemplateManagement() {
 
       if (response.ok) {
         toast({
-          title: t.success,
-          description: t.templateActivatedSuccessfully,
+          title: t("success"),
+          description: t("templateActivatedSuccessfully"),
         });
         fetchTemplates();
       } else {
@@ -319,8 +319,8 @@ export function TemplateManagement() {
     } catch (error) {
       console.error('Error activating template:', error);
       toast({
-        title: t.error,
-        description: t.failedToActivateTemplate,
+        title: t("error"),
+        description: t("failedToActivateTemplate"),
         variant: 'destructive',
       });
     } finally {
@@ -349,16 +349,16 @@ export function TemplateManagement() {
         setPreviewOpen(true);
       } else {
         toast({
-          title: t.error,
-          description: t.failedToLoadTemplatePreview,
+          title: t("error"),
+          description: t("failedToLoadTemplatePreview"),
           variant: 'destructive',
         });
       }
     } catch (error) {
       console.error('Error previewing template:', error);
       toast({
-        title: t.error,
-        description: t.errorLoadingTemplatePreview,
+        title: t("error"),
+        description: t("errorLoadingTemplatePreview"),
         variant: 'destructive',
       });
     }
@@ -369,7 +369,7 @@ export function TemplateManagement() {
   };
 
   const handleDelete = async (templateId: string, templateName: string) => {
-    if (!confirm(t.confirmDeleteTemplate.replace('{name}', templateName))) {
+    if (!confirm(t("confirmDeleteTemplate.replace")('{name}', templateName))) {
       return;
     }
 
@@ -382,8 +382,8 @@ export function TemplateManagement() {
 
       if (response.ok) {
         toast({
-          title: t.success,
-          description: t.templateDeletedSuccessfully,
+          title: t("success"),
+          description: t("templateDeletedSuccessfully"),
         });
         fetchTemplates();
       } else {
@@ -392,8 +392,8 @@ export function TemplateManagement() {
     } catch (error) {
       console.error('Error deleting template:', error);
       toast({
-        title: t.error,
-        description: t.templateDeleteFailed,
+        title: t("error"),
+        description: t("templateDeleteFailed"),
         variant: 'destructive',
       });
     }
@@ -412,21 +412,21 @@ export function TemplateManagement() {
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 py-3"
           >
             <FileSpreadsheet className="h-4 w-4 mr-2" />
-            {t.templates}
+            {t("templates")}
           </TabsTrigger>
           <TabsTrigger 
             value="hybrid"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 py-3"
           >
             <Sparkles className="h-4 w-4 mr-2" />
-            {t.hybridTemplates}
+            {t("hybridTemplates")}
           </TabsTrigger>
           <TabsTrigger 
             value="upload"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-sky-500 data-[state=active]:text-white rounded-xl transition-all duration-300 py-3"
           >
             <Upload className="h-4 w-4 mr-2" />
-            {t.uploadTemplate}
+            {t("uploadTemplate")}
           </TabsTrigger>
         </TabsList>
 
@@ -442,7 +442,7 @@ export function TemplateManagement() {
                     <FileSpreadsheet className="h-5 w-5 text-white" />
                   </div>
                   <span className="bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
-                    {t.templates}
+                    {t("templates")}
                   </span>
                   <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
                   <Badge variant="outline" className="ml-auto">
@@ -460,7 +460,7 @@ export function TemplateManagement() {
                         <FileSpreadsheet className="relative h-16 w-16 text-gray-400" />
                       </div>
                       <p className="text-lg font-medium text-gray-600">
-                        {t.noTemplatesUploaded}
+                        {t("noTemplatesUploaded")}
                       </p>
                       <p className="text-xs text-gray-400 mt-2">
                         {language === 'hu' 
@@ -489,18 +489,18 @@ export function TemplateManagement() {
                                   : 'bg-gradient-to-r from-gray-500 to-slate-500 text-white'
                               } border-0 px-3 py-1 shadow-md`}>
                                 {template.is_active ? (
-                                  <><CheckCircle className="h-3 w-3 mr-1" />{t.active}</>
+                                  <><CheckCircle className="h-3 w-3 mr-1" />{t("active")}</>
                                 ) : (
-                                  t.inactive
+                                  t("inactive")
                                 )}
                               </Badge>
                               
                               {/* Type Badge */}
                               <Badge className="bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white border-0 px-3 py-1">
                                 {template.type === 'unified' ? 
-                                  t.questionTemplate :
+                                  t("questionTemplate") :
                                   template.type === 'protocol' ? 
-                                  t.protocolTemplateName :
+                                  t("protocolTemplateName") :
                                   template.type
                                 }
                               </Badge>
@@ -560,7 +560,7 @@ export function TemplateManagement() {
                                 ) : (
                                   <span className="flex items-center gap-2 font-semibold">
                                     <CheckCircle className="h-4 w-4" />
-                                    {t.activate}
+                                    {t("activate")}
                                   </span>
                                 )}
                               </button>
@@ -570,7 +570,7 @@ export function TemplateManagement() {
                             <button
                               onClick={() => handleDelete(template.id, template.name)}
                               className="group/btn relative p-2 rounded-lg border-2 border-red-200 text-red-600 hover:bg-red-50 hover:border-red-400 transition-all"
-                              title={t.deleteTooltip}
+                              title={t("deleteTooltip")}
                             >
                               <Trash2 className="h-4 w-4 transition-transform group-hover/btn:scale-110" />
                             </button>
@@ -597,7 +597,7 @@ export function TemplateManagement() {
                     <Sparkles className="h-5 w-5 text-white" />
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
-                    {t.hybridTemplateManagement}
+                    {t("hybridTemplateManagement")}
                   </span>
                 </CardTitle>
               </CardHeader>
@@ -606,11 +606,11 @@ export function TemplateManagement() {
                   <div className="space-y-4">
                     <div>
                       <Label className="font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
-                        {t.localTemplates} ({hybridTemplates.local.length})
+                        {t("localTemplates")} ({hybridTemplates.local.length})
                       </Label>
                       <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
                         <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-purple-500/30">
-                          <SelectValue placeholder={t.chooseTemplate} />
+                          <SelectValue placeholder={t("chooseTemplate")} />
                         </SelectTrigger>
                         <SelectContent>
                           {hybridTemplates.local.map((template) => (
@@ -629,16 +629,16 @@ export function TemplateManagement() {
                     
                     <div>
                       <Label className="font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
-                        {t.loadingStrategy}
+                        {t("loadingStrategy")}
                       </Label>
                       <Select value={loadStrategy} onValueChange={setLoadStrategy}>
                         <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-purple-500/30">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="local_first">{t.localFirst}</SelectItem>
-                          <SelectItem value="cache_first">{t.cacheFirst}</SelectItem>
-                          <SelectItem value="remote_only">{t.remoteOnly}</SelectItem>
+                          <SelectItem value="local_first">{t("localFirst")}</SelectItem>
+                          <SelectItem value="cache_first">{t("cacheFirst")}</SelectItem>
+                          <SelectItem value="remote_only">{t("remoteOnly")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -650,9 +650,9 @@ export function TemplateManagement() {
                     >
                       <div className="flex items-center justify-center gap-2">
                         {loading ? (
-                          <><Loader2 className="h-5 w-5 animate-spin" />{t.switching}</>
+                          <><Loader2 className="h-5 w-5 animate-spin" />{t("switching")}</>
                         ) : (
-                          <><Sparkles className="h-5 w-5" /><span className="font-bold text-lg">{t.templateSwitch}</span></>
+                          <><Sparkles className="h-5 w-5" /><span className="font-bold text-lg">{t("templateSwitch")}</span></>
                         )}
                       </div>
                     </button>
@@ -675,40 +675,40 @@ export function TemplateManagement() {
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-sky-500 flex items-center justify-center shadow-lg">
                     <FileSpreadsheet className="h-5 w-5 text-white" />
                   </div>
-                  {t.uploadQuestionsTemplate}
+                  {t("uploadQuestionsTemplate")}
                 </CardTitle>
                 <CardDescription className="text-base">
-                  {t.uploadQuestionsDescription}
+                  {t("uploadQuestionsDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
-                    {t.templateName}
+                    {t("templateName")}
                   </Label>
                   <Input
                     value={questionsUpload.name}
                     onChange={(e) => setQuestionsUpload({ ...questionsUpload, name: e.target.value })}
-                    placeholder={t.exampleTemplateName}
+                    placeholder={t("exampleTemplateName")}
                     className="h-12 border-2 focus:ring-4 focus:ring-blue-500/30"
                   />
                 </div>
 
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    {t.selectExcel}
+                    {t("selectExcel")}
                   </Label>
                   <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors p-8 text-center bg-gradient-to-br from-gray-50 to-blue-50/30">
                     <FileSpreadsheet className="h-12 w-12 mx-auto text-gray-400 mb-4" />
                     <p className="text-gray-600 font-medium mb-4">
-                      {t.uploadExcelWithQuestions}
+                      {t("uploadExcelWithQuestions")}
                     </p>
                     <button
                       type="button"
                       onClick={() => document.getElementById('questions-excel-upload')?.click()}
                       className="relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 hover:bg-blue-50 transition-all font-semibold"
                     >
-                      {t.selectExcelFile}
+                      {t("selectExcelFile")}
                     </button>
                     <input
                       id="questions-excel-upload"
@@ -721,7 +721,7 @@ export function TemplateManagement() {
                       <div className="mt-4 p-3 rounded-lg bg-green-50 border-2 border-green-200">
                         <p className="text-sm font-semibold text-green-700 flex items-center justify-center gap-2">
                           <CheckCircle className="h-4 w-4" />
-                          {t.selected}: {questionsUpload.file.name}
+                          {t("selected")}: {questionsUpload.file.name}
                         </p>
                       </div>
                     )}
@@ -735,9 +735,9 @@ export function TemplateManagement() {
                 >
                   <div className="flex items-center justify-center gap-2">
                     {loading ? (
-                      <><Loader2 className="h-5 w-5 animate-spin" /><span className="font-bold text-lg">{t.loading}</span></>
+                      <><Loader2 className="h-5 w-5 animate-spin" /><span className="font-bold text-lg">{t("loading")}</span></>
                     ) : (
-                      <><Upload className="h-5 w-5" /><span className="font-bold text-lg">{t.uploadQuestionsTemplate}</span></>
+                      <><Upload className="h-5 w-5" /><span className="font-bold text-lg">{t("uploadQuestionsTemplate")}</span></>
                     )}
                   </div>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
@@ -756,40 +756,40 @@ export function TemplateManagement() {
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gray-700 to-slate-700 flex items-center justify-center shadow-lg">
                     <FileText className="h-5 w-5 text-white" />
                   </div>
-                  {t.uploadProtocolTemplate}
+                  {t("uploadProtocolTemplate")}
                 </CardTitle>
                 <CardDescription className="text-base">
-                  {t.uploadProtocolDescription}
+                  {t("uploadProtocolDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
-                    {t.templateName}
+                    {t("templateName")}
                   </Label>
                   <Input
                     value={protocolUpload.name}
                     onChange={(e) => setProtocolUpload({ ...protocolUpload, name: e.target.value })}
-                    placeholder={t.exampleProtocolName}
+                    placeholder={t("exampleProtocolName")}
                     className="h-12 border-2 focus:ring-4 focus:ring-gray-500/30"
                   />
                 </div>
 
                 <div>
                   <Label className="text-sm font-semibold text-gray-700 mb-2 block">
-                    {t.selectExcel}
+                    {t("selectExcel")}
                   </Label>
                   <div className="relative overflow-hidden rounded-xl border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors p-8 text-center bg-gradient-to-br from-gray-50 to-slate-50/30">
                     <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
                     <p className="text-gray-600 font-medium mb-4">
-                      {t.uploadProtocolFormat}
+                      {t("uploadProtocolFormat")}
                     </p>
                     <button
                       type="button"
                       onClick={() => document.getElementById('protocol-excel-upload')?.click()}
                       className="relative overflow-hidden px-6 py-3 rounded-xl border-2 border-gray-600 text-gray-700 hover:bg-gray-100 transition-all font-semibold"
                     >
-                      {t.selectExcelFile}
+                      {t("selectExcelFile")}
                     </button>
                     <input
                       id="protocol-excel-upload"
@@ -802,7 +802,7 @@ export function TemplateManagement() {
                       <div className="mt-4 p-3 rounded-lg bg-green-50 border-2 border-green-200">
                         <p className="text-sm font-semibold text-green-700 flex items-center justify-center gap-2">
                           <CheckCircle className="h-4 w-4" />
-                          {t.selected}: {protocolUpload.file.name}
+                          {t("selected")}: {protocolUpload.file.name}
                         </p>
                       </div>
                     )}
@@ -816,9 +816,9 @@ export function TemplateManagement() {
                 >
                   <div className="flex items-center justify-center gap-2">
                     {loading ? (
-                      <><Loader2 className="h-5 w-5 animate-spin" /><span className="font-bold text-lg">{t.loading}</span></>
+                      <><Loader2 className="h-5 w-5 animate-spin" /><span className="font-bold text-lg">{t("loading")}</span></>
                     ) : (
-                      <><Upload className="h-5 w-5" /><span className="font-bold text-lg">{t.uploadProtocolTemplate}</span></>
+                      <><Upload className="h-5 w-5" /><span className="font-bold text-lg">{t("uploadProtocolTemplate")}</span></>
                     )}
                   </div>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
@@ -839,15 +839,15 @@ export function TemplateManagement() {
       <TabsList className="grid w-full grid-cols-3 mb-6">
         <TabsTrigger value="templates">
           <FileSpreadsheet className="h-4 w-4 mr-2" />
-          {t.templates}
+          {t("templates")}
         </TabsTrigger>
         <TabsTrigger value="hybrid">
           <Sparkles className="h-4 w-4 mr-2" />
-          {t.hybridTemplates}
+          {t("hybridTemplates")}
         </TabsTrigger>
         <TabsTrigger value="upload">
           <Upload className="h-4 w-4 mr-2" />
-          {t.uploadTemplate}
+          {t("uploadTemplate")}
         </TabsTrigger>
       </TabsList>
 
@@ -857,7 +857,7 @@ export function TemplateManagement() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <FileSpreadsheet className="h-5 w-5 mr-2" />
-              {t.templates}
+              {t("templates")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -866,7 +866,7 @@ export function TemplateManagement() {
               {filteredTemplates.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                  <p>{t.noTemplatesUploaded}</p>
+                  <p>{t("noTemplatesUploaded")}</p>
                   <p className="text-xs text-gray-400 mt-2">
                     {language === 'hu' 
                       ? 'Töltsd fel az első sablont a "Feltöltés" fülön!' 
@@ -880,13 +880,13 @@ export function TemplateManagement() {
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-medium text-gray-800">{template.name}</h3>
                         <Badge variant={template.is_active ? "default" : "secondary"}>
-                          {template.is_active ? t.active : t.inactive}
+                          {template.is_active ? t("active") : t("inactive")}
                         </Badge>
                         <Badge variant="outline">
                           {template.type === 'unified' ? 
-                            t.questionTemplate :
+                            t("questionTemplate") :
                             template.type === 'protocol' ? 
-                            t.protocolTemplateName :
+                            t("protocolTemplateName") :
                             template.type
                           }
                         </Badge>
@@ -936,7 +936,7 @@ export function TemplateManagement() {
                           {activatingId === template.id ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                           ) : (
-                            t.activate
+                            t("activate")
                           )}
                         </Button>
                       )}
@@ -946,7 +946,7 @@ export function TemplateManagement() {
                         size="sm"
                         onClick={() => handleDelete(template.id, template.name)}
                         className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                        title={t.deleteTooltip}
+                        title={t("deleteTooltip")}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -963,16 +963,16 @@ export function TemplateManagement() {
       <TabsContent value="hybrid" className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>{t.hybridTemplateManagement}</CardTitle>
+            <CardTitle>{t("hybridTemplateManagement")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {hybridTemplates && (
               <div className="space-y-4">
                 <div>
-                  <Label>{t.localTemplates} ({hybridTemplates.local.length})</Label>
+                  <Label>{t("localTemplates")} ({hybridTemplates.local.length})</Label>
                   <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
                     <SelectTrigger>
-                      <SelectValue placeholder={t.chooseTemplate} />
+                      <SelectValue placeholder={t("chooseTemplate")} />
                     </SelectTrigger>
                     <SelectContent>
                       {hybridTemplates.local.map((template) => (
@@ -990,15 +990,15 @@ export function TemplateManagement() {
                 </div>
                 
                 <div>
-                  <Label>{t.loadingStrategy}</Label>
+                  <Label>{t("loadingStrategy")}</Label>
                   <Select value={loadStrategy} onValueChange={setLoadStrategy}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="local_first">{t.localFirst}</SelectItem>
-                      <SelectItem value="cache_first">{t.cacheFirst}</SelectItem>
-                      <SelectItem value="remote_only">{t.remoteOnly}</SelectItem>
+                      <SelectItem value="local_first">{t("localFirst")}</SelectItem>
+                      <SelectItem value="cache_first">{t("cacheFirst")}</SelectItem>
+                      <SelectItem value="remote_only">{t("remoteOnly")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1008,7 +1008,7 @@ export function TemplateManagement() {
                   disabled={loading || !selectedTemplate}
                   className="w-full"
                 >
-                  {loading ? t.switching : t.templateSwitch}
+                  {loading ? t("switching") : t("templateSwitch")}
                 </Button>
               </div>
             )}
@@ -1023,40 +1023,40 @@ export function TemplateManagement() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <FileSpreadsheet className="h-5 w-5 mr-2" />
-              {t.uploadQuestionsTemplate}
+              {t("uploadQuestionsTemplate")}
             </CardTitle>
             <CardDescription>
-              {t.uploadQuestionsDescription}
+              {t("uploadQuestionsDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <Label className="text-sm font-medium text-gray-700">
-                {t.templateName}
+                {t("templateName")}
               </Label>
               <Input
                 value={questionsUpload.name}
                 onChange={(e) => setQuestionsUpload({ ...questionsUpload, name: e.target.value })}
-                placeholder={t.exampleTemplateName}
+                placeholder={t("exampleTemplateName")}
                 className="mt-2"
               />
             </div>
 
             <div>
               <Label className="text-sm font-medium text-gray-700">
-                {t.selectExcel}
+                {t("selectExcel")}
               </Label>
               <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <FileSpreadsheet className="h-8 w-8 mx-auto text-gray-400 mb-4" />
                 <p className="text-gray-600 mb-2">
-                  {t.uploadExcelWithQuestions}
+                  {t("uploadExcelWithQuestions")}
                 </p>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => document.getElementById('questions-excel-upload-classic')?.click()}
                 >
-                  {t.selectExcelFile}
+                  {t("selectExcelFile")}
                 </Button>
                 <input
                   id="questions-excel-upload-classic"
@@ -1067,7 +1067,7 @@ export function TemplateManagement() {
                 />
                 {questionsUpload.file && (
                   <p className="text-sm text-green-600 mt-2">
-                    {t.selected}: {questionsUpload.file.name}
+                    {t("selected")}: {questionsUpload.file.name}
                   </p>
                 )}
               </div>
@@ -1083,7 +1083,7 @@ export function TemplateManagement() {
               ) : (
                 <Upload className="h-4 w-4 mr-2" />
               )}
-              {loading ? t.loading : t.uploadQuestionsTemplate}
+              {loading ? t("loading") : t("uploadQuestionsTemplate")}
             </Button>
           </CardContent>
         </Card>
@@ -1093,40 +1093,40 @@ export function TemplateManagement() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t.uploadProtocolTemplate}
+              {t("uploadProtocolTemplate")}
             </CardTitle>
             <CardDescription>
-              {t.uploadProtocolDescription}
+              {t("uploadProtocolDescription")}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
               <Label className="text-sm font-medium text-gray-700">
-                {t.templateName}
+                {t("templateName")}
               </Label>
               <Input
                 value={protocolUpload.name}
                 onChange={(e) => setProtocolUpload({ ...protocolUpload, name: e.target.value })}
-                placeholder={t.exampleProtocolName}
+                placeholder={t("exampleProtocolName")}
                 className="mt-2"
               />
             </div>
 
             <div>
               <Label className="text-sm font-medium text-gray-700">
-                {t.selectExcel}
+                {t("selectExcel")}
               </Label>
               <div className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <FileText className="h-8 w-8 mx-auto text-gray-400 mb-4" />
                 <p className="text-gray-600 mb-2">
-                  {t.uploadProtocolFormat}
+                  {t("uploadProtocolFormat")}
                 </p>
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => document.getElementById('protocol-excel-upload-classic')?.click()}
                 >
-                  {t.selectExcelFile}
+                  {t("selectExcelFile")}
                 </Button>
                 <input
                   id="protocol-excel-upload-classic"
@@ -1137,7 +1137,7 @@ export function TemplateManagement() {
                 />
                 {protocolUpload.file && (
                   <p className="text-sm text-green-600 mt-2">
-                    {t.selected}: {protocolUpload.file.name}
+                    {t("selected")}: {protocolUpload.file.name}
                   </p>
                 )}
               </div>
@@ -1153,7 +1153,7 @@ export function TemplateManagement() {
               ) : (
                 <Upload className="h-4 w-4 mr-2" />
               )}
-              {loading ? t.loading : t.uploadProtocolTemplate}
+              {loading ? t("loading") : t("uploadProtocolTemplate")}
             </Button>
           </CardContent>
         </Card>

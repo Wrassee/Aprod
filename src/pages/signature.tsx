@@ -96,11 +96,11 @@ export function Signature({
                 </button>
                 <div>
                   <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent">
-                    {t.title || 'OTIS APROD - Átvételi Protokoll'}
+                    {t("title") || 'OTIS APROD - Átvételi Protokoll'}
                   </h1>
                   <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                     <Sparkles className="h-3 w-3 text-cyan-500" />
-                    {t.signatureLastStep || 'Utolsó lépés: Aláírás'}
+                    {t("signatureLastStep") || 'Utolsó lépés: Aláírás'}
                   </p>
                 </div>
               </div>
@@ -128,11 +128,11 @@ export function Signature({
                     </div>
                     <div>
                       <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                        {t.signatureInstruction}
+                        {t("signatureInstruction")}
                       </h2>
                       <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-1">
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
-                        {t.signatureInstruction || 'Kérjük, írja alá a protokollt'}
+                        {t("signatureInstruction") || 'Kérjük, írja alá a protokollt'}
                       </p>
                     </div>
                   </div>
@@ -150,7 +150,7 @@ export function Signature({
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
                     <Edit3 className="h-3 w-3" />
-                    {t.signatureOptionalInfo || 'Az aláírás opcionális - a protokoll név nélkül is befejezhető'}
+                    {t("signatureOptionalInfo") || 'Az aláírás opcionális - a protokoll név nélkül is befejezhető'}
                   </p>
                 </div>
                 
@@ -158,13 +158,13 @@ export function Signature({
                 <div className="mb-8">
                   <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
                     <User className="h-4 w-4 text-blue-600" />
-                    {t.printedName}:
+                    {t("printedName")}:
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl opacity-0 group-focus-within:opacity-20 blur-xl transition-opacity"></div>
                     <input
                       type="text"
-                      placeholder={t.printedName}
+                      placeholder={t("printedName")}
                       className="relative w-full h-14 px-5 text-lg font-medium border-2 border-gray-300 dark:border-gray-600 rounded-xl focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 focus:outline-none bg-white dark:bg-gray-800 text-gray-900 dark:text-white transition-all shadow-sm hover:shadow-md"
                       autoComplete="off"
                       value={signerName}
@@ -184,7 +184,7 @@ export function Signature({
                     </div>
                   </div>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    {t.signatureNameAutoSave || 'A név automatikusan mentésre kerül'}
+                    {t("signatureNameAutoSave") || 'A név automatikusan mentésre kerül'}
                   </p>
                 </div>
                 
@@ -196,7 +196,7 @@ export function Signature({
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {t.signatureDate}:
+                        {t("signatureDate")}:
                       </p>
                       <p className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
                         {currentDate}
@@ -218,7 +218,7 @@ export function Signature({
                   >
                     <div className="flex items-center justify-center gap-2">
                       <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                      <span className="font-semibold">{t.back}</span>
+                      <span className="font-semibold">{t("back")}</span>
                     </div>
                   </button>
                   
@@ -242,7 +242,7 @@ export function Signature({
                     {/* Content */}
                     <div className="relative z-10 flex items-center gap-3 text-lg">
                       <Check className="h-6 w-6" />
-                      <span>{t.complete}</span>
+                      <span>{t("complete")}</span>
                       <Sparkles className="h-5 w-5 animate-pulse" />
                     </div>
 
@@ -263,31 +263,31 @@ export function Signature({
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-                      {t.signatureInfo || 'Aláírás információ'}
+                      {t("signatureInfo") || 'Aláírás információ'}
                     </h3>
                     <div className="grid md:grid-cols-2 gap-3 text-sm text-gray-700 dark:text-gray-300">
                       <div className="flex items-start gap-2 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
                         <span className="text-blue-500">✏️</span>
                         <p>
-                          <strong>{t.signatureTitle || 'Aláírás'}:</strong> {t.signatureInfoText1 || 'Az aláírás digitálisan kerül rögzítésre'}
+                          <strong>{t("signatureTitle") || 'Aláírás'}:</strong> {t("signatureInfoText1") || 'Az aláírás digitálisan kerül rögzítésre'}
                         </p>
                       </div>
                       <div className="flex items-start gap-2 p-3 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
                         <span className="text-green-500">💾</span>
                         <p>
-                          <strong>{t.save || 'Mentés'}:</strong> {t.signatureInfoText2 || 'Automatikus mentés minden változtatásnál'}
+                          <strong>{t("save") || 'Mentés'}:</strong> {t("signatureInfoText2") || 'Automatikus mentés minden változtatásnál'}
                         </p>
                       </div>
                       <div className="flex items-start gap-2 p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-800">
                         <span className="text-purple-500">📄</span>
                         <p>
-                          <strong>{'PDF'}:</strong> {t.signatureInfoText3 || 'Az aláírás bekerül a végleges PDF dokumentumba'}
+                          <strong>{'PDF'}:</strong> {t("signatureInfoText3") || 'Az aláírás bekerül a végleges PDF dokumentumba'}
                         </p>
                       </div>
                       <div className="flex items-start gap-2 p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg border border-orange-200 dark:border-orange-800">
                         <span className="text-orange-500">⚡</span>
                         <p>
-                          <strong>{t.optional || 'Opcionális'}:</strong> {t.signatureInfoText4 || 'A protokoll név nélkül is befejezhető'}
+                          <strong>{t("optional") || 'Opcionális'}:</strong> {t("signatureInfoText4") || 'A protokoll név nélkül is befejezhető'}
                         </p>
                       </div>
                     </div>
@@ -321,7 +321,7 @@ export function Signature({
                 />
               </button>
               <h1 className="text-xl font-semibold text-gray-800">
-                {t.title || 'OTIS APROD - Átvételi Protokoll'}
+                {t("title") || 'OTIS APROD - Átvételi Protokoll'}
               </h1>
             </div>
           </div>
@@ -333,7 +333,7 @@ export function Signature({
         <main className="max-w-4xl mx-auto px-6 py-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6">
-              {t.signatureInstruction}
+              {t("signatureInstruction")}
             </h2>
             
             {/* Signature Canvas */}
@@ -347,12 +347,12 @@ export function Signature({
             {/* Aláíró neve input */}
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {t.printedName}:
+                {t("printedName")}:
               </label>
               <div className="relative">
                 <input
                   type="text"
-                  placeholder={t.printedName}
+                  placeholder={t("printedName")}
                   className="w-full h-12 px-4 text-lg border-2 border-gray-300 rounded-lg focus:border-otis-blue focus:outline-none bg-white"
                   autoComplete="off"
                   value={signerName}
@@ -373,7 +373,7 @@ export function Signature({
             {/* Date Stamp */}
             <div className="flex items-center text-sm text-gray-600 mb-8">
               <Calendar className="h-4 w-4 mr-2" />
-              <span>{t.signatureDate}: </span>
+              <span>{t("signatureDate")}: </span>
               <span className="font-medium ml-1">{currentDate}</span>
             </div>
             
@@ -389,7 +389,7 @@ export function Signature({
                 }}
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t.back}
+                {t("back")}
               </Button>
               
               <Button
@@ -398,7 +398,7 @@ export function Signature({
                 className="bg-otis-blue hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white flex items-center px-8"
               >
                 <Check className="h-4 w-4 mr-2" />
-                {t.complete}
+                {t("complete")}
               </Button>
             </div>
           </div>

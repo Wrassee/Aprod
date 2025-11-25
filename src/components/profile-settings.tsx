@@ -1,4 +1,4 @@
-// src/components/profile-settings.tsx - LOCALIZED & THEME AWARE VERSION
+// src/components/profile-settings.tsx - JAVÍTOTT (NARANCSÁRGA CSÍK ELTÁVOLÍTVA)
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
@@ -16,7 +16,7 @@ export function ProfileSettings() {
   const { user, profile, refreshProfile, signOut, loading: authLoading, supabase } = useAuth();
   const { toast } = useToast();
   const { theme } = useTheme();
-  const { t, language } = useLanguageContext(); // ← ÚJ HOOK HASZNÁLAT
+  const { t, language } = useLanguageContext();
   const [loading, setLoading] = useState(false);
   const [isHoveringLogout, setIsHoveringLogout] = useState(false);
   
@@ -41,8 +41,8 @@ export function ProfileSettings() {
   const handleSave = async () => {
     if (!user) {
       toast({
-        title: t.error || 'Error',
-        description: t.Profile?.noUser || 'No user logged in.',
+        title: t("error"),
+        description: t("Profile.noUser"),
         variant: 'destructive',
       });
       return;
@@ -74,20 +74,20 @@ export function ProfileSettings() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || (isCreating ? t.Profile?.createFailed : t.Profile?.updateFailed) || 'Failed');
+        throw new Error(errorData.message || (isCreating ? t("Profile.createFailed") : t("Profile.updateFailed")));
       }
 
       await refreshProfile();
 
       toast({
-        title: `${isCreating ? (t.Profile?.createSuccessTitle || 'Created!') : (t.Profile?.saveSuccessTitle || 'Saved!')} ✅`,
-        description: isCreating ? (t.Profile?.createSuccessDesc || 'Profile created.') : (t.Profile?.saveSuccessDesc || 'Profile updated.'),
+        title: `${isCreating ? t("Profile.createSuccessTitle") : t("Profile.saveSuccessTitle")} ✅`,
+        description: isCreating ? t("Profile.createSuccessDesc") : t("Profile.saveSuccessDesc"),
       });
     } catch (error: any) {
       console.error('Profile save/create error:', error);
       toast({
-        title: isCreating ? (t.Profile?.createErrorTitle || 'Creation Error') : (t.Profile?.saveErrorTitle || 'Update Error'),
-        description: error.message || (isCreating ? t.Profile?.createFailed : t.Profile?.updateFailed) || 'Failed to save profile.',
+        title: isCreating ? t("Profile.createErrorTitle") : t("Profile.saveErrorTitle"),
+        description: error.message || (isCreating ? t("Profile.createFailed") : t("Profile.updateFailed")),
         variant: 'destructive',
       });
     } finally {
@@ -99,13 +99,13 @@ export function ProfileSettings() {
     try {
       await signOut();
       toast({
-        title: t.Profile?.logoutSuccessTitle || 'Signed out successfully',
-        description: t.Profile?.logoutSuccessDesc || 'Goodbye! 👋',
+        title: t("Profile.logoutSuccessTitle"),
+        description: t("Profile.logoutSuccessDesc"),
       });
     } catch (error) {
       console.error("Failed to sign out:", error);
       toast({
-        title: t.Profile?.logoutErrorTitle || 'Sign out error',
+        title: t("Profile.logoutErrorTitle"),
         variant: 'destructive',
       });
     }
@@ -117,7 +117,7 @@ export function ProfileSettings() {
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-300">{t.Profile?.loading || 'Loading profile...'}</p>
+            <p className="text-gray-600 dark:text-gray-300">{t("Profile.loading")}</p>
           </div>
         </CardContent>
       </Card>
@@ -160,7 +160,7 @@ export function ProfileSettings() {
                 
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent mb-1">
-                    {currentProfile?.name || (isCreating ? (t.Profile?.createTitle || 'Create New Profile') : (t.Profile?.userRole || 'User'))}
+                    {currentProfile?.name || (isCreating ? t("Profile.createTitle") : t("Profile.userRole"))}
                   </h2>
                   <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
                     <Mail className="h-4 w-4" />
@@ -176,23 +176,27 @@ export function ProfileSettings() {
                     </Badge>
                     <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                       <Sparkles className="h-3 w-3 text-cyan-500" />
-                      <span>{isCreating ? (t.Profile?.statusNew || 'New profile') : (t.Profile?.statusActive || 'Active')}</span>
+                      <span>{isCreating ? t("Profile.statusNew") : t("Profile.statusActive")}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* 🎨 SPECTACULAR LOGOUT BUTTON */}
+              {/* 🎨 MODERN LOGOUT BUTTON - CSÍK ÉS SARKOK JAVÍTVA */}
               <div className="relative">
                 <button
                   onClick={handleSignOut}
                   onMouseEnter={() => setIsHoveringLogout(true)}
                   onMouseLeave={() => setIsHoveringLogout(false)}
-                  className="relative overflow-hidden group"
+                  className="relative group bg-transparent" 
                 >
+                  {/* Blur/Glow háttér effekt */}
                   <div className={`absolute -inset-1 bg-gradient-to-r from-red-500 via-rose-500 to-pink-600 rounded-2xl blur opacity-30 group-hover:opacity-60 transition-all duration-500 ${isHoveringLogout ? 'animate-pulse' : ''}`}></div>
                   
-                  <div className={`relative bg-gradient-to-r from-red-500 via-rose-500 to-pink-600 rounded-2xl transition-all duration-300 ${isHoveringLogout ? 'scale-105' : 'scale-100'}`}>
+                  {/* Gomb konténer - overflow-hidden a lekerekítéshez */}
+                  <div className={`relative overflow-hidden bg-gradient-to-r from-red-500 via-rose-500 to-pink-600 rounded-2xl transition-all duration-300 ${isHoveringLogout ? 'scale-105' : 'scale-100'}`}>
+                    
+                    {/* Sheen (fény) effekt */}
                     <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 transition-transform duration-700 ${isHoveringLogout ? 'translate-x-full' : '-translate-x-full'}`}></div>
                     
                     <div className="relative flex items-center gap-3 px-6 py-3">
@@ -207,11 +211,11 @@ export function ProfileSettings() {
                       </div>
                       
                       <span className={`text-white font-semibold transition-all duration-300 hidden sm:inline ${isHoveringLogout ? 'tracking-wider' : 'tracking-normal'}`}>
-                        {t.Profile?.logout || 'Sign out'}
+                        {t("Profile.logout")}
                       </span>
                     </div>
                     
-                    <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 transition-all duration-300 ${isHoveringLogout ? 'opacity-100' : 'opacity-0'}`}></div>
+                    {/* 🔥 KIVETTEM INNEN A NARANCSÁRGA CSÍK DIV-ET */}
                   </div>
                 </button>
               </div>
@@ -227,13 +231,13 @@ export function ProfileSettings() {
                 <User className="h-5 w-5" />
               </div>
               <span className="bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
-                {isCreating ? (t.Profile?.createTitle || 'Create Profile') : (t.Profile?.editTitle || 'Edit Profile')}
+                {isCreating ? t("Profile.createTitle") : t("Profile.editTitle")}
               </span>
             </CardTitle>
             <CardDescription>
               {isCreating 
-                ? (t.Profile?.createDesc || 'Create your first profile by entering your details')
-                : (t.Profile?.editDesc || 'Enter or update your profile details')
+                ? t("Profile.createDesc") 
+                : t("Profile.editDesc") 
               }
             </CardDescription>
           </CardHeader>
@@ -243,13 +247,13 @@ export function ProfileSettings() {
               <div className="space-y-2">
                 <Label htmlFor="name" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <User className="h-4 w-4 text-blue-600" />
-                  {t.Profile?.nameLabel || 'Name'}
+                  {t("Profile.nameLabel")}
                 </Label>
                 <div className="relative group">
                   <Input
                     id="name"
                     data-testid="input-profile-name"
-                    placeholder={t.Profile?.namePlaceholder || 'Your full name'}
+                    placeholder={t("Profile.namePlaceholder")}
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
                     className="transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 pl-4 pr-10 group-hover:border-blue-300"
@@ -261,13 +265,13 @@ export function ProfileSettings() {
               <div className="space-y-2">
                 <Label htmlFor="address" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <MapPin className="h-4 w-4 text-blue-600" />
-                  {t.Profile?.addressLabel || 'Address'}
+                  {t("Profile.addressLabel")}
                 </Label>
                 <div className="relative group">
                   <Input
                     id="address"
                     data-testid="input-profile-address"
-                    placeholder={t.Profile?.addressPlaceholder || 'Street, number, city'}
+                    placeholder={t("Profile.addressPlaceholder")}
                     value={formData.address}
                     onChange={(e) => handleChange('address', e.target.value)}
                     className="transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 pl-4 pr-10 group-hover:border-blue-300"
@@ -279,7 +283,7 @@ export function ProfileSettings() {
               <div className="space-y-2">
                 <Label htmlFor="google_drive_folder_id" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                   <FolderOpen className="h-4 w-4 text-blue-600" />
-                  {t.Profile?.driveLabel || 'Google Drive Folder ID'}
+                  {t("Profile.driveLabel")}
                 </Label>
                 <div className="relative group">
                   <Input
@@ -294,7 +298,7 @@ export function ProfileSettings() {
                 </div>
                 <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                   <Sparkles className="h-3 w-3 text-cyan-500" />
-                  {t.Profile?.driveHelp || 'Folder ID where protocols will be uploaded (optional).'}
+                  {t("Profile.driveHelp")}
                 </p>
               </div>
             </div>
@@ -313,12 +317,12 @@ export function ProfileSettings() {
                   {loading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin" />
-                      {isCreating ? (t.Profile?.creating || 'Creating...') : (t.Profile?.saving || 'Saving...')}
+                      {isCreating ? t("Profile.creating") : t("Profile.saving")}
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4" />
-                      {isCreating ? (t.Profile?.createBtn || 'Create Profile') : (t.Profile?.saveBtn || 'Save Profile')}
+                      {isCreating ? t("Profile.createBtn") : t("Profile.saveBtn")}
                     </>
                   )}
                 </span>
@@ -333,7 +337,7 @@ export function ProfileSettings() {
                 <div className="relative flex items-center gap-2 text-xs">
                   <div className="w-2 h-2 rounded-full bg-amber-500 animate-ping absolute"></div>
                   <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                  <span className="text-amber-600 dark:text-amber-400 font-medium">{t.Profile?.unsavedChanges || 'Unsaved changes'}</span>
+                  <span className="text-amber-600 dark:text-amber-400 font-medium">{t("Profile.unsavedChanges")}</span>
                 </div>
               </div>
             )}
@@ -350,111 +354,110 @@ export function ProfileSettings() {
     <div className="w-full space-y-6">
       {/* Classic Profile Header */}
       <Card className="w-full border border-gray-300 shadow-sm">
-        <CardHeader className="border-b bg-gray-50">
+        <CardHeader className="border-b bg-gray-50/80">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               {/* Simple avatar */}
-              <div className="w-16 h-16 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow">
+              <div className="w-16 h-16 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
                 {currentProfile?.name?.charAt(0)?.toUpperCase() || currentProfile?.email?.charAt(0)?.toUpperCase() || 'U'}
               </div>
               
               <div>
-                <CardTitle className="text-gray-900 flex items-center gap-2">
-                  {currentProfile?.name || (isCreating ? (t.Profile?.createTitle || 'Create New Profile') : (t.Profile?.userRole || 'User'))}
+                <CardTitle className="text-gray-900 flex items-center gap-2 text-xl">
+                  {currentProfile?.name || (isCreating ? t("Profile.createTitle") : t("Profile.userRole"))}
                   {currentProfile?.role === 'admin' && (
-                    <Badge className="bg-yellow-500 text-white">
+                    <Badge className="bg-yellow-500 hover:bg-yellow-600 text-white border-none">
                       <Crown className="h-3 w-3 mr-1" />
                       Admin
                     </Badge>
                   )}
                 </CardTitle>
-                <CardDescription className="flex items-center gap-2 mt-1">
-                  <Mail className="h-4 w-4" />
+                <CardDescription className="flex items-center gap-2 mt-1 text-gray-600">
+                  <Mail className="h-4 w-4 text-blue-500" />
                   {currentProfile?.email || user?.email}
                 </CardDescription>
               </div>
             </div>
             
-            {/* Simple Logout Button */}
+            {/* Classic Logout Button */}
             <Button 
               onClick={handleSignOut}
-              variant="outline"
-              className="border-red-500 text-red-600 hover:bg-red-50"
+              className="bg-red-600 hover:bg-red-700 text-white shadow-sm hover:shadow transition-all duration-200 px-6"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              {t.Profile?.logout || 'Sign out'}
+              {t("Profile.logout")}
             </Button>
           </div>
         </CardHeader>
         
         <CardContent className="p-6 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name-classic" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              {t.Profile?.nameLabel || 'Name'}
+            <Label htmlFor="name-classic" className="flex items-center gap-2 text-gray-700">
+              <User className="h-4 w-4 text-blue-600" />
+              {t("Profile.nameLabel")}
             </Label>
             <Input
               id="name-classic"
               value={formData.name}
               onChange={(e) => handleChange('name', e.target.value)}
-              placeholder={t.Profile?.namePlaceholder || 'Your full name'}
-              className="border-gray-300"
+              placeholder={t("Profile.namePlaceholder")}
+              className="border-gray-300 focus:border-blue-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address-classic" className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              {t.Profile?.addressLabel || 'Address'}
+            <Label htmlFor="address-classic" className="flex items-center gap-2 text-gray-700">
+              <MapPin className="h-4 w-4 text-blue-600" />
+              {t("Profile.addressLabel")}
             </Label>
             <Input
               id="address-classic"
               value={formData.address}
               onChange={(e) => handleChange('address', e.target.value)}
-              placeholder={t.Profile?.addressPlaceholder || 'Street, number, city'}
-              className="border-gray-300"
+              placeholder={t("Profile.addressPlaceholder")}
+              className="border-gray-300 focus:border-blue-500"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="drive-classic" className="flex items-center gap-2">
-              <FolderOpen className="h-4 w-4" />
-              {t.Profile?.driveLabel || 'Google Drive Folder ID'}
+            <Label htmlFor="drive-classic" className="flex items-center gap-2 text-gray-700">
+              <FolderOpen className="h-4 w-4 text-blue-600" />
+              {t("Profile.driveLabel")}
             </Label>
             <Input
               id="drive-classic"
               value={formData.google_drive_folder_id}
               onChange={(e) => handleChange('google_drive_folder_id', e.target.value)}
               placeholder="1AbC2DeF3GhI4JkL5MnO6PqR..."
-              className="border-gray-300"
+              className="border-gray-300 focus:border-blue-500"
             />
             <p className="text-xs text-gray-500">
-              {t.Profile?.driveHelp || 'Folder ID where protocols will be uploaded (optional).'}
+              {t("Profile.driveHelp")}
             </p>
           </div>
 
           <Button 
             onClick={handleSave}
             disabled={(!hasChanges && !isCreating) || loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all mt-4"
           >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                {isCreating ? (t.Profile?.creating || 'Creating...') : (t.Profile?.saving || 'Saving...')}
+                {isCreating ? t("Profile.creating") : t("Profile.saving")}
               </>
             ) : (
               <>
                 <Save className="h-4 w-4 mr-2" />
-                {isCreating ? (t.Profile?.createBtn || 'Create Profile') : (t.Profile?.saveBtn || 'Save Profile')}
+                {isCreating ? t("Profile.createBtn") : t("Profile.saveBtn")}
               </>
             )}
           </Button>
 
           {hasChanges && !loading && !isCreating && (
-            <p className="text-sm text-amber-600 text-center">
-              ⚠️ {t.Profile?.unsavedChanges || 'Unsaved changes'}
-            </p>
+            <div className="text-sm text-amber-600 text-center bg-amber-50 p-2 rounded border border-amber-200">
+              ⚠️ {t("Profile.unsavedChanges")}
+            </div>
           )}
         </CardContent>
       </Card>

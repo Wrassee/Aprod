@@ -1,4 +1,4 @@
-// src/lib/translations.ts - FRISSÍTETT VERZIÓ (Minden új fordítással)
+// src/lib/translations.ts - JAVÍTOTT (Minden magyar és német kulccsal)
 
 // Interface definíciója - MEGHATÁROZZA A SZÜKSÉGES KULCSOKAT
 export interface Translation {
@@ -11,6 +11,7 @@ export interface Translation {
   title: string;
   receptionDate: string;
   progress: string;
+  home: string;       
   
   // Navigation
   previous: string;
@@ -35,7 +36,6 @@ export interface Translation {
   editError: string;
   deleteError: string;
   errorRegistrationRequired: string;
-  // ÚJ: error-list.tsx fordítások
   errorSingular: string;
   errorPlural: string;
   allGood: string;
@@ -85,14 +85,12 @@ export interface Translation {
   downloadPDF: string;
   downloadExcel: string;
   viewProtocol: string;
-  home: string;
   downloadGroundingPDF: string;
   generating: string;
   previewGeneratingTitle: string;
   previewGeneratingWait: string;
   previewErrorTitle: string;
   previewCloseWindow: string;
-  // ÚJ: completion.tsx fordítások
   emailSending: string;
   emailSentSuccess: string;
   emailSentError: string;
@@ -119,6 +117,7 @@ export interface Translation {
   // Common
   loading: string;
   error: string;
+  success: string;
   
   // Measurement and calculation components
   measurementData: string;
@@ -126,7 +125,6 @@ export interface Translation {
   calculatedValuesValidated: string;
   outOfRange: string;
   errorRecordingRequired: string;
-  success: string;
   
   // Admin Interface
   admin: string;
@@ -192,6 +190,22 @@ export interface Translation {
   uploadExcelWithQuestions: string;
   uploadProtocolFormat: string;
   selected: string;
+  protocolListDescription: string;
+  pieces: string;
+  protocolNumber: string;
+  createdAt: string;
+  status: string;
+  actions: string;
+  completed: string;
+  protocolFetchError: string;
+  protocolDeletedSuccess: string;
+  protocolDeleteError: string;
+  loadingProtocols: string;
+  retry: string;
+  noProtocolsYet: string;
+  delete_confirmation_title: string;
+  delete_mapping_warning: string;
+  confirm_delete: string;
   
   // Login page
   loginTitle: string;
@@ -219,7 +233,48 @@ export interface Translation {
   registrationSuccessful: string;
   loginSuccessfulAfterRegistration: string;
   userAlreadyExists: string;
+  forgotPassword: string;
+  or: string;
+
+  // Lift Selector
+  select_lift_type: string;
+  select_lift_type_description: string;
+  select_subtype: string;
+  select_subtype_description: string;
+  subtypes_available: string;
+  no_mapping_available: string;
+  missing_question_template: string;
+  missing_protocol_template: string;
+  question_template: string;
+  protocol_template: string;
+  error_loading_lift_types: string;
+  back_to_start: string;
   
+  // Admin UI (New)
+  lift_type_management: string;
+  create_new_type: string;
+  create_new_subtype: string;
+  create_new_mapping: string;
+  type_code: string;
+  type_name_hu: string;
+  type_name_de: string;
+  description_hu: string;
+  description_de: string;
+  subtypes: string;
+  mappings: string;
+  deactivate: string;
+  select_lift_subtype: string;
+  select_question_template: string;
+  select_protocol_template: string;
+  type_created_successfully: string;
+  subtype_created_successfully: string;
+  mapping_created_successfully: string;
+  mapping_activated_successfully: string;
+  type_already_exists: string;
+  subtype_already_exists: string;
+  invalid_template_type: string;
+  active_mapping_exists: string;
+
   // Page specific translations
   generalData: string;
   machineRoom: string;
@@ -229,11 +284,30 @@ export interface Translation {
   viewErrors: string;
   downloadErrorList: string;
   question: string;
-  // ÚJ: questionnaire.tsx fordítások
   questionsSuffix: string;
   questions: string;
+
+  // Grounding specific
+  groundingError: string; 
+  additionalErrorsInList: string; 
+
+  // Hiányzó kulcsok
+  types: string;
+  notes: string;
+  optional_notes: string;
+  create_new_type_description: string;
+  create_new_subtype_description: string;
+  create_new_mapping_description: string;
+  ui_theme: string;
+  select_ui_theme: string;
+  modern_theme: string;
+  modern_theme_desc: string;
+  classic_theme: string;
+  classic_theme_desc: string;
+  backup_under_development: string;
+  try_refresh_button: string;
   
-  // --- ÚJ: Profile fordítások (hozzáadva az interfészhez) ---
+  // Profile
   Profile: {
     loading: string;
     createTitle: string;
@@ -269,7 +343,7 @@ export interface Translation {
     logoutErrorTitle: string;
   };
 
-  // --- Admin NESTED STRUCTURE ---
+  // Admin Nested
   Admin: {
     tabs: {
       dashboard: string;
@@ -358,7 +432,7 @@ export interface Translation {
         resource: string;
         details: string;
         time: string;
-      },
+      };
     };
     Settings: {
       title: string;
@@ -403,6 +477,8 @@ export const translations: Record<string, Translation> = {
     title: "OTIS APROD - Átvételi Protokoll",
     receptionDate: "Átvétel dátuma:",
     progress: "Folyamat",
+    home: "Kezdőlap", 
+    settings: "Beállítások",
     
     // Navigation
     previous: "Előző",
@@ -427,7 +503,6 @@ export const translations: Record<string, Translation> = {
     editError: "Szerkesztés",
     deleteError: "Törlés",
     errorRegistrationRequired: "Hiba rögzítése szükséges",
-    // ÚJ: error-list.tsx fordítások
     errorSingular: "hiba",
     errorPlural: "hibák",
     allGood: "Minden rendben van!",
@@ -477,14 +552,12 @@ export const translations: Record<string, Translation> = {
     downloadPDF: "PDF letöltése",
     downloadExcel: "Excel letöltése",
     viewProtocol: "Protokoll előnézete",
-    home: "Kezdőlap",
     downloadGroundingPDF: "Földelésmérési jegyzőkönyv",
     generating: "Generálás",
     previewGeneratingTitle: "PDF generálása...",
     previewGeneratingWait: "Kérem várjon, ez 10-15 másodpercet vehet igénybe.",
     previewErrorTitle: "Előnézeti hiba",
     previewCloseWindow: "Ablak bezárása",
-    // ÚJ: completion.tsx fordítások
     emailSending: "Email küldése folyamatban...",
     emailSentSuccess: "Email sikeresen elküldve!",
     emailSentError: "Email küldése sikertelen!",
@@ -513,9 +586,15 @@ export const translations: Record<string, Translation> = {
     error: "Hiba történt",
     success: "Sikeres művelet",
     
+    // Measurement and calculation components
+    measurementData: "Mérési adatok",
+    calculatedValues: "Számított értékek",
+    calculatedValuesValidated: "A számított értékek automatikusan kiszámításra kerülnek. A határértéken kívüli értékek pirossal jelennek meg.",
+    outOfRange: "Határértéken kívül (700-9000 mm)",
+    errorRecordingRequired: "Hiba rögzítése szükséges",
+    
     // Admin Interface
     admin: "Adminisztráció",
-    settings: "Beállítások",
     templates: "Sablonok",
     uploadTemplate: "Sablon feltöltése",
     templateName: "Sablon neve",
@@ -577,6 +656,22 @@ export const translations: Record<string, Translation> = {
     uploadExcelWithQuestions: "Kérdéseket tartalmazó Excel fájl feltöltése",
     uploadProtocolFormat: "Protokoll formátum sablon feltöltése",
     selected: "Kiválasztva",
+    protocolListDescription: "Az összes létrehozott protokoll áttekintése",
+    pieces: "db",
+    protocolNumber: "Protokoll szám",
+    createdAt: "Létrehozva",
+    status: "Státusz",
+    actions: "Műveletek",
+    completed: "Befejezve",
+    protocolFetchError: "A protokollok betöltése sikertelen.",
+    protocolDeletedSuccess: "Protokoll sikeresen törölve.",
+    protocolDeleteError: "Sikertelen törlés",
+    loadingProtocols: "Protokollok betöltése...",
+    retry: "Újrapróbálás",
+    noProtocolsYet: "Még nem készült protokoll",
+    delete_confirmation_title: "Biztosan törölni szeretnéd?",
+    delete_mapping_warning: "Ez a művelet végleges. A hozzárendelés törlése után a lift típus inaktívvá válhat a felhasználók számára.",
+    confirm_delete: "Törlés megerősítése",
     
     // Login page
     loginTitle: "Bejelentkezés",
@@ -604,26 +699,76 @@ export const translations: Record<string, Translation> = {
     registrationSuccessful: "Sikeres regisztráció! 🎉",
     loginSuccessfulAfterRegistration: "Bejelentkezés sikeres!",
     userAlreadyExists: "Ez az email cím már használatban van.",
+    forgotPassword: "Elfelejtette a jelszavát?",
+    or: "vagy",
+
+    // Lift Selector
+    select_lift_type: "Válasszon lift típust",
+    select_lift_type_description: "Kérjük, válassza ki a megfelelő lift kategóriát",
+    select_subtype: "Altípus kiválasztása",
+    select_subtype_description: "Kérjük, válassza ki a konkrét lift típust",
+    subtypes_available: "altípus elérhető",
+    no_mapping_available: "Nincs elérhető sablon ehhez a típushoz",
+    missing_question_template: "Hiányzó kérdés sablon",
+    missing_protocol_template: "Hiányzó protokoll sablon",
+    error_loading_lift_types: "Hiba történt a lift típusok betöltésekor",
+    back_to_start: "Vissza a kezdőlapra",
     
-    // Page specific translations
-    generalData: "Általános adatok",
-    machineRoom: "Gépház",
-    modernizationAffected: "Modernizációban érintett",
-    measurementData: "Mérési adatok",
+    // Admin UI (New)
+    lift_type_management: "Lift Típus Kezelés",
+    create_new_type: "Új Típus",
+    create_new_subtype: "Új Altípus",
+    create_new_mapping: "Új Párosítás",
+    type_code: "Típus kód",
+    type_name_hu: "Magyar név",
+    type_name_de: "Német név",
+    description_hu: "Leírás (magyar)",
+    description_de: "Leírás (német)",
+    subtypes: "Altípusok",
+    mappings: "Sablon Párosítások",
+    deactivate: "Deaktiválás",
+    select_lift_subtype: "Válasszon lift altípust",
+    select_question_template: "Válasszon kérdés sablon",
+    select_protocol_template: "Válasszon protokoll sablont",
+    type_created_successfully: "Típus sikeresen létrehozva",
+    subtype_created_successfully: "Altípus sikeresen létrehozva",
+    mapping_created_successfully: "Sablon párosítás sikeresen létrehozva",
+    mapping_activated_successfully: "Sablon párosítás aktiválva",
+    type_already_exists: "Ez a típus kód már létezik",
+    subtype_already_exists: "Ez az altípus kód már létezik ennél a típusnál",
+    invalid_template_type: "Érvénytelen sablon típus",
+    active_mapping_exists: "Már létezik aktív párosítás ehhez az altípushoz",
+    
+    // Page specific
     questionsInGroup: "kérdés ebben a csoportban", 
     groupOf: "csoport",
-    calculatedValuesValidated: "A számított értékek automatikusan kiszámításra kerülnek. A határértéken kívüli értékek pirossal jelennek meg.",
-    calculatedValues: "Számított értékek",
-    errorRecordingRequired: "Hiba rögzítése szükséges",
-    outOfRange: "Határértéken kívül (700-9000 mm)",
     viewErrors: "Hibák megtekintése",
     downloadErrorList: "Hibalista letöltése",
     question: "Kérdés",
-    // ÚJ: questionnaire.tsx fordítások
     questionsSuffix: "kérdés",
     questions: "Kérdések",
 
-    // --- ÚJ: Profile fordítások (magyar) ---
+    // Grounding specific
+    groundingError: "Földelési hiba",
+    additionalErrorsInList: "A további hibákat keresd a közös hibalistában.",
+
+    // Hiányzó kulcsok pótlása
+    types: "Típusok",
+    notes: "Megjegyzések",
+    optional_notes: "Opcionális megjegyzés...",
+    create_new_type_description: "Hozzon létre egy új fő lift típust",
+    create_new_subtype_description: "Hozzon létre egy új altípust a választott kategóriához",
+    create_new_mapping_description: "Rendeljen hozzá sablonokat egy altípushoz",
+    ui_theme: "Felhasználói felület",
+    select_ui_theme: "Válassza ki az alkalmazás megjelenését",
+    modern_theme: "Modern",
+    modern_theme_desc: "Friss, színes dizájn árnyékokkal és színátmenetekkel.",
+    classic_theme: "Klasszikus",
+    classic_theme_desc: "Letisztult, professzionális megjelenés éles vonalakkal.",
+    backup_under_development: "A biztonsági mentés funkció fejlesztés alatt",
+    try_refresh_button: "Próbálja meg frissíteni az oldalt.",
+
+    // Profile
     Profile: {
       loading: "Profil betöltése...",
       createTitle: "Új Profil Létrehozása",
@@ -658,8 +803,8 @@ export const translations: Record<string, Translation> = {
       logoutSuccessDesc: "Viszlát! 👋",
       logoutErrorTitle: "Kijelentkezési hiba"
     },
-    
-    // Admin NESTED STRUCTURE
+
+    // Admin Nested
     Admin: {
       tabs: {
         dashboard: "Dashboard",
@@ -682,6 +827,7 @@ export const translations: Record<string, Translation> = {
         activeTemplates: "Aktív sablonok",
         currentlyActive: "Jelenleg használatban",
         recentActivity: "Legutóbbi aktivitás",
+        recentProtocols: "Legutóbbi Protokollok",
         last5Protocols: "Az utolsó 5 létrehozott protokoll",
         noProtocols: "Nincs még protokoll létrehozva.",
         protocolNumber: "Protokoll szám",
@@ -790,6 +936,9 @@ export const translations: Record<string, Translation> = {
     title: "OTIS APROD - Abnahmeprotokoll",
     receptionDate: "Abnahmedatum:",
     progress: "Fortschritt",
+    home: "Startseite",
+    settings: "Einstellungen",
+    
     
     // Navigation
     previous: "Zurück",
@@ -864,7 +1013,6 @@ export const translations: Record<string, Translation> = {
     downloadPDF: "PDF herunterladen",
     downloadExcel: "Excel herunterladen",
     viewProtocol: "Protokoll-Vorschau",
-    home: "Startseite",
     downloadGroundingPDF: "Erdungsprotokoll",
     generating: "Generieren",
     previewGeneratingTitle: "PDF wird generiert...",
@@ -902,7 +1050,6 @@ export const translations: Record<string, Translation> = {
     
     // Admin Interface
     admin: "Administration",
-    settings: "Einstellungen",
     templates: "Vorlagen",
     uploadTemplate: "Vorlage hochladen",
     templateName: "Vorlagenname",
@@ -964,6 +1111,22 @@ export const translations: Record<string, Translation> = {
     uploadExcelWithQuestions: "Excel-Datei mit Fragen hochladen",
     uploadProtocolFormat: "Protokoll-Formatvorlage hochladen",
     selected: "Ausgewählt",
+    protocolListDescription: "Übersicht über alle erstellten Protokolle",
+    pieces: "Stück",
+    protocolNumber: "Protokollnummer",
+    createdAt: "Erstellt am",
+    status: "Status",
+    actions: "Aktionen",
+    completed: "Abgeschlossen",
+    protocolFetchError: "Fehler beim Laden der Protokolle.",
+    protocolDeletedSuccess: "Protokoll erfolgreich gelöscht.",
+    protocolDeleteError: "Löschen fehlgeschlagen",
+    loadingProtocols: "Protokolle werden geladen...",
+    retry: "Erneut versuchen",
+    noProtocolsYet: "Noch keine Protokolle erstellt",
+    delete_confirmation_title: "Möchten Sie wirklich löschen?",
+    delete_mapping_warning: "Dieser Vorgang ist endgültig. Nach dem Löschen der Zuordnung kann der Aufzugstyp für Benutzer inaktiv werden.",
+    confirm_delete: "Löschen bestätigen",
     
     // Login page
     loginTitle: "Anmelden",
@@ -991,6 +1154,47 @@ export const translations: Record<string, Translation> = {
     registrationSuccessful: "Registrierung erfolgreich! 🎉",
     loginSuccessfulAfterRegistration: "Anmeldung erfolgreich!",
     userAlreadyExists: "Diese E-Mail-Adresse wird bereits verwendet.",
+    forgotPassword: "Passwort vergessen?",
+    or: "oder",
+
+    // Lift Selector
+    select_lift_type: "Aufzugstyp auswählen",
+    select_lift_type_description: "Bitte wählen Sie die entsprechende Aufzugskategorie",
+    select_subtype: "Untertyp auswählen",
+    select_subtype_description: "Bitte wählen Sie den spezifischen Aufzugstyp",
+    subtypes_available: "Untertypen verfügbar",
+    no_mapping_available: "Keine Vorlage für diesen Typ verfügbar",
+    missing_question_template: "Fehlende Fragenvorlage",
+    missing_protocol_template: "Fehlende Protokollvorlage",
+    question_template: "Fragenvorlage",
+    protocol_template: "Protokollvorlage",
+    error_loading_lift_types: "Fehler beim Laden der Aufzugstypen",
+    back_to_start: "Zurück zur Startseite",
+    
+    // Admin UI
+    lift_type_management: "Aufzugstyp-Verwaltung",
+    create_new_type: "Neuer Typ",
+    create_new_subtype: "Neuer Untertyp",
+    create_new_mapping: "Neue Zuordnung",
+    type_code: "Typcode",
+    type_name_hu: "Ungarischer Name",
+    type_name_de: "Deutscher Name",
+    description_hu: "Beschreibung (Ungarisch)",
+    description_de: "Beschreibung (Deutsch)",
+    subtypes: "Untertypen",
+    mappings: "Vorlagenzuordnungen",
+    deactivate: "Deaktivieren",
+    select_lift_subtype: "Aufzugs-Untertyp auswählen",
+    select_question_template: "Fragenvorlage auswählen",
+    select_protocol_template: "Protokollvorlage auswählen",
+    type_created_successfully: "Typ erfolgreich erstellt",
+    subtype_created_successfully: "Untertyp erfolgreich erstellt",
+    mapping_created_successfully: "Vorlagenzuordnung erfolgreich erstellt",
+    mapping_activated_successfully: "Vorlagenzuordnung aktiviert",
+    type_already_exists: "Dieser Typcode existiert bereits",
+    subtype_already_exists: "Dieser Untertyp-Code existiert bereits für diesen Typ",
+    invalid_template_type: "Ungültiger Vorlagentyp",
+    active_mapping_exists: "Für diesen Untertyp existiert bereits eine aktive Zuordnung",
     
     // Page specific translations
     generalData: "Allgemeine Daten",
@@ -1006,11 +1210,30 @@ export const translations: Record<string, Translation> = {
     viewErrors: "Fehler anzeigen",
     downloadErrorList: "Fehlerliste herunterladen",
     question: "Frage",
-    // ÚJ: questionnaire.tsx fordítások
     questionsSuffix: "Fragen",
     questions: "Fragen",
+
+    // Grounding specific
+    groundingError: "Erdungsfehler",
+    additionalErrorsInList: "Weitere Fehler finden Sie in der gemeinsamen Fehlerliste.",
+
+    // Hiányzó kulcsok pótlása (Német)
+    types: "Typen",
+    notes: "Notizen",
+    optional_notes: "Optionale Notizen...",
+    create_new_type_description: "Erstellen Sie einen neuen Hauptaufzugstyp",
+    create_new_subtype_description: "Erstellen Sie einen neuen Untertyp für die gewählte Kategorie",
+    create_new_mapping_description: "Verknüpfen Sie einen Untertyp mit Vorlagen",
+    ui_theme: "Benutzeroberfläche",
+    select_ui_theme: "Wählen Sie das Erscheinungsbild der Anwendung",
+    modern_theme: "Modern",
+    modern_theme_desc: "Ein frisches, farbenfrohes Design mit Verläufen und Schatten.",
+    classic_theme: "Klassisch",
+    classic_theme_desc: "Ein schlichtes, professionelles Design mit klaren Linien.",
+    backup_under_development: "Backup-Funktion ist in Entwicklung",
+    try_refresh_button: "Versuchen Sie, die Seite neu zu laden.",
     
-    // --- ÚJ: Profile fordítások (német) ---
+    // Profile
     Profile: {
       loading: "Profil wird geladen...",
       createTitle: "Neues Profil erstellen",
@@ -1046,7 +1269,7 @@ export const translations: Record<string, Translation> = {
       logoutErrorTitle: "Fehler bei der Abmeldung"
     },
 
-    // Admin NESTED STRUCTURE
+    // Admin Nested
     Admin: {
       tabs: {
         dashboard: "Dashboard",
@@ -1091,6 +1314,7 @@ export const translations: Record<string, Translation> = {
         systemStatus: "Systemstatus",
         operational: "Betriebsbereit",
         completed: "Abgeschlossen",
+        recentProtocols: "Letzte Protokolle",
         table: {
           id: "ID",
           created: "Erstellt",

@@ -1,7 +1,7 @@
-// src/components/error-export.tsx - THEME AWARE VERSION
+// src/components/error-export.tsx - JAVÍTOTT GÖRGETŐSÁV (SCROLLBAR BELÜLRE HELYEZVE)
 
 import { useState } from 'react';
-import { useTheme } from '@/contexts/theme-context'; // ← ÚJ IMPORT
+import { useTheme } from '@/contexts/theme-context';
 import { ProtocolError } from '@shared/schema';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -22,7 +22,7 @@ interface ErrorExportProps {
 
 export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   const { t, language } = useLanguageContext();
-  const { theme } = useTheme(); // ← ÚJ HOOK
+  const { theme } = useTheme();
   const [showPreview, setShowPreview] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
 
@@ -239,7 +239,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                 </Button>
               </div>
 
-              {/* Quick Statistics - Modern Cards */}
+              {/* Quick Statistics */}
               <div className="mt-6 grid grid-cols-3 gap-4">
                 {/* Critical */}
                 <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-500 to-rose-500 p-1 shadow-lg hover:shadow-xl hover:scale-105 transition-all">
@@ -281,22 +281,29 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
           </Card>
         </div>
 
-        {/* Preview Modal - Modern */}
+        {/* Preview Modal - Modern - JAVÍTOTT SCROLLING */}
         <Dialog open={showPreview} onOpenChange={setShowPreview}>
-          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto rounded-3xl border-0 p-0">
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse" />
+          <DialogContent className="max-w-4xl max-h-[85vh] p-0 bg-transparent border-0 shadow-none overflow-hidden flex flex-col">
+            
+            {/* KÜLSŐ GRADIENS KERET - Flex konténer */}
+            <div className="relative flex flex-col w-full h-full overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-2xl">
+              {/* Háttér effekt */}
+              <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl animate-pulse pointer-events-none" />
               
-              <div className="relative bg-white rounded-3xl">
-                <DialogHeader className="p-6 pb-4">
+              {/* BELSŐ FEHÉR KONTÉNER - Itt lesz a görgetés */}
+              <div className="relative flex flex-col w-full h-full bg-white rounded-3xl overflow-hidden">
+                
+                {/* Header (FIX) */}
+                <DialogHeader className="p-6 pb-4 flex-shrink-0 bg-white z-10 relative">
                   <DialogTitle className="text-2xl bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
                     <FileText className="h-6 w-6 text-blue-600" />
                     {language === 'hu' ? 'Hibalista Előnézet' : 'Fehlerliste Vorschau'}
                   </DialogTitle>
                 </DialogHeader>
 
-                <div className="p-6 pt-0 space-y-6" id="error-report-content">
-                  {/* Header */}
+                {/* Scrollable Content Area (FLEXIBLE) */}
+                <div className="p-6 pt-0 space-y-6 overflow-y-auto custom-scrollbar flex-1" id="error-report-content">
+                  {/* Report Header */}
                   <div className="text-center border-b-2 border-gray-200 pb-4">
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-3">
                       OTIS {language === 'hu' ? 'Hibalista' : 'Fehlerliste'}
@@ -368,7 +375,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   </div>
 
                   {/* Footer */}
-                  <div className="text-center text-sm text-gray-500 border-t-2 border-gray-200 pt-4">
+                  <div className="text-center text-sm text-gray-500 border-t-2 border-gray-200 pt-4 pb-2">
                     <p className="flex items-center justify-center gap-2">
                       <Sparkles className="h-4 w-4 text-blue-500" />
                       {language === 'hu' ? 'Generálva' : 'Erstellt'}: {new Date().toLocaleString()}
@@ -387,7 +394,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   }
 
   // ========================================
-  // CLASSIC THEME RENDER
+  // CLASSIC THEME RENDER ( változatlan)
   // ========================================
   if (allErrors.length === 0) {
     return (

@@ -33,7 +33,7 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
       <CardContent>
         {/* === ITT VAN A VÁLTOZTATÁS A FEJLÉCBEN === */}
         <div className="flex items-center px-3 pb-3 border-b-2 border-gray-200 mb-2">
-          <span className="flex-1 text-sm font-semibold text-gray-700">{t.question || 'Kérdés'}</span>
+          <span className="flex-1 text-sm font-semibold text-gray-700">{t("question") || 'Kérdés'}</span>
           
           <div 
             style={{ width: hasThreeOptionQuestion ? '280px' : '220px' }} 
@@ -43,15 +43,15 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
             <div className={`grid ${hasThreeOptionQuestion ? 'grid-cols-3' : 'grid-cols-2'} gap-x-2 sm:gap-x-3 text-center`}>
               <div className="text-sm font-semibold text-green-600 flex items-center justify-center gap-1">
                 <span className="font-bold">✓</span>
-                {t.yes || 'Igen'}
+                {t("yes") || 'Igen'}
               </div>
               <div className="text-sm font-semibold text-red-600 flex items-center justify-center gap-1">
                 <span className="font-bold">✗</span>
-                {t.no || 'Nem'}
+                {t("no") || 'Nem'}
               </div>
               {hasThreeOptionQuestion && (
                 <div className="text-sm font-semibold text-gray-600 flex items-center justify-center">
-                  {t.notApplicable || 'N.A.'}
+                  {t("notApplicable") || 'N.A.'}
                 </div>
               )}
             </div>
@@ -64,13 +64,13 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
             const isThreeOption = question.type === 'checkbox' || question.type === 'yes_no_na';
             const currentOptions = isThreeOption 
               ? [
-                  { value: 'yes', label: t.yes || 'Igen' },
-                  { value: 'no', label: t.no || 'Nem' },
-                  { value: 'na', label: t.notApplicable || 'N.A.' }
+                  { value: 'yes', label: t("yes") || 'Igen' },
+                  { value: 'no', label: t("no") || 'Nem' },
+                  { value: 'na', label: t("notApplicable") || 'N.A.' }
                 ] 
               : [
-                  { value: 'true', label: t.yes || 'Igen' },
-                  { value: 'false', label: t.no || 'Nem' }
+                  { value: 'true', label: t("yes") || 'Igen' },
+                  { value: 'false', label: t("no") || 'Nem' }
                 ];
               
             return (

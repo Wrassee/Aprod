@@ -1,6 +1,6 @@
 // src/components/protocol-list.tsx
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/auth-context'; // ✅ 1. IMPORTÁLVA
+import { useAuth } from '@/contexts/auth-context';
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { useToast } from '@/hooks/use-toast';
@@ -20,7 +20,6 @@ interface Protocol {
   created_at: string;
   status?: string | null;
   user_id?: string;
-  // Bővíthető további mezőkkel
 }
 
 interface ProtocolsResponse {
@@ -31,7 +30,7 @@ interface ProtocolsResponse {
 }
 
 export function ProtocolList() {
-  const { supabase, role } = useAuth(); // ✅ 2. ROLE LEKÉRÉSE
+  const { supabase, role } = useAuth();
   const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
@@ -45,14 +44,13 @@ export function ProtocolList() {
 
   useEffect(() => {
     console.log('🔍 ProtocolList useEffect triggered');
-    // ✅ 3. ROLE-T IS MEGVÁRJUK
     if (supabase && role) {
       console.log(`✅ Supabase & Role (${role}) available, fetching protocols...`);
       fetchProtocols();
     } else {
       console.log('⚠️ Waiting for supabase and/or role...');
     }
-  }, [supabase, role, currentPage]); // ✅ 4. ROLE HOZZÁADVA A DEPENDENCY-HEZ
+  }, [supabase, role, currentPage]);
 
   const fetchProtocols = async () => {
     setLoading(true);
@@ -62,10 +60,9 @@ export function ProtocolList() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Authentication required');
 
-      // ✅ 5. DINAMIKUS VÉGPONT VÁLASZTÁS
       const endpoint = role === 'admin' 
         ? `/api/admin/protocols?page=${currentPage}&limit=50`
-        : `/api/protocols?page=${currentPage}&limit=50`; // Feltételezzük, hogy ez a "USER" végpontja
+        : `/api/protocols?page=${currentPage}&limit=50`;
 
       console.log(`📤 Fetching from: ${endpoint} (Role: ${role})`);
       const response = await fetch(endpoint, {
@@ -87,10 +84,10 @@ export function ProtocolList() {
       setTotalCount(data.total || 0);
     } catch (err: any) {
       console.error('❌ Error fetching protocols:', err);
-      setError(err.message || 'A protokollok betöltése sikertelen.');
+      setError(err.message || t("protocolFetchError"));
       toast({
-        title: t.error || 'Hiba',
-        description: err.message || 'A protokollok betöltése sikertelen',
+        title: t("error") || 'Hiba',
+        description: err.message || t("protocolFetchError"),
         variant: 'destructive',
       });
     } finally {
@@ -115,10 +112,9 @@ export function ProtocolList() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Authentication required');
 
-      // ✅ A TÖRLÉSI VÉGPONTNAK IS DINAMIKUSNAK KELL LENNIE
       const deleteEndpoint = role === 'admin'
         ? `/api/admin/protocols/${protocolId}`
-        : `/api/protocols/${protocolId}`; // Feltételezzük, hogy a user is törölheti a sajátját
+        : `/api/protocols/${protocolId}`;
 
       console.log(`📤 Deleting from: ${deleteEndpoint} (Role: ${role})`);
 
@@ -134,8 +130,8 @@ export function ProtocolList() {
       }
 
       toast({
-        title: t.success || 'Siker',
-        description: 'Protokoll sikeresen törölve.',
+        title: t("success") || 'Siker',
+        description: t("protocolDeletedSuccess"),
       });
 
       // Frissítjük a listát
@@ -143,8 +139,8 @@ export function ProtocolList() {
     } catch (err: any) {
       console.error('Error deleting protocol:', err);
       toast({
-        title: t.error || 'Hiba',
-        description: err.message || 'Sikertelen törlés',
+        title: t("error") || 'Hiba',
+        description: err.message || t("protocolDeleteError"),
         variant: 'destructive',
       });
     } finally {
@@ -163,7 +159,7 @@ export function ProtocolList() {
           <Loader2 className="relative h-16 w-16 animate-spin text-blue-600" />
         </div>
         <p className="mt-6 text-lg font-medium bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-          {language === 'hu' ? 'Protokollok betöltése...' : 'Loading protocols...'}
+          {t("loadingProtocols")}
         </p>
       </div>
     );
@@ -199,7 +195,7 @@ export function ProtocolList() {
               className="mt-4"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              Újrapróbálás
+              {t("retry")}
             </Button>
           </CardContent>
         </Card>
@@ -224,20 +220,18 @@ export function ProtocolList() {
                 </div>
                 <div>
                   <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent flex items-center gap-2">
-                    {t.Admin?.tabs?.protocols || 'Protokollok'}
+                    {t("Admin")?.tabs?.protocols || 'Protokollok'}
                     <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
                   </CardTitle>
                   <CardDescription className="mt-1">
-                    {language === 'hu' 
-                      ? 'Az összes létrehozott protokoll áttekintése'
-                      : 'Overview of all created protocols'}
+                    {t("protocolListDescription")}
                   </CardDescription>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <Badge variant="outline" className="text-lg px-4 py-2">
-                  {totalCount} {language === 'hu' ? 'db' : 'total'}
+                  {totalCount} {t("pieces")}
                 </Badge>
                 <Button 
                   onClick={fetchProtocols} 
@@ -259,9 +253,7 @@ export function ProtocolList() {
                   <FileText className="relative h-16 w-16 text-gray-400" />
                 </div>
                 <p className="text-lg font-medium text-gray-600">
-                  {language === 'hu' 
-                    ? 'Még nem készült protokoll' 
-                    : 'No protocols created yet'}
+                  {t("noProtocolsYet")}
                 </p>
               </div>
             ) : (
@@ -272,17 +264,17 @@ export function ProtocolList() {
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <FileText className="h-4 w-4 text-blue-600" />
-                          Protokoll szám
+                          {t("protocolNumber")}
                         </div>
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <Calendar className="h-4 w-4 text-blue-600" />
-                          Létrehozva
+                          {t("createdAt")}
                         </div>
                       </TableHead>
-                      <TableHead className="font-bold text-gray-700">Státusz</TableHead>
-                      <TableHead className="font-bold text-gray-700 text-right">Műveletek</TableHead>
+                      <TableHead className="font-bold text-gray-700">{t("status")}</TableHead>
+                      <TableHead className="font-bold text-gray-700 text-right">{t("actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -300,7 +292,7 @@ export function ProtocolList() {
                         <TableCell>
                           <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 px-3 py-1 shadow-md">
                             <CheckCircle className="h-3 w-3 mr-1" />
-                            {protocol.status || 'Befejezve'}
+                            {protocol.status || t("completed")}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
@@ -342,18 +334,16 @@ export function ProtocolList() {
           <div>
             <CardTitle className="flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t.Admin?.tabs?.protocols || 'Protokollok'}
+              {t("Admin")?.tabs?.protocols || 'Protokollok'}
             </CardTitle>
             <CardDescription className="mt-2">
-              {language === 'hu' 
-                ? 'Az összes létrehozott protokoll áttekintése'
-                : 'Overview of all created protocols'}
+              {t("protocolListDescription")}
             </CardDescription>
           </div>
           
           <div className="flex items-center gap-3">
             <Badge variant="outline">
-              {totalCount} db
+              {totalCount} {t("pieces")}
             </Badge>
             <Button 
               onClick={fetchProtocols} 
@@ -371,9 +361,7 @@ export function ProtocolList() {
           <div className="text-center py-12">
             <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
             <p className="text-lg font-medium text-gray-600">
-              {language === 'hu' 
-                ? 'Még nem készült protokoll' 
-                : 'No protocols created yet'}
+              {t("noProtocolsYet")}
             </p>
           </div>
         ) : (
@@ -381,10 +369,10 @@ export function ProtocolList() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Protokoll szám</TableHead>
-                  <TableHead>Létrehozva</TableHead>
-                  <TableHead>Státusz</TableHead>
-                  <TableHead className="text-right">Műveletek</TableHead>
+                  <TableHead>{t("protocolNumber")}</TableHead>
+                  <TableHead>{t("createdAt")}</TableHead>
+                  <TableHead>{t("status")}</TableHead>
+                  <TableHead className="text-right">{t("actions")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -398,7 +386,7 @@ export function ProtocolList() {
                     </TableCell>
                     <TableCell>
                       <Badge variant="default" className="bg-green-600">
-                        {protocol.status || 'Befejezve'}
+                        {protocol.status || t("completed")}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -426,4 +414,3 @@ export function ProtocolList() {
     </Card>
   );
 }
-

@@ -99,7 +99,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
           return {
             gradient: 'from-red-500 to-rose-500',
             icon: AlertTriangle,
-            text: t.critical,
+            text: t("critical"),
             bgColor: 'bg-red-50',
             borderColor: 'border-red-200',
           };
@@ -107,7 +107,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
           return {
             gradient: 'from-amber-500 to-orange-500',
             icon: AlertCircle,
-            text: t.medium,
+            text: t("medium"),
             bgColor: 'bg-amber-50',
             borderColor: 'border-amber-200',
           };
@@ -115,7 +115,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
           return {
             gradient: 'from-blue-500 to-sky-500',
             icon: Info,
-            text: t.low,
+            text: t("low"),
             bgColor: 'bg-blue-50',
             borderColor: 'border-blue-200',
           };
@@ -146,11 +146,11 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                   </div>
                   <div>
                     <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                      {t.errorList}
+                      {t("errorList")}
                     </h2>
                     <p className="text-xs text-gray-500 flex items-center gap-1">
                       <Sparkles className="h-3 w-3" />
-                      {safeErrors.length} {safeErrors.length === 1 ? t.errorSingular : t.errorPlural}
+                      {safeErrors.length} {safeErrors.length === 1 ? t("errorSingular") : t("errorPlural")}
                     </p>
                   </div>
                 </div>
@@ -163,7 +163,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
                   <div className="relative flex items-center gap-2">
                     <Plus className="h-4 w-4" />
-                    <span>{t.addError}</span>
+                    <span>{t("addError")}</span>
                   </div>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
                 </button>
@@ -178,8 +178,8 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                       <CheckCircle className="h-10 w-10 text-white" />
                     </div>
                   </div>
-                  <p className="text-gray-600 font-medium">{t.noErrors}</p>
-                  <p className="text-sm text-gray-500 mt-1">{t.allGood} ✨</p>
+                  <p className="text-gray-600 font-medium">{t("noErrors")}</p>
+                  <p className="text-sm text-gray-500 mt-1">{t("allGood")} ✨</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -247,7 +247,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                                           <line x1="12" y1="8" x2="12" y2="12"></line>
                                           <line x1="12" y1="16" x2="12.01" y2="16"></line>
                                         </svg>
-                                        <span>${t.autoErrorNotEditable}</span>
+                                        <span>${t("autoErrorNotEditable")}</span>
                                       </div>
                                     `;
                                     toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(to right, #f59e0b, #d97706);color:white;padding:12px 20px;border-radius:12px;z-index:9999;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,0.2);';
@@ -280,7 +280,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                           <polyline points="20 6 9 17 4 12"></polyline>
                                         </svg>
-                                        <span>${t.errorDeletedSuccessfully}</span>
+                                        <span>${t("errorDeletedSuccessfully")}</span>
                                       </div>
                                     `;
                                     toast.style.cssText = 'position:fixed;top:20px;right:20px;background:linear-gradient(to right, #ef4444, #dc2626);color:white;padding:12px 20px;border-radius:12px;z-index:9999;font-weight:600;box-shadow:0 10px 25px rgba(0,0,0,0.2);';
@@ -340,11 +340,11 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
   const getSeverityText = (severity: ProtocolError['severity']) => {
     switch (severity) {
       case 'critical':
-        return t.critical;
+        return t("critical");
       case 'medium':
-        return t.medium;
+        return t("medium");
       case 'low':
-        return t.low;
+        return t("low");
       default:
         return severity;
     }
@@ -356,20 +356,20 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
       <Card className="bg-white border border-gray-200 shadow-sm">
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-800">{t.errorList}</h2>
+            <h2 className="text-xl font-semibold text-gray-800">{t("errorList")}</h2>
             <Button
               onClick={() => setShowModal(true)}
               className="bg-otis-blue hover:bg-blue-700 text-white"
             >
               <Plus className="h-4 w-4 mr-2" />
-              {t.addError}
+              {t("addError")}
             </Button>
           </div>
 
           {safeErrors.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
-              <p>{t.noErrors}</p>
+              <p>{t("noErrors")}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -418,7 +418,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                           // Boundary errors (automatically generated) cannot be edited
                           if (error.id.startsWith('boundary-')) {
                             const toast = document.createElement('div');
-                            toast.textContent = t.autoErrorNotEditable;
+                            toast.textContent = t("autoErrorNotEditable");
                             toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#f59e0b;color:white;padding:12px 24px;border-radius:8px;z-index:9999;font-weight:500;';
                             document.body.appendChild(toast);
                             setTimeout(() => document.body.removeChild(toast), 2000);
@@ -451,7 +451,7 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                             
                             // Show confirmation toast
                             const toast = document.createElement('div');
-                            toast.textContent = t.errorDeletedFromList;
+                            toast.textContent = t("errorDeletedFromList");
                             toast.style.cssText = 'position:fixed;top:20px;right:20px;background:#ef4444;color:white;padding:12px 24px;border-radius:8px;z-index:9999;font-weight:500;';
                             document.body.appendChild(toast);
                             setTimeout(() => document.body.removeChild(toast), 2000);

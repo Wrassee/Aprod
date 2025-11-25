@@ -591,7 +591,7 @@ export function NiedervoltTable({
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
                   <Filter className="h-6 w-6 text-blue-600" />
-                  {t.deviceSelection || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}
+                  {t("deviceSelection") || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}
                 </DialogTitle>
               </DialogHeader>
 
@@ -681,7 +681,7 @@ export function NiedervoltTable({
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
                     <div className="relative flex items-center gap-2">
                       <Check className="h-5 w-5" />
-                      <span>{t.ok || 'OK'}</span>
+                      <span>{t("ok") || 'OK'}</span>
                     </div>
                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
                   </button>
@@ -891,7 +891,7 @@ export function NiedervoltTable({
         <Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
           <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
             <DialogHeader>
-              <DialogTitle>{t.deviceSelection || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}</DialogTitle>
+              <DialogTitle>{t("deviceSelection") || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}</DialogTitle>
             </DialogHeader>
 
             <div className="flex-grow overflow-y-auto pr-4 -mr-4 space-y-4">
@@ -947,7 +947,7 @@ export function NiedervoltTable({
             <DialogFooter className="pt-4 flex-shrink-0">
               <DialogClose asChild>
                 <Button type="button">
-                  {t.ok || 'OK'}
+                  {t("ok") || 'OK'}
                 </Button>
               </DialogClose>
             </DialogFooter>

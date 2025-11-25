@@ -1,4 +1,4 @@
-// src/components/admin-dashboard.tsx - THEME AWARE VERSION
+// src/components/admin-dashboard.tsx - JAVÍTOTT FORDÍTÁSOK (DOT NOTATION)
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useLanguageContext } from "@/components/language-context";
@@ -35,7 +35,7 @@ interface DashboardStats {
 export function AdminDashboard() {
   const { supabase } = useAuth();
   const { t, language } = useLanguageContext();
-  const { theme } = useTheme(); // ← THEME HOOK
+  const { theme } = useTheme();
   const { toast } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,7 +74,7 @@ export function AdminDashboard() {
     } catch (error: any) {
       console.error('❌ Error fetching stats:', error);
       toast({
-        title: t.error || 'Hiba',
+        title: t("error"),
         description: error.message || 'A statisztikák betöltése sikertelen',
         variant: 'destructive',
       });
@@ -94,7 +94,7 @@ export function AdminDashboard() {
           <Loader2 className="relative h-16 w-16 animate-spin text-blue-600" />
         </div>
         <p className="mt-6 text-lg font-medium bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-          {language === 'hu' ? 'Statisztikák betöltése...' : 'Loading statistics...'}
+          {t("loading")}...
         </p>
       </div>
     );
@@ -124,7 +124,7 @@ export function AdminDashboard() {
             <div className="flex flex-col items-center justify-center">
               <Activity className="h-16 w-16 text-gray-400 mb-4" />
               <p className="text-center text-lg font-medium text-gray-600">
-                {t.Admin?.Dashboard?.noData || 'Nem sikerült betölteni a statisztikákat'}
+                {t("Admin.Dashboard.noData")}
               </p>
             </div>
           </CardContent>
@@ -141,7 +141,7 @@ export function AdminDashboard() {
       <Card>
         <CardContent className="py-12">
           <p className="text-center text-gray-500">
-            {t.Admin?.Dashboard?.noData || 'Nem sikerült betölteni a statisztikákat'}
+            {t("Admin.Dashboard.noData")}
           </p>
         </CardContent>
       </Card>
@@ -157,28 +157,28 @@ export function AdminDashboard() {
         {/* Stats Cards */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <StatsCard
-            title={t.Admin?.Dashboard?.totalUsers || 'Összes felhasználó'}
+            title={t("Admin.Dashboard.totalUsers")}
             value={stats.users.total}
             icon={Users}
-            description={t.Admin?.Dashboard?.registeredUsers || 'Regisztrált felhasználók száma'}
+            description={t("Admin.Dashboard.registeredUsers")}
             iconColor="text-blue-600"
             theme="modern"
           />
           
           <StatsCard
-            title={t.Admin?.Dashboard?.totalProtocols || 'Összes protokoll'}
+            title={t("Admin.Dashboard.totalProtocols")}
             value={stats.protocols.total}
             icon={FileText}
-            description={t.Admin?.Dashboard?.completedProtocols || 'Létrehozott protokollok'}
+            description={t("Admin.Dashboard.completedProtocols")}
             iconColor="text-green-600"
             theme="modern"
           />
           
           <StatsCard
-            title={t.Admin?.Dashboard?.totalTemplates || 'Sablonok'}
+            title={t("Admin.Dashboard.totalTemplates")}
             value={stats.templates.total}
             icon={FileSpreadsheet}
-            description={t.Admin?.Dashboard?.uploadedTemplates || 'Feltöltött sablonok'}
+            description={t("Admin.Dashboard.uploadedTemplates")}
             iconColor="text-purple-600"
             theme="modern"
           />
@@ -196,11 +196,11 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
-                    {t.Admin?.Dashboard?.systemActivity || 'Rendszer aktivitás'}
+                    {t("Admin.Dashboard.systemActivity")}
                     <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
                   </CardTitle>
                   <CardDescription className="mt-1">
-                    {t.Admin?.Dashboard?.activityDesc || 'Gyors áttekintés a rendszer működéséről'}
+                    {t("Admin.Dashboard.activityDesc")}
                   </CardDescription>
                 </div>
               </div>
@@ -217,7 +217,7 @@ export function AdminDashboard() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        {t.Admin?.Dashboard?.activeUsers || 'Aktív felhasználók'}
+                        {t("Admin.Dashboard.activeUsers")}
                       </p>
                       <p className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent">
                         {stats.users.total}
@@ -236,7 +236,7 @@ export function AdminDashboard() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        {t.Admin?.Dashboard?.recentProtocols || 'Friss protokollok'}
+                        {t("Admin.Dashboard.recentProtocols")}
                       </p>
                       <p className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent">
                         {stats.protocols.recent.length}
@@ -255,11 +255,11 @@ export function AdminDashboard() {
                     </div>
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        {t.Admin?.Dashboard?.systemStatus || 'Rendszer státusz'}
+                        {t("Admin.Dashboard.systemStatus")}
                       </p>
                       <p className="text-2xl font-bold text-green-600 flex items-center gap-2">
                         <CheckCircle className="h-6 w-6" />
-                        {t.Admin?.Dashboard?.operational || 'Működik'}
+                        {t("Admin.Dashboard.operational")}
                       </p>
                     </div>
                   </div>
@@ -282,10 +282,10 @@ export function AdminDashboard() {
                   </div>
                   <div className="flex-1">
                     <CardTitle className="text-xl bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                      {t.Admin?.Dashboard?.recentProtocolsTable || 'Legutóbbi protokollok'}
+                      {t("Admin.Dashboard.recentProtocolsTable")}
                     </CardTitle>
                     <CardDescription className="mt-1">
-                      {t.Admin?.Dashboard?.last5Protocols || 'Az utolsó 5 létrehozott protokoll'}
+                      {t("Admin.Dashboard.last5Protocols")}
                     </CardDescription>
                   </div>
                 </div>
@@ -298,17 +298,17 @@ export function AdminDashboard() {
                         <TableHead className="font-bold text-gray-700">
                           <div className="flex items-center gap-2">
                             <FileText className="h-4 w-4 text-blue-600" />
-                            {t.Admin?.Dashboard?.table?.id || 'ID'}
+                            {t("Admin.Dashboard.table.id")}
                           </div>
                         </TableHead>
                         <TableHead className="font-bold text-gray-700">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-blue-600" />
-                            {t.Admin?.Dashboard?.table?.created || 'Létrehozva'}
+                            {t("Admin.Dashboard.table.created")}
                           </div>
                         </TableHead>
                         <TableHead className="font-bold text-gray-700">
-                          {t.Admin?.Dashboard?.table?.status || 'Státusz'}
+                          {t("Admin.Dashboard.table.status")}
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -343,7 +343,7 @@ export function AdminDashboard() {
                               } text-white border-0 px-3 py-1 shadow-md`}
                             >
                               <CheckCircle className="h-3 w-3 mr-1" />
-                              {protocol.status || t.Admin?.Dashboard?.completed || 'Befejezve'}
+                              {protocol.status || t("Admin.Dashboard.completed")}
                             </Badge>
                           </TableCell>
                         </TableRow>
@@ -368,28 +368,28 @@ export function AdminDashboard() {
         {/* Stats Cards - Classic */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <StatsCard
-            title={t.Admin?.Dashboard?.totalUsers || 'Összes felhasználó'}
+            title={t("Admin.Dashboard.totalUsers")}
             value={stats.users.total}
             icon={Users}
-            description={t.Admin?.Dashboard?.registeredUsers || 'Regisztrált felhasználók száma'}
+            description={t("Admin.Dashboard.registeredUsers")}
             iconColor="text-blue-600"
             theme="classic"
           />
           
           <StatsCard
-            title={t.Admin?.Dashboard?.totalProtocols || 'Összes protokoll'}
+            title={t("Admin.Dashboard.totalProtocols")}
             value={stats.protocols.total}
             icon={FileText}
-            description={t.Admin?.Dashboard?.completedProtocols || 'Létrehozott protokollok'}
+            description={t("Admin.Dashboard.completedProtocols")}
             iconColor="text-green-600"
             theme="classic"
           />
           
           <StatsCard
-            title={t.Admin?.Dashboard?.totalTemplates || 'Sablonok'}
+            title={t("Admin.Dashboard.totalTemplates")}
             value={stats.templates.total}
             icon={FileSpreadsheet}
-            description={t.Admin?.Dashboard?.uploadedTemplates || 'Feltöltött sablonok'}
+            description={t("Admin.Dashboard.uploadedTemplates")}
             iconColor="text-purple-600"
             theme="classic"
           />
@@ -400,10 +400,10 @@ export function AdminDashboard() {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Activity className="h-5 w-5 mr-2" />
-              {t.Admin?.Dashboard?.systemActivity || 'Rendszer aktivitás'}
+              {t("Admin.Dashboard.systemActivity")}
             </CardTitle>
             <CardDescription className="mt-2">
-              {t.Admin?.Dashboard?.activityDesc || 'Gyors áttekintés a rendszer működéséről'}
+              {t("Admin.Dashboard.activityDesc")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -416,7 +416,7 @@ export function AdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {t.Admin?.Dashboard?.activeUsers || 'Aktív felhasználók'}
+                    {t("Admin.Dashboard.activeUsers")}
                   </p>
                   <p className="text-2xl font-bold text-gray-900">{stats.users.total}</p>
                 </div>
@@ -430,7 +430,7 @@ export function AdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {t.Admin?.Dashboard?.recentProtocols || 'Friss protokollok'}
+                    {t("Admin.Dashboard.recentProtocols")}
                   </p>
                   <p className="text-2xl font-bold text-gray-900">{stats.protocols.recent.length}</p>
                 </div>
@@ -444,10 +444,10 @@ export function AdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">
-                    {t.Admin?.Dashboard?.systemStatus || 'Rendszer státusz'}
+                    {t("Admin.Dashboard.systemStatus")}
                   </p>
                   <p className="text-2xl font-bold text-green-600">
-                    {t.Admin?.Dashboard?.operational || 'Működik'}
+                    {t("Admin.Dashboard.operational")}
                   </p>
                 </div>
               </div>
@@ -460,10 +460,10 @@ export function AdminDashboard() {
           <Card className="border-2 border-gray-200">
             <CardHeader>
               <CardTitle>
-                {t.Admin?.Dashboard?.recentProtocolsTable || 'Legutóbbi protokollok'}
+                {t("Admin.Dashboard.recentProtocolsTable")}
               </CardTitle>
               <CardDescription>
-                {t.Admin?.Dashboard?.last5Protocols || 'Az utolsó 5 létrehozott protokoll'}
+                {t("Admin.Dashboard.last5Protocols")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -471,9 +471,9 @@ export function AdminDashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>{t.Admin?.Dashboard?.table?.id || 'ID'}</TableHead>
-                      <TableHead>{t.Admin?.Dashboard?.table?.created || 'Létrehozva'}</TableHead>
-                      <TableHead>{t.Admin?.Dashboard?.table?.status || 'Státusz'}</TableHead>
+                      <TableHead>{t("Admin.Dashboard.table.id")}</TableHead>
+                      <TableHead>{t("Admin.Dashboard.table.created")}</TableHead>
+                      <TableHead>{t("Admin.Dashboard.table.status")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -497,7 +497,7 @@ export function AdminDashboard() {
                         </TableCell>
                         <TableCell>
                           <Badge variant="default" className="bg-green-600">
-                            {t.Admin?.Dashboard?.completed || 'Befejezve'}
+                            {t("Admin.Dashboard.completed")}
                           </Badge>
                         </TableCell>
                       </TableRow>

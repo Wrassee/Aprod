@@ -62,17 +62,17 @@ const IsolatedQuestionComponent = memo(({
         case 'radio':
         case 'true_false':
           options = [
-            { value: 'true', label: t.yes || 'Igen' },
-            { value: 'false', label: t.no || 'Nem' }
+            { value: 'true', label: t("yes") || 'Igen' },
+            { value: 'false', label: t("no") || 'Nem' }
           ];
           break;
           
         case 'checkbox':
         case 'yes_no_na':
           options = [
-            { value: 'yes', label: t.yes || 'Igen' },
-            { value: 'no', label: t.no || 'Nem' },
-            { value: 'na', label: t.notApplicable || 'N.A.' }
+            { value: 'yes', label: t("yes") || 'Igen' },
+            { value: 'no', label: t("no") || 'Nem' },
+            { value: 'na', label: t("notApplicable") || 'N.A.' }
           ];
           break;
       }
@@ -181,7 +181,7 @@ const IsolatedQuestionComponent = memo(({
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
                       <Camera className="h-4 w-4 text-blue-600" />
-                      {t.attachPhotos || 'Fotók csatolása'}
+                      {t("attachPhotos") || 'Fotók csatolása'}
                     </span>
                     <button
                       type="button"
@@ -190,7 +190,7 @@ const IsolatedQuestionComponent = memo(({
                     >
                       <span className="relative z-10 flex items-center gap-2 text-sm font-semibold">
                         <Camera className="h-4 w-4" />
-                        {t.selectFiles || 'Fájlok kiválasztása'}
+                        {t("selectFiles") || 'Fájlok kiválasztása'}
                       </span>
                       <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
                     </button>
@@ -252,7 +252,7 @@ const IsolatedQuestionComponent = memo(({
             <div className="border-t pt-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-sm font-medium text-gray-700">
-                  {t.attachPhotos || 'Fotók csatolása'}
+                  {t("attachPhotos") || 'Fotók csatolása'}
                 </span>
                 <Button
                   type="button"
@@ -261,7 +261,7 @@ const IsolatedQuestionComponent = memo(({
                   onClick={() => document.getElementById(`file-${question.id}`)?.click()}
                 >
                   <Camera className="h-4 w-4 mr-2" />
-                  {t.selectFiles || 'Fájlok kiválasztása'}
+                  {t("selectFiles") || 'Fájlok kiválasztása'}
                 </Button>
               </div>
               

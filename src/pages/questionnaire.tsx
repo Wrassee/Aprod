@@ -1,4 +1,4 @@
-// src/pages/questionnaire.tsx
+// src/pages/questionnaire.tsx - LIFT SELECTOR INTEGRÁCIÓ
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { create, all } from 'mathjs';
 import { Question, AnswerValue, ProtocolError } from '@shared/schema';
@@ -11,9 +11,10 @@ import { ErrorList } from '@/components/error-list';
 import { QuestionGroupHeader } from '@/components/question-group-header';
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
-import { ArrowLeft, ArrowRight, Save, Check, X, Sparkles, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Check, X, Sparkles, Zap, AlertCircle } from 'lucide-react';
 import { MeasurementBlock } from '@/components/measurement-block';
 import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface QuestionnaireProps {
   receptionDate: string;
@@ -60,6 +61,7 @@ function Questionnaire({
   const [allQuestions, setAllQuestions] = useState<Question[]>([]);
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [liftSelectionError, setLiftSelectionError] = useState<string | null>(null); // 🔥 ÚJ
   
   const [localAnswers, setLocalAnswers] = useState<Record<string, AnswerValue>>(answers);
   
@@ -67,6 +69,44 @@ function Questionnaire({
   useEffect(() => {
     setLocalAnswers(answers);
   }, [answers]);
+
+  // 🔥 ÚJ: LIFT SELECTION VALIDATION
+  useEffect(() => {
+    // Check if user has selected a lift type
+    const liftSelectionStr = localStorage.getItem("liftSelection");
+    
+    if (!liftSelectionStr) {
+      // No lift selection - show warning but don't redirect yet
+      console.warn("⚠️ No lift selection found in localStorage");
+      setLiftSelectionError("Nincs kiválasztott lift típus. Kérjük, válasszon egy típust.");
+      return;
+    }
+
+    try {
+      const liftSelection = JSON.parse(liftSelectionStr);
+      
+      // Validate required fields
+      if (!liftSelection.questionTemplateId) {
+        console.error("❌ Invalid lift selection - missing questionTemplateId");
+        setLiftSelectionError("Érvénytelen lift választás - hiányzó sablon azonosító.");
+        return;
+      }
+
+      console.log("✅ Lift selection loaded:", {
+        type: liftSelection.liftType,
+        subtype: liftSelection.liftSubtype,
+        questionTemplateId: liftSelection.questionTemplateId,
+        protocolTemplateId: liftSelection.protocolTemplateId,
+      });
+      
+      // Clear any previous error
+      setLiftSelectionError(null);
+      
+    } catch (error) {
+      console.error("❌ Error parsing lift selection:", error);
+      setLiftSelectionError("Hibás lift választás formátum.");
+    }
+  }, []);
 
   // Apply conditional filtering
   const { filteredQuestions, filteredCount } = useConditionalQuestionFilter(allQuestions, localAnswers);
@@ -105,30 +145,48 @@ function Questionnaire({
     }
   }, [filteredQuestions, allQuestions, localAnswers, onAnswerChange]);
 
-  // Load questions ONCE on mount
+  // 🔥 MÓDOSÍTOTT: Load questions with template ID support
   useEffect(() => {
     const loadQuestions = async () => {
       try {
         setQuestionsLoading(true);
-        const response = await fetch(`/api/questions/${language}`);
+        
+        // 🔥 ÚJ: Get template ID from lift selection
+        const liftSelectionStr = localStorage.getItem("liftSelection");
+        let templateId: string | null = null;
+        
+        if (liftSelectionStr) {
+          try {
+            const liftSelection = JSON.parse(liftSelectionStr);
+            templateId = liftSelection.questionTemplateId;
+            console.log('📦 Loading questions for template:', templateId);
+          } catch (error) {
+            console.error('❌ Error parsing lift selection:', error);
+          }
+        }
+        
+        // 🔥 MÓDOSÍTOTT: Build URL with optional templateId
+        const url = templateId 
+          ? `/api/questions/${language}?templateId=${templateId}`
+          : `/api/questions/${language}`;
+        
+        console.log('🔗 Fetching questions from:', url);
+        const response = await fetch(url);
         
         if (response.ok) {
           const questionsData = await response.json();
           console.log('✅ Questions loaded:', questionsData.length);
 
-          // === JAVÍTÁS: Nyelvi placeholder beállítása ===
+          // Nyelvi placeholder beállítása
           const langSuffix = language.toUpperCase(); // 'HU' vagy 'DE'
           const placeholderKey = `placeholder${langSuffix}`; // 'placeholderHU' vagy 'placeholderDE'
 
           const transformedQuestions = questionsData.map((q: any) => ({
             ...q,
-            // Felülírjuk/létrehozzuk a 'placeholder' kulcsot
-            // a megfelelő nyelvi verzióval (pl. q.placeholderHU)
             placeholder: q[placeholderKey] || q.placeholder || ''
           }));
 
           setAllQuestions(transformedQuestions);
-          // === JAVÍTÁS VÉGE ===
         } else {
           console.warn('⚠️ No active template found, using empty question list');
           setAllQuestions([]);
@@ -142,7 +200,7 @@ function Questionnaire({
     };
 
     loadQuestions();
-  }, [language]);
+  }, [language]); // 🔥 NEM függ a templateId-től, mert localStorage-ból olvassuk
 
   // Group questions and paginate
   const { questionGroups, totalPages, currentQuestions, currentGroup } = useMemo(() => {
@@ -293,10 +351,31 @@ function Questionnaire({
     onPageChange?.(Math.max(0, pageFromApp - 1));
   }, [pageFromApp, onPageChange]);
 
-  // ✅ JAVÍTOTT SZERKEZET: PageHeader KÍVÜL van
+  // 🔥 ÚJ: Lift selection info display
+  const LiftSelectionInfo = () => {
+    const liftSelectionStr = localStorage.getItem("liftSelection");
+    if (!liftSelectionStr) return null;
+    
+    try {
+      const liftSelection = JSON.parse(liftSelectionStr);
+      return (
+        <div className="mb-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2">
+          <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
+            <Sparkles className="h-4 w-4" />
+            {/* ITT VOLT A HIBA: Beégetett szöveg helyett t("...") */}
+            <span className="font-medium">{t("selectedLiftType")}</span>
+            <span>{liftSelection.liftType} - {liftSelection.liftSubtype}</span>
+          </div>
+        </div>
+      );
+    } catch {
+      return null;
+    }
+  };
+
   return (
     <div className="min-h-screen">
-      {/* ✅ PageHeader KÍVÜL (sticky működhet) */}
+      {/* PageHeader KÍVÜL (sticky működhet) */}
       <PageHeader
         onHome={onHome}
         onStartNew={onStartNew}
@@ -311,7 +390,7 @@ function Questionnaire({
         errors={errors}
       />
 
-      {/* ✅ Görgethető tartalom (overflow-hidden itt van, de NEM takarja a headert) */}
+      {/* Görgethető tartalom */}
       <div className={`min-h-screen relative overflow-hidden ${
         theme === 'modern'
           ? 'bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20'
@@ -327,6 +406,27 @@ function Questionnaire({
         )}
 
         <main className={`max-w-7xl mx-auto px-6 py-8 ${theme === 'modern' ? 'relative z-10' : ''}`}>
+          
+          {/* 🔥 ÚJ: Lift Selection Error Alert */}
+          {liftSelectionError && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                {liftSelectionError}
+                <Button 
+                  onClick={onHome} 
+                  variant="outline" 
+                  size="sm" 
+                  className="ml-4"
+                >
+                  Vissza a választáshoz
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* 🔥 ÚJ: Lift Selection Info */}
+          <LiftSelectionInfo />
           
           {/* Csoport fejléc */}
           {questionGroups.length > 0 && currentGroup && (
@@ -346,7 +446,7 @@ function Questionnaire({
                         </h2>
                         <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
                           <Sparkles className="h-3 w-3 text-cyan-500" />
-                          {currentGroup.questionCount} {t.questionsSuffix}
+                          {currentGroup.questionCount} {t("questionsSuffix")}
                         </p>
                       </div>
                     </div>
@@ -405,7 +505,7 @@ function Questionnaire({
                     questions={radioQuestions}
                     values={localAnswers}
                     onChange={handleLocalAnswerChange}
-                    groupName={currentGroup?.name || t.questions}
+                    groupName={currentGroup?.name || t("questions")}
                   />
                 );
               }
@@ -473,7 +573,7 @@ function Questionnaire({
               >
                 <div className="flex items-center justify-center gap-2">
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="font-semibold">{t.previous}</span>
+                  <span className="font-semibold">{t("previous")}</span>
                 </div>
               </button>
             ) : (
@@ -484,7 +584,7 @@ function Questionnaire({
                 className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t.previous}
+                {t("previous")}
               </Button>
             )}
 
@@ -515,22 +615,22 @@ function Questionnaire({
                     {saveStatus === 'saving' ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
-                        <span>{t.saving}</span>
+                        <span>{t("saving")}</span>
                       </>
                     ) : saveStatus === 'saved' ? (
                       <>
                         <Check className="h-5 w-5" />
-                        <span>{t.saved}</span>
+                        <span>{t("saved")}</span>
                       </>
                     ) : saveStatus === 'error' ? (
                       <>
                         <X className="h-5 w-5" />
-                        <span>{t.error}</span>
+                        <span>{t("error")}</span>
                       </>
                     ) : (
                       <>
                         <Save className="h-5 w-5" />
-                        <span>{t.save}</span>
+                        <span>{t("save")}</span>
                       </>
                     )}
                   </div>
@@ -549,22 +649,22 @@ function Questionnaire({
                   {saveStatus === 'saving' ? (
                     <>
                       <div className="animate-spin h-4 w-4 mr-2 border-2 border-gray-300 border-t-blue-600 rounded-full"></div>
-                      {t.saving}
+                      {t("saving")}
                     </>
                   ) : saveStatus === 'saved' ? (
                     <>
                       <Check className="h-4 w-4 mr-2 text-green-600" />
-                      {t.saved}
+                      {t("saved")}
                     </>
                   ) : saveStatus === 'error' ? (
                     <>
                       <X className="h-4 w-4 mr-2 text-red-600" />
-                      {t.error}
+                      {t("error")}
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4 mr-2" />
-                      {t.save}
+                      {t("save")}
                     </>
                   )}
                 </Button>
@@ -587,7 +687,7 @@ function Questionnaire({
                   )}
 
                   <div className="relative z-10 flex items-center gap-2 text-white">
-                    <span>{t.next}</span>
+                    <span>{t("next")}</span>
                     {canProceed ? (
                       <>
                         <Check className="h-5 w-5" />
@@ -612,7 +712,7 @@ function Questionnaire({
                         : 'bg-gray-400 text-white cursor-not-allowed'
                     }`}
                   >
-                    {t.next}
+                    {t("next")}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 ) : (
@@ -626,7 +726,7 @@ function Questionnaire({
                         : 'bg-gray-400 text-white cursor-not-allowed'
                     }`}
                   >
-                    {t.next} {canProceed ? '✓' : '✗'}
+                    {t("next")} {canProceed ? '✓' : '✗'}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </Button>
                 )

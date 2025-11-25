@@ -46,19 +46,19 @@ const QuestionBlockComponent = ({
             <div className="flex items-center space-x-3">
               <RadioGroupItem value="yes" id={`${question.id}-yes`} />
               <Label htmlFor={`${question.id}-yes`} className="cursor-pointer">
-                {t.yes}
+                {t("yes")}
               </Label>
             </div>
             <div className="flex items-center space-x-3">
               <RadioGroupItem value="no" id={`${question.id}-no`} />
               <Label htmlFor={`${question.id}-no`} className="cursor-pointer">
-                {t.no}
+                {t("no")}
               </Label>
             </div>
             <div className="flex items-center space-x-3">
               <RadioGroupItem value="na" id={`${question.id}-na`} />
               <Label htmlFor={`${question.id}-na`} className="cursor-pointer">
-                {t.notApplicable}
+                {t("notApplicable")}
               </Label>
             </div>
           </RadioGroup>

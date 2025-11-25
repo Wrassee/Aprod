@@ -26,11 +26,11 @@ export function QuestionGroupHeader({
             {groupName}
           </h2>
           <p className="text-sm text-blue-700 dark:text-blue-300">
-            {questionCount} {t.questionsInGroup}
+            {questionCount} {t("questionsInGroup")}
           </p>
         </div>
         <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
-          {currentGroupIndex + 1} / {totalGroups} {t.groupOf}
+          {currentGroupIndex + 1} / {totalGroups} {t("groupOf")}
         </div>
       </div>
     </div>

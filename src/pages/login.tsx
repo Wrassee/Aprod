@@ -36,8 +36,8 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
     
     if (!email || !password) {
       toast({
-        title: t.missingData,
-        description: t.pleaseProvideEmailAndPassword,
+        title: t("missingData"),
+        description: t("pleaseProvideEmailAndPassword"),
         variant: 'destructive',
       });
       return;
@@ -53,23 +53,23 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
       }
       
       toast({
-        title: t.loginSuccessful,
-        description: t.welcomeUser.replace('{email}', email),
+        title: t("loginSuccessful"),
+        description: t("welcomeUser").replace('{email}', email),
       });
       onLoginSuccess();
     } catch (error: any) {
       console.error('Login error:', error);
       
-      let errorMessage = error.message || t.genericLoginError;
+      let errorMessage = error.message || t("genericLoginError");
       
       if (error.message?.includes('Invalid login credentials')) {
-        errorMessage = t.invalidCredentials;
+        errorMessage = t("invalidCredentials");
       } else if (error.message?.includes('Email not confirmed')) {
-        errorMessage = t.emailNotConfirmed;
+        errorMessage = t("emailNotConfirmed");
       }
       
       toast({
-        title: t.loginError,
+        title: t("loginError"),
         description: errorMessage,
         variant: 'destructive',
       });
@@ -83,8 +83,8 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
     
     if (!email || !password) {
       toast({
-        title: t.missingData,
-        description: t.pleaseProvideEmailAndPassword,
+        title: t("missingData"),
+        description: t("pleaseProvideEmailAndPassword"),
         variant: 'destructive',
       });
       return;
@@ -92,8 +92,8 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
 
     if (password.length < 6) {
       toast({
-        title: t.weakPassword,
-        description: t.passwordMinLength,
+        title: t("weakPassword"),
+        description: t("passwordMinLength"),
         variant: 'destructive',
       });
       return;
@@ -106,8 +106,8 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
       
       if (!session) {
         toast({
-          title: t.emailConfirmationRequired,
-          description: t.checkEmailForConfirmation,
+          title: t("emailConfirmationRequired"),
+          description: t("checkEmailForConfirmation"),
         });
         setIsRegistering(false);
         setPassword('');
@@ -115,8 +115,8 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
       }
       
       toast({
-        title: t.registrationSuccessful,
-        description: t.loginSuccessfulAfterRegistration,
+        title: t("registrationSuccessful"),
+        description: t("loginSuccessfulAfterRegistration"),
       });
       
       onLoginSuccess();
@@ -125,21 +125,21 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
       
       if (error.message.includes('Email confirmation required')) {
         toast({
-          title: t.emailConfirmationRequired,
-          description: t.checkEmailForConfirmation,
+          title: t("emailConfirmationRequired"),
+          description: t("checkEmailForConfirmation"),
         });
         setIsRegistering(false);
         setPassword('');
       } else if (error.message.includes('User already registered')) {
         toast({
-          title: t.loginError,
-          description: t.userAlreadyExists,
+          title: t("loginError"),
+          description: t("userAlreadyExists"),
           variant: 'destructive',
         });
       } else {
         toast({
-          title: t.loginError,
-          description: error.message || t.genericLoginError,
+          title: t("loginError"),
+          description: error.message || t("genericLoginError"),
           variant: 'destructive',
         });
       }
@@ -176,11 +176,11 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
 
                 <div className="text-center space-y-2">
                   <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                    {isRegistering ? t.registerTitle : t.loginTitle}
+                    {isRegistering ? t("registerTitle") : t("loginTitle")}
                   </CardTitle>
                   <CardDescription className="text-base flex items-center justify-center gap-2">
                     <Sparkles className="h-4 w-4 text-cyan-500" />
-                    {isRegistering ? t.registerDescription : t.loginDescription}
+                    {isRegistering ? t("registerDescription") : t("loginDescription")}
                   </CardDescription>
                 </div>
               </CardHeader>
@@ -190,7 +190,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                   <div className="space-y-2">
                     <Label htmlFor="email" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <Mail className="h-4 w-4 text-blue-600" />
-                      {t.emailLabel}
+                      {t("emailLabel")}
                     </Label>
                     <div className="relative group">
                       <Input
@@ -211,7 +211,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                   <div className="space-y-2">
                     <Label htmlFor="password" className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
                       <Lock className="h-4 w-4 text-blue-600" />
-                      {t.passwordLabel}
+                      {t("passwordLabel")}
                     </Label>
                     <div className="relative group">
                       <Input
@@ -238,8 +238,8 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                         >
                           <HelpCircle className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
                           <span className="relative">
-                            Elfelejtette a jelszavát?
-                            <span className="absolute left-0 right-0 bottom-0 h-px bg-blue-600 dark:bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                             {t("forgotPassword")}
+                              <span className="absolute left-0 right-0 bottom-0 h-px bg-blue-600 dark:bg-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                           </span>
                         </button>
                       </div>
@@ -259,19 +259,19 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                       {loading ? (
                         <>
                           <Loader2 className="h-5 w-5 animate-spin" />
-                          <span>{t.loading}</span>
+                          <span>{t("loading")}</span>
                         </>
                       ) : (
                         <>
                           {isRegistering ? (
                             <>
                               <UserPlus className="h-5 w-5" />
-                              <span>{t.registerButton}</span>
+                              <span>{t("registerButton")}</span>
                             </>
                           ) : (
                             <>
                               <LogIn className="h-5 w-5" />
-                              <span>{t.loginButton}</span>
+                              <span>{t("loginButton")}</span>
                             </>
                           )}
                         </>
@@ -287,7 +287,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
                       <span className="bg-white dark:bg-gray-900 px-3 py-1 text-gray-500 font-medium rounded-full">
-                        vagy
+                        {t("or")}
                       </span>
                     </div>
                   </div>
@@ -299,7 +299,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                     data-testid="button-toggle-mode"
                     className="w-full h-12 rounded-xl border-2 border-blue-500 text-blue-600 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-all disabled:opacity-50"
                   >
-                    {isRegistering ? t.switchToLogin : t.switchToRegister}
+                    {isRegistering ? t("switchToLogin") : t("switchToRegister")}
                   </button>
                 </form>
               </CardContent>
@@ -332,10 +332,10 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
           </div>
           <div className="text-center">
             <CardTitle className="text-2xl font-bold">
-              {isRegistering ? t.registerTitle : t.loginTitle}
+              {isRegistering ? t("registerTitle") : t("loginTitle")}
             </CardTitle>
             <CardDescription>
-              {isRegistering ? t.registerDescription : t.loginDescription}
+              {isRegistering ? t("registerDescription") : t("loginDescription")}
             </CardDescription>
           </div>
         </CardHeader>
@@ -343,7 +343,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
         <CardContent>
           <form onSubmit={isRegistering ? handleRegister : handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">{t.emailLabel}</Label>
+              <Label htmlFor="email">{t("emailLabel")}</Label>
               <Input
                 id="email"
                 type="email"
@@ -357,7 +357,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">{t.passwordLabel}</Label>
+              <Label htmlFor="password">{t("passwordLabel")}</Label>
               <Input
                 id="password"
                 type="password"
@@ -379,8 +379,8 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                   >
                     <HelpCircle className="h-3.5 w-3.5" />
                     <span className="relative">
-                      Elfelejtette a jelszavát?
-                      <span className="absolute left-0 right-0 bottom-0 h-px bg-current scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                     {t("forgotPassword")}
+                    <span className="absolute left-0 right-0 bottom-0 h-px bg-current scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
                     </span>
                   </button>
                 </div>
@@ -396,19 +396,19 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {t.loading}
+                  {t("loading")}
                 </>
               ) : (
                 <>
                   {isRegistering ? (
                     <>
                       <UserPlus className="mr-2 h-4 w-4" />
-                      {t.registerButton}
+                      {t("registerButton")}
                     </>
                   ) : (
                     <>
                       <LogIn className="mr-2 h-4 w-4" />
-                      {t.loginButton}
+                      {t("loginButton")}
                     </>
                   )}
                 </>
@@ -420,7 +420,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">vagy</span>
+                <span className="bg-background px-2 text-muted-foreground">{t("or")}</span>
               </div>
             </div>
 
@@ -432,7 +432,7 @@ export function Login({ onLoginSuccess, onBackToHome, onNavigateToForgotPassword
               disabled={loading}
               data-testid="button-toggle-mode"
             >
-              {isRegistering ? t.switchToLogin : t.switchToRegister}
+              {isRegistering ? t("switchToLogin") : t("switchToRegister")}
             </Button>
           </form>
         </CardContent>

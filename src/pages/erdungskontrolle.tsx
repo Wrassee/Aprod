@@ -338,7 +338,9 @@ export function Erdungskontrolle({
               
               newErrors.push({
                 id: `grounding_${questionId}`,
-                title: language === 'hu' ? 'Földelési hiba' : 'Erdungsfehler',
+                // JAVÍTÁS: Hardcoded string helyett fordító kulcs használata
+                // RÉGI: title: language === 'hu' ? 'Földelési hiba' : 'Erdungsfehler',
+                title: t("groundingError") || (language === 'hu' ? 'Földelési hiba' : 'Erdungsfehler'), 
                 description: `${group.title}: ${questionText}`,
                 severity: 'medium' as const,
                 context: questionId,
@@ -356,7 +358,7 @@ export function Erdungskontrolle({
         };
       });
     },
-    [setFormData, groundingData, language, customRowTexts]
+    [setFormData, groundingData, language, customRowTexts, t] // 't' hozzáadva a függőségekhez
   );
 
   const totalQuestions = useMemo(() => {
@@ -473,10 +475,10 @@ export function Erdungskontrolle({
         errors={formData.errors || []}
       />
 
-      {/* ✅ Görgethető tartalom (overflow-hidden itt van, de NEM takarja a headert) */}
-      <div className={`min-h-screen relative overflow-hidden ${
-        theme === 'modern'
-          ? 'bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20'
+      {/* ✅ Görgethető tartalom - CSAK MODERN témánál van overflow-hidden */}
+      <div className={`min-h-screen relative ${
+        theme === 'modern' 
+          ? 'overflow-hidden bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20'
           : 'bg-gray-50'
       }`}>
         {/* Animated background - CSAK MODERN */}

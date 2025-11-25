@@ -1,4 +1,4 @@
-// src/components/audit-log-table.tsx - EVERYONE CAN ACCESS
+// src/components/audit-log-table.tsx - JAVÍTOTT FORDÍTÁSOK (DOT NOTATION)
 import React, { useState, useEffect } from 'react';
 import { useLanguageContext } from "@/components/language-context";
 import { useToast } from '@/hooks/use-toast';
@@ -48,7 +48,6 @@ interface AuditLogEntry {
 export function AuditLogTable() {
   const { t, language } = useLanguageContext();
   const { toast } = useToast();
-  // ✅ JAVÍTÁS: Csak supabase és initialized kell, NINCS role check
   const { supabase, initialized } = useAuth();
   const { theme } = useTheme();
   
@@ -56,21 +55,10 @@ export function AuditLogTable() {
   const [loading, setLoading] = useState(true);
   const [limit, setLimit] = useState(50);
 
-  // ✅ JAVÍTÁS: ELTÁVOLÍTVA a role !== 'admin' ellenőrzés
   useEffect(() => {
-    console.log('📜 AuditLog useEffect triggered');
-    console.log('📊 Initialized:', initialized);
-    console.log('📊 Supabase:', !!supabase);
-
-    // Várjuk meg, amíg az AuthContext betöltődik
-    if (!initialized) {
-      console.log('⏳ AuditLog: Waiting for AuthContext to initialize...');
-      return;
-    }
+    if (!initialized) return;
 
     if (supabase) {
-      // ✅ MINDENKI SZÁMÁRA ELÉRHETŐ - nincs role check
-      console.log('✅ User authenticated, fetching audit logs for all users...');
       fetchLogs();
     }
   }, [supabase, limit, initialized]);
@@ -104,8 +92,8 @@ export function AuditLogTable() {
     } catch (error: any) {
       console.error('❌ Error fetching audit logs:', error);
       toast({
-        title: t.error || 'Hiba',
-        description: error.message || 'A naplók betöltése sikertelen',
+        title: t("error"),
+        description: error.message,
         variant: 'destructive',
       });
     } finally {
@@ -129,6 +117,7 @@ export function AuditLogTable() {
     return 'text-gray-600';
   };
 
+  // Helper a specifikus log üzenetek fordítására
   const getActionLabel = (action: string) => {
     const translations: Record<string, { hu: string; de: string }> = {
       'user.create': { hu: 'Felhasználó létrehozva', de: 'Benutzer erstellt' },
@@ -169,7 +158,8 @@ export function AuditLogTable() {
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
-                {t.Admin?.AuditLog?.title || 'Tevékenység napló'}
+                {/* JAVÍTVA */}
+                {t("Admin.AuditLog.title")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -180,7 +170,8 @@ export function AuditLogTable() {
                 <Loader2 className="relative h-12 w-12 animate-spin text-purple-600" />
               </div>
               <p className="mt-4 text-gray-600">
-                {language === 'hu' ? 'Naplók betöltése...' : 'Loading logs...'}
+                {/* JAVÍTVA */}
+                {t("loading")}...
               </p>
             </div>
           </CardContent>
@@ -198,7 +189,8 @@ export function AuditLogTable() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Shield className="h-5 w-5 mr-2" />
-            {t.Admin?.AuditLog?.title || 'Tevékenység napló'}
+            {/* JAVÍTVA */}
+            {t("Admin.AuditLog.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -225,7 +217,8 @@ export function AuditLogTable() {
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
-                {t.Admin?.AuditLog?.title || 'Tevékenység napló'}
+                {/* JAVÍTVA */}
+                {t("Admin.AuditLog.title")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -236,13 +229,8 @@ export function AuditLogTable() {
                 <AlertCircle className="relative h-16 w-16 text-gray-400" />
               </div>
               <p className="text-lg font-medium text-gray-600">
-                {t.Admin?.AuditLog?.noLogs || 'Nincs még naplóbejegyzés.'}
-              </p>
-              {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
-              <p className="text-xs text-gray-400 mt-2">
-                {language === 'hu' 
-                  ? 'A rendszer tevékenységei itt fognak megjelenni.' 
-                  : 'System activities will appear here.'}
+                {/* JAVÍTVA */}
+                {t("Admin.AuditLog.noLogs")}
               </p>
             </div>
           </CardContent>
@@ -260,19 +248,15 @@ export function AuditLogTable() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Shield className="h-5 w-5 mr-2" />
-            {t.Admin?.AuditLog?.title || 'Tevékenység napló'}
+            {/* JAVÍTVA */}
+            {t("Admin.AuditLog.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <AlertCircle className="h-12 w-12 mb-4 text-gray-300" />
-            <p>{t.Admin?.AuditLog?.noLogs || 'Nincs még naplóbejegyzés.'}</p>
-            {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
-            <p className="text-xs text-gray-400 mt-2">
-              {language === 'hu' 
-                ? 'A rendszer tevékenységei itt fognak megjelenni.' 
-                : 'System activities will appear here.'}
-            </p>
+            {/* JAVÍTVA */}
+            <p>{t("Admin.AuditLog.noLogs")}</p>
           </div>
         </CardContent>
       </Card>
@@ -296,20 +280,22 @@ export function AuditLogTable() {
                     <Shield className="h-5 w-5 text-white" />
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
-                    {t.Admin?.AuditLog?.title || 'Tevékenység napló'}
+                    {/* JAVÍTVA */}
+                    {t("Admin.AuditLog.title")}
                   </span>
                   <Sparkles className="h-5 w-5 text-fuchsia-500 animate-pulse" />
                 </CardTitle>
                 <CardDescription className="flex items-center gap-2 text-base mt-2">
-                  {t.Admin?.AuditLog?.description || 'Összes adminisztrátori művelet nyomon követése'}
+                  {/* JAVÍTVA */}
+                  {t("Admin.AuditLog.description")}
                   {' • '}
                   <Badge className="bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white border-0 px-3 py-1">
-                    {logs.length} {t.Admin?.AuditLog?.entries || 'bejegyzés'}
+                    {/* JAVÍTVA */}
+                    {logs.length} {t("Admin.AuditLog.entries")}
                   </Badge>
                 </CardDescription>
               </div>
               
-              {/* Refresh Button */}
               <button
                 onClick={fetchLogs}
                 disabled={loading}
@@ -317,7 +303,8 @@ export function AuditLogTable() {
               >
                 <div className="flex items-center gap-2">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : 'group-hover:rotate-180'} transition-transform duration-500`} />
-                  <span className="font-semibold">{t.Admin?.AuditLog?.refresh || 'Frissítés'}</span>
+                  {/* JAVÍTVA */}
+                  <span className="font-semibold">{t("Admin.AuditLog.refresh")}</span>
                 </div>
                 
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
@@ -332,30 +319,36 @@ export function AuditLogTable() {
                   <TableHeader>
                     <TableRow className="bg-gradient-to-r from-purple-50 via-fuchsia-50 to-pink-50 dark:from-purple-950/20 dark:via-fuchsia-950/20 dark:to-pink-950/20">
                       <TableHead className="w-[50px] font-bold text-gray-700">
-                        {t.Admin?.AuditLog?.table?.status || 'Státusz'}
+                        {/* JAVÍTVA */}
+                        {t("Admin.AuditLog.table.status")}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4 text-purple-600" />
-                          {t.Admin?.AuditLog?.table?.action || 'Művelet'}
+                          {/* JAVÍTVA */}
+                          {t("Admin.AuditLog.table.action")}
                         </div>
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-purple-600" />
-                          {t.Admin?.AuditLog?.table?.user || 'Felhasználó'}
+                          {/* JAVÍTVA */}
+                          {t("Admin.AuditLog.table.user")}
                         </div>
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
-                        {t.Admin?.AuditLog?.table?.resource || 'Erőforrás'}
+                        {/* JAVÍTVA */}
+                        {t("Admin.AuditLog.table.resource")}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
-                        {t.Admin?.AuditLog?.table?.details || 'Részletek'}
+                        {/* JAVÍTVA */}
+                        {t("Admin.AuditLog.table.details")}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-purple-600" />
-                          {t.Admin?.AuditLog?.table?.time || 'Időpont'}
+                          {/* JAVÍTVA */}
+                          {t("Admin.AuditLog.table.time")}
                         </div>
                       </TableHead>
                     </TableRow>
@@ -489,14 +482,17 @@ export function AuditLogTable() {
           <div>
             <CardTitle className="flex items-center">
               <Shield className="h-5 w-5 mr-2" />
-              {t.Admin?.AuditLog?.title || 'Tevékenység napló'}
+              {/* JAVÍTVA */}
+              {t("Admin.AuditLog.title")}
             </CardTitle>
             <CardDescription className="mt-2">
-              {t.Admin?.AuditLog?.description || 'Összes adminisztrátori művelet nyomon követése'}
+              {/* JAVÍTVA */}
+              {t("Admin.AuditLog.description")}
               {' • '}
               <span className="font-semibold">{logs.length}</span>
               {' '}
-              {t.Admin?.AuditLog?.entries || 'bejegyzés'}
+              {/* JAVÍTVA */}
+              {t("Admin.AuditLog.entries")}
             </CardDescription>
           </div>
           <div className="flex items-center gap-2">
@@ -507,7 +503,8 @@ export function AuditLogTable() {
               disabled={loading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              {t.Admin?.AuditLog?.refresh || 'Frissítés'}
+              {/* JAVÍTVA */}
+              {t("Admin.AuditLog.refresh")}
             </Button>
           </div>
         </div>
@@ -518,12 +515,30 @@ export function AuditLogTable() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50px]">{t.Admin?.AuditLog?.table?.status || 'Státusz'}</TableHead>
-                  <TableHead>{t.Admin?.AuditLog?.table?.action || 'Művelet'}</TableHead>
-                  <TableHead>{t.Admin?.AuditLog?.table?.user || 'Felhasználó'}</TableHead>
-                  <TableHead>{t.Admin?.AuditLog?.table?.resource || 'Erőforrás'}</TableHead>
-                  <TableHead>{t.Admin?.AuditLog?.table?.details || 'Részletek'}</TableHead>
-                  <TableHead>{t.Admin?.AuditLog?.table?.time || 'Időpont'}</TableHead>
+                  <TableHead className="w-[50px]">
+                    {/* JAVÍTVA */}
+                    {t("Admin.AuditLog.table.status")}
+                  </TableHead>
+                  <TableHead>
+                    {/* JAVÍTVA */}
+                    {t("Admin.AuditLog.table.action")}
+                  </TableHead>
+                  <TableHead>
+                    {/* JAVÍTVA */}
+                    {t("Admin.AuditLog.table.user")}
+                  </TableHead>
+                  <TableHead>
+                    {/* JAVÍTVA */}
+                    {t("Admin.AuditLog.table.resource")}
+                  </TableHead>
+                  <TableHead>
+                    {/* JAVÍTVA */}
+                    {t("Admin.AuditLog.table.details")}
+                  </TableHead>
+                  <TableHead>
+                    {/* JAVÍTVA */}
+                    {t("Admin.AuditLog.table.time")}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

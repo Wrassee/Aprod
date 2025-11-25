@@ -1,4 +1,4 @@
-// src/components/system-settings.tsx - EVERYONE CAN ACCESS
+// src/components/system-settings.tsx - FIX: Dot notation for translations
 import React, { useState, useEffect } from 'react';
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
@@ -42,20 +42,17 @@ export function SystemSettings() {
   const { t, language } = useLanguageContext();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-  // ✅ JAVÍTÁS: Csak supabase és initialized kell, NINCS role check
   const { supabase, initialized } = useAuth();
   
   const [info, setInfo] = useState<SystemInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  // ✅ JAVÍTÁS: ELTÁVOLÍTVA a role !== 'admin' ellenőrzés
   useEffect(() => {
     console.log('ℹ️ SystemSettings useEffect triggered');
     console.log('📊 Initialized:', initialized);
     console.log('📊 Supabase:', !!supabase);
 
-    // Várjuk meg, amíg az AuthContext betöltődik
     if (!initialized) {
       console.log('⏳ SystemSettings: Waiting for AuthContext to initialize...');
       setLoading(false);
@@ -63,7 +60,6 @@ export function SystemSettings() {
     }
 
     if (supabase) {
-      // ✅ MINDENKI SZÁMÁRA ELÉRHETŐ - nincs role check
       console.log('✅ User authenticated, fetching system info for all users...');
       fetchInfo();
     }
@@ -93,8 +89,8 @@ export function SystemSettings() {
     } catch (error: any) {
       console.error('❌ Error loading system info:', error);
       toast({ 
-        title: t.error || 'Hiba', 
-        description: error.message || 'Nem sikerült betölteni a rendszerinformációkat', 
+        title: t("error"), 
+        description: error.message || 'Failed to load system info', 
         variant: 'destructive' 
       });
     } finally {
@@ -107,16 +103,16 @@ export function SystemSettings() {
     await fetchInfo();
     setRefreshing(false);
     toast({
-      title: t.success || 'Siker',
-      description: t.Admin?.Settings?.refreshed || 'Rendszerinformációk frissítve',
+      title: t("success"),
+      description: t("Admin.Settings.refreshed"),
     });
   };
 
   const handleThemeChange = (newTheme: 'modern' | 'classic') => {
     setTheme(newTheme);
     toast({
-      title: t.success || 'Siker',
-      description: `Felület téma váltva: ${newTheme === 'modern' ? 'Modern' : 'Klasszikus'}`,
+      title: t("success"),
+      description: `${t("theme_changed")}: ${newTheme === 'modern' ? 'Modern' : 'Classic'}`,
     });
   };
 
@@ -142,11 +138,11 @@ export function SystemSettings() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg">
                 <Settings className="h-5 w-5 text-white" />
               </div>
-              {t.Admin?.Settings?.title || 'Rendszerbeállítások'}
+              {t("Admin.Settings.title")}
               <Sparkles className="h-6 w-6 text-cyan-500 animate-pulse" />
             </h2>
             <p className="text-base text-gray-600 dark:text-gray-400 mt-2 ml-1">
-              {t.Admin?.Settings?.description || 'Szerver és adatbázis információk, biztonsági mentések, felület beállítások'}
+              {t("Admin.Settings.description")}
             </p>
           </div>
           
@@ -162,7 +158,7 @@ export function SystemSettings() {
                   ? 'animate-spin' 
                   : 'group-hover:rotate-180'
               } transition-transform duration-500`} />
-              <span className="font-semibold">{t.Admin?.Settings?.refresh || 'Frissítés'}</span>
+              <span className="font-semibold">{t("Admin.Settings.refresh")}</span>
             </div>
             
             <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
@@ -180,14 +176,12 @@ export function SystemSettings() {
                   <Palette className="h-6 w-6 text-white" />
                 </div>
                 <span className="bg-gradient-to-r from-purple-600 to-fuchsia-600 bg-clip-text text-transparent">
-                  {language === 'hu' ? 'Felület Téma' : 'UI Theme'}
+                  {t("ui_theme")}
                 </span>
                 <Sparkles className="h-5 w-5 text-pink-500 animate-pulse" />
               </CardTitle>
               <CardDescription className="text-base mt-2">
-                {language === 'hu' 
-                  ? 'Válaszd ki a kívánt felület témát'
-                  : 'Select your preferred UI theme'}
+                {t("select_ui_theme")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -222,23 +216,21 @@ export function SystemSettings() {
                     <h3 className={`text-xl font-bold mb-2 ${
                       theme === 'modern' ? 'text-white' : 'text-gray-900 dark:text-white'
                     }`}>
-                      {language === 'hu' ? 'Modern Téma' : 'Modern Theme'}
+                      {t("modern_theme")}
                     </h3>
                     
                     {/* Description */}
                     <p className={`text-sm mb-4 ${
                       theme === 'modern' ? 'text-white/90' : 'text-gray-600 dark:text-gray-400'
                     }`}>
-                      {language === 'hu' 
-                        ? 'Glassmorphism, gradientek, animációk'
-                        : 'Glassmorphism, gradients, animations'}
+                      {t("modern_theme_desc")}
                     </p>
                     
                     {/* Selected Badge */}
                     {theme === 'modern' && (
                       <div className="flex items-center justify-center gap-2 text-white font-semibold">
                         <CheckCircle className="h-5 w-5" />
-                        <span>{language === 'hu' ? 'Kiválasztva' : 'Selected'}</span>
+                        <span>{t("selected")}</span>
                       </div>
                     )}
                   </div>
@@ -274,23 +266,21 @@ export function SystemSettings() {
                     <h3 className={`text-xl font-bold mb-2 ${
                       theme === 'classic' ? 'text-white' : 'text-gray-900 dark:text-white'
                     }`}>
-                      {language === 'hu' ? 'Klasszikus Téma' : 'Classic Theme'}
+                      {t("classic_theme")}
                     </h3>
                     
                     {/* Description */}
                     <p className={`text-sm mb-4 ${
                       theme === 'classic' ? 'text-white/90' : 'text-gray-600 dark:text-gray-400'
                     }`}>
-                      {language === 'hu' 
-                        ? 'Tiszta, egyszerű, gyors'
-                        : 'Clean, simple, fast'}
+                      {t("classic_theme_desc")}
                     </p>
                     
                     {/* Selected Badge */}
                     {theme === 'classic' && (
                       <div className="flex items-center justify-center gap-2 text-white font-semibold">
                         <CheckCircle className="h-5 w-5" />
-                        <span>{language === 'hu' ? 'Kiválasztva' : 'Selected'}</span>
+                        <span>{t("selected")}</span>
                       </div>
                     )}
                   </div>
@@ -311,12 +301,12 @@ export function SystemSettings() {
                   <Server className="h-6 w-6 text-white" />
                 </div>
                 <span className="bg-gradient-to-r from-blue-600 to-sky-600 bg-clip-text text-transparent">
-                  {t.Admin?.Settings?.systemInfo || 'Rendszerinformáció'}
+                  {t("Admin.Settings.systemInfo")}
                 </span>
                 <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
               </CardTitle>
               <CardDescription className="text-base mt-2">
-                {t.Admin?.Settings?.systemInfoDesc || 'A szerver és az adatbázis technikai adatai'}
+                {t("Admin.Settings.systemInfoDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -327,7 +317,7 @@ export function SystemSettings() {
                     <Loader2 className="relative h-16 w-16 animate-spin text-blue-600" />
                   </div>
                   <p className="mt-6 text-lg font-medium text-gray-600">
-                    {language === 'hu' ? 'Adatok betöltése...' : 'Loading data...'}
+                    {t("loading")}
                   </p>
                 </div>
               ) : info ? (
@@ -340,7 +330,7 @@ export function SystemSettings() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          {t.Admin?.Settings?.environment || 'Környezet'}
+                          {t("Admin.Settings.environment")}
                         </p>
                         <Badge className={`${getEnvironmentBadgeColor(info.environment)} text-white border-0 px-3 py-1 text-sm shadow-md`}>
                           {info.environment}
@@ -357,7 +347,7 @@ export function SystemSettings() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          {t.Admin?.Settings?.platform || 'Platform'}
+                          {t("Admin.Settings.platform")}
                         </p>
                         <p className="font-bold text-lg text-gray-900 dark:text-white">{info.platform}</p>
                       </div>
@@ -372,7 +362,7 @@ export function SystemSettings() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          {t.Admin?.Settings?.nodeVersion || 'Node.js verzió'}
+                          {t("Admin.Settings.nodeVersion")}
                         </p>
                         <p className="font-mono text-base font-bold text-gray-900 dark:text-white">
                           {info.nodeVersion}
@@ -389,7 +379,7 @@ export function SystemSettings() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          {t.Admin?.Settings?.databaseSize || 'Adatbázis mérete'}
+                          {t("Admin.Settings.databaseSize")}
                         </p>
                         <p className="font-bold text-lg text-gray-900 dark:text-white">{info.databaseSize}</p>
                       </div>
@@ -404,7 +394,7 @@ export function SystemSettings() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          {t.Admin?.Settings?.uptime || 'Futási idő'}
+                          {t("Admin.Settings.uptime")}
                         </p>
                         <p className="font-bold text-lg text-gray-900 dark:text-white">{info.uptime}</p>
                       </div>
@@ -419,7 +409,7 @@ export function SystemSettings() {
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
-                          {t.Admin?.Settings?.memoryUsage || 'Memória használat'}
+                          {t("Admin.Settings.memoryUsage")}
                         </p>
                         <p className="font-mono text-base font-bold text-gray-900 dark:text-white">
                           {info.memoryUsage.used} / {info.memoryUsage.total}
@@ -435,13 +425,10 @@ export function SystemSettings() {
                     <AlertCircle className="relative h-16 w-16 text-red-500" />
                   </div>
                   <p className="text-lg font-semibold text-red-600">
-                    {t.Admin?.Settings?.loadError || 'Nem sikerült betölteni az adatokat'}
+                    {t("Admin.Settings.loadError")}
                   </p>
-                  {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
                   <p className="text-xs text-gray-400 mt-2">
-                    {language === 'hu' 
-                      ? 'Próbáld meg frissíteni a Frissítés gombbal' 
-                      : 'Try refreshing with the Refresh button'}
+                    {t("try_refresh_button")}
                   </p>
                 </div>
               )}
@@ -460,11 +447,11 @@ export function SystemSettings() {
                   <HardDrive className="h-6 w-6 text-white" />
                 </div>
                 <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                  {t.Admin?.Settings?.backupTitle || 'Biztonsági mentés és visszaállítás'}
+                  {t("Admin.Settings.backupTitle")}
                 </span>
               </CardTitle>
               <CardDescription className="text-base mt-2">
-                {t.Admin?.Settings?.backupDesc || 'Adatbázis mentése és korábbi állapotok visszaállítása'}
+                {t("Admin.Settings.backupDesc")}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -475,7 +462,7 @@ export function SystemSettings() {
                 >
                   <div className="flex items-center gap-2">
                     <Download className="h-5 w-5" />
-                    <span className="font-semibold">{t.Admin?.Settings?.createBackup || 'Mentés készítése'}</span>
+                    <span className="font-semibold">{t("Admin.Settings.createBackup")}</span>
                   </div>
                 </button>
                 
@@ -485,7 +472,7 @@ export function SystemSettings() {
                 >
                   <div className="flex items-center gap-2">
                     <Upload className="h-5 w-5" />
-                    <span className="font-semibold">{t.Admin?.Settings?.restoreBackup || 'Mentés visszaállítása'}</span>
+                    <span className="font-semibold">{t("Admin.Settings.restoreBackup")}</span>
                   </div>
                 </button>
               </div>
@@ -495,12 +482,10 @@ export function SystemSettings() {
                   <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold text-amber-900 dark:text-amber-100 text-sm">
-                      {t.Admin?.Settings?.comingSoon || 'Hamarosan elérhető funkció'}
+                      {t("Admin.Settings.comingSoon")}
                     </p>
                     <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                      {language === 'hu' 
-                        ? 'A biztonsági mentés funkciók jelenleg fejlesztés alatt állnak.'
-                        : 'Backup features are currently under development.'}
+                      {t("backup_under_development")}
                     </p>
                   </div>
                 </div>
@@ -522,10 +507,10 @@ export function SystemSettings() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Settings className="h-6 w-6 text-blue-600" />
-            {t.Admin?.Settings?.title || 'Rendszerbeállítások'}
+            {t("Admin.Settings.title")}
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            {t.Admin?.Settings?.description || 'Szerver és adatbázis információk, biztonsági mentések, felület beállítások'}
+            {t("Admin.Settings.description")}
           </p>
         </div>
         
@@ -536,7 +521,7 @@ export function SystemSettings() {
           variant="outline"
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-          {t.Admin?.Settings?.refresh || 'Frissítés'}
+          {t("Admin.Settings.refresh")}
         </Button>
       </div>
 
@@ -545,12 +530,10 @@ export function SystemSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5 text-purple-600" />
-            {language === 'hu' ? 'Felület Téma' : 'UI Theme'}
+            {t("ui_theme")}
           </CardTitle>
           <CardDescription>
-            {language === 'hu' 
-              ? 'Válaszd ki a kívánt felület témát'
-              : 'Select your preferred UI theme'}
+            {t("select_ui_theme")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -577,17 +560,15 @@ export function SystemSettings() {
                 <h3 className={`text-lg font-bold mb-2 ${
                   theme === 'modern' ? 'text-purple-900' : 'text-gray-900'
                 }`}>
-                  {language === 'hu' ? 'Modern Téma' : 'Modern Theme'}
+                  {t("modern_theme")}
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  {language === 'hu' 
-                    ? 'Glassmorphism, gradientek, animációk'
-                    : 'Glassmorphism, gradients, animations'}
+                  {t("modern_theme_desc")}
                 </p>
                 {theme === 'modern' && (
                   <Badge className="bg-purple-600 text-white">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    {language === 'hu' ? 'Kiválasztva' : 'Selected'}
+                    {t("selected")}
                   </Badge>
                 )}
               </div>
@@ -615,17 +596,15 @@ export function SystemSettings() {
                 <h3 className={`text-lg font-bold mb-2 ${
                   theme === 'classic' ? 'text-gray-900' : 'text-gray-900'
                 }`}>
-                  {language === 'hu' ? 'Klasszikus Téma' : 'Classic Theme'}
+                  {t("classic_theme")}
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  {language === 'hu' 
-                    ? 'Tiszta, egyszerű, gyors'
-                    : 'Clean, simple, fast'}
+                  {t("classic_theme_desc")}
                 </p>
                 {theme === 'classic' && (
                   <Badge className="bg-gray-700 text-white">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    {language === 'hu' ? 'Kiválasztva' : 'Selected'}
+                    {t("selected")}
                   </Badge>
                 )}
               </div>
@@ -639,10 +618,10 @@ export function SystemSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Server className="h-5 w-5 text-blue-600" />
-            {t.Admin?.Settings?.systemInfo || 'Rendszerinformáció'}
+            {t("Admin.Settings.systemInfo")}
           </CardTitle>
           <CardDescription>
-            {t.Admin?.Settings?.systemInfoDesc || 'A szerver és az adatbázis technikai adatai'}
+            {t("Admin.Settings.systemInfoDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -650,7 +629,7 @@ export function SystemSettings() {
             <div className="flex flex-col justify-center items-center py-12">
               <Loader2 className="h-12 w-12 animate-spin text-blue-600 mb-4" />
               <p className="text-gray-600">
-                {language === 'hu' ? 'Adatok betöltése...' : 'Loading data...'}
+                {t("loading")}
               </p>
             </div>
           ) : info ? (
@@ -663,7 +642,7 @@ export function SystemSettings() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-500 mb-1">
-                      {t.Admin?.Settings?.environment || 'Környezet'}
+                      {t("Admin.Settings.environment")}
                     </p>
                     <Badge variant={info.environment === 'production' ? 'default' : 'secondary'}>
                       {info.environment}
@@ -680,7 +659,7 @@ export function SystemSettings() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-500 mb-1">
-                      {t.Admin?.Settings?.platform || 'Platform'}
+                      {t("Admin.Settings.platform")}
                     </p>
                     <p className="font-semibold text-gray-900">{info.platform}</p>
                   </div>
@@ -695,7 +674,7 @@ export function SystemSettings() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-500 mb-1">
-                      {t.Admin?.Settings?.nodeVersion || 'Node.js verzió'}
+                      {t("Admin.Settings.nodeVersion")}
                     </p>
                     <p className="font-mono text-sm font-semibold text-gray-900">
                       {info.nodeVersion}
@@ -712,7 +691,7 @@ export function SystemSettings() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-500 mb-1">
-                      {t.Admin?.Settings?.databaseSize || 'Adatbázis mérete'}
+                      {t("Admin.Settings.databaseSize")}
                     </p>
                     <p className="font-semibold text-gray-900">{info.databaseSize}</p>
                   </div>
@@ -727,7 +706,7 @@ export function SystemSettings() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-500 mb-1">
-                      {t.Admin?.Settings?.uptime || 'Futási idő'}
+                      {t("Admin.Settings.uptime")}
                     </p>
                     <p className="font-semibold text-gray-900">{info.uptime}</p>
                   </div>
@@ -742,7 +721,7 @@ export function SystemSettings() {
                   </div>
                   <div className="flex-1">
                     <p className="text-xs font-medium text-gray-500 mb-1">
-                      {t.Admin?.Settings?.memoryUsage || 'Memória használat'}
+                      {t("Admin.Settings.memoryUsage")}
                     </p>
                     <p className="font-mono text-sm font-semibold text-gray-900">
                       {info.memoryUsage.used} / {info.memoryUsage.total}
@@ -755,13 +734,10 @@ export function SystemSettings() {
             <div className="flex flex-col items-center justify-center py-12">
               <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
               <p className="text-red-600 font-medium">
-                {t.Admin?.Settings?.loadError || 'Nem sikerült betölteni az adatokat'}
+                {t("Admin.Settings.loadError")}
               </p>
-              {/* ✅ JAVÍTÁS: Eltávolítva a role warning */}
               <p className="text-xs text-gray-400 mt-2">
-                {language === 'hu' 
-                  ? 'Próbáld meg frissíteni a Frissítés gombbal' 
-                  : 'Try refreshing with the Refresh button'}
+                {t("try_refresh_button")}
               </p>
             </div>
           )}
@@ -773,22 +749,22 @@ export function SystemSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HardDrive className="h-5 w-5 text-amber-600" />
-            {t.Admin?.Settings?.backupTitle || 'Biztonsági mentés és visszaállítás'}
+            {t("Admin.Settings.backupTitle")}
           </CardTitle>
           <CardDescription>
-            {t.Admin?.Settings?.backupDesc || 'Adatbázis mentése és korábbi állapotok visszaállítása'}
+            {t("Admin.Settings.backupDesc")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
             <Button disabled variant="outline" className="opacity-50">
               <Download className="h-4 w-4 mr-2" />
-              {t.Admin?.Settings?.createBackup || 'Mentés készítése'}
+              {t("Admin.Settings.createBackup")}
             </Button>
             
             <Button disabled variant="outline" className="opacity-50">
               <Upload className="h-4 w-4 mr-2" />
-              {t.Admin?.Settings?.restoreBackup || 'Mentés visszaállítása'}
+              {t("Admin.Settings.restoreBackup")}
             </Button>
           </div>
           
@@ -797,12 +773,10 @@ export function SystemSettings() {
               <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-amber-900 text-sm">
-                  {t.Admin?.Settings?.comingSoon || 'Hamarosan elérhető funkció'}
+                  {t("Admin.Settings.comingSoon")}
                 </p>
                 <p className="text-xs text-amber-700 mt-1">
-                  {language === 'hu' 
-                    ? 'A biztonsági mentés funkciók jelenleg fejlesztés alatt állnak.'
-                    : 'Backup features are currently under development.'}
+                  {t("backup_under_development")}
                 </p>
               </div>
             </div>

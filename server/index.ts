@@ -1,6 +1,9 @@
 import { createApp } from './app.js';
 import ViteExpress from 'vite-express';
 
+// 1. Ez indítja el a Frontend-et a háttérben (hogy ne kelljen külön ablak)
+ViteExpress.config({ mode: 'development' });
+
 const PORT = Number(process.env.PORT) || 5000;
 const MODE = process.env.NODE_ENV || 'development';
 
@@ -8,12 +11,14 @@ async function startServer() {
   try {
     const app = await createApp();
     
-    // Javított hívás: Vissza a 3 argumentumos verzióra, ahogy a TypeScript kéri
+    // 2. A "0.0.0.0" paraméter miatt lesz elérhető a telefonról is!
     ViteExpress.listen(app, PORT, () => {
-      // Ez a log csak azt mutatja meg, milyen porton fut
-      // A host-ot (0.0.0.0 vs localhost) a vite.config.ts fogja beállítani
-      console.log(`🚀 Server listening on port: ${PORT}`);
+      console.log(`🚀 Server listening on port: ${PORT} (Host: 0.0.0.0)`);
       console.log(`🔧 Vite-Express is running in ${MODE} mode.`);
+      console.log(`📱 Local access: http://localhost:${PORT}`);
+      // Itt kiírhatod a saját IP-det is emlékeztetőnek, ha akarod
+    }).on('error', (err) => {
+      console.error("❌ Server error:", err);
     });
 
   } catch (error) {

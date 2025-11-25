@@ -258,17 +258,17 @@ export function NiedervoltMeasurements({
                     {saveStatus === 'saving' ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
-                        <span>{t.saving}</span>
+                        <span>{t("saving")}</span>
                       </>
                     ) : saveStatus === 'saved' ? (
                       <>
                         <Check className="h-5 w-5" />
-                        <span>{t.saved}</span>
+                        <span>{t("saved")}</span>
                       </>
                     ) : (
                       <>
                         <Save className="h-5 w-5" />
-                        <span>{t.save}</span>
+                        <span>{t("save")}</span>
                       </>
                     )}
                   </div>
@@ -468,7 +468,7 @@ export function NiedervoltMeasurements({
                 >
                   <div className="flex items-center justify-center gap-2">
                     <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                    <span className="font-semibold">{t.previous}</span>
+                    <span className="font-semibold">{t("previous")}</span>
                   </div>
                 </button>
                 <button
@@ -478,7 +478,7 @@ export function NiedervoltMeasurements({
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
                   <div className="relative flex items-center gap-2">
-                    <span>{t.next}</span>
+                    <span>{t("next")}</span>
                     <span className="transition-transform group-hover:translate-x-1">→</span>
                   </div>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>

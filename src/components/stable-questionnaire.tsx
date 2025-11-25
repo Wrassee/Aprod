@@ -150,12 +150,12 @@ export function StableQuestionnaire({
                   <Home className="h-4 w-4" />
                 </Button>
               )}
-              <span className="text-lg font-medium text-gray-800">{t.title}</span>
+              <span className="text-lg font-medium text-gray-800">{t("title")}</span>
             </div>
             
             {/* Date Picker and Admin */}
             <div className="flex items-center space-x-4">
-              <Label className="text-sm font-medium text-gray-600">{t.receptionDate}</Label>
+              <Label className="text-sm font-medium text-gray-600">{t("receptionDate")}</Label>
               <Input
                 type="date"
                 value={receptionDate}
@@ -183,7 +183,7 @@ export function StableQuestionnaire({
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm font-medium text-gray-600">
-              {t.progress}: {currentPage + 1} / {totalPages}
+              {t("progress")}: {currentPage + 1} / {totalPages}
             </span>
             <span className="text-sm text-gray-500">
               {Math.round(((currentPage + 1) / totalPages) * 100)}%
@@ -232,7 +232,7 @@ export function StableQuestionnaire({
                           className="w-4 h-4"
                         />
                         <span className="text-sm text-gray-700">
-                          {option === 'yes' ? t.yes : option === 'no' ? t.no : t.notApplicable}
+                          {option === 'yes' ? t("yes") : option === 'no' ? t("no") : t("notApplicable")}
                         </span>
                       </label>
                     ))}
@@ -287,7 +287,7 @@ export function StableQuestionnaire({
             className="flex items-center space-x-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>{t.previous}</span>
+            <span>{t("previous")}</span>
           </Button>
 
           <div className="flex space-x-4">
@@ -297,7 +297,7 @@ export function StableQuestionnaire({
               className="flex items-center space-x-2"
             >
               <Save className="h-4 w-4" />
-              <span>{t.save}</span>
+              <span>{t("save")}</span>
             </Button>
 
             {isLastPage ? (
@@ -306,7 +306,7 @@ export function StableQuestionnaire({
                 disabled={!canProceed()}
                 className="bg-otis-blue hover:bg-otis-blue/90"
               >
-                {t.complete}
+                {t("complete")}
               </Button>
             ) : (
               <Button
@@ -314,7 +314,7 @@ export function StableQuestionnaire({
                 disabled={!canProceed()}
                 className="flex items-center space-x-2 bg-otis-blue hover:bg-otis-blue/90"
               >
-                <span>{t.next}</span>
+                <span>{t("next")}</span>
                 <ArrowRight className="h-4 w-4" />
               </Button>
             )}

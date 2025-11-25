@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Otis Aprod</string>
+    <string name="title_activity_main">Otis Aprod</string>
+    <string name="package_name">com.wrasse.otisaprod</string>
+    <string name="custom_url_scheme">com.wrasse.otisaprod</string>
+</resources>

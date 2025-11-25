@@ -1,4 +1,4 @@
-// shared/schema.ts - FRISSÍTETT VERZIÓ (Audit Logs-szal)
+// shared/schema.ts - FRISSÍTETT VERZIÓ (Lift Types + Audit Logs)
 
 import { relations, sql } from "drizzle-orm";
 import {
@@ -72,6 +72,76 @@ export const templates = pgTable("templates", {
 export const insertTemplateSchema = createInsertSchema(templates);
 export type Template = typeof templates.$inferSelect;
 export type InsertTemplate = typeof templates.$inferInsert;
+
+/* -------------------------------------------------------------------------
+ * LIFT TYPE SELECTION SYSTEM (ÚJ TÁBLÁK - 2024-11-11)
+ * ----------------------------------------------------------------------- */
+
+// LIFT_TYPES - Fő lift kategóriák (MOD, BEX, NEU, EGYEDI)
+export const liftTypes = pgTable("lift_types", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  code: text("code").notNull().unique(),
+  name_hu: text("name_hu").notNull(),
+  name_de: text("name_de"),
+  description_hu: text("description_hu"),
+  description_de: text("description_de"),
+  sort_order: integer("sort_order").default(0),
+  is_active: boolean("is_active").default(true).notNull(),
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updated_at: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertLiftTypeSchema = createInsertSchema(liftTypes);
+export type LiftType = typeof liftTypes.$inferSelect;
+export type InsertLiftType = typeof liftTypes.$inferInsert;
+
+// LIFT_SUBTYPES - Alkategóriák (pl. MOD_DR, BEX_GEN2)
+export const liftSubtypes = pgTable("lift_subtypes", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  lift_type_id: uuid("lift_type_id")
+    .notNull()
+    .references(() => liftTypes.id, { onDelete: "cascade" }),
+  code: text("code").notNull(),
+  name_hu: text("name_hu").notNull(),
+  name_de: text("name_de"),
+  description_hu: text("description_hu"),
+  description_de: text("description_de"),
+  sort_order: integer("sort_order").default(0),
+  is_active: boolean("is_active").default(true).notNull(),
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updated_at: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+});
+
+export const insertLiftSubtypeSchema = createInsertSchema(liftSubtypes);
+export type LiftSubtype = typeof liftSubtypes.$inferSelect;
+export type InsertLiftSubtype = typeof liftSubtypes.$inferInsert;
+
+// LIFT_TEMPLATE_MAPPINGS - Altípus → Template párosítás
+export const liftTemplateMappings = pgTable("lift_template_mappings", {
+  id: uuid("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  lift_subtype_id: uuid("lift_subtype_id")
+    .notNull()
+    .references(() => liftSubtypes.id, { onDelete: "cascade" }),
+  question_template_id: uuid("question_template_id")
+    .references(() => templates.id, { onDelete: "set null" }),
+  protocol_template_id: uuid("protocol_template_id")
+    .references(() => templates.id, { onDelete: "set null" }),
+  is_active: boolean("is_active").default(true).notNull(),
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  updated_at: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  created_by: text("created_by"),
+  notes: text("notes"),
+});
+
+export const insertLiftTemplateMappingSchema = createInsertSchema(liftTemplateMappings);
+export type LiftTemplateMapping = typeof liftTemplateMappings.$inferSelect;
+export type InsertLiftTemplateMapping = typeof liftTemplateMappings.$inferInsert;
 
 /* -------------------------------------------------------------------------
  * Question configurations – single source of truth for questions
@@ -156,7 +226,7 @@ export type Profile = typeof profiles.$inferSelect;
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 
 /* -------------------------------------------------------------------------
- * Audit Logs - Activity tracking for admin operations (ÚJ TÁBLA)
+ * Audit Logs - Activity tracking for admin operations
  * ----------------------------------------------------------------------- */
 export const AuditActionEnum = z.enum([
   // User management
@@ -178,6 +248,18 @@ export const AuditActionEnum = z.enum([
   "protocol.delete",
   "protocol.complete",
   
+  // Lift type management (ÚJ)
+  "lift_type.create",
+  "lift_type.update",
+  "lift_type.delete",
+  "lift_subtype.create",
+  "lift_subtype.update",
+  "lift_subtype.delete",
+  "lift_mapping.create",
+  "lift_mapping.update",
+  "lift_mapping.activate",
+  "lift_mapping.deactivate",
+  
   // System
   "admin.login",
   "admin.logout",
@@ -196,18 +278,18 @@ export const audit_logs = pgTable("audit_logs", {
   user_email: text("user_email"),
   
   // Mit csinált
-  action: text("action").notNull(), // pl. "template.upload", "user.delete"
-  resource_type: text("resource_type"), // pl. "template", "user", "protocol"
-  resource_id: text("resource_id"), // Az érintett erőforrás ID-ja
+  action: text("action").notNull(),
+  resource_type: text("resource_type"),
+  resource_id: text("resource_id"),
   
   // Részletek
-  details: jsonb("details"), // További kontextuális információk
-  ip_address: text("ip_address"), // Kliens IP címe
-  user_agent: text("user_agent"), // Browser információ
+  details: jsonb("details"),
+  ip_address: text("ip_address"),
+  user_agent: text("user_agent"),
   
   // Eredmény
-  status: text("status").notNull().default("success"), // "success" | "failure"
-  error_message: text("error_message"), // Ha status="failure"
+  status: text("status").notNull().default("success"),
+  error_message: text("error_message"),
   
   // Időbélyeg
   created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
@@ -263,6 +345,12 @@ export type Question = QuestionConfig & {
  * ----------------------------------------------------------------------- */
 export const templatesRelations = relations(templates, ({ many }) => ({
   questionConfigs: many(questionConfigs),
+  questionMappings: many(liftTemplateMappings, { 
+    relationName: "questionTemplate" 
+  }),
+  protocolMappings: many(liftTemplateMappings, { 
+    relationName: "protocolTemplate" 
+  }),
 }));
 
 export const questionConfigsRelations = relations(
@@ -275,7 +363,37 @@ export const questionConfigsRelations = relations(
   }),
 );
 
-// --- ÚJ RELÁCIÓK AZ AUDIT LOGS-HOZ ---
+// LIFT TYPE RELATIONS (ÚJ)
+export const liftTypesRelations = relations(liftTypes, ({ many }) => ({
+  subtypes: many(liftSubtypes),
+}));
+
+export const liftSubtypesRelations = relations(liftSubtypes, ({ one, many }) => ({
+  liftType: one(liftTypes, {
+    fields: [liftSubtypes.lift_type_id],
+    references: [liftTypes.id],
+  }),
+  mappings: many(liftTemplateMappings),
+}));
+
+export const liftTemplateMappingsRelations = relations(liftTemplateMappings, ({ one }) => ({
+  subtype: one(liftSubtypes, {
+    fields: [liftTemplateMappings.lift_subtype_id],
+    references: [liftSubtypes.id],
+  }),
+  questionTemplate: one(templates, {
+    fields: [liftTemplateMappings.question_template_id],
+    references: [templates.id],
+    relationName: "questionTemplate",
+  }),
+  protocolTemplate: one(templates, {
+    fields: [liftTemplateMappings.protocol_template_id],
+    references: [templates.id],
+    relationName: "protocolTemplate",
+  }),
+}));
+
+// AUDIT LOGS RELATIONS
 export const auditLogsRelations = relations(audit_logs, ({ one }) => ({
   user: one(profiles, {
     fields: [audit_logs.user_id],

@@ -114,7 +114,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-sky-500 flex items-center justify-center shadow-lg">
                     <Ruler className="h-5 w-5 text-white" />
                   </div>
-                  {t.measurementData}
+                  {t("measurementData")}
                   <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
                 </h3>
               </div>
@@ -202,7 +202,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
                     <Calculator className="h-5 w-5 text-white" />
                   </div>
-                  {t.calculatedValues}
+                  {t("calculatedValues")}
                   <Sparkles className="h-5 w-5 text-teal-500 animate-pulse" />
                 </h3>
               </div>
@@ -246,7 +246,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                           {isOutOfBounds && (
                             <p className="text-sm text-red-600 dark:text-red-400 font-semibold mt-1 flex items-center gap-1">
                               <AlertTriangle className="h-4 w-4" />
-                              {t.outOfRange || 'Határértéken kívül'}
+                              {t("outOfRange") || 'Határértéken kívül'}
                             </p>
                           )}
                         </div>
@@ -297,7 +297,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                                 setTimeout(() => document.body.removeChild(toast), 2000);
                               }}
                               className="group relative p-3 rounded-xl bg-red-100 hover:bg-red-200 dark:bg-red-950/50 dark:hover:bg-red-900/50 transition-all"
-                              title={t.errorRecordingRequired}
+                              title={t("errorRecordingRequired")}
                             >
                               <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform" />
                             </button>
@@ -325,7 +325,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Ruler className="h-5 w-5 text-blue-600" />
-              {t.measurementData}
+              {t("measurementData")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -388,7 +388,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
 
             <div className="pt-4 border-t border-gray-200">
               <div className="text-center text-sm text-gray-600">
-                {t.calculatedValuesValidated}
+                {t("calculatedValuesValidated")}
               </div>
             </div>
           </CardContent>
@@ -400,7 +400,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calculator className="h-5 w-5 text-green-600" />
-              {t.calculatedValues}
+              {t("calculatedValues")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -429,7 +429,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                       )}
                       {isOutOfBounds && (
                         <p className="text-sm text-red-500 font-medium mt-1">
-                          ⚠️ {t.outOfRange || 'Határértéken kívül'}
+                          ⚠️ {t("outOfRange") || 'Határértéken kívül'}
                         </p>
                       )}
                     </div>
@@ -482,7 +482,7 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                             <AlertTriangle className="h-6 w-6" />
                           </button>
                           <p className="text-xs text-red-600 font-medium mt-1">
-                            {t.errorRecordingRequired}
+                            {t("errorRecordingRequired")}
                           </p>
                         </div>
                       )}

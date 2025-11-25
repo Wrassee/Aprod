@@ -1,4 +1,4 @@
-// shared/schema-sqlite.ts - VÉGLEGES VERZIÓ (user_id és audit_logs hozzáadva)
+// shared/schema-sqlite.ts - VÉGLEGES VERZIÓ (Lift Types hozzáadva)
 
 import { relations, sql } from 'drizzle-orm';
 import {
@@ -89,6 +89,70 @@ export type Template = typeof templates.$inferSelect;
 export type InsertTemplate = typeof templates.$inferInsert;
 
 /* -------------------------------------------------------------------------
+ * LIFT TYPE SELECTION SYSTEM (ÚJ TÁBLÁK - 2024-11-14) - SQLite
+ * ----------------------------------------------------------------------- */
+
+// LIFT_TYPES - Fő lift kategóriák (MOD, BEX, NEU, EGYEDI)
+export const liftTypes = sqliteTable("lift_types", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  code: text("code").notNull().unique(),
+  name_hu: text("name_hu").notNull(),
+  name_de: text("name_de"),
+  description_hu: text("description_hu"),
+  description_de: text("description_de"),
+  sort_order: integer("sort_order").default(0),
+  is_active: integer("is_active", { mode: "boolean" }).default(true).notNull(),
+  created_at: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`).notNull(),
+  updated_at: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`).notNull(),
+});
+
+export const insertLiftTypeSchema = createInsertSchema(liftTypes);
+export type LiftType = typeof liftTypes.$inferSelect;
+export type InsertLiftType = typeof liftTypes.$inferInsert;
+
+// LIFT_SUBTYPES - Alkategóriák (pl. MOD_DR, BEX_GEN2)
+export const liftSubtypes = sqliteTable("lift_subtypes", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  lift_type_id: text("lift_type_id")
+    .notNull()
+    .references(() => liftTypes.id, { onDelete: "cascade" }),
+  code: text("code").notNull(),
+  name_hu: text("name_hu").notNull(),
+  name_de: text("name_de"),
+  description_hu: text("description_hu"),
+  description_de: text("description_de"),
+  sort_order: integer("sort_order").default(0),
+  is_active: integer("is_active", { mode: "boolean" }).default(true).notNull(),
+  created_at: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`).notNull(),
+  updated_at: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`).notNull(),
+});
+
+export const insertLiftSubtypeSchema = createInsertSchema(liftSubtypes);
+export type LiftSubtype = typeof liftSubtypes.$inferSelect;
+export type InsertLiftSubtype = typeof liftSubtypes.$inferInsert;
+
+// LIFT_TEMPLATE_MAPPINGS - Altípus → Template párosítás
+export const liftTemplateMappings = sqliteTable("lift_template_mappings", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  lift_subtype_id: text("lift_subtype_id")
+    .notNull()
+    .references(() => liftSubtypes.id, { onDelete: "cascade" }),
+  question_template_id: text("question_template_id")
+    .references(() => templates.id, { onDelete: "set null" }),
+  protocol_template_id: text("protocol_template_id")
+    .references(() => templates.id, { onDelete: "set null" }),
+  is_active: integer("is_active", { mode: "boolean" }).default(true).notNull(),
+  created_at: integer("created_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`).notNull(),
+  updated_at: integer("updated_at", { mode: "timestamp" }).default(sql`(strftime('%s', 'now'))`).notNull(),
+  created_by: text("created_by"),
+  notes: text("notes"),
+});
+
+export const insertLiftTemplateMappingSchema = createInsertSchema(liftTemplateMappings);
+export type LiftTemplateMapping = typeof liftTemplateMappings.$inferSelect;
+export type InsertLiftTemplateMapping = typeof liftTemplateMappings.$inferInsert;
+
+/* -------------------------------------------------------------------------
  * Question configurations – single source of truth for questions
  * ----------------------------------------------------------------------- */
 export const questionConfigs = sqliteTable('question_configs', {
@@ -109,8 +173,8 @@ export const questionConfigs = sqliteTable('question_configs', {
   group_order: integer('group_order').default(0),
   conditional_group_key: text('conditional_group_key'),
   unit: text('unit'),
-  min_value: real('min_value'), // Changed to real for potentially decimal values
-  max_value: real('max_value'), // Changed to real
+  min_value: real('min_value'),
+  max_value: real('max_value'),
   calculation_formula: text('calculation_formula'),
   calculation_inputs: text('calculation_inputs', { mode: 'json' }),
   created_at: integer('created_at', { mode: 'timestamp' }).default(sql`(strftime('%s', 'now'))`).notNull(),
@@ -123,8 +187,48 @@ export type InsertQuestionConfig = typeof questionConfigs.$inferInsert;
 export type Question = QuestionConfig;
 
 /* -------------------------------------------------------------------------
- * Audit Logs - SQLite compatible schema (ÚJ)
+ * Audit Logs - SQLite compatible schema
  * ----------------------------------------------------------------------- */
+export const AuditActionEnum = z.enum([
+  // User management
+  "user.create",
+  "user.update",
+  "user.delete",
+  "user.role_change",
+  
+  // Template management
+  "template.upload",
+  "template.activate",
+  "template.deactivate",
+  "template.delete",
+  "template.download",
+  
+  // Protocol management
+  "protocol.create",
+  "protocol.update",
+  "protocol.delete",
+  "protocol.complete",
+  
+  // Lift type management (ÚJ)
+  "lift_type.create",
+  "lift_type.update",
+  "lift_type.delete",
+  "lift_subtype.create",
+  "lift_subtype.update",
+  "lift_subtype.delete",
+  "lift_mapping.create",
+  "lift_mapping.update",
+  "lift_mapping.activate",
+  "lift_mapping.deactivate",
+  
+  // System
+  "admin.login",
+  "admin.logout",
+  "settings.update",
+]);
+
+export type AuditAction = z.infer<typeof AuditActionEnum>;
+
 export const audit_logs = sqliteTable('audit_logs', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   user_id: text('user_id').notNull(),
@@ -147,9 +251,15 @@ export type InsertAuditLog = typeof audit_logs.$inferInsert;
  * Relations – enables eager loading with Drizzle
  * ----------------------------------------------------------------------- */
 
-// Templates <-> QuestionConfigs kapcsolat
+// Templates <-> QuestionConfigs + Lift Mappings kapcsolat (FRISSÍTETT)
 export const templatesRelations = relations(templates, ({ many }) => ({
   questionConfigs: many(questionConfigs),
+  questionMappings: many(liftTemplateMappings, { 
+    relationName: "questionTemplate" 
+  }),
+  protocolMappings: many(liftTemplateMappings, { 
+    relationName: "protocolTemplate" 
+  }),
 }));
 
 export const questionConfigsRelations = relations(
@@ -162,6 +272,36 @@ export const questionConfigsRelations = relations(
   }),
 );
 
+// LIFT TYPE RELATIONS (ÚJ)
+export const liftTypesRelations = relations(liftTypes, ({ many }) => ({
+  subtypes: many(liftSubtypes),
+}));
+
+export const liftSubtypesRelations = relations(liftSubtypes, ({ one, many }) => ({
+  liftType: one(liftTypes, {
+    fields: [liftSubtypes.lift_type_id],
+    references: [liftTypes.id],
+  }),
+  mappings: many(liftTemplateMappings),
+}));
+
+export const liftTemplateMappingsRelations = relations(liftTemplateMappings, ({ one }) => ({
+  subtype: one(liftSubtypes, {
+    fields: [liftTemplateMappings.lift_subtype_id],
+    references: [liftSubtypes.id],
+  }),
+  questionTemplate: one(templates, {
+    fields: [liftTemplateMappings.question_template_id],
+    references: [templates.id],
+    relationName: "questionTemplate",
+  }),
+  protocolTemplate: one(templates, {
+    fields: [liftTemplateMappings.protocol_template_id],
+    references: [templates.id],
+    relationName: "protocolTemplate",
+  }),
+}));
+
 // Protocols <-> Profiles kapcsolat
 export const protocolsRelations = relations(protocols, ({ one }) => ({
   user: one(profiles, {
@@ -170,7 +310,7 @@ export const protocolsRelations = relations(protocols, ({ one }) => ({
   }),
 }));
 
-// Audit Logs <-> Profiles kapcsolat (ÚJ)
+// Audit Logs <-> Profiles kapcsolat
 export const auditLogsRelations = relations(audit_logs, ({ one }) => ({
   user: one(profiles, {
     fields: [audit_logs.user_id],
@@ -178,8 +318,8 @@ export const auditLogsRelations = relations(audit_logs, ({ one }) => ({
   }),
 }));
 
-// Profiles <-> Protocols és Audit Logs kapcsolat (FRISSÍTETT)
+// Profiles <-> Protocols és Audit Logs kapcsolat
 export const profilesRelations = relations(profiles, ({ many }) => ({
   protocols: many(protocols),
-  audit_logs: many(audit_logs), // Hozzáadva
+  audit_logs: many(audit_logs),
 }));

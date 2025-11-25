@@ -22,14 +22,26 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_APP_URL': JSON.stringify(env.VITE_APP_URL),
     },
 
-    // 🔥 EZ KELL, KÜLÖNBEN LOCALHOSTON IS LEÁLL A FRONTEND!
+    // 🔥 MÓDOSÍTOTT RÉSZ:
     server: {
-  host: "0.0.0.0",
-  port: 5173,
-},
-preview: {
-  host: "0.0.0.0",
-  port: 4173,
-},
+      host: "0.0.0.0",
+      port: 5173,
+      // Itt engedélyezzük a Renderes domaineket
+      allowedHosts: [
+        'aprod-app-kkcr.onrender.com', // A jelenlegi teszt oldal
+        'aprod.onrender.com',          // A jövőbeli éles oldal
+        'localhost'
+      ],
+    },
+    preview: {
+      host: "0.0.0.0",
+      port: 4173,
+      // Biztonság kedvéért a preview módhoz is hozzáadjuk
+      allowedHosts: [
+        'aprod-app-kkcr.onrender.com',
+        'aprod.onrender.com',
+        'localhost'
+      ],
+    },
   };
 });

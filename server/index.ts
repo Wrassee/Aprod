@@ -1,34 +1,46 @@
-import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
-import cors from "cors";
+import { createApp } from './app.js';
+import ViteExpress from 'vite-express';
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// ESM helyettesítő __dirname-hez
+const PORT = Number(process.env.PORT) || 5000;
+const MODE = process.env.NODE_ENV || 'development';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
+// Dev mód → Vite dev szerver
+if (MODE !== 'production') {
+  ViteExpress.config();
+}
 
-app.use(express.json({ limit: "15mb" }));
-app.use(cors());
+async function startServer() {
+  const app = await createApp({
+    mode: MODE === 'production' ? 'production' : 'development'
+  });
 
-// ===============================
-// STATIC FRONTEND (Vite build)
-// ===============================
+  if (MODE === 'production') {
+    console.log("📦 Serving static frontend from dist/...");
 
-const distPath = path.join(__dirname, "..", "client");   // /dist/client
+    const distPath = path.join(__dirname, "..", "dist");
 
-app.use(express.static(distPath));
+    app.use(express.static(distPath));
 
-app.get("*", (_, res) => {
-    res.sendFile(path.join(distPath, "index.html"));
-});
+    // SPA fallback
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
 
-// ===============================
-// SERVER START
-// ===============================
-const PORT = process.env.PORT || 10000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Production server running on port ${PORT}`);
+    });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-});
+  } else {
+    ViteExpress.listen(app, PORT, () => {
+      console.log(`🚀 Dev server running on port ${PORT}`);
+    });
+  }
+}
+
+startServer();

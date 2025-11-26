@@ -11,10 +11,12 @@ const MODE = process.env.NODE_ENV === 'production' ? 'production' : 'development
 
 // Development ONLY: enable Vite middleware
 if (MODE === 'development') {
-  ViteExpress.config();
+  // 🔥 FIX: Üres objektum paraméter a ViteExpress.config() számára
+  ViteExpress.config({});
 }
 
 async function startServer() {
+  // 🔥 FIX: Paraméter átadása createApp-nak
   const app = await createApp({
     mode: MODE,
   });

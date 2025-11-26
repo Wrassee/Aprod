@@ -1,42 +1,21 @@
-import { createApp } from './app.js';
-import ViteExpress from 'vite-express';
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
+// server/index.ts
 
-const PORT = Number(process.env.PORT) || 5000;
-const MODE = process.env.NODE_ENV || 'development';
+import { createApp } from "./app.js";
+import 'dotenv/config';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Dev módban indítjuk a Vite-et
-if (MODE !== 'production') {
-  ViteExpress.config();
-}
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
 
 async function startServer() {
-  const app = await createApp();   // <<< NINCS PARAMÉTER!!!
-
-  if (MODE === 'production') {
-    // FRONTEND kiszolgálása
-    const distPath = path.join(__dirname, '../dist');
-    app.use(express.static(distPath));
-
-    // SPA fallback (React/Vue/Svelte)
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
-    });
+  try {
+    const app = await createApp();
 
     app.listen(PORT, () => {
-      console.log(`🚀 Production server running on port ${PORT}`);
+      console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
     });
 
-  } else {
-    // DEV mód → ViteExpress
-    ViteExpress.listen(app, PORT, () => {
-      console.log(`🚀 Dev server running on port ${PORT}`);
-    });
+  } catch (error) {
+    console.error("❌ Failed to start server:", error);
+    process.exit(1);
   }
 }
 

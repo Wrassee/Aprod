@@ -19,29 +19,25 @@ export default defineConfig(({ mode }) => {
     define: {
       'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
       'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
-      'import.meta.env.VITE_APP_URL': JSON.stringify(env.VITE_APP_URL),
+      // ❌ TÖRÖLD: VITE_APP_URL-t nem kell definiálni!
     },
 
-    // --- MÓDOSÍTÁS: KONKRÉT STRINGEK TÖMBJE ---
     server: {
       host: "0.0.0.0",
       port: 5173,
-      // A "true" helyett most felsoroljuk őket, így nem tud belekötni:
-      allowedHosts: [
-        "aprod-app-kkcr.onrender.com",
-        "aprod.onrender.com",
-        "localhost"
-      ],
+      // 🔥 PROXY hozzáadása development-hez
+      proxy: {
+        '/api': {
+          target: 'http://localhost:5000',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
+    
     preview: {
       host: "0.0.0.0",
       port: 4173,
-      allowedHosts: [
-        "aprod-app-kkcr.onrender.com",
-        "aprod.onrender.com",
-        "localhost"
-      ],
     },
-    // ------------------------------------------
   };
 });

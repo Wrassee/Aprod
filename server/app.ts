@@ -1,43 +1,48 @@
-// server/app.ts - DINAMIKUS CORS (bármely Render URL működik)
+// server/app.ts - JAVÍTOTT VERZIÓ
 
 import express from 'express';
 import 'dotenv/config';
 import { registerRoutes } from './routes.js';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-export async function createApp() {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// 🔥 PARAMÉTER HOZZÁADÁSA
+interface AppConfig {
+  mode: 'development' | 'production';
+}
+
+export async function createApp(config: AppConfig) {
   const app = express();
+  const isProduction = config.mode === 'production';
 
-  // 🔥 DINAMIKUS CORS - Automatikusan kezeli a Render URL-eket
-  const isProduction = process.env.NODE_ENV === 'production';
-  
+  // ===================================================
+  // CORS - DINAMIKUS
+  // ===================================================
   app.use(cors({
     origin: (origin, callback) => {
-      // Development: mindenhonnan engedélyezett
       if (!isProduction) {
         return callback(null, true);
       }
       
-      // Production: Engedélyezett origin-ek
       const allowedOrigins = [
-        'capacitor://localhost', // Android app
-        'http://localhost', // iOS app
-        'ionic://localhost', // Ionic
-        /^https:\/\/.*\.onrender\.com$/, // ⚡ BÁRMELY Render URL (regex)
-        /^https:\/\/aprod-app-.*\.onrender\.com$/, // Specifikus Render pattern
+        'capacitor://localhost',
+        'http://localhost',
+        'ionic://localhost',
+        /^https:\/\/.*\.onrender\.com$/,
       ];
       
-      // Ha nincs origin (pl. Postman), engedélyezzük
       if (!origin) {
         return callback(null, true);
       }
       
-      // Ellenőrizzük, hogy az origin engedélyezett-e
       const isAllowed = allowedOrigins.some(allowed => {
         if (typeof allowed === 'string') {
           return allowed === origin;
         }
-        // Regex esetén
         return allowed.test(origin);
       });
       
@@ -55,7 +60,9 @@ export async function createApp() {
 
   app.use(express.json());
 
-  // 🔥 SECURITY HEADERS
+  // ===================================================
+  // SECURITY HEADERS
+  // ===================================================
   app.use((req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -68,7 +75,27 @@ export async function createApp() {
     next();
   });
 
-  // Loggoló middleware
+  // ===================================================
+  // STATIC FILES (PRODUCTION)
+  // ===================================================
+  if (isProduction) {
+    // 🔥 FONTOS: Statikus fájlok kiszolgálása (dist mappa)
+    const distPath = path.join(__dirname, '..', '..', 'dist');
+    console.log(`📁 Serving static files from: ${distPath}`);
+    
+    app.use(express.static(distPath, {
+      maxAge: '1d',
+      setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.html')) {
+          res.setHeader('Cache-Control', 'no-cache');
+        }
+      },
+    }));
+  }
+
+  // ===================================================
+  // LOGGING
+  // ===================================================
   app.use((req, res, next) => {
     if (req.path.startsWith("/api")) {
       console.log(`[API Request] ${req.method} ${req.path}`);
@@ -76,10 +103,29 @@ export async function createApp() {
     next();
   });
   
-  // Route-ok regisztrálása
+  // ===================================================
+  // API ROUTES
+  // ===================================================
   await registerRoutes(app);
   
-  // Globális hibakezelő
+  // ===================================================
+  // SPA FALLBACK (PRODUCTION)
+  // ===================================================
+  if (isProduction) {
+    // 🔥 Minden nem-API kérést az index.html-re irányít (SPA routing)
+    app.get('*', (req, res) => {
+      if (!req.path.startsWith('/api')) {
+        const indexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
+        res.sendFile(indexPath);
+      } else {
+        res.status(404).json({ message: 'API endpoint not found' });
+      }
+    });
+  }
+  
+  // ===================================================
+  // GLOBAL ERROR HANDLER
+  // ===================================================
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
     console.error(`[Global Error Handler] Unhandled error on path: ${req.path}`, err);
     const status = err.status || 500;
@@ -89,14 +135,3 @@ export async function createApp() {
 
   return app;
 }
-
-// ============================================
-// MAGYARÁZAT:
-// ============================================
-
-// A regex pattern: /^https:\/\/.*\.onrender\.com$/
-// Engedélyezi:
-// ✅ https://otis-aprod.onrender.com
-// ✅ https://aprod-app-kkcr.onrender.com
-// ✅ https://barmilyen-nev.onrender.com
-// ❌ http://malicious.com

@@ -1,22 +1,72 @@
-// server/app.ts - JAVÍTOTT VERZIÓ (CORS Engedélyezve)
+// server/app.ts - DINAMIKUS CORS (bármely Render URL működik)
 
 import express from 'express';
 import 'dotenv/config';
 import { registerRoutes } from './routes.js';
-import cors from 'cors'; // 🔥 ÚJ IMPORT
+import cors from 'cors';
 
 export async function createApp() {
   const app = express();
 
-  // 🔥 EZT A RÉSZT HAGYTUK KI EDDIG! EZ KELL A TELEFONHOZ!
+  // 🔥 DINAMIKUS CORS - Automatikusan kezeli a Render URL-eket
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   app.use(cors({
-    origin: '*', // Mindenhonnan engedjük a kérést (fejlesztéshez ez a legjobb)
+    origin: (origin, callback) => {
+      // Development: mindenhonnan engedélyezett
+      if (!isProduction) {
+        return callback(null, true);
+      }
+      
+      // Production: Engedélyezett origin-ek
+      const allowedOrigins = [
+        'capacitor://localhost', // Android app
+        'http://localhost', // iOS app
+        'ionic://localhost', // Ionic
+        /^https:\/\/.*\.onrender\.com$/, // ⚡ BÁRMELY Render URL (regex)
+        /^https:\/\/aprod-app-.*\.onrender\.com$/, // Specifikus Render pattern
+      ];
+      
+      // Ha nincs origin (pl. Postman), engedélyezzük
+      if (!origin) {
+        return callback(null, true);
+      }
+      
+      // Ellenőrizzük, hogy az origin engedélyezett-e
+      const isAllowed = allowedOrigins.some(allowed => {
+        if (typeof allowed === 'string') {
+          return allowed === origin;
+        }
+        // Regex esetén
+        return allowed.test(origin);
+      });
+      
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        console.warn(`⚠️ CORS blocked origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   }));
-  // ======================================================
 
   app.use(express.json());
+
+  // 🔥 SECURITY HEADERS
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    
+    if (isProduction) {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+    
+    next();
+  });
 
   // Loggoló middleware
   app.use((req, res, next) => {
@@ -39,3 +89,14 @@ export async function createApp() {
 
   return app;
 }
+
+// ============================================
+// MAGYARÁZAT:
+// ============================================
+
+// A regex pattern: /^https:\/\/.*\.onrender\.com$/
+// Engedélyezi:
+// ✅ https://otis-aprod.onrender.com
+// ✅ https://aprod-app-kkcr.onrender.com
+// ✅ https://barmilyen-nev.onrender.com
+// ❌ http://malicious.com

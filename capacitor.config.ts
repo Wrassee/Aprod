@@ -5,15 +5,19 @@ const config: CapacitorConfig = {
   appName: 'Otis Aprod',
   webDir: 'dist',
   
-  server: {
-    // 🔥 DEVELOPMENT: Telefonon való teszteléshez
-    // PRODUCTION: Kommenteld ki ezt a sort build előtt!
+  // 🔥 FONTOS: Éles buildhez a teljes 'server' blokkot töröld ki vagy kommenteld ki!
+  // Így az app a 'dist' mappából tölti be a fájlokat (offline-first működés).
+  /* server: {
     url: 'http://192.168.50.183:5000',
-    
-    // HTTP engedélyezése (nem HTTPS)
     androidScheme: 'http',
     cleartext: true,
-  },
+  }, 
+  */
+ 
+  // Opcionális: Élesben a https séma szebb, de nem kötelező
+  server: {
+    androidScheme: 'https'
+  }
 };
 
 export default config;

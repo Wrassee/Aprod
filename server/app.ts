@@ -1,4 +1,4 @@
-// server/app.ts - FINAL WORKING VERSION
+// server/app.ts - FINAL WORKING VERSION (CORS FIXED)
 
 import express from 'express';
 import 'dotenv/config';
@@ -25,6 +25,7 @@ export async function createApp(config: AppConfig) {
   // ===================================================
   app.use(cors({
     origin: (origin, callback) => {
+      // Fejlesztéskor mindent engedünk
       if (!isProduction) {
         return callback(null, true);
       }
@@ -32,19 +33,22 @@ export async function createApp(config: AppConfig) {
       const allowedOrigins = [
         'capacitor://localhost',
         'http://localhost',
+        'https://localhost', // 👈 EZT ADTAM HOZZÁ! (Android HTTPS support)
         'ionic://localhost',
-        /^https:\/\/.*\.onrender\.com$/,
+        /^https:\/\/.*\.onrender\.com$/, // Render domainek
       ];
       
+      // Ha nincs origin (pl. backend-to-backend hívás), engedjük
       if (!origin) {
         return callback(null, true);
       }
       
+      // Ellenőrizzük, hogy az origin benne van-e a listában
       const isAllowed = allowedOrigins.some(allowed => {
         if (typeof allowed === 'string') {
           return allowed === origin;
         }
-        return allowed.test(origin);
+        return allowed.test(origin); // Regex ellenőrzés
       });
       
       if (isAllowed) {
@@ -80,8 +84,6 @@ export async function createApp(config: AppConfig) {
   // STATIC FILES (PRODUCTION)
   // ===================================================
   if (isProduction) {
-    // 🔥 FIXED: Compiled code-ban __dirname = /app/dist/server
-    // Egy szinttel feljebb: /app/dist (itt van az index.html és assets/)
     const distPath = path.join(__dirname, '..');
     console.log(`📁 Serving static files from: ${distPath}`);
     
@@ -116,7 +118,6 @@ export async function createApp(config: AppConfig) {
   if (isProduction) {
     app.get('*', (req, res) => {
       if (!req.path.startsWith('/api')) {
-        // 🔥 FIXED: __dirname = /app/dist/server → ../ = /app/dist
         const indexPath = path.join(__dirname, '..', 'index.html');
         console.log(`📄 Serving SPA: ${req.path} -> ${indexPath}`);
         res.sendFile(indexPath);

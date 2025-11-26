@@ -155,9 +155,33 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
   const [selectedType, setSelectedType] = useState<LiftType | null>(null);
   const [selectedSubtype, setSelectedSubtype] = useState<LiftSubtype | null>(null);
 
+  // ===========================================================================
+  // 🔥 JAVÍTÁS: API URL és Fetch függvény definiálása
+  // ===========================================================================
+  
+  // 1. Meghatározzuk a Render URL-t (vagy fallback)
+  const BASE_URL = import.meta.env.VITE_API_URL || 'https://aprod-app-kkcr.onrender.com';
+
   // Fetch available lift types
   const { data, isLoading, error } = useQuery<LiftAvailableResponse>({
     queryKey: ["/api/lifts/available"],
+    // 2. Megadjuk a függvényt, ami ténylegesen lekéri az adatot a Render-ről
+    queryFn: async () => {
+      console.log(`🚀 Fetching lifts from: ${BASE_URL}/api/lifts/available`);
+      
+      const response = await fetch(`${BASE_URL}/api/lifts/available`, {
+        headers: {
+          'Content-Type': 'application/json',
+          // Ha használsz Auth-ot, ide kellhet a token is, de a /available publikus szokott lenni
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      return response.json();
+    }
   });
 
   // Reset selection when language changes

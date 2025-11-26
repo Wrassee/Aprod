@@ -1,4 +1,4 @@
-// server/middleware/auth.ts - KIBŐVÍTETT VERZIÓ (Email confirmation support)
+// server/middleware/auth.ts - JAVÍTOTT ÉS ROBUSTUS VERZIÓ (Email confirmation support)
 import { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { storage } from '../storage.js';
@@ -18,8 +18,14 @@ if (!supabaseServiceKey) {
 
 console.log('✅ Supabase Admin Client initialized with service role key');
 
-// Server-side Supabase client with service role key for admin operations
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+// Service role client az admin műveletekhez
+// Backend oldalon nem kell persistSession és autoRefreshToken
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
 
 /**
  * Middleware to verify Supabase JWT token, attach user to request,
@@ -29,48 +35,53 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   try {
     const authHeader = req.headers.authorization;
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
-        message: 'Unauthorized - No token provided' 
-      });
+    // 1. Token kinyerése (Robusztus módon)
+    if (!authHeader) {
+      console.warn(`[Auth] Missing Authorization header on ${req.path}`);
+      return res.status(401).json({ message: 'No token provided' });
     }
 
-    const token = authHeader.split(' ')[1];
-    
-    // Verify JWT token with Supabase
+    // Levágjuk a "Bearer " előtagot, függetlenül a kis/nagybetűtől
+    // és kezeljük, ha véletlenül többször szerepelne
+    let token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+    if (!token) {
+      console.warn(`[Auth] Empty token on ${req.path}`);
+      return res.status(401).json({ message: 'Empty token' });
+    }
+
+    // 2. Token ellenőrzése a Supabase-nél
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
     
     if (error || !user) {
-      console.error('❌ Auth error:', error);
-      return res.status(401).json({ 
-        message: 'Unauthorized - Invalid token' 
-      });
+      console.error(`[Auth] Invalid token on ${req.path}:`, error?.message);
+      return res.status(401).json({ message: 'Invalid or expired session' });
     }
 
     // === AUTOMATIKUS SZINKRONIZÁCIÓ KEZDETE ===
-    // 1. Supabase role és email confirmation státusz lekérése
+    // 3. Supabase role és email confirmation státusz lekérése
     const supabaseRole = user.app_metadata?.role || 'user';
-    const emailConfirmed = user.email_confirmed_at !== null; // ÚJ!
+    const emailConfirmed = user.email_confirmed_at !== null;
 
-    // 2. Helyi profil lekérése
+    // 4. Helyi profil lekérése
     let localProfile = await storage.getProfileByUserId(user.id);
 
-    // 3. Ha nincs helyi profil, létrehozzuk a helyes adatokkal
+    // 5. Ha nincs helyi profil, létrehozzuk a helyes adatokkal
     if (!localProfile) {
       console.log(`🔄 Creating missing local profile for ${user.id} with role: ${supabaseRole}, email_confirmed: ${emailConfirmed}`);
       localProfile = await storage.createProfile({
         user_id: user.id,
         email: user.email!,
         role: supabaseRole,
-        email_confirmed: emailConfirmed, // ÚJ!
+        email_confirmed: emailConfirmed,
         name: user.user_metadata?.full_name || user.email?.split('@')[0],
       });
     }
-    // 4. Ha van helyi profil, de valami eltér, frissítjük
+    // 6. Ha van helyi profil, de valami eltér, frissítjük
     else {
       const needsUpdate = 
         localProfile.role !== supabaseRole || 
-        localProfile.email_confirmed !== emailConfirmed; // ÚJ!
+        localProfile.email_confirmed !== emailConfirmed;
 
       if (needsUpdate) {
         console.log(`🔄 Syncing profile for ${user.id}:`, {
@@ -80,7 +91,7 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
         
         const updatedProfile = await storage.updateProfile(user.id, { 
           role: supabaseRole,
-          email_confirmed: emailConfirmed // ÚJ!
+          email_confirmed: emailConfirmed
         });
         
         if (updatedProfile) {
@@ -90,19 +101,18 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
     // === AUTOMATIKUS SZINKRONIZÁCIÓ VÉGE ===
 
-    // Attach validated (and synced) user profile to request object
+    // 7. Attach validated (and synced) user profile to request object
     (req as any).user = localProfile || user;
     next();
+
   } catch (error) {
-    console.error('❌ Auth middleware error:', error);
-    return res.status(500).json({ 
-      message: 'Authentication error' 
-    });
+    console.error('❌ Auth middleware fatal error:', error);
+    return res.status(500).json({ message: 'Internal Authentication Error' });
   }
 }
 
 /**
- * ÚJ! Middleware to ensure the user has confirmed their email
+ * Middleware to ensure the user has confirmed their email
  * This should be used AFTER requireAuth middleware
  */
 export async function requireEmailConfirmed(req: Request, res: Response, next: NextFunction) {

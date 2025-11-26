@@ -1,4 +1,4 @@
-// server/app.ts - JAVÍTOTT VERZIÓ
+// server/app.ts - FINAL WORKING VERSION
 
 import express from 'express';
 import 'dotenv/config';
@@ -10,7 +10,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 🔥 PARAMÉTER HOZZÁADÁSA
 interface AppConfig {
   mode: 'development' | 'production';
 }
@@ -19,8 +18,10 @@ export async function createApp(config: AppConfig) {
   const app = express();
   const isProduction = config.mode === 'production';
 
+  console.log(`🔧 Starting app in ${config.mode} mode`);
+
   // ===================================================
-  // CORS - DINAMIKUS
+  // CORS
   // ===================================================
   app.use(cors({
     origin: (origin, callback) => {
@@ -79,8 +80,9 @@ export async function createApp(config: AppConfig) {
   // STATIC FILES (PRODUCTION)
   // ===================================================
   if (isProduction) {
-    // 🔥 FONTOS: Statikus fájlok kiszolgálása (dist mappa)
-    const distPath = path.join(__dirname, '..', '..', 'dist');
+    // 🔥 FIXED: Compiled code-ban __dirname = /app/dist/server
+    // Egy szinttel feljebb: /app/dist (itt van az index.html és assets/)
+    const distPath = path.join(__dirname, '..');
     console.log(`📁 Serving static files from: ${distPath}`);
     
     app.use(express.static(distPath, {
@@ -98,7 +100,7 @@ export async function createApp(config: AppConfig) {
   // ===================================================
   app.use((req, res, next) => {
     if (req.path.startsWith("/api")) {
-      console.log(`[API Request] ${req.method} ${req.path}`);
+      console.log(`[API] ${req.method} ${req.path}`);
     }
     next();
   });
@@ -112,10 +114,11 @@ export async function createApp(config: AppConfig) {
   // SPA FALLBACK (PRODUCTION)
   // ===================================================
   if (isProduction) {
-    // 🔥 Minden nem-API kérést az index.html-re irányít (SPA routing)
     app.get('*', (req, res) => {
       if (!req.path.startsWith('/api')) {
-        const indexPath = path.join(__dirname, '..', '..', 'dist', 'index.html');
+        // 🔥 FIXED: __dirname = /app/dist/server → ../ = /app/dist
+        const indexPath = path.join(__dirname, '..', 'index.html');
+        console.log(`📄 Serving SPA: ${req.path} -> ${indexPath}`);
         res.sendFile(indexPath);
       } else {
         res.status(404).json({ message: 'API endpoint not found' });
@@ -127,7 +130,7 @@ export async function createApp(config: AppConfig) {
   // GLOBAL ERROR HANDLER
   // ===================================================
   app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error(`[Global Error Handler] Unhandled error on path: ${req.path}`, err);
+    console.error(`[ERROR] Path: ${req.path}`, err);
     const status = err.status || 500;
     const message = err.message || 'Internal Server Error';
     res.status(status).json({ message });

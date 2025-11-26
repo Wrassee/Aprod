@@ -1,4 +1,4 @@
-// src/components/template-management.tsx - EVERYONE CAN ACCESS
+// src/components/template-management.tsx - JAVÍTOTT VERZIÓ (CAPACITOR FIX)
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -15,6 +15,9 @@ import { formatDate } from '@/lib/utils';
 import { Upload, FileSpreadsheet, Eye, Trash2, Download, Loader2, FileText, Sparkles, CheckCircle, Calendar, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
+
+// 🔥 1. URL DEFINIÁLÁSE (Render URL)
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://aprod-app-kkcr.onrender.com';
 
 interface Template {
   id: string;
@@ -50,7 +53,6 @@ export function TemplateManagement() {
   const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
-  // ✅ JAVÍTÁS: Csak a supabase és initialized kell, NINCS role check
   const { supabase, initialized } = useAuth();
   
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -73,7 +75,6 @@ export function TemplateManagement() {
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [loadStrategy, setLoadStrategy] = useState<string>('local_first');
 
-  // ✅ JAVÍTÁS: ELTÁVOLÍTVA a role !== 'admin' ellenőrzés
   useEffect(() => {
     console.log('🔍 TemplateManagement useEffect triggered');
     console.log('📊 Supabase available:', !!supabase);
@@ -90,7 +91,6 @@ export function TemplateManagement() {
       return;
     }
 
-    // ✅ MINDENKI SZÁMÁRA ELÉRHETŐ - nincs role check
     console.log('✅ AuthContext ready, fetching templates for all users...');
     fetchTemplates();
     fetchHybridTemplates();
@@ -111,8 +111,9 @@ export function TemplateManagement() {
       const headers = await getAuthHeaders();
       console.log('✅ Auth headers received');
       
-      console.log('📤 Fetching from: /api/admin/templates');
-      const response = await fetch('/api/admin/templates', { headers });
+      // 🔥 JAVÍTVA: BASE_URL használata
+      console.log(`📤 Fetching from: ${BASE_URL}/api/admin/templates`);
+      const response = await fetch(`${BASE_URL}/api/admin/templates`, { headers });
       console.log('📥 Response status:', response.status);
       
       if (response.ok) {
@@ -139,7 +140,8 @@ export function TemplateManagement() {
   const fetchHybridTemplates = async () => {
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch('/api/admin/templates/available', { headers });
+      // 🔥 JAVÍTVA: BASE_URL használata
+      const response = await fetch(`${BASE_URL}/api/admin/templates/available`, { headers });
       if (response.ok) {
         const data = await response.json();
         setHybridTemplates(data);
@@ -157,7 +159,8 @@ export function TemplateManagement() {
     setLoading(true);
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch('/api/admin/templates/select', {
+      // 🔥 JAVÍTVA: BASE_URL használata
+      const response = await fetch(`${BASE_URL}/api/admin/templates/select`, {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -221,9 +224,10 @@ export function TemplateManagement() {
 
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch('/api/admin/templates/upload', {
+      // 🔥 JAVÍTVA: BASE_URL használata
+      const response = await fetch(`${BASE_URL}/api/admin/templates/upload`, {
         method: 'POST',
-        headers: headers,
+        headers: headers, // Fontos: NE állítsd be a Content-Type-ot FormData-nál!
         body: formData,
       });
 
@@ -269,7 +273,8 @@ export function TemplateManagement() {
 
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch('/api/admin/templates/upload', {
+      // 🔥 JAVÍTVA: BASE_URL használata
+      const response = await fetch(`${BASE_URL}/api/admin/templates/upload`, {
         method: 'POST',
         headers: headers,
         body: formData,
@@ -302,7 +307,8 @@ export function TemplateManagement() {
     setActivatingId(templateId);
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch(`/api/admin/templates/${templateId}/activate`, {
+      // 🔥 JAVÍTVA: BASE_URL használata
+      const response = await fetch(`${BASE_URL}/api/admin/templates/${templateId}/activate`, {
         method: 'POST',
         headers: headers,
       });
@@ -331,9 +337,10 @@ export function TemplateManagement() {
   const handlePreview = async (templateId: string) => {
     try {
       const headers = await getAuthHeaders();
+      // 🔥 JAVÍTVA: BASE_URL használata (mindkét fetch-nél)
       const [templateResponse, questionsResponse] = await Promise.all([
-        fetch(`/api/admin/templates/${templateId}/preview`, { headers }),
-        fetch('/api/questions/hu', { headers })
+        fetch(`${BASE_URL}/api/admin/templates/${templateId}/preview`, { headers }),
+        fetch(`${BASE_URL}/api/questions/hu`, { headers })
       ]);
       
       if (templateResponse.ok) {
@@ -365,7 +372,9 @@ export function TemplateManagement() {
   };
 
   const handleDownload = (templateId: string) => {
-    window.location.href = `/api/admin/templates/${templateId}/download`;
+    // 🔥 JAVÍTVA: Teljes URL megadása a letöltéshez
+    // Telefonon a relatív URL nem működik
+    window.location.href = `${BASE_URL}/api/admin/templates/${templateId}/download`;
   };
 
   const handleDelete = async (templateId: string, templateName: string) => {
@@ -375,7 +384,8 @@ export function TemplateManagement() {
 
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch(`/api/admin/templates/${templateId}`, {
+      // 🔥 JAVÍTVA: BASE_URL használata
+      const response = await fetch(`${BASE_URL}/api/admin/templates/${templateId}`, {
         method: 'DELETE',
         headers: headers,
       });
@@ -452,7 +462,6 @@ export function TemplateManagement() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {/* ✅ JAVÍTÁS: Eltávolítva a role check az üres állapotból */}
                   {filteredTemplates.length === 0 ? (
                     <div className="text-center py-12">
                       <div className="relative inline-block mb-6">
@@ -663,7 +672,7 @@ export function TemplateManagement() {
           </div>
         </TabsContent>
 
-        {/* UPLOAD TAB - folytatás a következő update-ben */}
+        {/* UPLOAD TAB */}
         <TabsContent value="upload" className="space-y-6">
           {/* Questions Upload Card */}
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl">
@@ -862,7 +871,6 @@ export function TemplateManagement() {
           </CardHeader>
           <CardContent>
             <div className="grid gap-4">
-              {/* ✅ JAVÍTÁS: Eltávolítva a role check a classic theme-ből is */}
               {filteredTemplates.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
                   <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-gray-300" />

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Download, Mail, Printer, FileText, Camera, Tag, Sparkles, AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
 import { useLanguageContext } from "@/components/language-context";
+import { getApiUrl } from '@/lib/queryClient';
 
 interface ErrorExportProps {
   errors: ProtocolError[];
@@ -63,7 +64,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/errors/export-pdf', {
+      const response = await fetch(getApiUrl('/api/errors/export-pdf'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -94,7 +95,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   const generateExcel = async () => {
     setIsGenerating(true);
     try {
-      const response = await fetch('/api/errors/export-excel', {
+      const response = await fetch(getApiUrl('/api/errors/export-excel'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

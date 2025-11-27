@@ -41,6 +41,7 @@ import { FormData, MeasurementRow } from "./lib/types";
 
 /* -------------------- Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema";
+import { getApiUrl } from '@/lib/queryClient';
 
 type Screen = 
   | 'start' 
@@ -328,7 +329,7 @@ function AppContent({
 
       const headers = await getAuthHeaders();
       
-      const response = await fetch('/api/protocols', {
+      const response = await fetch(getApiUrl('/api/protocols'), {
         method: 'POST',
         headers: headers,
         body: JSON.stringify(protocolData),
@@ -355,7 +356,7 @@ function AppContent({
   const handleEmailPDF = async () => {
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch('/api/protocols/email', {
+      const response = await fetch(getApiUrl('/api/protocols/email'), {
         method: 'POST',
         headers,
         body: JSON.stringify({ formData, language }),
@@ -372,7 +373,7 @@ function AppContent({
   const handleDownloadPDF = async () => {
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch('/api/protocols/download', {
+      const response = await fetch(getApiUrl('/api/protocols/download'), {
         method: 'POST',
         headers,
         body: JSON.stringify({ formData, language }),
@@ -403,7 +404,7 @@ function AppContent({
       const filename = `AP_${otisLiftId}.xlsx`;
 
       const headers = await getAuthHeaders();
-      const response = await fetch('/api/protocols/download-excel', {
+      const response = await fetch(getApiUrl('/api/protocols/download-excel'), {
         method: 'POST',
         headers,
         body: JSON.stringify({ formData, language }),
@@ -446,7 +447,7 @@ function AppContent({
         completed: true,
       };
 
-      const response = await fetch('/api/protocols', {
+      const response = await fetch(getApiUrl('/api/protocols'), {
         method: 'POST',
         headers,
         body: JSON.stringify(protocolData),

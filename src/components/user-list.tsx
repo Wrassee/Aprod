@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Trash2, User, Loader2, AlertCircle, Users, Shield, Sparkles, Calendar } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { getApiUrl } from '@/lib/queryClient';
 
 interface UserProfile {
   user_id: string;
@@ -49,7 +50,7 @@ export function UserList() {
         throw new Error(t("Admin.UserManagement.errorAuth"));
       }
 
-      const response = await fetch('/api/admin/users', {
+      const response = await fetch(getApiUrl('/api/admin/users'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
@@ -99,7 +100,7 @@ export function UserList() {
         throw new Error(t("Admin.UserManagement.errorAuth"));
       }
 
-      const response = await fetch(`/api/admin/users/${userId}`, {
+      const response = await fetch(getApiUrl(`/api/admin/users/${userId}`), {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,

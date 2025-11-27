@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatsCard } from '@/components/stats-card';
 import { Users, FileSpreadsheet, FileText, Loader2, TrendingUp, Activity, Sparkles, Calendar, CheckCircle } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { getApiUrl } from '@/lib/queryClient';
 
 interface Protocol {
   id: string;
@@ -57,7 +58,7 @@ export function AdminDashboard() {
         throw new Error('Authentication required');
       }
 
-      const response = await fetch('/api/admin/stats', {
+      const response = await fetch(getApiUrl('/api/admin/stats'), {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',

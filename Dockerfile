@@ -39,7 +39,7 @@ ENV NODE_ENV=production
 RUN npm run build
 
 # Production dependencies only
-RUN npm prune --production
+RUN npm prune --production --legacy-peer-deps
 
 # ============================================
 # 2. FÁZIS: PRODUCTION

@@ -1,4 +1,4 @@
-// src/components/audit-log-table.tsx - JAVÍTOTT FORDÍTÁSOK (DOT NOTATION)
+// src/components/audit-log-table.tsx - JAVÍTOTT (API URL Fix)
 import React, { useState, useEffect } from 'react';
 import { useLanguageContext } from "@/components/language-context";
 import { useToast } from '@/hooks/use-toast';
@@ -25,6 +25,11 @@ import {
   Clock
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+
+// 🔥 FONTOS: IDE ÍRD BE A BACKEND SZERVERED CÍMÉT!
+// Ha Render-en van: "https://te-projekt-neved.onrender.com"
+// Ha lokálisan teszteled WiFi-n: "http://192.168.0.XX:5000"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 interface AuditLogEntry {
   id: string;
@@ -75,12 +80,24 @@ export function AuditLogTable() {
         throw new Error('Authentication required');
       }
 
-      const response = await fetch(`/api/admin/audit-logs?limit=${limit}`, {
+      // 🔥 JAVÍTÁS ITT: API_BASE_URL hozzáadása
+      const url = `${API_BASE_URL}/api/admin/audit-logs?limit=${limit}`;
+      console.log('📤 Fetching from URL:', url);
+
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
       });
+
+      // 🔥 JAVÍTÁS: Ellenőrizzük, hogy véletlenül HTML-t kaptunk-e vissza JSON helyett
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") === -1) {
+        const text = await response.text();
+        console.error("❌ Nem JSON válasz érkezett:", text.substring(0, 200));
+        throw new Error("A szerver nem JSON választ küldött (Valószínűleg rossz az URL)");
+      }
 
       if (!response.ok) {
         throw new Error('Failed to fetch audit logs');
@@ -158,7 +175,6 @@ export function AuditLogTable() {
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
-                {/* JAVÍTVA */}
                 {t("Admin.AuditLog.title")}
               </span>
             </CardTitle>
@@ -170,7 +186,6 @@ export function AuditLogTable() {
                 <Loader2 className="relative h-12 w-12 animate-spin text-purple-600" />
               </div>
               <p className="mt-4 text-gray-600">
-                {/* JAVÍTVA */}
                 {t("loading")}...
               </p>
             </div>
@@ -189,7 +204,6 @@ export function AuditLogTable() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Shield className="h-5 w-5 mr-2" />
-            {/* JAVÍTVA */}
             {t("Admin.AuditLog.title")}
           </CardTitle>
         </CardHeader>
@@ -217,7 +231,6 @@ export function AuditLogTable() {
                 <Shield className="h-5 w-5 text-white" />
               </div>
               <span className="bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
-                {/* JAVÍTVA */}
                 {t("Admin.AuditLog.title")}
               </span>
             </CardTitle>
@@ -229,7 +242,6 @@ export function AuditLogTable() {
                 <AlertCircle className="relative h-16 w-16 text-gray-400" />
               </div>
               <p className="text-lg font-medium text-gray-600">
-                {/* JAVÍTVA */}
                 {t("Admin.AuditLog.noLogs")}
               </p>
             </div>
@@ -248,14 +260,12 @@ export function AuditLogTable() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Shield className="h-5 w-5 mr-2" />
-            {/* JAVÍTVA */}
             {t("Admin.AuditLog.title")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <AlertCircle className="h-12 w-12 mb-4 text-gray-300" />
-            {/* JAVÍTVA */}
             <p>{t("Admin.AuditLog.noLogs")}</p>
           </div>
         </CardContent>
@@ -280,17 +290,14 @@ export function AuditLogTable() {
                     <Shield className="h-5 w-5 text-white" />
                   </div>
                   <span className="bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
-                    {/* JAVÍTVA */}
                     {t("Admin.AuditLog.title")}
                   </span>
                   <Sparkles className="h-5 w-5 text-fuchsia-500 animate-pulse" />
                 </CardTitle>
                 <CardDescription className="flex items-center gap-2 text-base mt-2">
-                  {/* JAVÍTVA */}
                   {t("Admin.AuditLog.description")}
                   {' • '}
                   <Badge className="bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white border-0 px-3 py-1">
-                    {/* JAVÍTVA */}
                     {logs.length} {t("Admin.AuditLog.entries")}
                   </Badge>
                 </CardDescription>
@@ -303,7 +310,6 @@ export function AuditLogTable() {
               >
                 <div className="flex items-center gap-2">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : 'group-hover:rotate-180'} transition-transform duration-500`} />
-                  {/* JAVÍTVA */}
                   <span className="font-semibold">{t("Admin.AuditLog.refresh")}</span>
                 </div>
                 
@@ -319,35 +325,29 @@ export function AuditLogTable() {
                   <TableHeader>
                     <TableRow className="bg-gradient-to-r from-purple-50 via-fuchsia-50 to-pink-50 dark:from-purple-950/20 dark:via-fuchsia-950/20 dark:to-pink-950/20">
                       <TableHead className="w-[50px] font-bold text-gray-700">
-                        {/* JAVÍTVA */}
                         {t("Admin.AuditLog.table.status")}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4 text-purple-600" />
-                          {/* JAVÍTVA */}
                           {t("Admin.AuditLog.table.action")}
                         </div>
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-purple-600" />
-                          {/* JAVÍTVA */}
                           {t("Admin.AuditLog.table.user")}
                         </div>
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
-                        {/* JAVÍTVA */}
                         {t("Admin.AuditLog.table.resource")}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
-                        {/* JAVÍTVA */}
                         {t("Admin.AuditLog.table.details")}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-purple-600" />
-                          {/* JAVÍTVA */}
                           {t("Admin.AuditLog.table.time")}
                         </div>
                       </TableHead>
@@ -482,16 +482,13 @@ export function AuditLogTable() {
           <div>
             <CardTitle className="flex items-center">
               <Shield className="h-5 w-5 mr-2" />
-              {/* JAVÍTVA */}
               {t("Admin.AuditLog.title")}
             </CardTitle>
             <CardDescription className="mt-2">
-              {/* JAVÍTVA */}
               {t("Admin.AuditLog.description")}
               {' • '}
               <span className="font-semibold">{logs.length}</span>
               {' '}
-              {/* JAVÍTVA */}
               {t("Admin.AuditLog.entries")}
             </CardDescription>
           </div>
@@ -503,7 +500,6 @@ export function AuditLogTable() {
               disabled={loading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              {/* JAVÍTVA */}
               {t("Admin.AuditLog.refresh")}
             </Button>
           </div>
@@ -516,27 +512,21 @@ export function AuditLogTable() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px]">
-                    {/* JAVÍTVA */}
                     {t("Admin.AuditLog.table.status")}
                   </TableHead>
                   <TableHead>
-                    {/* JAVÍTVA */}
                     {t("Admin.AuditLog.table.action")}
                   </TableHead>
                   <TableHead>
-                    {/* JAVÍTVA */}
                     {t("Admin.AuditLog.table.user")}
                   </TableHead>
                   <TableHead>
-                    {/* JAVÍTVA */}
                     {t("Admin.AuditLog.table.resource")}
                   </TableHead>
                   <TableHead>
-                    {/* JAVÍTVA */}
                     {t("Admin.AuditLog.table.details")}
                   </TableHead>
                   <TableHead>
-                    {/* JAVÍTVA */}
                     {t("Admin.AuditLog.table.time")}
                   </TableHead>
                 </TableRow>

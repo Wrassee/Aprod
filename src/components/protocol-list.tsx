@@ -1,4 +1,4 @@
-// src/components/protocol-list.tsx
+// src/components/protocol-list.tsx - JAVÍTOTT (API URL Fix)
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useLanguageContext } from "@/components/language-context";
@@ -13,6 +13,11 @@ import {
   Download, Eye, Trash2, RefreshCw, Sparkles 
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+
+// 🔥 FONTOS: IDE ÍRD BE A BACKEND SZERVERED CÍMÉT!
+// Ha Render-en van: "https://te-projekt-neved.onrender.com"
+// Ha lokálisan teszteled WiFi-n: "http://192.168.0.XX:5000"
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 interface Protocol {
   id: string;
@@ -43,7 +48,7 @@ export function ProtocolList() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('🔍 ProtocolList useEffect triggered');
+    console.log('📋 ProtocolList useEffect triggered');
     if (supabase && role) {
       console.log(`✅ Supabase & Role (${role}) available, fetching protocols...`);
       fetchProtocols();
@@ -60,9 +65,12 @@ export function ProtocolList() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Authentication required');
 
-      const endpoint = role === 'admin' 
+      // 🔥 JAVÍTÁS ITT: API_BASE_URL használata
+      const path = role === 'admin' 
         ? `/api/admin/protocols?page=${currentPage}&limit=50`
         : `/api/protocols?page=${currentPage}&limit=50`;
+      
+      const endpoint = `${API_BASE_URL}${path}`;
 
       console.log(`📤 Fetching from: ${endpoint} (Role: ${role})`);
       const response = await fetch(endpoint, {
@@ -72,6 +80,14 @@ export function ProtocolList() {
       });
 
       console.log('📥 Response status:', response.status);
+
+      // 🔥 JAVÍTÁS: Ellenőrzés, hogy HTML jött-e vissza
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.indexOf("application/json") === -1) {
+        const text = await response.text();
+        console.error("❌ Nem JSON válasz érkezett:", text.substring(0, 200));
+        throw new Error("A szerver HTML-t küldött JSON helyett. Ellenőrizd az API URL-t!");
+      }
 
       if (!response.ok) {
         throw new Error('Failed to fetch protocols');
@@ -101,7 +117,7 @@ export function ProtocolList() {
     // 💡 FONTOS: Az `confirm` hívás helyett egyedi modális ablakra lesz szükség
     // A `window.confirm` nem működik megbízhatóan beágyazott környezetben.
     // Egyelőre `true`-ra állítjuk a teszteléshez, de ezt cserélni kell!
-    const userConfirmed = true; // window.confirm(`Biztosan törölni szeretnéd ezt a protokollt?\n${displayName}`);
+    const userConfirmed = window.confirm(`Biztosan törölni szeretnéd ezt a protokollt?\n${displayName}`);
     
     if (!userConfirmed) {
       return;
@@ -112,9 +128,12 @@ export function ProtocolList() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Authentication required');
 
-      const deleteEndpoint = role === 'admin'
+      // 🔥 JAVÍTÁS ITT IS: API_BASE_URL
+      const deletePath = role === 'admin'
         ? `/api/admin/protocols/${protocolId}`
         : `/api/protocols/${protocolId}`;
+        
+      const deleteEndpoint = `${API_BASE_URL}${deletePath}`;
 
       console.log(`📤 Deleting from: ${deleteEndpoint} (Role: ${role})`);
 

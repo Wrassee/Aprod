@@ -101,6 +101,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/drizzle.config*.ts ./
 COPY --from=builder /app/migrations ./migrations
+COPY --from=builder /app/public ./public
 
 # Entrypoint script
 COPY entrypoint.sh .

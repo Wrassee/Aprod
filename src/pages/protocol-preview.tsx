@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText, User, Calendar, CheckCircle, AlertTriangle, Mail, Download, Loader2 } from 'lucide-react';
 import { useLanguageContext } from "@/components/language-context";
+import { getApiUrl } from '@/lib/queryClient';
 
 // JAVÍTÁS: Importáld a FormData típust
 import type { FormData } from '../lib/types';
@@ -46,8 +47,8 @@ export function ProtocolPreview({ onBack, formData, language }: ProtocolPreviewP
         }
 
         // JAVÍTÁS: Az előnézet a '/preview-pdf' végpontot hívja
-        const pdfResponse = await fetch('/api/protocols/preview-pdf', {
-          method: 'POST',
+        const pdfResponse = await fetch(getApiUrl('/api/protocols/preview-pdf'), {
+  method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           // JAVÍTÁS: A 'savedData'-t küldjük el, nem a 'formData' prop-ot
           body: JSON.stringify({ formData: savedData, language: language })
@@ -102,8 +103,8 @@ export function ProtocolPreview({ onBack, formData, language }: ProtocolPreviewP
     setEmailStatus('Email küldése folyamatban...');
     
     try {
-      const response = await fetch('/api/protocols/email', {
-        method: 'POST',
+      const response = await fetch(getApiUrl('/api/protocols/email'), {
+  method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // JAVÍTÁS: A propok használata
         body: JSON.stringify({
@@ -141,8 +142,8 @@ export function ProtocolPreview({ onBack, formData, language }: ProtocolPreviewP
     try {
       console.log('⬇️ Starting PDF download...');
       
-      const response = await fetch('/api/protocols/download-pdf', {
-        method: 'POST',
+      const response = await fetch(getApiUrl('/api/protocols/download-pdf'), {
+  method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         // JAVÍTÁS: A propok használata
         body: JSON.stringify({ formData: formData, language: language })

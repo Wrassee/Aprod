@@ -22,6 +22,8 @@ import {
   Award,
   Zap,
 } from 'lucide-react';
+import { getApiUrl } from '@/lib/queryClient';
+
 
 interface CompletionProps {
   onEmailPDF: () => void;
@@ -90,7 +92,7 @@ export function Completion({
         throw new Error(t("noFormDataError") || 'No form data found in localStorage to generate PDF.');
       }
 
-      const response = await fetch('/api/protocols/download-pdf', {
+      const response = await fetch(getApiUrl('/api/protocols/download-pdf'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -188,7 +190,7 @@ export function Completion({
         throw new Error(t("noSavedDataForPreview"));
       }
 
-      const response = await fetch('/api/protocols/preview-pdf', {
+      const response = await fetch(getApiUrl('/api/protocols/preview-pdf'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -310,7 +312,7 @@ export function Completion({
       // 🔥🔥🔥 ÚJ SOR: NYELV ÁTADÁSA 🔥🔥🔥
       formData.append('language', language);
 
-      const response = await fetch('/api/protocols/download-grounding-pdf', {
+      const response = await fetch(getApiUrl('/api/protocols/download-grounding-pdf'), {
         method: 'POST',
         body: formData,
       });

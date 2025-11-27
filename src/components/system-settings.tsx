@@ -25,6 +25,8 @@ import {
   Zap
 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
+import { getApiUrl } from '@/lib/queryClient';
+
 
 interface SystemInfo {
   nodeVersion: string;
@@ -74,7 +76,7 @@ export function SystemSettings() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Authentication required');
 
-      const response = await fetch('/api/admin/system/info', {
+      const response = await fetch(getApiUrl('/api/admin/system/info'), {
         headers: { 
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'

@@ -1,6 +1,10 @@
-// src/lib/queryClient.ts
+// src/lib/queryClient.ts - FINAL CORRECT VERSION
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabaseClient.ts";
+import { supabase } from "@/lib/supabaseClient"; // A .ts kiterjesztés nem kell importnál
+
+// 🔥 1. BASE URL DEFINIÁLÁSA
+// Ez a legfontosabb sor a telefonos működéshez!
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://aprod-app-kkcr.onrender.com';
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -17,7 +21,8 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-async function getAuthHeaders() {
+// 🔥 2. EXPORT HOZZÁADVA: Hogy más fájlokban is tudd használni
+export async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession();
   const token = session?.access_token;
   
@@ -28,22 +33,21 @@ async function getAuthHeaders() {
   return headers;
 }
 
-// 🔥 OKOS URL KEZELÉS
-// Development: /api/* → proxy átirányítja :5000-re
-// Production/Android: /api/* → ugyanaz a szerver
-function getApiUrl(endpoint: string): string {
+// 🔥 3. OKOS URL KEZELÉS (JAVÍTVA)
+// Most már MINDIG elé teszi a https://...render.com címet, ha nem teljes URL-t kap
+export function getApiUrl(endpoint: string): string {
   // Ha már teljes URL (pl. external API), hagyjuk
   if (endpoint.startsWith('http')) {
     return endpoint;
   }
   
-  // Ha /api/-vel kezdődik, hagyjuk relatívnak
-  if (endpoint.startsWith('/api')) {
-    return endpoint;
-  }
+  // Levágjuk az esetleges vezető perjelet a duplázás elkerülése végett
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   
-  // Ha nem, előre tesszük az /api prefixet
-  return `/api${endpoint.startsWith('/') ? '' : '/'}${endpoint}`;
+  // Ha az endpoint már tartalmazza, hogy /api, akkor is elé kell tenni a BASE_URL-t!
+  // Telefonon: https://aprod.../api/questions
+  // Weben: https://aprod.../api/questions
+  return `${BASE_URL}${cleanEndpoint}`;
 }
 
 // ====================================================================
@@ -56,7 +60,10 @@ export async function apiRequest(
 ): Promise<Response> {
   
   const authHeaders = await getAuthHeaders();
-  const baseHeaders: Record<string, string> = data
+  // Ha FormData-t küldünk (fájl feltöltés), NEM szabad Content-Type-ot állítani kézzel!
+  const isFormData = data instanceof FormData;
+  
+  const baseHeaders: Record<string, string> = !isFormData && data
     ? { "Content-Type": "application/json" }
     : {};
 
@@ -69,7 +76,7 @@ export async function apiRequest(
       ...baseHeaders,
       ...authHeaders,
     },
-    body: data ? JSON.stringify(data) : undefined,
+    body: isFormData ? (data as FormData) : (data ? JSON.stringify(data) : undefined),
   });
 
   await throwIfResNotOk(res);
@@ -87,6 +94,7 @@ export const getQueryFn: <T>(options: {
   async ({ queryKey }) => {
     
     const authHeaders = await getAuthHeaders();
+    // A queryKey elemeit összefűzzük, pl: ['api', 'questions'] -> 'api/questions'
     const path = queryKey.join("/");
     const finalUrl = getApiUrl(path);
 

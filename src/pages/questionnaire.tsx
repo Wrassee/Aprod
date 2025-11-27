@@ -15,6 +15,7 @@ import { ArrowLeft, ArrowRight, Save, Check, X, Sparkles, Zap, AlertCircle } fro
 import { MeasurementBlock } from '@/components/measurement-block';
 import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { getApiUrl } from '@/lib/queryClient';
 
 interface QuestionnaireProps {
   receptionDate: string;
@@ -166,9 +167,11 @@ function Questionnaire({
         }
         
         // 🔥 MÓDOSÍTOTT: Build URL with optional templateId
-        const url = templateId 
+        const relativePath = templateId 
           ? `/api/questions/${language}?templateId=${templateId}`
           : `/api/questions/${language}`;
+        
+        const url = getApiUrl(relativePath); // 👈 EZ A KULCS!
         
         console.log('🔗 Fetching questions from:', url);
         const response = await fetch(url);

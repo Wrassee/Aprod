@@ -1,4 +1,4 @@
-// src/pages/admin.tsx - FIXED MOBILE MENU OVERLAP (h-auto & grid adjustments)
+// src/pages/admin.tsx - JAVÍTOTT (Auth Header + URL Fix)
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +26,9 @@ import { ProfileSettings } from '@/components/profile-settings';
 import { ProtocolList } from '@/components/protocol-list';
 import LiftManagement from '@/components/admin/LiftManagement';
 
+// 🔥 FONTOS: getAuthHeaders importálása!
+import { getApiUrl, getAuthHeaders } from '@/lib/queryClient';
+
 interface AdminProps {
   onBack: () => void;
   onHome?: () => void;
@@ -39,40 +42,23 @@ export function Admin({ onBack, onHome }: AdminProps) {
   const isAdmin = role === 'admin';
 
   const [loading, setLoading] = useState(false);
-
   const [activeMainTab, setActiveMainTab] = useState('dashboard');
   const [activeSettingsTab, setActiveSettingsTab] = useState('profile');
-
-  useEffect(() => {
-    if (role && !isAdmin && (activeMainTab === 'dashboard' || activeMainTab === 'users')) {
-      setActiveMainTab('protocols');
-    }
-  }, [role, isAdmin, activeMainTab]);
-
-  const [questionsUpload, setQuestionsUpload] = useState({
-    name: '',
-    file: null as File | null,
-  });
-
-  const [protocolUpload, setProtocolUpload] = useState({
-    name: '',
-    file: null as File | null,
-  });
+  
+  const [questionsUpload, setQuestionsUpload] = useState({ name: '', file: null as File | null });
+  const [protocolUpload, setProtocolUpload] = useState({ name: '', file: null as File | null });
 
   const handleQuestionsFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setQuestionsUpload({ ...questionsUpload, file });
-    }
+    if (file) setQuestionsUpload({ ...questionsUpload, file });
   };
 
   const handleProtocolFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setProtocolUpload({ ...protocolUpload, file });
-    }
+    if (file) setProtocolUpload({ ...protocolUpload, file });
   };
 
+  // 🔥 JAVÍTOTT KÉRDÉS FELTÖLTÉS
   const handleQuestionsUpload = async () => {
     if (!questionsUpload.file || !questionsUpload.name) {
       toast({
@@ -91,8 +77,14 @@ export function Admin({ onBack, onHome }: AdminProps) {
     formData.append('language', 'multilingual');
 
     try {
-      const response = await fetch('/api/admin/templates/upload', {
+      // 1. Token lekérése
+      const headers = await getAuthHeaders();
+      
+      // 2. Fetch hívás URL-lel és Headerrel
+      // FONTOS: A Content-Type-ot NE állítsd be kézzel FormData esetén!
+      const response = await fetch(getApiUrl('/api/admin/templates/upload'), {
         method: 'POST',
+        headers: headers, 
         body: formData,
       });
 
@@ -117,6 +109,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
     }
   };
 
+  // 🔥 JAVÍTOTT PROTOKOLL FELTÖLTÉS
   const handleProtocolUpload = async () => {
     if (!protocolUpload.file || !protocolUpload.name) {
       toast({
@@ -135,8 +128,13 @@ export function Admin({ onBack, onHome }: AdminProps) {
     formData.append('language', 'multilingual');
 
     try {
-      const response = await fetch('/api/admin/templates/upload', {
+      // 1. Token lekérése
+      const headers = await getAuthHeaders();
+
+      // 2. Fetch hívás URL-lel és Headerrel
+      const response = await fetch(getApiUrl('/api/admin/templates/upload'), {
         method: 'POST',
+        headers: headers,
         body: formData,
       });
 

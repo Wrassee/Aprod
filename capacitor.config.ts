@@ -17,7 +17,15 @@ const config: CapacitorConfig = {
   // Opcionális: Élesben a https séma szebb, de nem kötelező
   server: {
     androidScheme: 'https'
-  }
+  },
+
+  // 🔥 ÚJ RÉSZ: PLUGINS KONFIGURÁCIÓ (Immersive Mode) 🔥
+  plugins: {
+    StatusBar: {
+      // Ez engedi, hogy az app tartalma a status bar mögé csússzon (teljesebb élmény)
+      overlaysWebView: true,
+    },
+  },
 };
 
 export default config;

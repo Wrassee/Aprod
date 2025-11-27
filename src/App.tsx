@@ -1,4 +1,4 @@
-// src/App.tsx - JAVÍTOTT VERZIÓ (Lift Selector Home Loop Fix)
+// src/App.tsx - JAVÍTOTT VERZIÓ (Lift Selector Home Loop Fix + Immersive Mode)
 
 import React, {
   useState,
@@ -18,6 +18,11 @@ import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { ThemeProvider } from '@/contexts/theme-context';
 import { Loader2 } from 'lucide-react';
 
+/* -------------------- Capacitor Imports (ÚJ) -------------------- */
+import { Capacitor } from '@capacitor/core';
+import { StatusBar } from '@capacitor/status-bar';
+import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar';
+
 /* -------------------- Oldalak / Komponensek -------------------- */
 import { StartScreen } from "@/pages/start-screen";
 import LiftSelector from "@/pages/lift-selector";
@@ -32,7 +37,6 @@ import { Login } from "@/pages/login";
 import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import AuthCallback from "@/pages/auth-callback";
-// import { ProtectedRoute } from "@/components/protected-route"; // Nem használt
 import { FormData, MeasurementRow } from "./lib/types";
 
 /* -------------------- Shared schema -------------------- */
@@ -104,7 +108,7 @@ function AppContent({
       console.log('✅ User logged in, language saved. Redirecting to lift selector...');
       setCurrentScreen('lift-selector');
     }
-  }, [user, currentScreen, setCurrentScreen]); // Kivettem a languageSelected-et a függőségek közül a loop elkerülése végett
+  }, [user, currentScreen, setCurrentScreen]);
 
   const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
@@ -179,14 +183,11 @@ function AppContent({
     setLanguageSelected(false);
     localStorage.removeItem('otis-protocol-language');
     localStorage.removeItem('liftSelection');
-    
-    // ❌ EZT A SORT TÖRÖLTÜK, MERT EZ OKOZTA A HIBÁKAT ÉS A LOOP-OT:
-    // setLanguage(null as any);
 
     setCurrentScreen('start');
     setCurrentQuestionnairePage(0);
     localStorage.setItem('questionnaire-current-page', '0');
-  }, [setCurrentScreen, setCurrentQuestionnairePage]); // setLanguage már nem kell dependency-nek
+  }, [setCurrentScreen, setCurrentQuestionnairePage]);
 
   const handleSettings = useCallback(() => {
     setCurrentScreen('admin');
@@ -677,6 +678,29 @@ function App() {
     niedervoltMeasurements: [],
     niedervoltTableMeasurements: {},
   });
+
+  // 🔥 ÚJ RÉSZ: TELJES KÉPERNYŐS MÓD BEÁLLÍTÁSA 🔥
+  useEffect(() => {
+    const enableImmersiveMode = async () => {
+      // Csak natív környezetben (Android/iOS) fusson
+      if (Capacitor.isNativePlatform()) {
+        try {
+          // 1. Státuszsor (felső óra/akksi) elrejtése
+          await StatusBar.hide();
+
+          // 2. Navigációs sáv (alsó gombok) elrejtése
+          await NavigationBar.hide();
+
+          console.log('📱 Immersive mode enabled');
+        } catch (e) {
+          console.error('Hiba a teljes képernyő beállításakor:', e);
+        }
+      }
+    };
+
+    enableImmersiveMode();
+  }, []); 
+  // 🔥 ÚJ RÉSZ VÉGE 🔥
 
   // URL-ellenőrző hook (csak egyszer fut le)
   useEffect(() => {

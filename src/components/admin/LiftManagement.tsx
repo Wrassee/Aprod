@@ -29,6 +29,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { useLanguageContext } from "@/components/language-context";
 import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { getApiUrl } from '@/lib/queryClient';
 
 // =============================================================================
 // TYPES
@@ -153,7 +154,7 @@ export default function LiftManagement() {
   const createTypeMutation = useMutation({
     mutationFn: async (data: typeof typeForm) => {
       const headers = await getAuthHeaders();
-      const response = await fetch("/api/admin/lift-types", {
+      const response = await fetch(getApiUrl("/api/admin/lift-types"), {
         method: "POST",
         headers,
         body: JSON.stringify(data),
@@ -176,7 +177,7 @@ export default function LiftManagement() {
   const createSubtypeMutation = useMutation({
     mutationFn: async (data: typeof subtypeForm) => {
       const headers = await getAuthHeaders();
-      const response = await fetch("/api/admin/lift-subtypes", {
+      const response = await fetch(getApiUrl("/api/admin/lift-subtypes"), {
         method: "POST",
         headers,
         body: JSON.stringify(data),
@@ -206,7 +207,7 @@ export default function LiftManagement() {
   const createMappingMutation = useMutation({
     mutationFn: async (data: typeof mappingForm) => {
       const headers = await getAuthHeaders();
-      const response = await fetch("/api/admin/lift-mappings", {
+      const response = await fetch(getApiUrl("/api/admin/lift-mappings"), {
         method: "POST",
         headers,
         body: JSON.stringify(data),
@@ -234,7 +235,7 @@ export default function LiftManagement() {
   const activateMappingMutation = useMutation({
     mutationFn: async (mappingId: string) => {
       const headers = await getAuthHeaders();
-      const response = await fetch(`/api/admin/lift-mappings/${mappingId}/activate`, {
+      const response = await fetch(getApiUrl(`/api/admin/lift-mappings/${mappingId}/activate`), {
         method: "POST",
         headers,
       });

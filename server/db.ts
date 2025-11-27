@@ -1,4 +1,4 @@
-// server/db.ts - JAVÍTOTT TÍPUSOK (Build hiba javítása)
+// server/db.ts - JAVÍTOTT (Dynamic Import Fix)
 
 // ------------------------------------------------------------
 // 1️⃣ Imports
@@ -7,8 +7,8 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 const { Pool } = pg;
 
-import { drizzle as drizzleSqlite } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
+// ❌ KIVETTÜK INNEN A SQLITE IMPORTKAT
+// (Ezeket lejjebb, dinamikusan töltjük be, hogy ne omoljon össze élesben)
 
 import path from "node:path";
 import fs from "node:fs";
@@ -18,9 +18,6 @@ import type { InferSelectModel, InferInsertModel } from "drizzle-orm";
 // ------------------------------------------------------------
 // 3️⃣ DB típusdefiníciók és változók
 // ------------------------------------------------------------
-// 🔥 FONTOS VÁLTOZÁS: 'any'-t használunk a db típushoz, hogy
-// a TypeScript ne akadjon fenn a Postgres/SQLite select különbségeken.
-// Ez megoldja a "This expression is not callable" hibákat a build során.
 let db: any; 
 let schema: any;
 let testConnectionFn: () => Promise<boolean>;
@@ -37,6 +34,7 @@ if (process.env.NODE_ENV === "production" || forcePostgres) {
     throw new Error("DATABASE_URL environment variable is required.");
   }
   
+  // Schema betöltése
   schema = await import("../shared/schema.js");
 
   const pool = new Pool({ 
@@ -63,6 +61,13 @@ if (process.env.NODE_ENV === "production" || forcePostgres) {
 // ------------------------------------------------------------
 else {
   console.log("⚠️ No DATABASE_URL found. Fallback to SQLite (local file).");
+
+  // 🔥 ÚJ RÉSZ: DINAMIKUS IMPORT
+  // Csak akkor töltjük be a modulokat, ha tényleg itt vagyunk.
+  // Így a szerver nem keresi a better-sqlite3-at éles környezetben.
+  const { drizzle: drizzleSqlite } = await import("drizzle-orm/better-sqlite3");
+  const { default: Database } = await import("better-sqlite3");
+
   const dbPath = path.join(process.cwd(), "data", "otis_aprod.db");
   const dataDir = path.dirname(dbPath);
   if (!fs.existsSync(dataDir)) {
@@ -72,6 +77,7 @@ else {
   const schemaPath = path.resolve(process.cwd(), 'shared/schema-sqlite.js');
   schema = await import(pathToFileURL(schemaPath).href);
 
+  // Itt a 'Database' már a dinamikusan importált osztály
   const sqlite = new Database(dbPath);
   sqlite.pragma("journal_mode = WAL");
   db = drizzleSqlite(sqlite, { schema });
@@ -91,6 +97,10 @@ else {
 // ------------------------------------------------------------
 // 6️⃣ Re-export schema tables and types
 // ------------------------------------------------------------
+// Mivel a schema dinamikusan van betöltve, ellenőrizzük, hogy létezik-e, mielőtt destrukturáljuk.
+// (Bár a fenti await import miatt elvileg mindig léteznie kell).
+const safeSchema = schema || {};
+
 export const { 
   protocols, 
   templates, 
@@ -100,10 +110,9 @@ export const {
   liftTypes,
   liftSubtypes,
   liftTemplateMappings,
-} = schema;
+} = safeSchema;
 
-// Típusok exportálása (ezek maradhatnak, mert csak típusok)
-// Fontos: ha a schema dinamikus, ezek 'any'-ként viselkedhetnek buildkor, ami jó.
+// Típusok exportálása
 export type Protocol = any;
 export type InsertProtocol = any;
 export type Template = any;

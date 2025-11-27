@@ -17,7 +17,7 @@ COPY package.json package-lock.json ./
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 # Dependencies telepítése
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Forráskód másolása
 COPY . .

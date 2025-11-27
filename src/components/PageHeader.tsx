@@ -1,4 +1,4 @@
-// src/components/PageHeader.tsx - JAVÍTOTT (Safe translation & Home button)
+// src/components/PageHeader.tsx - RESZPONZÍV CÍM JAVÍTÁS (Mobil: Rövid, PC: Hosszú)
 
 import { FC } from "react";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,11 @@ const PageHeader: FC<PageHeaderProps> = ({
                   <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-lg group-hover:shadow-xl transition-shadow">
                     <div className="w-full h-full bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center overflow-hidden">
                       <img
-                        src="/otis-elevators-seeklogo_1753525178175.png"
+                        src="/otis-logo.png"
+                        onError={(e) => {
+                           // Fallback ha a png nem töltene be, bár elvileg jó a path
+                           (e.target as HTMLImageElement).src = "/otis-elevators-seeklogo_1753525178175.png"; 
+                        }}
                         alt="OTIS Logo"
                         className="w-10 h-10 object-contain"
                       />
@@ -113,9 +117,18 @@ const PageHeader: FC<PageHeaderProps> = ({
                 </button>
               )}
 
-              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent truncate">
-                {displayTitle}
-              </h1>
+              {/* 🔥 MÓDOSÍTÁS: MOBILON RÖVID CÍM, PC-N HOSSZÚ 🔥 */}
+              <div className="flex flex-col justify-center min-w-0">
+                {/* Mobilon ez látszik: Csak "OTIS APROD" */}
+                <h1 className="md:hidden text-lg font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent truncate">
+                  OTIS APROD
+                </h1>
+                
+                {/* PC-n/Tableten ez látszik: Teljes cím */}
+                <h1 className="hidden md:block text-xl font-bold bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent truncate">
+                  {displayTitle}
+                </h1>
+              </div>
             </div>
 
             {/* RIGHT SIDE */}
@@ -236,9 +249,16 @@ const PageHeader: FC<PageHeaderProps> = ({
                 <Home className="h-6 w-6 text-gray-600 hover:text-blue-600" />
               </button>
             )}
-            <h1 className="text-[17px] font-semibold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
-              {displayTitle}
-            </h1>
+            
+            {/* 🔥 MÓDOSÍTÁS: MOBILON RÖVID CÍM, PC-N HOSSZÚ (CLASSIC TÉMA) 🔥 */}
+            <div className="flex flex-col justify-center overflow-hidden">
+              <h1 className="md:hidden text-[17px] font-semibold text-gray-800">
+                OTIS APROD
+              </h1>
+              <h1 className="hidden md:block text-[17px] font-semibold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
+                {displayTitle}
+              </h1>
+            </div>
           </div>
 
           <div className="flex-1 flex justify-end items-center space-x-4">

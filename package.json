@@ -21,6 +21,7 @@
     "generate-grounding-questions": "ts-node scripts/generate-grounding-questions.ts"
   },
   "dependencies": {
+    "@capacitor-community/file-opener": "^7.0.1",
     "@capacitor/android": "^7.4.4",
     "@capacitor/cli": "^7.4.4",
     "@capacitor/core": "^7.4.4",

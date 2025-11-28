@@ -1,4 +1,4 @@
-// src/pages/completion.tsx - MOBIL LETÖLTÉS JAVÍTVA (Capacitor Filesystem)
+// src/pages/completion.tsx - JAVÍTOTT, SZINTAKTIKAILAG HELYES VERZIÓ
 
 import PageHeader from '@/components/PageHeader';
 import { useState, useCallback } from 'react';
@@ -24,9 +24,10 @@ import {
 } from 'lucide-react';
 import { getApiUrl } from '@/lib/queryClient';
 
-// 🔥 CAPACITOR IMPORTOK A MOBIL MENTÉSHEZ
+// 🔥 CAPACITOR IMPORTOK
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { FileOpener } from '@capacitor-community/file-opener';
 
 interface CompletionProps {
   onEmailPDF: () => void;
@@ -50,8 +51,6 @@ interface CompletionProps {
 export function Completion({
   onEmailPDF,
   onSaveToCloud,
-  onDownloadExcel,
-  onViewProtocol,
   onStartNew,
   onGoHome,
   onSettings,
@@ -67,16 +66,15 @@ export function Completion({
   const [isEmailSending, setIsEmailSending] = useState(false);
   const [isPdfDownloading, setIsPdfDownloading] = useState(false);
   const [isGroundingPdfDownloading, setIsGroundingPdfDownloading] = useState(false);
+  const [isExcelDownloading, setIsExcelDownloading] = useState(false);
   const [isPdfPreviewing, setIsPdfPreviewing] = useState(false);
 
-  // === 🛠️ HELPER: BLOB KONVERTÁLÁSA BASE64-RE (MOBILHOZ) ===
+  // === 🛠️ HELPER: BLOB KONVERTÁLÁSA BASE64-RE ===
   const convertBlobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = reject;
       reader.onload = () => {
-        // A result formátuma: "data:application/pdf;base64,....."
-        // Nekünk csak a vessző utáni rész kell a Filesystem pluginnek
         const result = reader.result as string;
         const base64 = result.split(',')[1];
         resolve(base64);
@@ -85,20 +83,17 @@ export function Completion({
     });
   };
 
-  // === 🛠️ HELPER: FÁJL MENTÉSE (MOBIL VS WEB DETEKTÁLÁS) ===
-  const saveFile = async (blob: Blob, filename: string) => {
+  // === 🛠️ HELPER: FÁJL MENTÉSE ===
+  const saveFile = async (blob: Blob, filename: string): Promise<string> => {
     if (Capacitor.isNativePlatform()) {
       try {
         console.log('📱 Saving file on mobile/native device...');
         const base64Data = await convertBlobToBase64(blob);
         
-        // 🔥 JAVÍTÁS: PDF esetén NEM használunk encoding-ot!
-        // Mentés a Dokumentumok mappába
         const result = await Filesystem.writeFile({
           path: filename,
           data: base64Data,
           directory: Directory.Documents,
-          // FONTOS: PDF-nél NEM kell encoding paraméter!
         });
 
         console.log('✅ File saved to:', result.uri);
@@ -109,6 +104,7 @@ export function Completion({
             : `Datei im Dokumente-Ordner gespeichert: ${filename}`,
           duration: 5000,
         });
+        return result.uri;
 
       } catch (e) {
         console.error('❌ Mobile save failed:', e);
@@ -119,6 +115,7 @@ export function Completion({
             : "Datei konnte nicht auf dem Telefon gespeichert werden. Berechtigungen überprüfen.",
           variant: "destructive"
         });
+        throw e;
       }
     } else {
       // WEB LOGIKA (PC)
@@ -132,6 +129,7 @@ export function Completion({
       a.click();
       window.URL.revokeObjectURL(url);
       a.remove();
+      return '';
     }
   };
 
@@ -148,6 +146,42 @@ export function Completion({
       setTimeout(() => setEmailStatus(''), 5000);
     } finally {
       setIsEmailSending(false);
+    }
+  };
+
+  // 🔥 EXCEL LETÖLTÉS - HELYI KEZELÉS (NEM PROP)
+  const handleDownloadExcel = async () => {
+    setIsExcelDownloading(true);
+    try {
+      console.log('Starting Excel download...');
+      const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
+      if (!savedData.answers) throw new Error(t("noFormDataError"));
+
+      const response = await fetch(getApiUrl('/api/protocols/download-excel'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ formData: savedData, language }),
+      });
+
+      if (!response.ok) throw new Error('Excel generation failed');
+
+      const blob = await response.blob();
+      const liftId = savedData.answers?.['7'] || 'Unknown';
+      const filename = `AP_${liftId}.xlsx`;
+
+      await saveFile(blob, filename);
+
+      console.log('Excel download completed successfully.');
+
+    } catch (error) {
+      console.error('Error downloading Excel:', error);
+      toast({
+        title: t("error"),
+        description: "Hiba az Excel letöltésekor",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExcelDownloading(false);
     }
   };
 
@@ -179,7 +213,6 @@ export function Completion({
       const liftId = savedData.answers?.['7'] ? String(savedData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
       const filename = `OTIS_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
 
-      // 🔥 JAVÍTOTT MENTÉS (mobil és web is)
       await saveFile(blob, filename);
 
       console.log('PDF download initiated successfully.');
@@ -255,7 +288,6 @@ export function Completion({
       const liftIdForFilename = payload.liftId.replace(/[^a-zA-Z0-9]/g, '_') || 'Unknown';
       const filename = `Erdungskontrolle_${liftIdForFilename}_${payload.receptionDate || new Date().toISOString().split('T')[0]}.pdf`;
 
-      // 🔥 JAVÍTOTT MENTÉS (mobil és web is)
       await saveFile(blob, filename);
       
       console.log('Grounding PDF download initiated successfully.');
@@ -279,61 +311,62 @@ export function Completion({
     }
   }, [language, toast, t]);
 
-  // Preview marad változatlan (böngésző ablakot nyit, mobil is támogatja)
+  // 🔥 ELŐNÉZET - MOBIL ÉS WEB TÁMOGATÁS
   const handlePreviewPDF = async () => {
     setIsPdfPreviewing(true);
-    console.log('Starting PDF preview from completion page...');
+    let newTab: Window | null = null;
 
-    const newTab = window.open('', '_blank');
-    if (!newTab) {
-      toast({
-        title: t("popupBlockedTitle"),
-        description: t("popupBlockedDescription"),
-        variant: 'destructive',
-        duration: 5000,
-      });
-      setIsPdfPreviewing(false);
-      return;
+    // Csak PC-n nyitunk azonnal ablakot
+    if (!Capacitor.isNativePlatform()) {
+        newTab = window.open('', '_blank');
+        if (!newTab) {
+            toast({
+                title: t("popupBlockedTitle"),
+                description: t("popupBlockedDescription"),
+                variant: 'destructive'
+            });
+            setIsPdfPreviewing(false);
+            return;
+        }
+        newTab.document.write(`
+          <html>
+            <head>
+              <title>${t("previewGeneratingTitle")}</title>
+              <style>
+                body {
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100vh;
+                  margin: 0;
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                  color: white;
+                }
+                .spinner {
+                  width: 50px;
+                  height: 50px;
+                  border: 5px solid rgba(255,255,255,0.3);
+                  border-radius: 50%;
+                  border-top-color: white;
+                  animation: spin 1s ease-in-out infinite;
+                }
+                @keyframes spin {
+                  to { transform: rotate(360deg); }
+                }
+                h2 { margin-top: 20px; font-weight: 300; }
+                p { opacity: 0.8; }
+              </style>
+            </head>
+            <body>
+              <div class="spinner"></div>
+              <h2>${t("generating")}...</h2>
+              <p>${t("previewGeneratingWait")}</p>
+            </body>
+          </html>
+        `);
     }
-    
-    newTab.document.write(`
-      <html>
-        <head>
-          <title>${t("previewGeneratingTitle")}</title>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              justify-content: center;
-              height: 100vh;
-              margin: 0;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-            }
-            .spinner {
-              width: 50px;
-              height: 50px;
-              border: 5px solid rgba(255,255,255,0.3);
-              border-radius: 50%;
-              border-top-color: white;
-              animation: spin 1s ease-in-out infinite;
-            }
-            @keyframes spin {
-              to { transform: rotate(360deg); }
-            }
-            h2 { margin-top: 20px; font-weight: 300; }
-            p { opacity: 0.8; }
-          </style>
-        </head>
-        <body>
-          <div class="spinner"></div>
-          <h2>${t("generating")}...</h2>
-          <p>${t("previewGeneratingWait")}</p>
-        </body>
-      </html>
-    `);
 
     try {
       const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
@@ -356,53 +389,78 @@ export function Completion({
       }
 
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      newTab.location.href = url;
-      
-      console.log('PDF preview opened in new tab.');
+
+      // 🔥 MOBIL LOGIKA: Mentés + FileOpener
+      if (Capacitor.isNativePlatform()) {
+          const filename = "preview_temp.pdf";
+          const uri = await saveFile(blob, filename);
+          
+          try {
+              await FileOpener.open({
+                  filePath: uri,
+                  contentType: 'application/pdf'
+              });
+              console.log('PDF preview opened with FileOpener.');
+          } catch (openerError) {
+              console.error("FileOpener hiba:", openerError);
+              toast({
+                  title: "Nincs PDF olvasó",
+                  description: "A fájl le lett mentve, de nem sikerült automatikusan megnyitni.",
+                  variant: "default"
+              });
+          }
+
+      } else {
+          // 🔥 PC LOGIKA: Új fül
+          const url = window.URL.createObjectURL(blob);
+          if (newTab) newTab.location.href = url;
+          console.log('PDF preview opened in new tab.');
+      }
 
     } catch (error) {
       console.error('Error during PDF preview:', error);
       
-      newTab.document.write(`
-        <html>
-          <head>
-            <title>${t("errorTitle")}</title>
-            <style>
-              body {
-                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                margin: 0;
-                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                color: white;
-                padding: 20px;
-                text-align: center;
-              }
-              h2 { margin-bottom: 10px; }
-              p { opacity: 0.9; max-width: 500px; }
-              button {
-                margin-top: 20px;
-                padding: 10px 20px;
-                background: white;
-                color: #f5576c;
-                border: none;
-                border-radius: 5px;
-                font-size: 16px;
-                cursor: pointer;
-              }
-            </style>
-          </head>
-          <body>
-            <h2>❌ ${t("errorOccurred")}</h2>
-            <p>${(error as Error).message}</p>
-            <button onclick="window.close()">${t("closeWindow")}</button>
-          </body>
-        </html>
-      `);
+      if (newTab && !Capacitor.isNativePlatform()) {
+        newTab.document.write(`
+          <html>
+            <head>
+              <title>${t("errorTitle")}</title>
+              <style>
+                body {
+                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                  height: 100vh;
+                  margin: 0;
+                  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                  color: white;
+                  padding: 20px;
+                  text-align: center;
+                }
+                h2 { margin-bottom: 10px; }
+                p { opacity: 0.9; max-width: 500px; }
+                button {
+                  margin-top: 20px;
+                  padding: 10px 20px;
+                  background: white;
+                  color: #f5576c;
+                  border: none;
+                  border-radius: 5px;
+                  font-size: 16px;
+                  cursor: pointer;
+                }
+              </style>
+            </head>
+            <body>
+              <h2>❌ ${t("errorOccurred")}</h2>
+              <p>${(error as Error).message}</p>
+              <button onclick="window.close()">${t("closeWindow")}</button>
+            </body>
+          </html>
+        `);
+      }
       
       toast({
         title: t("previewErrorTitle"),
@@ -418,7 +476,6 @@ export function Completion({
   const errorList = errors.length > 0 ? errors : JSON.parse(localStorage.getItem('protocol-errors') || '[]');
   const hasErrors = errorList.length > 0;
 
-  // RENDER RÉSZ
   return (
     <div className="min-h-screen">
       <PageHeader
@@ -584,21 +641,23 @@ export function Completion({
             {/* Download Excel */}
             {theme === 'modern' ? (
               <button
-                onClick={onDownloadExcel}
-                className="group relative overflow-hidden p-6 rounded-2xl font-semibold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+                onClick={handleDownloadExcel}
+                disabled={isExcelDownloading}
+                className="group relative overflow-hidden p-6 rounded-2xl font-semibold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-600 to-red-600"></div>
                 <div className="relative flex flex-col items-center gap-3">
-                  <FileText className="h-8 w-8" />
+                  {isExcelDownloading ? <Loader2 className="h-8 w-8 animate-spin" /> : <FileText className="h-8 w-8" />}
                   <span className="text-lg">{t("downloadExcel")}</span>
                 </div>
               </button>
             ) : (
               <Button
-                onClick={onDownloadExcel}
-                className="bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center py-4 h-auto"
+                onClick={handleDownloadExcel}
+                disabled={isExcelDownloading}
+                className="bg-orange-600 hover:bg-orange-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
               >
-                <Download className="h-5 w-5 mr-3" />
+                {isExcelDownloading ? <Loader2 className="h-5 w-5 mr-3 animate-spin" /> : <Download className="h-5 w-5 mr-3" />}
                 {t("downloadExcel")}
               </Button>
             )}

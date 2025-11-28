@@ -1,4 +1,4 @@
-// src/components/admin/LiftManagement.tsx - JAVÍTOTT LOGIKA (Delete/Edit active enabled)
+// src/components/admin/LiftManagement.tsx - JAVÍTOTT (Mobil URL + Duplikáció Fix)
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -29,7 +29,9 @@ import { useAuth } from "@/contexts/auth-context";
 import { useLanguageContext } from "@/components/language-context";
 import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getApiUrl } from '@/lib/queryClient';
+
+// 🔥 ÚJ: API URL DEFINIÁLÁSA
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 // =============================================================================
 // TYPES
@@ -99,17 +101,35 @@ export default function LiftManagement() {
     };
   };
 
-  // Fetch data
+  // Fetch data - 🔥 URL JAVÍTVA
   const { data: liftTypesData, isLoading: loadingTypes } = useQuery<{ success: boolean; data: LiftType[] }>({
     queryKey: ["/api/admin/lift-types"],
+    queryFn: async () => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE_URL}/api/admin/lift-types`, { headers });
+      if (!res.ok) throw new Error('Failed to fetch lift types');
+      return res.json();
+    }
   });
 
   const { data: mappingsData, isLoading: loadingMappings } = useQuery<{ success: boolean; data: LiftMapping[] }>({
     queryKey: ["/api/admin/lift-mappings"],
+    queryFn: async () => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE_URL}/api/admin/lift-mappings`, { headers });
+      if (!res.ok) throw new Error('Failed to fetch mappings');
+      return res.json();
+    }
   });
 
   const { data: templatesData } = useQuery<Template[]>({
     queryKey: ["/api/admin/templates"],
+    queryFn: async () => {
+      const headers = await getAuthHeaders();
+      const res = await fetch(`${API_BASE_URL}/api/admin/templates`, { headers });
+      if (!res.ok) throw new Error('Failed to fetch templates');
+      return res.json();
+    }
   });
 
   // Dialogs state
@@ -147,18 +167,26 @@ export default function LiftManagement() {
   });
 
   // ==========================================================================
-  // MUTATIONS
+  // MUTATIONS (JAVÍTOTT URL + HIBAKEZELÉS)
   // ==========================================================================
   
   // --- TYPE MUTATIONS ---
   const createTypeMutation = useMutation({
     mutationFn: async (data: typeof typeForm) => {
       const headers = await getAuthHeaders();
-      const response = await fetch(getApiUrl("/api/admin/lift-types"), {
+      // 🔥 JAVÍTOTT URL
+      const response = await fetch(`${API_BASE_URL}/api/admin/lift-types`, {
         method: "POST",
         headers,
         body: JSON.stringify(data),
       });
+      
+      // 🔥 JAVÍTOTT HIBAKEZELÉS (DUPLIKÁCIÓ)
+      if (response.status === 400 || response.status === 409) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Ez a lift típus kód már létezik!");
+      }
+
       if (!response.ok) throw new Error(await response.text());
       return response.json();
     },
@@ -177,11 +205,19 @@ export default function LiftManagement() {
   const createSubtypeMutation = useMutation({
     mutationFn: async (data: typeof subtypeForm) => {
       const headers = await getAuthHeaders();
-      const response = await fetch(getApiUrl("/api/admin/lift-subtypes"), {
+      // 🔥 JAVÍTOTT URL
+      const response = await fetch(`${API_BASE_URL}/api/admin/lift-subtypes`, {
         method: "POST",
         headers,
         body: JSON.stringify(data),
       });
+
+      // 🔥 JAVÍTOTT HIBAKEZELÉS
+      if (response.status === 400 || response.status === 409) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Ez az altípus kód már létezik ehhez a lifthez!");
+      }
+
       if (!response.ok) throw new Error(await response.text());
       return response.json();
     },
@@ -207,11 +243,19 @@ export default function LiftManagement() {
   const createMappingMutation = useMutation({
     mutationFn: async (data: typeof mappingForm) => {
       const headers = await getAuthHeaders();
-      const response = await fetch(getApiUrl("/api/admin/lift-mappings"), {
+      // 🔥 JAVÍTOTT URL
+      const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings`, {
         method: "POST",
         headers,
         body: JSON.stringify(data),
       });
+
+      // 🔥 JAVÍTOTT HIBAKEZELÉS
+      if (response.status === 400 || response.status === 409) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Ehhez az altípushoz már létezik aktív hozzárendelés! Előbb deaktiváld a régit.");
+      }
+
       if (!response.ok) throw new Error(await response.text());
       return response.json();
     },
@@ -227,7 +271,6 @@ export default function LiftManagement() {
       });
     },
     onError: (error: Error) => {
-      // Ha már létezik, akkor csak egy figyelmeztetés, de lehet, hogy frissíteni kellene
       toast({ title: t("error"), description: error.message, variant: "destructive" });
     },
   });
@@ -235,7 +278,8 @@ export default function LiftManagement() {
   const activateMappingMutation = useMutation({
     mutationFn: async (mappingId: string) => {
       const headers = await getAuthHeaders();
-      const response = await fetch(getApiUrl(`/api/admin/lift-mappings/${mappingId}/activate`), {
+      // 🔥 JAVÍTOTT URL
+      const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings/${mappingId}/activate`, {
         method: "POST",
         headers,
       });
@@ -251,10 +295,12 @@ export default function LiftManagement() {
     },
   });
 
+  // --- DELETE MUTATION (TÖRLÉS JAVÍTÁSA) ---
   const deleteMappingMutation = useMutation({
     mutationFn: async (mappingId: string) => {
       const headers = await getAuthHeaders();
-      const response = await fetch(`/api/admin/lift-mappings/${mappingId}`, {
+      // 🔥 JAVÍTOTT URL (Itt volt a mobil hiba forrása!)
+      const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings/${mappingId}`, {
         method: "DELETE",
         headers,
       });

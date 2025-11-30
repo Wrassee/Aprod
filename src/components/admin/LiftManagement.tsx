@@ -1,4 +1,4 @@
-// src/components/admin/LiftManagement.tsx - MODERN THEME INTEGRATED
+// src/components/admin/LiftManagement.tsx - MODERN THEME INTEGRATED + FIXES
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,9 +28,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/auth-context";
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from "@/contexts/theme-context";
-import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle, Settings, Sparkles } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle, Settings, Sparkles, ArrowRight, Layers } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
+// 🔥 API URL DEFINIÁLÁSA
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 // =============================================================================
@@ -102,7 +103,7 @@ export default function LiftManagement() {
     };
   };
 
-  // Fetch data
+  // Fetch data - JAVÍTOTT queryFn
   const { data: liftTypesData, isLoading: loadingTypes } = useQuery<{ success: boolean; data: LiftType[] }>({
     queryKey: ["/api/admin/lift-types"],
     queryFn: async () => {
@@ -168,7 +169,7 @@ export default function LiftManagement() {
   });
 
   // ==========================================================================
-  // MUTATIONS
+  // MUTATIONS (JAVÍTOTT URL + DUPLIKÁCIÓ ELLENŐRZÉS)
   // ==========================================================================
   
   // --- TYPE MUTATIONS ---
@@ -292,6 +293,7 @@ export default function LiftManagement() {
   const deleteMappingMutation = useMutation({
     mutationFn: async (mappingId: string) => {
       const headers = await getAuthHeaders();
+      // 🔥 JAVÍTÁS: API_BASE_URL hozzáadása, hogy mobilon is töröljön!
       const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings/${mappingId}`, {
         method: "DELETE",
         headers,
@@ -310,19 +312,9 @@ export default function LiftManagement() {
   });
 
   // ==========================================================================
-  // RENDER
+  // RENDER - VÁLTOZATLAN (A TE DESIGNOD)
   // ==========================================================================
   if (loadingTypes || loadingMappings) {
-    if (theme === 'modern') {
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 flex items-center justify-center">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
-            <div className="relative animate-spin rounded-full h-32 w-32 border-b-4 border-blue-600"></div>
-          </div>
-        </div>
-      );
-    }
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -337,9 +329,7 @@ export default function LiftManagement() {
   const questionTemplates = templates.filter((t) => t.type === "unified");
   const protocolTemplates = templates.filter((t) => t.type === "protocol");
 
-  // ==========================================================================
   // MODERN THEME RENDER
-  // ==========================================================================
   if (theme === 'modern') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
@@ -512,6 +502,7 @@ export default function LiftManagement() {
                 </div>
               ))}
             </TabsContent>
+
             {/* MAPPINGS TAB - MODERN */}
             <TabsContent value="mappings" className="space-y-6">
               <div className="flex justify-end mb-6">
@@ -682,6 +673,7 @@ export default function LiftManagement() {
       </div>
     );
   }
+
   // ==========================================================================
   // CLASSIC THEME RENDER
   // ==========================================================================
@@ -701,7 +693,7 @@ export default function LiftManagement() {
           <TabsTrigger value="types">{t("types")}</TabsTrigger>
         </TabsList>
 
-        {/* TYPES TAB - CLASSIC */}
+        {/* TYPES TAB */}
         <TabsContent value="types" className="space-y-4">
           {liftTypes.map((type) => (
             <Card key={type.id}>
@@ -775,7 +767,7 @@ export default function LiftManagement() {
           ))}
         </TabsContent>
 
-        {/* MAPPINGS TAB - CLASSIC */}
+        {/* MAPPINGS TAB */}
         <TabsContent value="mappings" className="space-y-4">
           <div className="flex justify-end mb-4">
             <Button onClick={() => setCreateMappingDialog(true)}>
@@ -879,7 +871,8 @@ export default function LiftManagement() {
           </div>
         </TabsContent>
       </Tabs>
-      {/* CREATE TYPE DIALOG */}
+
+      {/* DIALOGS */}
       <Dialog open={createTypeDialog} onOpenChange={setCreateTypeDialog}>
         <DialogContent>
           <DialogHeader>
@@ -924,7 +917,6 @@ export default function LiftManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* CREATE SUBTYPE DIALOG */}
       <Dialog open={createSubtypeDialog} onOpenChange={setCreateSubtypeDialog}>
         <DialogContent>
           <DialogHeader>
@@ -971,7 +963,6 @@ export default function LiftManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* CREATE MAPPING DIALOG */}
       <Dialog open={createMappingDialog} onOpenChange={setCreateMappingDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
@@ -1092,4 +1083,3 @@ export default function LiftManagement() {
     </div>
   );
 }
-

@@ -1,4 +1,4 @@
-// src/components/admin/LiftManagement.tsx - JAVÍTOTT (Mobil URL + Duplikáció Fix)
+// src/components/admin/LiftManagement.tsx - MODERN THEME INTEGRATED
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,10 +27,10 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/auth-context";
 import { useLanguageContext } from "@/components/language-context";
-import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { useTheme } from "@/contexts/theme-context";
+import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle, Settings, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-// 🔥 ÚJ: API URL DEFINIÁLÁSA
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 // =============================================================================
@@ -89,6 +89,7 @@ export default function LiftManagement() {
   const queryClient = useQueryClient();
   const { supabase } = useAuth();
   const { t, language } = useLanguageContext();
+  const { theme } = useTheme();
 
   // Auth headers helper
   const getAuthHeaders = async () => {
@@ -101,7 +102,7 @@ export default function LiftManagement() {
     };
   };
 
-  // Fetch data - 🔥 URL JAVÍTVA
+  // Fetch data
   const { data: liftTypesData, isLoading: loadingTypes } = useQuery<{ success: boolean; data: LiftType[] }>({
     queryKey: ["/api/admin/lift-types"],
     queryFn: async () => {
@@ -167,21 +168,19 @@ export default function LiftManagement() {
   });
 
   // ==========================================================================
-  // MUTATIONS (JAVÍTOTT URL + HIBAKEZELÉS)
+  // MUTATIONS
   // ==========================================================================
   
   // --- TYPE MUTATIONS ---
   const createTypeMutation = useMutation({
     mutationFn: async (data: typeof typeForm) => {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTOTT URL
       const response = await fetch(`${API_BASE_URL}/api/admin/lift-types`, {
         method: "POST",
         headers,
         body: JSON.stringify(data),
       });
       
-      // 🔥 JAVÍTOTT HIBAKEZELÉS (DUPLIKÁCIÓ)
       if (response.status === 400 || response.status === 409) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Ez a lift típus kód már létezik!");
@@ -205,14 +204,12 @@ export default function LiftManagement() {
   const createSubtypeMutation = useMutation({
     mutationFn: async (data: typeof subtypeForm) => {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTOTT URL
       const response = await fetch(`${API_BASE_URL}/api/admin/lift-subtypes`, {
         method: "POST",
         headers,
         body: JSON.stringify(data),
       });
 
-      // 🔥 JAVÍTOTT HIBAKEZELÉS
       if (response.status === 400 || response.status === 409) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Ez az altípus kód már létezik ehhez a lifthez!");
@@ -243,14 +240,12 @@ export default function LiftManagement() {
   const createMappingMutation = useMutation({
     mutationFn: async (data: typeof mappingForm) => {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTOTT URL
       const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings`, {
         method: "POST",
         headers,
         body: JSON.stringify(data),
       });
 
-      // 🔥 JAVÍTOTT HIBAKEZELÉS
       if (response.status === 400 || response.status === 409) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Ehhez az altípushoz már létezik aktív hozzárendelés! Előbb deaktiváld a régit.");
@@ -278,7 +273,6 @@ export default function LiftManagement() {
   const activateMappingMutation = useMutation({
     mutationFn: async (mappingId: string) => {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTOTT URL
       const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings/${mappingId}/activate`, {
         method: "POST",
         headers,
@@ -295,11 +289,9 @@ export default function LiftManagement() {
     },
   });
 
-  // --- DELETE MUTATION (TÖRLÉS JAVÍTÁSA) ---
   const deleteMappingMutation = useMutation({
     mutationFn: async (mappingId: string) => {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTOTT URL (Itt volt a mobil hiba forrása!)
       const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings/${mappingId}`, {
         method: "DELETE",
         headers,
@@ -321,6 +313,16 @@ export default function LiftManagement() {
   // RENDER
   // ==========================================================================
   if (loadingTypes || loadingMappings) {
+    if (theme === 'modern') {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 flex items-center justify-center">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full blur-xl opacity-50 animate-pulse"></div>
+            <div className="relative animate-spin rounded-full h-32 w-32 border-b-4 border-blue-600"></div>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -335,6 +337,354 @@ export default function LiftManagement() {
   const questionTemplates = templates.filter((t) => t.type === "unified");
   const protocolTemplates = templates.filter((t) => t.type === "protocol");
 
+  // ==========================================================================
+  // MODERN THEME RENDER
+  // ==========================================================================
+  if (theme === 'modern') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+          {/* Header */}
+          <div className="mb-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-xl">
+                <Settings className="h-8 w-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                  {t("lift_type_management")}
+                </h2>
+                <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-1">
+                  <Sparkles className="h-3 w-3 text-cyan-500" />
+                  Lift típusok és sablonok kezelése
+                </p>
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setCreateTypeDialog(true)}
+              className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
+              <div className="relative flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                <span>{t("create_new_type")}</span>
+              </div>
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <Tabs defaultValue="mappings" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
+              <TabsTrigger 
+                value="mappings"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+              >
+                {t("mappings")}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="types"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+              >
+                {t("types")}
+              </TabsTrigger>
+            </TabsList>
+
+            {/* TYPES TAB - MODERN */}
+            <TabsContent value="types" className="space-y-6">
+              {liftTypes.map((type) => (
+                <div key={type.id} className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl hover:shadow-2xl transition-all">
+                  <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity"></div>
+                  
+                  <div className="relative bg-white dark:bg-gray-900 rounded-xl">
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg">
+                            <Settings className="h-6 w-6 text-white" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                {language === 'de' && type.name_de ? type.name_de : type.name_hu}
+                              </h3>
+                              <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
+                                {type.code}
+                              </Badge>
+                              {type.is_active ? (
+                                <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0">
+                                  {t("active")}
+                                </Badge>
+                              ) : (
+                                <Badge variant="secondary" className="bg-gray-200 text-gray-600">
+                                  {t("inactive")}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {language === 'de' && type.description_de ? type.description_de : type.description_hu}
+                            </p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => toast({ title: "Info", description: "Edit feature coming soon" })}
+                            className="w-10 h-10 rounded-xl bg-blue-50 hover:bg-blue-100 flex items-center justify-center transition-colors"
+                          >
+                            <Edit className="w-5 h-5 text-blue-600" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedType(type.id);
+                              setSubtypeForm({ ...subtypeForm, liftTypeId: type.id });
+                              setCreateSubtypeDialog(true);
+                            }}
+                            className="group relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all"
+                          >
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500"></div>
+                            <div className="relative flex items-center gap-2">
+                              <Plus className="h-4 w-4" />
+                              <span className="text-sm">{t("subtypes")}</span>
+                            </div>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Subtypes */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                          <Sparkles className="h-4 w-4 text-cyan-500" />
+                          {t("subtypes")} ({type.subtypes.length})
+                        </h4>
+                        <div className="grid gap-3">
+                          {type.subtypes.map((subtype) => (
+                            <div
+                              key={subtype.id}
+                              className="group/subtype relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-gray-800 dark:to-gray-800/50 p-4 border border-blue-100 dark:border-blue-900/30 hover:border-blue-300 transition-all"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-300 flex items-center justify-center shadow-md">
+                                    <span className="text-xs font-bold text-white">
+                                      {subtype.code.charAt(subtype.code.length - 1)}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="font-semibold text-gray-900 dark:text-white">
+                                      {language === 'de' && subtype.name_de ? subtype.name_de : subtype.name_hu}
+                                    </span>
+                                    <Badge variant="outline" className="ml-2 text-xs bg-white">
+                                      {subtype.code}
+                                    </Badge>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex gap-2 items-center">
+                                  {subtype.is_active ? (
+                                    <div className="flex items-center gap-1 text-green-600">
+                                      <CheckCircle2 className="w-5 h-5" />
+                                      <span className="text-xs font-medium">Aktív</span>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center gap-1 text-gray-400">
+                                      <XCircle className="w-5 h-5" />
+                                      <span className="text-xs font-medium">Inaktív</span>
+                                    </div>
+                                  )}
+                                  <button className="w-8 h-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 flex items-center justify-center transition-colors opacity-0 group-hover/subtype:opacity-100">
+                                    <Edit className="w-4 h-4 text-blue-600" />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </TabsContent>
+            {/* MAPPINGS TAB - MODERN */}
+            <TabsContent value="mappings" className="space-y-6">
+              <div className="flex justify-end mb-6">
+                <button
+                  onClick={() => setCreateMappingDialog(true)}
+                  className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
+                  <div className="relative flex items-center gap-2">
+                    <Link className="h-5 w-5" />
+                    <span>{t("create_new_mapping")}</span>
+                  </div>
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
+                </button>
+              </div>
+
+              {mappings.length === 0 && (
+                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center shadow-lg flex-shrink-0">
+                      <AlertCircle className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                        Nincs még létrehozva sablon párosítás
+                      </h4>
+                      <p className="text-sm text-amber-700 dark:text-amber-300">
+                        Hozz létre egyet a fenti gombbal!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="grid gap-6">
+                {mappings.map((mapping) => (
+                  <div
+                    key={mapping.id}
+                    className={`group relative overflow-hidden rounded-2xl transition-all ${
+                      mapping.is_active
+                        ? 'bg-gradient-to-br from-green-600 via-emerald-500 to-teal-400 p-1 shadow-xl hover:shadow-2xl'
+                        : 'bg-gradient-to-br from-gray-400 via-slate-400 to-gray-500 p-1 shadow-lg hover:shadow-xl opacity-70'
+                    }`}
+                  >
+                    {mapping.is_active && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity"></div>
+                    )}
+                    
+                    <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
+                            mapping.is_active
+                              ? 'bg-gradient-to-br from-green-500 to-emerald-400'
+                              : 'bg-gradient-to-br from-gray-400 to-slate-400'
+                          }`}>
+                            <Link className="h-6 w-6 text-white" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge variant="outline" className="bg-slate-50 border-slate-200 text-slate-700 font-mono">
+                                {mapping.subtype?.code || "?"}
+                              </Badge>
+                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                                {language === 'de' && mapping.subtype?.name_de 
+                                  ? mapping.subtype.name_de 
+                                  : mapping.subtype?.name_hu || t("unknown_subtype")}
+                              </h3>
+                              {mapping.is_active && (
+                                <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-md">
+                                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                                  {t("active")}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2">
+                          {!mapping.is_active && (
+                            <button
+                              onClick={() => activateMappingMutation.mutate(mapping.id)}
+                              className="group/btn relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all"
+                            >
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
+                              <div className="relative flex items-center gap-1 text-sm">
+                                <CheckCircle2 className="w-4 h-4" />
+                                <span>{t("activate")}</span>
+                              </div>
+                            </button>
+                          )}
+                          
+                          <button
+                            onClick={() => setDeleteConfirmDialog({ open: true, id: mapping.id, type: 'mapping' })}
+                            className="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors"
+                          >
+                            <Trash2 className="w-5 h-5 text-red-600" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* Question Template */}
+                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20 p-4 border border-blue-100 dark:border-blue-900/30">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-300 flex items-center justify-center shadow-md flex-shrink-0 mt-1">
+                              <Sparkles className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">
+                                {t("question_template")}
+                              </p>
+                              {mapping.questionTemplate ? (
+                                <p className="font-semibold text-gray-900 dark:text-white truncate">
+                                  {mapping.questionTemplate.name}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
+                                  <XCircle className="w-4 h-4" />
+                                  {t("not_specified")}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Protocol Template */}
+                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-50 to-fuchsia-50/50 dark:from-purple-950/20 dark:to-fuchsia-950/20 p-4 border border-purple-100 dark:border-purple-900/30">
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-fuchsia-300 flex items-center justify-center shadow-md flex-shrink-0 mt-1">
+                              <Settings className="h-4 w-4 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase mb-1">
+                                {t("protocol_template")}
+                              </p>
+                              {mapping.protocolTemplate ? (
+                                <p className="font-semibold text-gray-900 dark:text-white truncate">
+                                  {mapping.protocolTemplate.name}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">
+                                  <AlertCircle className="w-4 h-4" />
+                                  {t("not_specified")} (Opcionális)
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {mapping.notes && (
+                        <div className="mt-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
+                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Megjegyzés:</p>
+                          <p className="text-sm text-gray-700 dark:text-gray-300 italic">
+                            {mapping.notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    );
+  }
+  // ==========================================================================
+  // CLASSIC THEME RENDER
+  // ==========================================================================
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -351,7 +701,7 @@ export default function LiftManagement() {
           <TabsTrigger value="types">{t("types")}</TabsTrigger>
         </TabsList>
 
-        {/* TYPES TAB */}
+        {/* TYPES TAB - CLASSIC */}
         <TabsContent value="types" className="space-y-4">
           {liftTypes.map((type) => (
             <Card key={type.id}>
@@ -425,7 +775,7 @@ export default function LiftManagement() {
           ))}
         </TabsContent>
 
-        {/* MAPPINGS TAB */}
+        {/* MAPPINGS TAB - CLASSIC */}
         <TabsContent value="mappings" className="space-y-4">
           <div className="flex justify-end mb-4">
             <Button onClick={() => setCreateMappingDialog(true)}>
@@ -475,7 +825,6 @@ export default function LiftManagement() {
                         </Button>
                       )}
                       
-                      {/* Törlés gomb mindenkinek elérhető (de megerősítést kér) */}
                       <Button
                         variant="destructive"
                         size="sm"
@@ -530,7 +879,6 @@ export default function LiftManagement() {
           </div>
         </TabsContent>
       </Tabs>
-
       {/* CREATE TYPE DIALOG */}
       <Dialog open={createTypeDialog} onOpenChange={setCreateTypeDialog}>
         <DialogContent>
@@ -744,3 +1092,4 @@ export default function LiftManagement() {
     </div>
   );
 }
+

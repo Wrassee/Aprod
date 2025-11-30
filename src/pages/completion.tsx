@@ -1,4 +1,9 @@
-// src/pages/completion.tsx - JAVÍTOTT, SZINTAKTIKAILAG HELYES VERZIÓ
+// src/pages/completion.tsx - VÉGLEGES, ÖSSZEVONT VERZIÓ (Version3 alap + Version1/2 javítások)
+/*
+  - Alap: Version3
+  - Beépítve: Version1 & Version2 javításai (egységes saveFile, Excel letöltés komponensben, FileOpener natív megnyitás,
+    jobb hibaüzenetek, preview loading UI, toast-ok mobilon)
+*/
 
 import PageHeader from '@/components/PageHeader';
 import { useState, useCallback } from 'react';
@@ -19,7 +24,6 @@ import {
   Loader2,
   Sparkles,
   FileText,
-  Award,
   Zap,
 } from 'lucide-react';
 import { getApiUrl } from '@/lib/queryClient';
@@ -32,8 +36,7 @@ import { FileOpener } from '@capacitor-community/file-opener';
 interface CompletionProps {
   onEmailPDF: () => void;
   onSaveToCloud: () => void;
-  onDownloadExcel: () => void;
-  onViewProtocol: () => void;
+  // onDownloadExcel / onViewProtocol kept out — Excel is handled locally in this component
   onStartNew: () => void;
   onGoHome: () => void;
   onSettings: () => void;
@@ -69,7 +72,7 @@ export function Completion({
   const [isExcelDownloading, setIsExcelDownloading] = useState(false);
   const [isPdfPreviewing, setIsPdfPreviewing] = useState(false);
 
-  // === 🛠️ HELPER: BLOB KONVERTÁLÁSA BASE64-RE ===
+  // === 🛠️ HELPER: BLOB → BASE64 ===
   const convertBlobToBase64 = (blob: Blob): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -84,12 +87,13 @@ export function Completion({
   };
 
   // === 🛠️ HELPER: FÁJL MENTÉSE ===
+  // Visszaadja a mentett URI-t (mobil) vagy üres stringet (web)
   const saveFile = async (blob: Blob, filename: string): Promise<string> => {
     if (Capacitor.isNativePlatform()) {
       try {
         console.log('📱 Saving file on mobile/native device...');
         const base64Data = await convertBlobToBase64(blob);
-        
+
         const result = await Filesystem.writeFile({
           path: filename,
           data: base64Data,
@@ -99,20 +103,22 @@ export function Completion({
         console.log('✅ File saved to:', result.uri);
         toast({
           title: language === 'hu' ? 'Sikeres mentés!' : 'Erfolgreich gespeichert!',
-          description: language === 'hu' 
-            ? `A fájl a Dokumentumok mappába került: ${filename}` 
-            : `Datei im Dokumente-Ordner gespeichert: ${filename}`,
+          description:
+            language === 'hu'
+              ? `A fájl a Dokumentumok mappába került: ${filename}`
+              : `Datei im Dokumente-Ordner gespeichert: ${filename}`,
           duration: 5000,
         });
-        return result.uri;
 
+        return result.uri;
       } catch (e) {
         console.error('❌ Mobile save failed:', e);
         toast({
           title: t("error"),
-          description: language === 'hu' 
-            ? "Nem sikerült a fájlt a telefonra menteni. Ellenőrizd a jogosultságokat."
-            : "Datei konnte nicht auf dem Telefon gespeichert werden. Berechtigungen überprüfen.",
+          description:
+            language === 'hu'
+              ? "Nem sikerült a fájlt a telefonra menteni. Ellenőrizd a jogosultságokat."
+              : "Datei konnte nicht auf dem Telefon gespeichert werden. Berechtigungen überprüfen.",
           variant: "destructive"
         });
         throw e;
@@ -133,6 +139,7 @@ export function Completion({
     }
   };
 
+  // === EMAIL ===
   const handleEmailClick = async () => {
     setIsEmailSending(true);
     setEmailStatus(t("emailSending"));
@@ -142,6 +149,7 @@ export function Completion({
       setEmailStatus(`✅ ${t("emailSentSuccess")}`);
       setTimeout(() => setEmailStatus(''), 5000);
     } catch (error) {
+      console.error('Error sending email:', error);
       setEmailStatus(`❌ ${t("emailSentError")}`);
       setTimeout(() => setEmailStatus(''), 5000);
     } finally {
@@ -149,7 +157,7 @@ export function Completion({
     }
   };
 
-  // 🔥 EXCEL LETÖLTÉS - HELYI KEZELÉS (NEM PROP)
+  // 🔥 EXCEL LETÖLTÉS - komponensben (nem prop)
   const handleDownloadExcel = async () => {
     setIsExcelDownloading(true);
     try {
@@ -163,28 +171,41 @@ export function Completion({
         body: JSON.stringify({ formData: savedData, language }),
       });
 
-      if (!response.ok) throw new Error('Excel generation failed');
+      if (!response.ok) {
+        let message = 'Excel generation failed';
+        try {
+          const txt = await response.text();
+          message = txt || message;
+        } catch { /* ignore */ }
+        throw new Error(message);
+      }
 
       const blob = await response.blob();
       const liftId = savedData.answers?.['7'] || 'Unknown';
-      const filename = `AP_${liftId}.xlsx`;
+      const filename = `AP_${String(liftId).replace(/[^a-zA-Z0-9_-]/g, '_')}.xlsx`;
 
       await saveFile(blob, filename);
 
-      console.log('Excel download completed successfully.');
+      toast({
+        title: language === 'hu' ? 'Excel letöltve!' : 'Excel heruntergeladen!',
+        description: language === 'hu' ? 'A fájlt a Dokumentumok mappában találod.' : 'Datei im Dokumente-Ordner gespeichert.',
+        duration: 3000,
+      });
 
+      console.log('Excel download completed successfully.');
     } catch (error) {
       console.error('Error downloading Excel:', error);
       toast({
         title: t("error"),
-        description: "Hiba az Excel letöltésekor",
-        variant: "destructive"
+        description: (error as Error).message || "Hiba az Excel letöltésekor",
+        variant: "destructive",
       });
     } finally {
       setIsExcelDownloading(false);
     }
   };
 
+  // === PDF LETÖLTÉS ===
   const handleDownloadPDF = async () => {
     setIsPdfDownloading(true);
     try {
@@ -205,22 +226,41 @@ export function Completion({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || t("pdfGenerationError") || 'Failed to generate PDF on the server.');
+        let errMsg = t("pdfGenerationError");
+        try {
+          const json = await response.json();
+          errMsg = json?.message || errMsg;
+        } catch {
+          try {
+            const text = await response.text();
+            if (text) errMsg = text;
+          } catch { /* ignore */ }
+        }
+        throw new Error(errMsg);
       }
 
       const blob = await response.blob();
       const liftId = savedData.answers?.['7'] ? String(savedData.answers['7']).replace(/[^a-zA-Z0-9]/g, '_') : 'Unknown';
       const filename = `OTIS_Protocol_${liftId}_${new Date().toISOString().split('T')[0]}.pdf`;
 
-      await saveFile(blob, filename);
+      const uri = await saveFile(blob, filename);
+
+      // Ha mobilon, próbáljuk meg megnyitni automatikusan
+      if (Capacitor.isNativePlatform() && uri) {
+        try {
+          await FileOpener.open({ filePath: uri, contentType: 'application/pdf' });
+        } catch (openErr) {
+          console.warn('Could not auto-open PDF after save:', openErr);
+          // nem fatal, csak figyelmeztetés
+        }
+      }
 
       console.log('PDF download initiated successfully.');
     } catch (error) {
       console.error('Error during PDF download:', error);
       toast({
         title: t("error"),
-        description: (error as Error).message,
+        description: (error as Error).message || t("pdfGenerationError"),
         variant: "destructive"
       });
     } finally {
@@ -228,6 +268,7 @@ export function Completion({
     }
   };
 
+  // === GROUNDING PDF ===
   const handleDownloadGroundingPDF = useCallback(async () => {
     setIsGroundingPdfDownloading(true);
     try {
@@ -237,15 +278,12 @@ export function Completion({
       if (!savedData.groundingCheckAnswers) {
         throw new Error(t("noGroundingDataError"));
       }
-      
+
       const plz = savedData.answers?.['3'] || '';
       const city = savedData.answers?.['4'] || '';
       const street = savedData.answers?.['5'] || '';
       const houseNumber = savedData.answers?.['6'] || '';
-      
-      const fullAddress = [plz, city, street, houseNumber]
-        .filter(Boolean)
-        .join(' ');
+      const fullAddress = [plz, city, street, houseNumber].filter(Boolean).join(' ');
 
       const payload = {
         groundingCheckAnswers: savedData.groundingCheckAnswers,
@@ -279,19 +317,30 @@ export function Completion({
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Server Error details:", errorText);
-        throw new Error(`Szerver hiba (500): ${errorText.substring(0, 100)}...`);
+        let serverDetails = '';
+        try {
+          serverDetails = await response.text();
+        } catch { /* ignore */ }
+        console.error("Server Error details:", serverDetails);
+        throw new Error(t("groundingPdfGenerationError") + (serverDetails ? `: ${serverDetails.substring(0, 200)}` : ''));
       }
 
       const blob = await response.blob();
       const liftIdForFilename = payload.liftId.replace(/[^a-zA-Z0-9]/g, '_') || 'Unknown';
       const filename = `Erdungskontrolle_${liftIdForFilename}_${payload.receptionDate || new Date().toISOString().split('T')[0]}.pdf`;
 
-      await saveFile(blob, filename);
-      
+      const uri = await saveFile(blob, filename);
+
+      if (Capacitor.isNativePlatform() && uri) {
+        try {
+          await FileOpener.open({ filePath: uri, contentType: 'application/pdf' });
+        } catch (openErr) {
+          console.warn('Could not auto-open grounding PDF after save:', openErr);
+        }
+      }
+
       console.log('Grounding PDF download initiated successfully.');
-      
+
       toast({
         title: t("downloadSuccessTitle"),
         description: t("groundingProtocolDownloaded"),
@@ -309,63 +358,64 @@ export function Completion({
     } finally {
       setIsGroundingPdfDownloading(false);
     }
-  }, [language, toast, t]);
+  }, [language, t, toast]);
 
-  // 🔥 ELŐNÉZET - MOBIL ÉS WEB TÁMOGATÁS
+  // 🔥 PREVIEW (már Version3-ból, kibővítve)
   const handlePreviewPDF = async () => {
     setIsPdfPreviewing(true);
     let newTab: Window | null = null;
 
-    // Csak PC-n nyitunk azonnal ablakot
+    // Csak PC-n nyitunk először ablakot, hogy a popup-blocker előtt legyünk
     if (!Capacitor.isNativePlatform()) {
-        newTab = window.open('', '_blank');
-        if (!newTab) {
-            toast({
-                title: t("popupBlockedTitle"),
-                description: t("popupBlockedDescription"),
-                variant: 'destructive'
-            });
-            setIsPdfPreviewing(false);
-            return;
-        }
-        newTab.document.write(`
-          <html>
-            <head>
-              <title>${t("previewGeneratingTitle")}</title>
-              <style>
-                body {
-                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  justify-content: center;
-                  height: 100vh;
-                  margin: 0;
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  color: white;
-                }
-                .spinner {
-                  width: 50px;
-                  height: 50px;
-                  border: 5px solid rgba(255,255,255,0.3);
-                  border-radius: 50%;
-                  border-top-color: white;
-                  animation: spin 1s ease-in-out infinite;
-                }
-                @keyframes spin {
-                  to { transform: rotate(360deg); }
-                }
-                h2 { margin-top: 20px; font-weight: 300; }
-                p { opacity: 0.8; }
-              </style>
-            </head>
-            <body>
-              <div class="spinner"></div>
-              <h2>${t("generating")}...</h2>
-              <p>${t("previewGeneratingWait")}</p>
-            </body>
-          </html>
-        `);
+      newTab = window.open('', '_blank');
+      if (!newTab) {
+        toast({
+          title: t("popupBlockedTitle"),
+          description: t("popupBlockedDescription"),
+          variant: 'destructive'
+        });
+        setIsPdfPreviewing(false);
+        return;
+      }
+
+      newTab.document.write(`
+        <html>
+          <head>
+            <title>${t("previewGeneratingTitle")}</title>
+            <style>
+              body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                margin: 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+              }
+              .spinner {
+                width: 50px;
+                height: 50px;
+                border: 5px solid rgba(255,255,255,0.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 1s ease-in-out infinite;
+              }
+              @keyframes spin {
+                to { transform: rotate(360deg); }
+              }
+              h2 { margin-top: 20px; font-weight: 300; }
+              p { opacity: 0.8; max-width: 720px; text-align: center; padding: 0 20px; }
+            </style>
+          </head>
+          <body>
+            <div class="spinner"></div>
+            <h2>${t("generating")}...</h2>
+            <p>${t("previewGeneratingWait")}</p>
+          </body>
+        </html>
+      `);
     }
 
     try {
@@ -384,87 +434,108 @@ export function Completion({
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || t("pdfGenerationServerError"));
+        let errMsg = t("pdfGenerationServerError");
+        try {
+          const json = await response.json();
+          errMsg = json?.message || errMsg;
+        } catch {
+          try {
+            const text = await response.text();
+            if (text) errMsg = text;
+          } catch { /* ignore */ }
+        }
+        throw new Error(errMsg);
       }
 
       const blob = await response.blob();
 
-      // 🔥 MOBIL LOGIKA: Mentés + FileOpener
+      // MOBIL: mentés + FileOpener
       if (Capacitor.isNativePlatform()) {
-          const filename = "preview_temp.pdf";
-          const uri = await saveFile(blob, filename);
-          
-          try {
-              await FileOpener.open({
-                  filePath: uri,
-                  contentType: 'application/pdf'
-              });
-              console.log('PDF preview opened with FileOpener.');
-          } catch (openerError) {
-              console.error("FileOpener hiba:", openerError);
-              toast({
-                  title: "Nincs PDF olvasó",
-                  description: "A fájl le lett mentve, de nem sikerült automatikusan megnyitni.",
-                  variant: "default"
-              });
-          }
+        const filename = "preview_temp.pdf";
+        const uri = await saveFile(blob, filename);
 
+        try {
+          if (uri) {
+            await FileOpener.open({ filePath: uri, contentType: 'application/pdf' });
+            console.log('PDF preview opened with FileOpener.');
+          } else {
+            // Ha mentés nem adott URI-t valamiért, fallback: próbáljuk web-es letöltést
+            console.warn('No URI returned on native save; cannot open automatically.');
+            toast({
+              title: t("previewWarningTitle"),
+              description: t("previewSavedButNotOpened"),
+              duration: 4000,
+            });
+          }
+        } catch (openerError) {
+          console.error("FileOpener hiba:", openerError);
+          toast({
+            title: "Nincs PDF olvasó",
+            description: language === 'hu'
+              ? "A fájl le lett mentve, de nem sikerült automatikusan megnyitni."
+              : "Die Datei wurde gespeichert, konnte aber nicht automatisch geöffnet werden.",
+            variant: "default"
+          });
+        }
       } else {
-          // 🔥 PC LOGIKA: Új fül
-          const url = window.URL.createObjectURL(blob);
-          if (newTab) newTab.location.href = url;
-          console.log('PDF preview opened in new tab.');
+        // PC: új fül
+        const url = window.URL.createObjectURL(blob);
+        if (newTab) newTab.location.href = url;
       }
 
     } catch (error) {
       console.error('Error during PDF preview:', error);
-      
+
       if (newTab && !Capacitor.isNativePlatform()) {
-        newTab.document.write(`
-          <html>
-            <head>
-              <title>${t("errorTitle")}</title>
-              <style>
-                body {
-                  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  justify-content: center;
-                  height: 100vh;
-                  margin: 0;
-                  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-                  color: white;
-                  padding: 20px;
-                  text-align: center;
-                }
-                h2 { margin-bottom: 10px; }
-                p { opacity: 0.9; max-width: 500px; }
-                button {
-                  margin-top: 20px;
-                  padding: 10px 20px;
-                  background: white;
-                  color: #f5576c;
-                  border: none;
-                  border-radius: 5px;
-                  font-size: 16px;
-                  cursor: pointer;
-                }
-              </style>
-            </head>
-            <body>
-              <h2>❌ ${t("errorOccurred")}</h2>
-              <p>${(error as Error).message}</p>
-              <button onclick="window.close()">${t("closeWindow")}</button>
-            </body>
-          </html>
-        `);
+        // Mutassunk hibás állapotot az új fülön
+        try {
+          newTab.document.write(`
+            <html>
+              <head>
+                <title>${t("errorTitle")}</title>
+                <style>
+                  body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    height: 100vh;
+                    margin: 0;
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                  }
+                  h2 { margin-bottom: 10px; }
+                  p { opacity: 0.9; max-width: 500px; }
+                  button {
+                    margin-top: 20px;
+                    padding: 10px 20px;
+                    background: white;
+                    color: #f5576c;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    cursor: pointer;
+                  }
+                </style>
+              </head>
+              <body>
+                <h2>❌ ${t("errorOccurred")}</h2>
+                <p>${(error as Error).message}</p>
+                <button onclick="window.close()">${t("closeWindow")}</button>
+              </body>
+            </html>
+          `);
+        } catch (e) {
+          // esetleg a newTab már bezáródott — ignore
+        }
       }
-      
+
       toast({
         title: t("previewErrorTitle"),
-        description: (error as Error).message,
+        description: (error as Error).message || t("previewErrorTitle"),
         variant: 'destructive',
         duration: 5000,
       });
@@ -648,7 +719,7 @@ export function Completion({
                 <div className="absolute inset-0 bg-gradient-to-br from-orange-600 to-red-600"></div>
                 <div className="relative flex flex-col items-center gap-3">
                   {isExcelDownloading ? <Loader2 className="h-8 w-8 animate-spin" /> : <FileText className="h-8 w-8" />}
-                  <span className="text-lg">{t("downloadExcel")}</span>
+                  <span className="text-lg">{isExcelDownloading ? t("generating") : t("downloadExcel")}</span>
                 </div>
               </button>
             ) : (
@@ -662,7 +733,7 @@ export function Completion({
               </Button>
             )}
 
-            {/* View Protocol */}
+            {/* View Protocol (Preview) */}
             {theme === 'modern' ? (
               <button
                 onClick={handlePreviewPDF}
@@ -693,7 +764,7 @@ export function Completion({
               <div className="mb-8 relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-600 via-rose-500 to-pink-400 p-1 shadow-xl">
                 <div className="absolute inset-0 bg-gradient-to-r from-rose-400 via-red-500 to-pink-500 opacity-30 animate-pulse"></div>
                 <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
-                  <ErrorExport 
+                  <ErrorExport
                     errors={errorList}
                     protocolData={protocolData || {
                       buildingAddress: '',
@@ -706,7 +777,7 @@ export function Completion({
               </div>
             ) : (
               <div className="mt-8">
-                <ErrorExport 
+                <ErrorExport
                   errors={errorList}
                   protocolData={protocolData || {
                     buildingAddress: '',

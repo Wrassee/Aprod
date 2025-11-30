@@ -1,8 +1,11 @@
-// src/contexts/auth-context.tsx - VÉGLEGES, JAVÍTOTT VERZIÓ (API-val)
+// src/contexts/auth-context.tsx - JAVÍTOTT (Mobil Profil Betöltés Fix)
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { User, Session, SupabaseClient, AuthError } from '@supabase/supabase-js';
+
+// 🔥 ÚJ: API URL DEFINIÁLÁSA MOBILHOZ
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
 // Ez a "Profile" objektum típusa, ahogy az adatbázisban van
 interface Profile {
@@ -49,7 +52,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('🔄 AuthContext - Refreshing profile from API for user:', currentUser.id);
       try {
         // ✅ A backend /api/profiles/:userId végpontját hívjuk
-        const response = await fetch(`/api/profiles/${currentUser.id}`, {
+        // 🔥 JAVÍTÁS: API_BASE_URL használata, hogy mobilon is megtalálja a szervert
+        const response = await fetch(`${API_BASE_URL}/api/profiles/${currentUser.id}`, {
           headers: {
             'Authorization': `Bearer ${currentSession.access_token}`
           }

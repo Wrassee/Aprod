@@ -356,6 +356,7 @@ export default function LiftManagement() {
             </div>
             
             <button
+            type="button"
               onClick={() => setCreateTypeDialog(true)}
               className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             >
@@ -425,12 +426,14 @@ export default function LiftManagement() {
                         
                         <div className="flex gap-2">
                           <button
+                          type="button"
                             onClick={() => toast({ title: "Info", description: "Edit feature coming soon" })}
                             className="w-10 h-10 rounded-xl bg-blue-50 hover:bg-blue-100 flex items-center justify-center transition-colors"
                           >
                             <Edit className="w-5 h-5 text-blue-600" />
                           </button>
                           <button
+                          type="button"
                             onClick={() => {
                               setSelectedType(type.id);
                               setSubtypeForm({ ...subtypeForm, liftTypeId: type.id });
@@ -488,7 +491,9 @@ export default function LiftManagement() {
                                       <span className="text-xs font-medium">Inaktív</span>
                                     </div>
                                   )}
-                                  <button className="w-8 h-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 flex items-center justify-center transition-colors opacity-0 group-hover/subtype:opacity-100">
+                                  <button
+                                  type="button"
+                                   className="w-8 h-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 flex items-center justify-center transition-colors opacity-0 group-hover/subtype:opacity-100">
                                     <Edit className="w-4 h-4 text-blue-600" />
                                   </button>
                                 </div>
@@ -507,6 +512,7 @@ export default function LiftManagement() {
             <TabsContent value="mappings" className="space-y-6">
               <div className="flex justify-end mb-6">
                 <button
+                type="button"
                   onClick={() => setCreateMappingDialog(true)}
                   className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                 >
@@ -585,6 +591,7 @@ export default function LiftManagement() {
                         <div className="flex gap-2">
                           {!mapping.is_active && (
                             <button
+                            type="button"
                               onClick={() => activateMappingMutation.mutate(mapping.id)}
                               className="group/btn relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all"
                             >
@@ -597,6 +604,7 @@ export default function LiftManagement() {
                           )}
                           
                           <button
+                          type="button"
                             onClick={() => setDeleteConfirmDialog({ open: true, id: mapping.id, type: 'mapping' })}
                             className="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors"
                           >

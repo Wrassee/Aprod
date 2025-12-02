@@ -1,4 +1,4 @@
-// src/components/admin/LiftManagement.tsx - MODERN THEME INTEGRATED + FIXES
+// src/components/admin/LiftManagement.tsx - FULL FIXED VERSION
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -103,7 +103,7 @@ export default function LiftManagement() {
     };
   };
 
-  // Fetch data - JAVÍTOTT queryFn
+  // Fetch data
   const { data: liftTypesData, isLoading: loadingTypes } = useQuery<{ success: boolean; data: LiftType[] }>({
     queryKey: ["/api/admin/lift-types"],
     queryFn: async () => {
@@ -169,7 +169,7 @@ export default function LiftManagement() {
   });
 
   // ==========================================================================
-  // MUTATIONS (JAVÍTOTT URL + DUPLIKÁCIÓ ELLENŐRZÉS)
+  // MUTATIONS
   // ==========================================================================
   
   // --- TYPE MUTATIONS ---
@@ -293,7 +293,6 @@ export default function LiftManagement() {
   const deleteMappingMutation = useMutation({
     mutationFn: async (mappingId: string) => {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTÁS: API_BASE_URL hozzáadása, hogy mobilon is töröljön!
       const response = await fetch(`${API_BASE_URL}/api/admin/lift-mappings/${mappingId}`, {
         method: "DELETE",
         headers,
@@ -311,9 +310,6 @@ export default function LiftManagement() {
     },
   });
 
-  // ==========================================================================
-  // RENDER - VÁLTOZATLAN (A TE DESIGNOD)
-  // ==========================================================================
   if (loadingTypes || loadingMappings) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -329,13 +325,15 @@ export default function LiftManagement() {
   const questionTemplates = templates.filter((t) => t.type === "unified");
   const protocolTemplates = templates.filter((t) => t.type === "protocol");
 
+  // ==========================================================================
   // MODERN THEME RENDER
+  // ==========================================================================
   if (theme === 'modern') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
         {/* Animated background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000 pointer-events-none"></div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
           {/* Header */}
@@ -355,18 +353,18 @@ export default function LiftManagement() {
               </div>
             </div>
             
+            {/* 🔥 JAVÍTOTT GOMB: type="button" és pointer-events-none a díszítésen */}
             <button
-            type="button"
+              type="button"
               onClick={() => setCreateTypeDialog(true)}
-              className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95 z-10"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
-              <div className="relative flex items-center gap-2">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity pointer-events-none"></div>
+              <div className="relative flex items-center gap-2 pointer-events-none">
                 <Plus className="h-5 w-5" />
                 <span>{t("create_new_type")}</span>
               </div>
-              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
             </button>
           </div>
 
@@ -391,7 +389,7 @@ export default function LiftManagement() {
             <TabsContent value="types" className="space-y-6">
               {liftTypes.map((type) => (
                 <div key={type.id} className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl hover:shadow-2xl transition-all">
-                  <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity pointer-events-none"></div>
                   
                   <div className="relative bg-white dark:bg-gray-900 rounded-xl">
                     <div className="p-6">
@@ -426,23 +424,24 @@ export default function LiftManagement() {
                         
                         <div className="flex gap-2">
                           <button
-                          type="button"
+                            type="button"
                             onClick={() => toast({ title: "Info", description: "Edit feature coming soon" })}
-                            className="w-10 h-10 rounded-xl bg-blue-50 hover:bg-blue-100 flex items-center justify-center transition-colors"
+                            className="w-10 h-10 rounded-xl bg-blue-50 hover:bg-blue-100 flex items-center justify-center transition-colors z-10"
                           >
-                            <Edit className="w-5 h-5 text-blue-600" />
+                            <Edit className="w-5 h-5 text-blue-600 pointer-events-none" />
                           </button>
+                          {/* 🔥 JAVÍTOTT GOMB: type="button" és pointer-events-none */}
                           <button
-                          type="button"
+                            type="button"
                             onClick={() => {
                               setSelectedType(type.id);
                               setSubtypeForm({ ...subtypeForm, liftTypeId: type.id });
                               setCreateSubtypeDialog(true);
                             }}
-                            className="group relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all"
+                            className="group relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all z-10"
                           >
-                            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500"></div>
-                            <div className="relative flex items-center gap-2">
+                            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 pointer-events-none"></div>
+                            <div className="relative flex items-center gap-2 pointer-events-none">
                               <Plus className="h-4 w-4" />
                               <span className="text-sm">{t("subtypes")}</span>
                             </div>
@@ -491,10 +490,11 @@ export default function LiftManagement() {
                                       <span className="text-xs font-medium">Inaktív</span>
                                     </div>
                                   )}
-                                  <button
-                                  type="button"
-                                   className="w-8 h-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 flex items-center justify-center transition-colors opacity-0 group-hover/subtype:opacity-100">
-                                    <Edit className="w-4 h-4 text-blue-600" />
+                                  <button 
+                                    type="button"
+                                    className="w-8 h-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 flex items-center justify-center transition-colors opacity-0 group-hover/subtype:opacity-100 z-10"
+                                  >
+                                    <Edit className="w-4 h-4 text-blue-600 pointer-events-none" />
                                   </button>
                                 </div>
                               </div>
@@ -511,18 +511,18 @@ export default function LiftManagement() {
             {/* MAPPINGS TAB - MODERN */}
             <TabsContent value="mappings" className="space-y-6">
               <div className="flex justify-end mb-6">
+                {/* 🔥 JAVÍTOTT GOMB: type="button" és pointer-events-none */}
                 <button
-                type="button"
+                  type="button"
                   onClick={() => setCreateMappingDialog(true)}
-                  className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                  className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 z-10"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
-                  <div className="relative flex items-center gap-2">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 pointer-events-none"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity pointer-events-none"></div>
+                  <div className="relative flex items-center gap-2 pointer-events-none">
                     <Link className="h-5 w-5" />
                     <span>{t("create_new_mapping")}</span>
                   </div>
-                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
                 </button>
               </div>
 
@@ -555,7 +555,7 @@ export default function LiftManagement() {
                     }`}
                   >
                     {mapping.is_active && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity"></div>
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity pointer-events-none"></div>
                     )}
                     
                     <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
@@ -591,12 +591,12 @@ export default function LiftManagement() {
                         <div className="flex gap-2">
                           {!mapping.is_active && (
                             <button
-                            type="button"
+                              type="button"
                               onClick={() => activateMappingMutation.mutate(mapping.id)}
-                              className="group/btn relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all"
+                              className="group/btn relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all z-10"
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400"></div>
-                              <div className="relative flex items-center gap-1 text-sm">
+                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 pointer-events-none"></div>
+                              <div className="relative flex items-center gap-1 text-sm pointer-events-none">
                                 <CheckCircle2 className="w-4 h-4" />
                                 <span>{t("activate")}</span>
                               </div>
@@ -604,11 +604,11 @@ export default function LiftManagement() {
                           )}
                           
                           <button
-                          type="button"
+                            type="button"
                             onClick={() => setDeleteConfirmDialog({ open: true, id: mapping.id, type: 'mapping' })}
-                            className="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors"
+                            className="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors z-10"
                           >
-                            <Trash2 className="w-5 h-5 text-red-600" />
+                            <Trash2 className="w-5 h-5 text-red-600 pointer-events-none" />
                           </button>
                         </div>
                       </div>

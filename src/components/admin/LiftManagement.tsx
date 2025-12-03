@@ -370,7 +370,7 @@ export default function LiftManagement() {
 
           {/* Tabs */}
           <Tabs defaultValue="mappings" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
+            <TabsList className="relative z-20 grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
               <TabsTrigger 
                 value="mappings"
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
@@ -386,7 +386,7 @@ export default function LiftManagement() {
             </TabsList>
 
             {/* TYPES TAB - MODERN */}
-            <TabsContent value="types" className="space-y-6">
+            <TabsContent value="types" className="relative z-0 space-y-6">
               {liftTypes.map((type) => (
                 <div key={type.id} className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl hover:shadow-2xl transition-all">
                   <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity pointer-events-none"></div>
@@ -509,7 +509,7 @@ export default function LiftManagement() {
             </TabsContent>
 
             {/* MAPPINGS TAB - MODERN */}
-            <TabsContent value="mappings" className="space-y-6">
+            <TabsContent value="mappings" className="relative z-0 space-y-6">
               <div className="flex justify-end mb-6">
                 {/* 🔥 JAVÍTOTT GOMB: type="button" és pointer-events-none */}
                 <button

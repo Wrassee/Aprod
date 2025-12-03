@@ -1,4 +1,4 @@
-// src/components/admin/LiftManagement.tsx - FULL FIXED VERSION
+// src/components/admin/LiftManagement.tsx - ULTIMATE FIXED VERSION
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,7 +28,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/auth-context";
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from "@/contexts/theme-context";
-import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle, Settings, Sparkles, ArrowRight, Layers } from "lucide-react";
+import { Loader2, Plus, Edit, Trash2, Link, CheckCircle2, XCircle, AlertCircle, Settings, Sparkles } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // 🔥 API URL DEFINIÁLÁSA
@@ -141,7 +141,6 @@ export default function LiftManagement() {
   const [deleteConfirmDialog, setDeleteConfirmDialog] = useState<{ open: boolean; id: string; type: 'type' | 'subtype' | 'mapping' }>({ open: false, id: '', type: 'mapping' });
   
   const [selectedType, setSelectedType] = useState<string>("");
-  const [selectedSubtype, setSelectedSubtype] = useState<string>("");
 
   // Form state
   const [typeForm, setTypeForm] = useState({
@@ -326,19 +325,17 @@ export default function LiftManagement() {
   const protocolTemplates = templates.filter((t) => t.type === "protocol");
 
   // ==========================================================================
-  // MODERN THEME RENDER
+  // MODERN THEME RENDER (SIMPLIFIED BUT BEAUTIFUL)
   // ==========================================================================
   if (theme === 'modern') {
     return (
-      // 🔥 FIX 1: pointer-events-auto a fő konténerre
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden pointer-events-auto">
-        {/* Animated background */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000 pointer-events-none"></div>
-
+      <div className="min-h-screen bg-slate-50 relative pointer-events-auto">
+        {/* Simplified Background - No overflow hidden, no complex pointer events issues */}
+        <div className="fixed inset-0 bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 z-0 pointer-events-none" />
+        
         <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
           {/* Header */}
-          <div className="mb-8 flex items-center justify-between">
+          <div className="mb-8 flex items-center justify-between relative z-50">
             <div className="flex items-center gap-4">
               <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-xl">
                 <Settings className="h-8 w-8 text-white" />
@@ -354,108 +351,98 @@ export default function LiftManagement() {
               </div>
             </div>
             
-            <button
-              type="button"
-              onClick={() => setCreateTypeDialog(true)}
-              className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95 z-10"
+            {/* 🔥 JAVÍTOTT GOMB: Nincs belső absolute div, egyszerű CSS class */}
+            <Button
+              onClick={() => {
+                console.log("🟢 CLICKED: Create New Type Button");
+                setCreateTypeDialog(true);
+              }}
+              className="bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white border-0 shadow-lg hover:shadow-xl rounded-xl h-12 px-6 transition-all transform hover:scale-105"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 pointer-events-none"></div>
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity pointer-events-none"></div>
-              <div className="relative flex items-center gap-2 pointer-events-none">
-                <Plus className="h-5 w-5" />
-                <span>{t("create_new_type")}</span>
-              </div>
-            </button>
+              <Plus className="h-5 w-5 mr-2" />
+              {t("create_new_type")}
+            </Button>
           </div>
 
           {/* Tabs */}
-          {/* 🔥 FIX 2: pointer-events-auto a Tabs wrapperre */}
-          <Tabs defaultValue="mappings" className="space-y-6 pointer-events-auto">
-            {/* 🔥 FIX 3: pointer-events-auto és z-10 a listára */}
-            <TabsList className="relative z-10 pointer-events-auto grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
+          <Tabs defaultValue="mappings" className="space-y-6">
+            <TabsList className="relative z-40 grid w-full grid-cols-2 bg-white/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
               <TabsTrigger 
                 value="mappings"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold py-3"
               >
                 {t("mappings")}
               </TabsTrigger>
               <TabsTrigger 
                 value="types"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold py-3"
               >
                 {t("types")}
               </TabsTrigger>
             </TabsList>
 
             {/* TYPES TAB - MODERN */}
-            {/* 🔥 FIX 4: z-20 és pointer-events-auto a tartalomra */}
-            <TabsContent value="types" className="relative z-20 space-y-6 pointer-events-auto">
+            <TabsContent value="types" className="space-y-6 relative z-30">
               {liftTypes.map((type) => (
-                // 🔥 FIX 5: pointer-events-auto a kártyákra
-                <div key={type.id} className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl hover:shadow-2xl transition-all pointer-events-auto">
-                  <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity pointer-events-none"></div>
-                  
-                  <div className="relative bg-white dark:bg-gray-900 rounded-xl">
-                    <div className="p-6">
+                <div key={type.id} className="relative overflow-hidden rounded-2xl bg-white p-1 shadow-xl border border-blue-100">
+                  <div className="p-6">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center shadow-lg">
-                            <Settings className="h-6 w-6 text-white" />
+                          <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                            <Settings className="h-6 w-6" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                              <h3 className="text-xl font-bold text-gray-900">
                                 {language === 'de' && type.name_de ? type.name_de : type.name_hu}
                               </h3>
                               <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700">
                                 {type.code}
                               </Badge>
                               {type.is_active ? (
-                                <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0">
+                                <Badge className="bg-green-100 text-green-700 border-green-200">
                                   {t("active")}
                                 </Badge>
                               ) : (
-                                <Badge variant="secondary" className="bg-gray-200 text-gray-600">
+                                <Badge variant="secondary" className="bg-gray-100 text-gray-600">
                                   {t("inactive")}
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                            <p className="text-sm text-gray-600">
                               {language === 'de' && type.description_de ? type.description_de : type.description_hu}
                             </p>
                           </div>
                         </div>
                         
                         <div className="flex gap-2">
-                          <button
-                            type="button"
+                          <Button
+                            variant="outline"
+                            size="icon"
                             onClick={() => toast({ title: "Info", description: "Edit feature coming soon" })}
-                            className="w-10 h-10 rounded-xl bg-blue-50 hover:bg-blue-100 flex items-center justify-center transition-colors z-10"
+                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 border-0 rounded-xl w-10 h-10"
                           >
-                            <Edit className="w-5 h-5 text-blue-600 pointer-events-none" />
-                          </button>
+                            <Edit className="w-5 h-5" />
+                          </Button>
                           
-                          <button
-                            type="button"
+                          <Button
                             onClick={() => {
+                              console.log("🟢 CLICKED: Create Subtype Button");
                               setSelectedType(type.id);
                               setSubtypeForm({ ...subtypeForm, liftTypeId: type.id });
                               setCreateSubtypeDialog(true);
                             }}
-                            className="group relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all z-10"
+                            className="bg-green-500 hover:bg-green-600 text-white rounded-xl shadow-md hover:shadow-lg transition-all"
                           >
-                            <div className="absolute inset-0 bg-gradient-to-r from-green-500 to-emerald-500 pointer-events-none"></div>
-                            <div className="relative flex items-center gap-2 pointer-events-none">
-                              <Plus className="h-4 w-4" />
-                              <span className="text-sm">{t("subtypes")}</span>
-                            </div>
-                          </button>
+                            <Plus className="h-4 w-4 mr-2" />
+                            {t("subtypes")}
+                          </Button>
                         </div>
                       </div>
 
                       {/* Subtypes */}
                       <div className="space-y-3">
-                        <h4 className="font-semibold text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                        <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
                           <Sparkles className="h-4 w-4 text-cyan-500" />
                           {t("subtypes")} ({type.subtypes.length})
                         </h4>
@@ -463,129 +450,100 @@ export default function LiftManagement() {
                           {type.subtypes.map((subtype) => (
                             <div
                               key={subtype.id}
-                              className="group/subtype relative overflow-hidden rounded-xl bg-gradient-to-r from-slate-50 to-blue-50/50 dark:from-gray-800 dark:to-gray-800/50 p-4 border border-blue-100 dark:border-blue-900/30 hover:border-blue-300 transition-all"
+                              className="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200"
                             >
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-300 flex items-center justify-center shadow-md">
-                                    <span className="text-xs font-bold text-white">
-                                      {subtype.code.charAt(subtype.code.length - 1)}
-                                    </span>
-                                  </div>
-                                  <div>
-                                    <span className="font-semibold text-gray-900 dark:text-white">
-                                      {language === 'de' && subtype.name_de ? subtype.name_de : subtype.name_hu}
-                                    </span>
-                                    <Badge variant="outline" className="ml-2 text-xs bg-white">
-                                      {subtype.code}
-                                    </Badge>
-                                  </div>
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center font-bold text-slate-700 text-xs">
+                                  {subtype.code.split('_').pop()}
                                 </div>
-                                
-                                <div className="flex gap-2 items-center">
-                                  {subtype.is_active ? (
-                                    <div className="flex items-center gap-1 text-green-600">
-                                      <CheckCircle2 className="w-5 h-5" />
-                                      <span className="text-xs font-medium">Aktív</span>
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-1 text-gray-400">
-                                      <XCircle className="w-5 h-5" />
-                                      <span className="text-xs font-medium">Inaktív</span>
-                                    </div>
-                                  )}
-                                  <button 
-                                    type="button"
-                                    className="w-8 h-8 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/30 flex items-center justify-center transition-colors opacity-0 group-hover/subtype:opacity-100 z-10"
-                                  >
-                                    <Edit className="w-4 h-4 text-blue-600 pointer-events-none" />
-                                  </button>
+                                <div>
+                                  <span className="font-semibold text-gray-900">
+                                    {language === 'de' && subtype.name_de ? subtype.name_de : subtype.name_hu}
+                                  </span>
+                                  <Badge variant="outline" className="ml-2 text-xs bg-white">
+                                    {subtype.code}
+                                  </Badge>
                                 </div>
+                              </div>
+                              
+                              <div className="flex gap-2 items-center">
+                                {subtype.is_active ? (
+                                  <div className="flex items-center gap-1 text-green-600">
+                                    <CheckCircle2 className="w-5 h-5" />
+                                    <span className="text-xs font-medium">Aktív</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-1 text-gray-400">
+                                    <XCircle className="w-5 h-5" />
+                                    <span className="text-xs font-medium">Inaktív</span>
+                                  </div>
+                                )}
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     </div>
-                  </div>
                 </div>
               ))}
             </TabsContent>
 
             {/* MAPPINGS TAB - MODERN */}
-            {/* 🔥 FIX 6: z-20 és pointer-events-auto a mappings tartalomra is */}
-            <TabsContent value="mappings" className="relative z-20 space-y-6 pointer-events-auto">
+            <TabsContent value="mappings" className="space-y-6 relative z-30">
               <div className="flex justify-end mb-6">
-                <button
-                  type="button"
-                  onClick={() => setCreateMappingDialog(true)}
-                  className="group relative overflow-hidden px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105 z-10"
+                {/* 🔥 JAVÍTOTT GOMB: Egyszerűbb szerkezet */}
+                <Button
+                  onClick={() => {
+                    console.log("🟢 CLICKED: Create Mapping Button");
+                    setCreateMappingDialog(true);
+                  }}
+                  className="bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white border-0 shadow-lg hover:shadow-xl rounded-xl h-12 px-6 transition-all transform hover:scale-105"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 pointer-events-none"></div>
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity pointer-events-none"></div>
-                  <div className="relative flex items-center gap-2 pointer-events-none">
-                    <Link className="h-5 w-5" />
-                    <span>{t("create_new_mapping")}</span>
-                  </div>
-                </button>
+                  <Link className="h-5 w-5 mr-2" />
+                  {t("create_new_mapping")}
+                </Button>
               </div>
 
               {mappings.length === 0 && (
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center shadow-lg flex-shrink-0">
-                      <AlertCircle className="h-6 w-6 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                        Nincs még létrehozva sablon párosítás
-                      </h4>
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
-                        Hozz létre egyet a fenti gombbal!
-                      </p>
-                    </div>
+                <div className="rounded-2xl bg-orange-50 border-2 border-orange-200 p-6 flex items-center gap-4">
+                  <AlertCircle className="h-8 w-8 text-orange-500" />
+                  <div>
+                    <h4 className="font-semibold text-orange-900">Nincs még létrehozva sablon párosítás</h4>
+                    <p className="text-sm text-orange-700">Hozz létre egyet a fenti gombbal!</p>
                   </div>
                 </div>
               )}
 
               <div className="grid gap-6">
                 {mappings.map((mapping) => (
-                  // 🔥 FIX 7: pointer-events-auto a mapping kártyákra
                   <div
                     key={mapping.id}
-                    className={`group relative overflow-hidden rounded-2xl transition-all pointer-events-auto ${
+                    className={`relative rounded-2xl transition-all p-1 shadow-lg ${
                       mapping.is_active
-                        ? 'bg-gradient-to-br from-green-600 via-emerald-500 to-teal-400 p-1 shadow-xl hover:shadow-2xl'
-                        : 'bg-gradient-to-br from-gray-400 via-slate-400 to-gray-500 p-1 shadow-lg hover:shadow-xl opacity-70'
+                        ? 'bg-gradient-to-br from-green-500 to-emerald-400'
+                        : 'bg-slate-300'
                     }`}
                   >
-                    {mapping.is_active && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 via-green-500 to-teal-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity pointer-events-none"></div>
-                    )}
-                    
-                    <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
+                    <div className="bg-white rounded-xl p-6 h-full">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${
-                            mapping.is_active
-                              ? 'bg-gradient-to-br from-green-500 to-emerald-400'
-                              : 'bg-gradient-to-br from-gray-400 to-slate-400'
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm ${
+                            mapping.is_active ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
                           }`}>
-                            <Link className="h-6 w-6 text-white" />
+                            <Link className="h-6 w-6" />
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <Badge variant="outline" className="bg-slate-50 border-slate-200 text-slate-700 font-mono">
                                 {mapping.subtype?.code || "?"}
                               </Badge>
-                              <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                              <h3 className="text-lg font-bold text-gray-900">
                                 {language === 'de' && mapping.subtype?.name_de 
                                   ? mapping.subtype.name_de 
                                   : mapping.subtype?.name_hu || t("unknown_subtype")}
                               </h3>
                               {mapping.is_active && (
-                                <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 shadow-md">
-                                  <CheckCircle2 className="w-3 h-3 mr-1" />
+                                <Badge className="bg-green-500 text-white border-0">
                                   {t("active")}
                                 </Badge>
                               )}
@@ -595,87 +553,50 @@ export default function LiftManagement() {
                         
                         <div className="flex gap-2">
                           {!mapping.is_active && (
-                            <button
-                              type="button"
-                              onClick={() => activateMappingMutation.mutate(mapping.id)}
-                              className="group/btn relative overflow-hidden px-4 py-2 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all z-10"
+                            <Button
+                              onClick={() => {
+                                console.log("🟢 CLICKED: Activate Mapping");
+                                activateMappingMutation.mutate(mapping.id);
+                              }}
+                              className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl"
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-cyan-400 pointer-events-none"></div>
-                              <div className="relative flex items-center gap-1 text-sm pointer-events-none">
-                                <CheckCircle2 className="w-4 h-4" />
-                                <span>{t("activate")}</span>
-                              </div>
-                            </button>
+                              <CheckCircle2 className="w-4 h-4 mr-1" />
+                              {t("activate")}
+                            </Button>
                           )}
                           
-                          <button
-                            type="button"
-                            onClick={() => setDeleteConfirmDialog({ open: true, id: mapping.id, type: 'mapping' })}
-                            className="w-10 h-10 rounded-xl bg-red-50 hover:bg-red-100 flex items-center justify-center transition-colors z-10"
+                          <Button
+                            variant="destructive"
+                            onClick={() => {
+                              console.log("🟢 CLICKED: Delete Mapping");
+                              setDeleteConfirmDialog({ open: true, id: mapping.id, type: 'mapping' });
+                            }}
+                            className="bg-red-50 hover:bg-red-100 text-red-600 border-0 rounded-xl w-10 h-10 p-0 flex items-center justify-center shadow-none"
                           >
-                            <Trash2 className="w-5 h-5 text-red-600 pointer-events-none" />
-                          </button>
+                            <Trash2 className="w-5 h-5" />
+                          </Button>
                         </div>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {/* Question Template */}
-                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50/50 dark:from-blue-950/20 dark:to-cyan-950/20 p-4 border border-blue-100 dark:border-blue-900/30">
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-400 to-cyan-300 flex items-center justify-center shadow-md flex-shrink-0 mt-1">
-                              <Sparkles className="h-4 w-4 text-white" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">
-                                {t("question_template")}
-                              </p>
-                              {mapping.questionTemplate ? (
-                                <p className="font-semibold text-gray-900 dark:text-white truncate">
-                                  {mapping.questionTemplate.name}
-                                </p>
-                              ) : (
-                                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
-                                  <XCircle className="w-4 h-4" />
-                                  {t("not_specified")}
-                                </p>
-                              )}
-                            </div>
-                          </div>
+                        <div className="rounded-xl bg-blue-50 p-4 border border-blue-100">
+                          <p className="text-xs font-bold text-blue-600 uppercase mb-1">{t("question_template")}</p>
+                          {mapping.questionTemplate ? (
+                            <p className="font-semibold text-gray-900">{mapping.questionTemplate.name}</p>
+                          ) : (
+                            <p className="text-sm text-red-500 flex items-center gap-1"><XCircle className="w-4 h-4" /> {t("not_specified")}</p>
+                          )}
                         </div>
 
-                        {/* Protocol Template */}
-                        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-purple-50 to-fuchsia-50/50 dark:from-purple-950/20 dark:to-fuchsia-950/20 p-4 border border-purple-100 dark:border-purple-900/30">
-                          <div className="flex items-start gap-3">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-400 to-fuchsia-300 flex items-center justify-center shadow-md flex-shrink-0 mt-1">
-                              <Settings className="h-4 w-4 text-white" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-bold text-purple-600 dark:text-purple-400 uppercase mb-1">
-                                {t("protocol_template")}
-                              </p>
-                              {mapping.protocolTemplate ? (
-                                <p className="font-semibold text-gray-900 dark:text-white truncate">
-                                  {mapping.protocolTemplate.name}
-                                </p>
-                              ) : (
-                                <p className="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-1">
-                                  <AlertCircle className="w-4 h-4" />
-                                  {t("not_specified")} (Opcionális)
-                                </p>
-                              )}
-                            </div>
-                          </div>
+                        <div className="rounded-xl bg-purple-50 p-4 border border-purple-100">
+                          <p className="text-xs font-bold text-purple-600 uppercase mb-1">{t("protocol_template")}</p>
+                          {mapping.protocolTemplate ? (
+                            <p className="font-semibold text-gray-900">{mapping.protocolTemplate.name}</p>
+                          ) : (
+                            <p className="text-sm text-amber-600 flex items-center gap-1"><AlertCircle className="w-4 h-4" /> {t("not_specified")}</p>
+                          )}
                         </div>
                       </div>
-
-                      {mapping.notes && (
-                        <div className="mt-4 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
-                          <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1">Megjegyzés:</p>
-                          <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                            {mapping.notes}
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
@@ -686,6 +607,8 @@ export default function LiftManagement() {
       </div>
     );
   }
+
+  // ... (REST OF THE FILE: Classic Render + Dialogs remain the same) ...
 
   // ==========================================================================
   // CLASSIC THEME RENDER

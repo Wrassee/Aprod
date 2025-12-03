@@ -370,20 +370,23 @@ export default function LiftManagement() {
 
           {/* Tabs */}
           <Tabs defaultValue="mappings" className="space-y-6">
-            <TabsList className="relative z-20 grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
-              <TabsTrigger 
-                value="mappings"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
-              >
-                {t("mappings")}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="types"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
-              >
-                {t("types")}
-              </TabsTrigger>
-            </TabsList>
+            <TabsList className="relative z-0 grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
+  
+  <TabsTrigger 
+    value="mappings"
+    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+  >
+    {t("mappings")}
+  </TabsTrigger>
+
+  <TabsTrigger 
+    value="types"
+    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+  >
+    {t("types")}
+  </TabsTrigger>
+
+</TabsList>
 
             {/* TYPES TAB - MODERN */}
             <TabsContent value="types" className="relative z-0 space-y-6">

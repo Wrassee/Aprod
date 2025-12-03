@@ -330,7 +330,8 @@ export default function LiftManagement() {
   // ==========================================================================
   if (theme === 'modern') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden">
+      // 🔥 FIX 1: pointer-events-auto a fő konténerre
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/20 relative overflow-hidden pointer-events-auto">
         {/* Animated background */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-400/10 to-cyan-400/10 rounded-full blur-3xl animate-pulse pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-sky-400/10 to-blue-400/10 rounded-full blur-3xl animate-pulse delay-1000 pointer-events-none"></div>
@@ -353,7 +354,6 @@ export default function LiftManagement() {
               </div>
             </div>
             
-            {/* 🔥 JAVÍTOTT GOMB: type="button" és pointer-events-none a díszítésen */}
             <button
               type="button"
               onClick={() => setCreateTypeDialog(true)}
@@ -369,29 +369,30 @@ export default function LiftManagement() {
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="mappings" className="space-y-6">
-            <TabsList className="relative z-0 grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
-  
-  <TabsTrigger 
-    value="mappings"
-    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
-  >
-    {t("mappings")}
-  </TabsTrigger>
-
-  <TabsTrigger 
-    value="types"
-    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
-  >
-    {t("types")}
-  </TabsTrigger>
-
-</TabsList>
+          {/* 🔥 FIX 2: pointer-events-auto a Tabs wrapperre */}
+          <Tabs defaultValue="mappings" className="space-y-6 pointer-events-auto">
+            {/* 🔥 FIX 3: pointer-events-auto és z-10 a listára */}
+            <TabsList className="relative z-10 pointer-events-auto grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
+              <TabsTrigger 
+                value="mappings"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+              >
+                {t("mappings")}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="types"
+                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-cyan-400 data-[state=active]:text-white rounded-lg transition-all font-semibold"
+              >
+                {t("types")}
+              </TabsTrigger>
+            </TabsList>
 
             {/* TYPES TAB - MODERN */}
-            <TabsContent value="types" className="relative z-0 space-y-6">
+            {/* 🔥 FIX 4: z-20 és pointer-events-auto a tartalomra */}
+            <TabsContent value="types" className="relative z-20 space-y-6 pointer-events-auto">
               {liftTypes.map((type) => (
-                <div key={type.id} className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl hover:shadow-2xl transition-all">
+                // 🔥 FIX 5: pointer-events-auto a kártyákra
+                <div key={type.id} className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-400 p-1 shadow-xl hover:shadow-2xl transition-all pointer-events-auto">
                   <div className="absolute inset-0 bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500 opacity-50 blur-xl group-hover:opacity-70 transition-opacity pointer-events-none"></div>
                   
                   <div className="relative bg-white dark:bg-gray-900 rounded-xl">
@@ -433,7 +434,7 @@ export default function LiftManagement() {
                           >
                             <Edit className="w-5 h-5 text-blue-600 pointer-events-none" />
                           </button>
-                          {/* 🔥 JAVÍTOTT GOMB: type="button" és pointer-events-none */}
+                          
                           <button
                             type="button"
                             onClick={() => {
@@ -512,9 +513,9 @@ export default function LiftManagement() {
             </TabsContent>
 
             {/* MAPPINGS TAB - MODERN */}
-            <TabsContent value="mappings" className="relative z-0 space-y-6">
+            {/* 🔥 FIX 6: z-20 és pointer-events-auto a mappings tartalomra is */}
+            <TabsContent value="mappings" className="relative z-20 space-y-6 pointer-events-auto">
               <div className="flex justify-end mb-6">
-                {/* 🔥 JAVÍTOTT GOMB: type="button" és pointer-events-none */}
                 <button
                   type="button"
                   onClick={() => setCreateMappingDialog(true)}
@@ -549,9 +550,10 @@ export default function LiftManagement() {
 
               <div className="grid gap-6">
                 {mappings.map((mapping) => (
+                  // 🔥 FIX 7: pointer-events-auto a mapping kártyákra
                   <div
                     key={mapping.id}
-                    className={`group relative overflow-hidden rounded-2xl transition-all ${
+                    className={`group relative overflow-hidden rounded-2xl transition-all pointer-events-auto ${
                       mapping.is_active
                         ? 'bg-gradient-to-br from-green-600 via-emerald-500 to-teal-400 p-1 shadow-xl hover:shadow-2xl'
                         : 'bg-gradient-to-br from-gray-400 via-slate-400 to-gray-500 p-1 shadow-lg hover:shadow-xl opacity-70'

@@ -1,4 +1,4 @@
-// src/components/admin/LiftManagement.tsx - ULTIMATE FIXED VERSION
+// src/components/admin/LiftManagement.tsx - ULTIMATE FIXED VERSION WITH DROPDOWN FIX
 
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -353,7 +353,7 @@ export default function LiftManagement() {
               </div>
             </div>
             
-            {/* ÚJ TÍPUS GOMB - Egyszerűsítve a biztos kattintásért */}
+            {/* ÚJ TÍPUS GOMB */}
             <Button
               onClick={() => setCreateTypeDialog(true)}
               className="bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 hover:from-blue-700 hover:to-cyan-500 text-white border-0 shadow-lg hover:shadow-xl rounded-xl h-12 px-6 transition-all transform hover:scale-105 active:scale-95"
@@ -363,7 +363,7 @@ export default function LiftManagement() {
             </Button>
           </div>
 
-          {/* Tabs - Z-index beállítva */}
+          {/* Tabs */}
           <Tabs defaultValue="mappings" className="space-y-6">
             <TabsList className="relative z-40 grid w-full grid-cols-2 bg-white/50 dark:bg-gray-800/50 backdrop-blur-sm p-1 rounded-xl shadow-lg border border-blue-100">
               <TabsTrigger 
@@ -661,7 +661,7 @@ export default function LiftManagement() {
             </TabsContent>
           </Tabs>
 
-          {/* 🔥 LÉNYEGES JAVÍTÁS: A DIALOGOK ITT IS MEGJELENNEK A MODERN NÉZETBEN 🔥 */}
+          {/* 🔥 MODERN DIALOGOK: Z-INDEX 9999 + SELECT CONTENT Z-INDEX 10000 FIX 🔥 */}
           
           <Dialog open={createTypeDialog} onOpenChange={setCreateTypeDialog}>
             <DialogContent className="z-[9999]">
@@ -773,7 +773,8 @@ export default function LiftManagement() {
                     <SelectTrigger>
                       <SelectValue placeholder={t("select_subtype")} />
                     </SelectTrigger>
-                    <SelectContent>
+                    {/* 🔥 FIX: Z-INDEX 10000 A DROPDOWN-RA 🔥 */}
+                    <SelectContent className="z-[10000] bg-white dark:bg-gray-900 max-h-[300px]">
                       {liftTypes.flatMap((type) =>
                         type.subtypes.map((subtype) => (
                           <SelectItem key={subtype.id} value={subtype.id}>
@@ -796,7 +797,8 @@ export default function LiftManagement() {
                     <SelectTrigger>
                       <SelectValue placeholder={t("select_question_template")} />
                     </SelectTrigger>
-                    <SelectContent>
+                    {/* 🔥 FIX: Z-INDEX 10000 A DROPDOWN-RA 🔥 */}
+                    <SelectContent className="z-[10000] bg-white dark:bg-gray-900 max-h-[300px]">
                       {questionTemplates.map((template) => (
                         <SelectItem key={template.id} value={template.id}>
                           {template.name} ({template.language})
@@ -816,7 +818,8 @@ export default function LiftManagement() {
                     <SelectTrigger>
                       <SelectValue placeholder={t("select_protocol_template")} />
                     </SelectTrigger>
-                    <SelectContent>
+                    {/* 🔥 FIX: Z-INDEX 10000 A DROPDOWN-RA 🔥 */}
+                    <SelectContent className="z-[10000] bg-white dark:bg-gray-900 max-h-[300px]">
                       {protocolTemplates.map((template) => (
                         <SelectItem key={template.id} value={template.id}>
                           {template.name} ({template.language})

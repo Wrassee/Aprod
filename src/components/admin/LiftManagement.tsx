@@ -347,8 +347,8 @@ export default function LiftManagement() {
                   {t("lift_type_management")}
                 </h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1 mt-1">
-                  <Sparkles className="h-3 w-3 text-cyan-500" />
-                  Lift típusok és sablonok kezelése
+                <Sparkles className="h-3 w-3 text-cyan-500" />
+                 {t("lift_management_subtitle")}
                 </p>
               </div>
             </div>
@@ -520,13 +520,13 @@ export default function LiftManagement() {
                       <AlertCircle className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
-                        Nincs még létrehozva sablon párosítás
-                      </h4>
-                      <p className="text-sm text-amber-700 dark:text-amber-300">
-                        Hozz létre egyet a fenti gombbal!
-                      </p>
-                    </div>
+                    <h4 className="font-semibold text-amber-900 dark:text-amber-100 mb-1">
+                     {t("no_mappings_title")}
+                    </h4>
+                   <p className="text-sm text-amber-700 dark:text-amber-300">
+                     {t("no_mappings_description")}
+                   </p>
+                   </div>
                   </div>
                 </div>
               )}
@@ -984,7 +984,7 @@ export default function LiftManagement() {
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Nincs még létrehozva sablon párosítás. Hozz létre egyet a fenti gombbal!
+              {t("no_mappings_title")}. {t("no_mappings_description")}
               </AlertDescription>
             </Alert>
           )}

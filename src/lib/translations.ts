@@ -162,11 +162,23 @@ export interface Translation {
   profile: string;
   hybridTemplateManagement: string;
   localTemplates: string;
+  remoteTemplates: string;
   chooseTemplate: string;
   loadingStrategy: string;
   localFirst: string;
+  localFirstDescription: string;
   cacheFirst: string;
+  cacheFirstDescription: string;
   remoteOnly: string;
+  remoteOnlyDescription: string;
+  offlineSupport: string;
+  cacheEnabled: string;
+  templateExists: string;
+  templateMissing: string;
+  saveSettings: string;
+  settingsSaved: string;
+  settingsDescription: string;
+  liftType: string;
   switching: string;
   templateSwitch: string;
   templateSwitchSuccess: string;
@@ -633,9 +645,21 @@ export const translations: Record<string, Translation> = {
     localTemplates: "Helyi Sablonok",
     chooseTemplate: "Válassz sablont",
     loadingStrategy: "Betöltési Stratégia",
-    localFirst: "Helyi Először",
-    cacheFirst: "Cache Először",
-    remoteOnly: "Csak Távoli",
+    localFirst: "Helyi először",
+    localFirstDescription: "A helyi sablonokat használja először, ha elérhetőek (offline működés)",
+    cacheFirst: "Cache először",
+    cacheFirstDescription: "A gyorsítótárazott sablonokat próbálja először betölteni",
+    remoteOnly: "Csak távoli",
+    remoteOnlyDescription: "Csak a szerveren tárolt sablonokat használja",
+    offlineSupport: "Offline támogatás",
+    cacheEnabled: "Cache engedélyezve",
+    templateExists: "Elérhető",
+    templateMissing: "Hiányzik",
+    saveSettings: "Beállítások mentése",
+    settingsSaved: "Beállítások sikeresen mentve",
+    settingsDescription: "A betöltési stratégia meghatározza, honnan töltődnek be a sablonok",
+    liftType: "Lift típus",
+    remoteTemplates: "Távoli sablonok",
     switching: "Váltás...",
     templateSwitch: "Sablon Váltás",
     templateSwitchSuccess: "Sablon váltás sikeres: {name}",
@@ -1095,8 +1119,20 @@ export const translations: Record<string, Translation> = {
     chooseTemplate: "Vorlage auswählen",
     loadingStrategy: "Ladestrategie",
     localFirst: "Lokal zuerst",
+    localFirstDescription: "Lokale Vorlagen werden zuerst verwendet, wenn verfügbar (Offline-Betrieb)",
     cacheFirst: "Cache zuerst",
+    cacheFirstDescription: "Versucht zuerst, zwischengespeicherte Vorlagen zu laden",
     remoteOnly: "Nur Remote",
+    remoteOnlyDescription: "Verwendet nur auf dem Server gespeicherte Vorlagen",
+    offlineSupport: "Offline-Unterstützung",
+    cacheEnabled: "Cache aktiviert",
+    templateExists: "Verfügbar",
+    templateMissing: "Fehlt",
+    saveSettings: "Einstellungen speichern",
+    settingsSaved: "Einstellungen erfolgreich gespeichert",
+    settingsDescription: "Die Ladestrategie bestimmt, woher die Vorlagen geladen werden",
+    liftType: "Aufzugstyp",
+    remoteTemplates: "Remote-Vorlagen",
     switching: "Wechseln...",
     templateSwitch: "Vorlagenwechsel",
     templateSwitchSuccess: "Vorlagenwechsel erfolgreich: {name}",

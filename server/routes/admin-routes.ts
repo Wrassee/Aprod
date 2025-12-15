@@ -402,14 +402,100 @@ router.delete('/protocols/:id', requireAdmin, async (req, res) => {
 //          TEMPLATE MANAGEMENT
 // ===============================================
 
+import { 
+  getAllLocalTemplates, 
+  getLoadStrategy, 
+  setLoadStrategy, 
+  checkLocalTemplateExists,
+  getTemplateRegistrySettings,
+  TemplateLoadStrategy 
+} from '../config/local-templates.js';
+
+// Helyi sablonok listázása
+router.get("/templates/local", async (_req, res) => {
+  try {
+    const localTemplates = getAllLocalTemplates();
+    const templatesWithStatus = localTemplates.map(t => ({
+      ...t,
+      exists: checkLocalTemplateExists(t.path),
+      source: 'local'
+    }));
+    
+    console.log(`📁 Local templates found: ${templatesWithStatus.length}`);
+    res.json(templatesWithStatus);
+  } catch (error) {
+    console.error("Error fetching local templates:", error);
+    res.status(500).json({ message: "Failed to fetch local templates" });
+  }
+});
+
+// Betöltési stratégia lekérdezése
+router.get("/templates/settings", async (_req, res) => {
+  try {
+    const settings = getTemplateRegistrySettings();
+    const currentStrategy = getLoadStrategy();
+    
+    res.json({
+      loadStrategy: currentStrategy,
+      cacheEnabled: settings.cacheEnabled,
+      offlineSupport: settings.offlineSupport,
+      availableStrategies: [
+        { value: 'local_first', label_hu: 'Helyi először', label_de: 'Lokal zuerst' },
+        { value: 'cache_first', label_hu: 'Cache először', label_de: 'Cache zuerst' },
+        { value: 'remote_only', label_hu: 'Csak távoli', label_de: 'Nur Remote' }
+      ]
+    });
+  } catch (error) {
+    console.error("Error fetching template settings:", error);
+    res.status(500).json({ message: "Failed to fetch template settings" });
+  }
+});
+
+// Betöltési stratégia beállítása
+router.post("/templates/settings", requireAdmin, async (req, res) => {
+  try {
+    const { loadStrategy } = req.body;
+    
+    if (!loadStrategy || !Object.values(TemplateLoadStrategy).includes(loadStrategy)) {
+      return res.status(400).json({ message: "Invalid load strategy" });
+    }
+    
+    const success = setLoadStrategy(loadStrategy as TemplateLoadStrategy);
+    
+    if (success) {
+      await createManualAuditLog(
+        req,
+        'template.settings.update',
+        'settings',
+        'load_strategy',
+        { loadStrategy },
+        'success'
+      );
+      
+      console.log(`✅ Load strategy updated to: ${loadStrategy}`);
+      res.json({ success: true, loadStrategy });
+    } else {
+      throw new Error('Failed to save settings');
+    }
+  } catch (error) {
+    console.error("Error updating template settings:", error);
+    res.status(500).json({ message: "Failed to update template settings" });
+  }
+});
+
 // MÓDOSÍTVA: requireAdmin eltávolítva
 router.get("/templates/available", async (_req, res) => {
   try {
     const allTemplates = await hybridTemplateLoader.getAllAvailableTemplates();
     const activeTemplate = await storage.getActiveTemplate('unified', 'multilingual');
+    const currentStrategy = getLoadStrategy();
+    
     res.json({
       ...allTemplates,
-      current: { templateId: activeTemplate?.id }
+      current: { 
+        templateId: activeTemplate?.id,
+        loadStrategy: currentStrategy
+      }
     });
   } catch (error) {
     console.error("Error fetching available templates:", error);

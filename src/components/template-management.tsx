@@ -74,6 +74,7 @@ export function TemplateManagement() {
   const [hybridTemplates, setHybridTemplates] = useState<HybridTemplateData | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [loadStrategy, setLoadStrategy] = useState<string>('local_first');
+  const [savingSettings, setSavingSettings] = useState(false);
 
   useEffect(() => {
     console.log('🔍 TemplateManagement useEffect triggered');
@@ -153,13 +154,50 @@ export function TemplateManagement() {
     }
   };
 
+  const handleSaveLoadStrategy = async (newStrategy: string) => {
+    if (savingSettings || newStrategy === loadStrategy) return;
+    
+    const previousStrategy = loadStrategy;
+    setLoadStrategy(newStrategy);
+    setSavingSettings(true);
+    
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${BASE_URL}/api/admin/templates/settings`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loadStrategy: newStrategy }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: t("success"),
+          description: language === 'hu' ? 'Beállítások mentve' : 'Einstellungen gespeichert',
+        });
+        fetchHybridTemplates();
+      } else {
+        setLoadStrategy(previousStrategy);
+        throw new Error('Settings save failed');
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      setLoadStrategy(previousStrategy);
+      toast({
+        title: t("error"),
+        description: language === 'hu' ? 'Beállítások mentése sikertelen' : 'Einstellungen konnten nicht gespeichert werden',
+        variant: 'destructive',
+      });
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
   const handleTemplateSelect = async () => {
     if (!selectedTemplate) return;
 
     setLoading(true);
     try {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTVA: BASE_URL használata
       const response = await fetch(`${BASE_URL}/api/admin/templates/select`, {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/json' },
@@ -173,7 +211,7 @@ export function TemplateManagement() {
         const result = await response.json();
         toast({
           title: t("success"),
-          description: t("templateSwitchSuccess.replace")('{name}', result.template?.name || 'Template'),
+          description: t("templateSwitchSuccess").replace('{name}', result.template?.name || 'Template'),
         });
         fetchHybridTemplates();
       } else {
@@ -378,7 +416,7 @@ export function TemplateManagement() {
   };
 
   const handleDelete = async (templateId: string, templateName: string) => {
-    if (!confirm(t("confirmDeleteTemplate.replace")('{name}', templateName))) {
+    if (!confirm(t("confirmDeleteTemplate").replace('{name}', templateName))) {
       return;
     }
 
@@ -596,6 +634,7 @@ export function TemplateManagement() {
 
         {/* HYBRID TAB */}
         <TabsContent value="hybrid" className="space-y-6">
+          {/* Betöltési Stratégia Kártya */}
           <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-500 to-pink-400 p-1 shadow-xl">
             <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-400 via-purple-500 to-pink-500 opacity-30 animate-pulse" />
             
@@ -609,67 +648,151 @@ export function TemplateManagement() {
                     {t("hybridTemplateManagement")}
                   </span>
                 </CardTitle>
+                <CardDescription className="text-base">
+                  {language === 'hu' 
+                    ? 'A betöltési stratégia meghatározza, honnan töltődnek be a sablonok. A "Helyi először" opció offline működést biztosít.' 
+                    : 'Die Ladestrategie bestimmt, woher die Vorlagen geladen werden. Die Option "Lokal zuerst" ermöglicht den Offline-Betrieb.'}
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                {hybridTemplates && (
-                  <div className="space-y-4">
-                    <div>
-                      <Label className="font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
-                        {t("localTemplates")} ({hybridTemplates.local.length})
-                      </Label>
-                      <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                        <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-purple-500/30">
-                          <SelectValue placeholder={t("chooseTemplate")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {hybridTemplates.local.map((template) => (
-                            <SelectItem key={template.id} value={template.id}>
-                              {template.name} (helyi)
-                            </SelectItem>
-                          ))}
-                          {hybridTemplates.remote.map((template) => (
-                            <SelectItem key={template.id} value={template.id}>
-                              {template.name} (távoli)
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div>
-                      <Label className="font-semibold text-gray-700 dark:text-gray-300 mb-2 block">
-                        {t("loadingStrategy")}
-                      </Label>
-                      <Select value={loadStrategy} onValueChange={setLoadStrategy}>
-                        <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-purple-500/30">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="local_first">{t("localFirst")}</SelectItem>
-                          <SelectItem value="cache_first">{t("cacheFirst")}</SelectItem>
-                          <SelectItem value="remote_only">{t("remoteOnly")}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <button
-                      onClick={handleTemplateSelect}
-                      disabled={loading || !selectedTemplate}
-                      className="group relative overflow-hidden w-full px-6 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        {loading ? (
-                          <><Loader2 className="h-5 w-5 animate-spin" />{t("switching")}</>
-                        ) : (
-                          <><Sparkles className="h-5 w-5" /><span className="font-bold text-lg">{t("templateSwitch")}</span></>
-                        )}
+              <CardContent className="space-y-6">
+                {/* Betöltési Stratégia Választó */}
+                <div className="space-y-3">
+                  <Label className="font-semibold text-gray-700 dark:text-gray-300">
+                    {t("loadingStrategy")}
+                  </Label>
+                  <div className="grid gap-3">
+                    {[
+                      { value: 'local_first', label: t("localFirst"), desc: language === 'hu' ? 'Helyi sablonokat használ először (offline működés)' : 'Verwendet zuerst lokale Vorlagen (Offline-Betrieb)', icon: '📁' },
+                      { value: 'cache_first', label: t("cacheFirst"), desc: language === 'hu' ? 'Gyorsítótárazott sablonokat próbálja először' : 'Versucht zuerst zwischengespeicherte Vorlagen', icon: '💾' },
+                      { value: 'remote_only', label: t("remoteOnly"), desc: language === 'hu' ? 'Csak szerveren tárolt sablonokat használ' : 'Verwendet nur auf dem Server gespeicherte Vorlagen', icon: '☁️' }
+                    ].map((strategy) => (
+                      <div
+                        key={strategy.value}
+                        onClick={() => !savingSettings && handleSaveLoadStrategy(strategy.value)}
+                        className={`p-4 rounded-xl border-2 transition-all ${
+                          savingSettings 
+                            ? 'opacity-50 cursor-not-allowed' 
+                            : 'cursor-pointer'
+                        } ${
+                          loadStrategy === strategy.value
+                            ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/20 shadow-md'
+                            : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/50'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{strategy.icon}</span>
+                          <div className="flex-1">
+                            <div className="font-semibold text-gray-800 dark:text-white">{strategy.label}</div>
+                            <div className="text-sm text-gray-500">{strategy.desc}</div>
+                          </div>
+                          {loadStrategy === strategy.value && (
+                            <CheckCircle className="h-5 w-5 text-purple-500" />
+                          )}
+                        </div>
                       </div>
-                    </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Sablon Választó */}
+                {hybridTemplates && (
+                  <div className="space-y-3">
+                    <Label className="font-semibold text-gray-700 dark:text-gray-300">
+                      {t("chooseTemplate")}
+                    </Label>
+                    <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                      <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-purple-500/30">
+                        <SelectValue placeholder={t("chooseTemplate")} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hybridTemplates.local.length > 0 && (
+                          <>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-gray-100">
+                              📁 {t("localTemplates")} ({hybridTemplates.local.length})
+                            </div>
+                            {hybridTemplates.local.map((template) => (
+                              <SelectItem key={template.id} value={template.id}>
+                                {language === 'de' ? template.name_de : template.name}
+                              </SelectItem>
+                            ))}
+                          </>
+                        )}
+                        {hybridTemplates.remote.length > 0 && (
+                          <>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-gray-100 mt-2">
+                              ☁️ {language === 'hu' ? 'Távoli sablonok' : 'Remote-Vorlagen'} ({hybridTemplates.remote.length})
+                            </div>
+                            {hybridTemplates.remote.map((template) => (
+                              <SelectItem key={template.id} value={template.id}>
+                                {template.name}
+                              </SelectItem>
+                            ))}
+                          </>
+                        )}
+                      </SelectContent>
+                    </Select>
                   </div>
                 )}
+                    
+                <button
+                  onClick={handleTemplateSelect}
+                  disabled={loading || !selectedTemplate}
+                  className="group relative overflow-hidden w-full px-6 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    {loading ? (
+                      <><Loader2 className="h-5 w-5 animate-spin" />{t("switching")}</>
+                    ) : (
+                      <><Sparkles className="h-5 w-5" /><span className="font-bold text-lg">{t("templateSwitch")}</span></>
+                    )}
+                  </div>
+                </button>
               </CardContent>
             </Card>
           </div>
+
+          {/* Helyi Sablonok Lista */}
+          {hybridTemplates && hybridTemplates.local.length > 0 && (
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-600 via-emerald-500 to-teal-400 p-1 shadow-xl">
+              <Card className="relative bg-white dark:bg-gray-900 border-0 rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-xl">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center shadow-lg">
+                      <FileSpreadsheet className="h-4 w-4 text-white" />
+                    </div>
+                    <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                      {t("localTemplates")}
+                    </span>
+                    <Badge className="ml-auto bg-green-100 text-green-700">
+                      {hybridTemplates.local.length} {language === 'hu' ? 'sablon' : 'Vorlagen'}
+                    </Badge>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid gap-3">
+                    {hybridTemplates.local.map((template) => (
+                      <div 
+                        key={template.id}
+                        className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-green-300 transition-colors bg-gradient-to-r from-white to-green-50/30"
+                      >
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-800">
+                            {language === 'de' ? template.name_de : template.name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {language === 'de' ? template.description_de : template.description}
+                          </div>
+                        </div>
+                        <Badge className="bg-green-100 text-green-700 border-green-200">
+                          📁 {language === 'hu' ? 'Helyi' : 'Lokal'}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </TabsContent>
 
         {/* UPLOAD TAB */}

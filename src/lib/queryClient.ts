@@ -3,8 +3,8 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient"; // A .ts kiterjesztés nem kell importnál
 
 // 🔥 1. BASE URL DEFINIÁLÁSA
-// Ez a legfontosabb sor a telefonos működéshez!
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://aprod-app-kkcr.onrender.com';
+// Fejlesztésben üres (relatív URL), production-ben a Render URL
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {

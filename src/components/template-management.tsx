@@ -16,8 +16,8 @@ import { Upload, FileSpreadsheet, Eye, Trash2, Download, Loader2, FileText, Spar
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 
-// 🔥 1. URL DEFINIÁLÁSE (Render URL)
-const BASE_URL = import.meta.env.VITE_API_URL || 'https://aprod-app-kkcr.onrender.com';
+// 🔥 1. URL DEFINIÁLÁSA (fejlesztésben üres = relatív URL)
+const BASE_URL = import.meta.env.VITE_API_URL || '';
 
 interface Template {
   id: string;

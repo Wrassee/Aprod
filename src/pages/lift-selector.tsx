@@ -159,8 +159,8 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
   // 🔥 JAVÍTÁS: API URL és Fetch függvény definiálása
   // ===========================================================================
   
-  // 1. Meghatározzuk a Render URL-t (vagy fallback)
-  const BASE_URL = import.meta.env.VITE_API_URL || 'https://aprod-app-kkcr.onrender.com';
+  // 1. Meghatározzuk a BASE URL-t (fejlesztésben üres = relatív URL)
+  const BASE_URL = import.meta.env.VITE_API_URL || '';
 
   // Fetch available lift types
   const { data, isLoading, error } = useQuery<LiftAvailableResponse>({

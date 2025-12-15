@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-15",
+  "templates": {
+    "questions": [
+      {
+        "id": "local-bex-questions",
+        "name": "BEX Kérdések",
+        "name_de": "BEX Fragen",
+        "fileName": "BEX FRAGEN.xlsx",
+        "type": "questions",
+        "liftType": "BEX",
+        "description": "BEX lift típus kérdéssablon",
+        "description_de": "BEX Aufzugstyp Fragevorlage",
+        "isDefault": false
+      },
+      {
+        "id": "local-abnahme-questions",
+        "name": "Átvételi Kérdések",
+        "name_de": "Abnahme Fragen",
+        "fileName": "Abnahme FRAGEN.xlsx",
+        "type": "questions",
+        "liftType": "MOD",
+        "description": "Általános átvételi kérdéssablon",
+        "description_de": "Allgemeine Abnahme Fragevorlage",
+        "isDefault": true
+      }
+    ],
+    "protocols": [
+      {
+        "id": "local-abnahme-protocol-de",
+        "name": "Átvételi Protokoll (DE)",
+        "name_de": "Abnahmeprotokoll (DE)",
+        "fileName": "Abnahmeprotokoll Leer DE.xlsx",
+        "type": "protocol",
+        "liftType": "MOD",
+        "description": "Német nyelvű átvételi protokoll sablon",
+        "description_de": "Deutschsprachige Abnahmeprotokoll Vorlage",
+        "isDefault": true
+      },
+      {
+        "id": "local-bex-protocol",
+        "name": "BEX Protokoll",
+        "name_de": "BEX Protokoll",
+        "fileName": "BEX-DE.xlsx",
+        "type": "protocol",
+        "liftType": "BEX",
+        "description": "BEX lift típus protokoll sablon",
+        "description_de": "BEX Aufzugstyp Protokollvorlage",
+        "isDefault": false
+      }
+    ]
+  },
+  "settings": {
+    "loadStrategy": "local_first",
+    "cacheEnabled": true,
+    "offlineSupport": true
+  }
+}

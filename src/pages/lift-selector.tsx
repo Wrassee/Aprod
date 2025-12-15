@@ -267,7 +267,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
     return (
       <div className="min-h-screen">
         <PageHeader
-          title={language === 'hu' ? 'Lift típus választás' : 'Aufzugstyp Auswahl'}
+          title={t("lift_type_selection_title")}
           onHome={handleHomeClick}
           onStartNew={() => {
             localStorage.removeItem("liftSelection");
@@ -282,9 +282,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              {language === 'hu' 
-                ? 'Hiba történt a lift típusok betöltése közben.' 
-                : 'Fehler beim Laden der Aufzugstypen.'}
+              {t("error_loading_lift_types")}
             </AlertDescription>
           </Alert>
         </div>
@@ -301,7 +299,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
     return (
       <div className="min-h-screen">
         <PageHeader
-          title={language === 'hu' ? 'Lift típus választás' : 'Aufzugstyp Auswahl'}
+          title={t("lift_type_selection_title")}
           onHome={handleHomeClick}
           onStartNew={() => {
             localStorage.removeItem("liftSelection");
@@ -330,12 +328,10 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                 <AlertCircle className="h-4 w-4 text-yellow-600" />
                 <AlertDescription className="text-yellow-800">
                   <strong>
-                    {language === 'hu' ? 'Nincs elérhető lift típus!' : 'Keine Aufzugstypen verfügbar!'}
+                    {t("no_lift_types_available")}
                   </strong>
                   <p className="mt-2">
-                    {language === 'hu' 
-                      ? 'Kérjük, lépjen be az Admin panelba (fent jobb sarokban) és hozzon létre lift típusokat és sablonokat.'
-                      : 'Bitte öffnen Sie das Admin-Panel (oben rechts) und erstellen Sie Aufzugstypen und Vorlagen.'}
+                    {t("open_admin_panel_message")}
                   </p>
                 </AlertDescription>
               </Alert>
@@ -348,12 +344,10 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                   : 'text-gray-800'
               }`}>
                 <Sparkles className={`h-10 w-10 ${theme === 'modern' ? 'text-blue-600' : 'text-gray-700'}`} />
-                {language === 'hu' ? 'Válasszon lift típust' : 'Wählen Sie einen Aufzugstyp'}
+                {t("select_lift_type")}
               </h1>
               <p className={theme === 'modern' ? 'text-gray-600' : 'text-gray-700'}>
-                {language === 'hu' 
-                  ? 'Válassza ki a lift típusát a protokoll elkészítéséhez.' 
-                  : 'Wählen Sie den Aufzugstyp für die Protokollerstellung.'}
+                {t("select_lift_type_description")}
               </p>
             </div>
 
@@ -393,11 +387,11 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                             {type.code}
                           </Badge>
                           <span>•</span>
-                          <span>{type.subtypes.length} {language === 'hu' ? 'altípus' : 'Untertyp'}</span>
+                          <span>{type.subtypes.length} {t("subtype_singular")}</span>
                         </div>
 
                         <div className="flex items-center justify-center gap-2 mt-4 text-sm text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          <span>{language === 'hu' ? 'Tovább' : 'Weiter'}</span>
+                          <span>{t("continue_button")}</span>
                           <ArrowRight className="h-4 w-4" />
                         </div>
                       </div>
@@ -430,7 +424,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                       <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
                         <Badge variant="outline" className="border-gray-300">{type.code}</Badge>
                         <span>•</span>
-                        <span>{type.subtypes.length} {language === 'hu' ? 'altípus' : 'Untertyp'}</span>
+                        <span>{type.subtypes.length} {t("subtype_singular")}</span>
                       </div>
                     </div>
                   </button>
@@ -449,7 +443,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
   return (
     <div className="min-h-screen">
       <PageHeader
-        title={`${getName(selectedType)} - ${language === 'hu' ? 'Altípus választás' : 'Untertyp Auswahl'}`}
+        title={`${getName(selectedType)} - ${t("subtype_selection_title")}`}
         onHome={handleHomeClick}
         onStartNew={() => {
           localStorage.removeItem("liftSelection");
@@ -481,7 +475,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800">
                 <strong>
-                  {language === 'hu' ? 'Nincs altípus ehhez a típushoz!' : 'Keine Untertypen für diesen Typ!'}
+                  {t("no_subtypes_for_type")}
                 </strong>
               </AlertDescription>
             </Alert>
@@ -492,7 +486,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800">
                 <strong>
-                  {language === 'hu' ? 'Nincs aktív sablon párosítás!' : 'Keine aktive Vorlagenzuordnung!'}
+                  {t("no_active_mapping")}
                 </strong>
               </AlertDescription>
             </Alert>
@@ -506,12 +500,10 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                 : 'text-gray-800'
             }`}>
               <Sparkles className={`h-10 w-10 ${theme === 'modern' ? 'text-blue-600' : 'text-gray-700'}`} />
-              {getName(selectedType)} - {language === 'hu' ? 'Válasszon altípust' : 'Wählen Sie einen Untertyp'}
+              {getName(selectedType)} - {t("select_subtype")}
             </h1>
             <p className={theme === 'modern' ? 'text-gray-600' : 'text-gray-700'}>
-              {language === 'hu' 
-                ? 'Válassza ki a lift altípusát a protokoll elkészítéséhez.' 
-                : 'Wählen Sie den Aufzugsuntertyp für die Protokollerstellung.'}
+              {t("select_subtype_description")}
             </p>
           </div>
 
@@ -569,13 +561,13 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
 
                       {!hasMapping && (
                         <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
-                          {language === 'hu' ? 'Nincs sablon párosítás' : 'Keine Vorlagenzuordnung'}
+                          {t("no_mapping_available")}
                         </div>
                       )}
 
                       {hasMapping && !isComplete && (
                         <div className="mt-3 p-2 bg-yellow-50 border border-yellow-200 rounded-lg text-xs text-yellow-700">
-                          {!hasQuestionTemplate && (language === 'hu' ? 'Hiányzó kérdés sablon' : 'Fehlende Fragenvorlage')}
+                          {!hasQuestionTemplate && t("missing_question_template")}
                         </div>
                       )}
 
@@ -589,7 +581,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                           </div>
 
                           <div className="flex items-center justify-center gap-2 mt-4 text-sm text-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <span>{language === 'hu' ? 'Indítás' : 'Starten'}</span>
+                            <span>{t("start_button")}</span>
                             <ArrowRight className="h-4 w-4" />
                           </div>
                         </>
@@ -655,7 +647,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
               >
                 <div className="flex items-center justify-center gap-2">
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="font-semibold">{language === 'hu' ? 'Vissza' : 'Zurück'}</span>
+                  <span className="font-semibold">{t("back_to_start")}</span>
                 </div>
               </button>
             ) : (
@@ -665,7 +657,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                 className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {language === 'hu' ? 'Vissza' : 'Zurück'}
+                {t("back_to_start")}
               </Button>
             )}
           </div>

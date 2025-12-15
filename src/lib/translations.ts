@@ -262,6 +262,15 @@ export interface Translation {
   protocol_template: string;
   error_loading_lift_types: string;
   back_to_start: string;
+  no_lift_types_available: string;
+  open_admin_panel_message: string;
+  no_subtypes_for_type: string;
+  no_active_mapping: string;
+  subtype_singular: string;
+  continue_button: string;
+  start_button: string;
+  lift_type_selection_title: string;
+  subtype_selection_title: string;
   
   // Admin UI (New)
   lift_type_management: string;
@@ -732,18 +741,27 @@ export const translations: Record<string, Translation> = {
 
     // Lift Selector
     select_lift_type: "Válasszon lift típust",
-    select_lift_type_description: "Kérjük, válassza ki a megfelelő lift kategóriát",
-    select_subtype: "Altípus kiválasztása",
+    select_lift_type_description: "Válassza ki a lift típusát a protokoll elkészítéséhez.",
+    select_subtype: "Válasszon altípust",
     select_subtype_description: "Kérjük, válassza ki a konkrét lift típust",
     subtypes_available: "altípus elérhető",
-    no_mapping_available: "Nincs elérhető sablon ehhez a típushoz",
+    no_mapping_available: "Nincs sablon párosítás",
     missing_question_template: "Hiányzó kérdés sablon",
     missing_protocol_template: "Hiányzó protokoll sablon",
-    error_loading_lift_types: "Hiba történt a lift típusok betöltésekor",
-    back_to_start: "Vissza a kezdőlapra",
+    error_loading_lift_types: "Hiba történt a lift típusok betöltése közben.",
+    back_to_start: "Vissza",
     lift_management_subtitle: "Lift típusok és sablonok kezelése",
     no_mappings_title: "Nincs még létrehozva sablon párosítás",
     no_mappings_description: "Hozz létre egyet a fenti gombbal!",
+    no_lift_types_available: "Nincs elérhető lift típus!",
+    open_admin_panel_message: "Kérjük, lépjen be az Admin panelba (fent jobb sarokban) és hozzon létre lift típusokat és sablonokat.",
+    no_subtypes_for_type: "Nincs altípus ehhez a típushoz!",
+    no_active_mapping: "Nincs aktív sablon párosítás!",
+    subtype_singular: "altípus",
+    continue_button: "Tovább",
+    start_button: "Indítás",
+    lift_type_selection_title: "Lift típus választás",
+    subtype_selection_title: "Altípus választás",
     
     // Admin UI (New)
     lift_type_management: "Lift Típus Kezelés",
@@ -1205,20 +1223,29 @@ export const translations: Record<string, Translation> = {
 
     // Lift Selector
     select_lift_type: "Aufzugstyp auswählen",
-    select_lift_type_description: "Bitte wählen Sie die entsprechende Aufzugskategorie",
+    select_lift_type_description: "Wählen Sie den Aufzugstyp für die Protokollerstellung.",
     select_subtype: "Untertyp auswählen",
     select_subtype_description: "Bitte wählen Sie den spezifischen Aufzugstyp",
     subtypes_available: "Untertypen verfügbar",
-    no_mapping_available: "Keine Vorlage für diesen Typ verfügbar",
+    no_mapping_available: "Keine Vorlagenzuordnung",
     missing_question_template: "Fehlende Fragenvorlage",
     missing_protocol_template: "Fehlende Protokollvorlage",
     question_template: "Fragenvorlage",
     protocol_template: "Protokollvorlage",
-    error_loading_lift_types: "Fehler beim Laden der Aufzugstypen",
-    back_to_start: "Zurück zur Startseite",
+    error_loading_lift_types: "Fehler beim Laden der Aufzugstypen.",
+    back_to_start: "Zurück",
     lift_management_subtitle: "Verwaltung von Aufzugstypen und Vorlagen",
     no_mappings_title: "Noch keine Vorlagenzuordnung erstellt",
     no_mappings_description: "Erstellen Sie eine mit der obigen Schaltfläche!",
+    no_lift_types_available: "Keine Aufzugstypen verfügbar!",
+    open_admin_panel_message: "Bitte öffnen Sie das Admin-Panel (oben rechts) und erstellen Sie Aufzugstypen und Vorlagen.",
+    no_subtypes_for_type: "Keine Untertypen für diesen Typ!",
+    no_active_mapping: "Keine aktive Vorlagenzuordnung!",
+    subtype_singular: "Untertyp",
+    continue_button: "Weiter",
+    start_button: "Starten",
+    lift_type_selection_title: "Aufzugstyp Auswahl",
+    subtype_selection_title: "Untertyp Auswahl",
     
     // Admin UI
     lift_type_management: "Aufzugstyp-Verwaltung",
@@ -1681,17 +1708,26 @@ export const translations: Record<string, Translation> = {
 
     // Lift Selector
     select_lift_type: "Select Lift Type",
-    select_lift_type_description: "Please select the appropriate lift category",
+    select_lift_type_description: "Select the lift type to create the protocol.",
     select_subtype: "Select Subtype",
     select_subtype_description: "Please select the specific lift type",
     subtypes_available: "subtypes available",
-    no_mapping_available: "No template available for this type",
+    no_mapping_available: "No template mapping",
     missing_question_template: "Missing question template",
     missing_protocol_template: "Missing protocol template",
     question_template: "Question Template",
     protocol_template: "Protocol Template",
-    error_loading_lift_types: "Error loading lift types",
-    back_to_start: "Back to Start Screen",
+    error_loading_lift_types: "Error loading lift types.",
+    back_to_start: "Back",
+    no_lift_types_available: "No lift types available!",
+    open_admin_panel_message: "Please open the Admin Panel (top right) and create lift types and templates.",
+    no_subtypes_for_type: "No subtypes for this type!",
+    no_active_mapping: "No active template mapping!",
+    subtype_singular: "subtype",
+    continue_button: "Continue",
+    start_button: "Start",
+    lift_type_selection_title: "Lift Type Selection",
+    subtype_selection_title: "Subtype Selection",
     
     // Admin UI (New)
     lift_type_management: "Lift Type Management",
@@ -2149,17 +2185,26 @@ export const translations: Record<string, Translation> = {
 
     // Lift Selector
     select_lift_type: "Sélectionner le Type d'Ascenseur",
-    select_lift_type_description: "Veuillez sélectionner la catégorie d'ascenseur appropriée",
+    select_lift_type_description: "Sélectionnez le type d'ascenseur pour créer le protocole.",
     select_subtype: "Sélectionner le Sous-type",
     select_subtype_description: "Veuillez sélectionner le type d'ascenseur spécifique",
     subtypes_available: "sous-types disponibles",
-    no_mapping_available: "Aucun modèle disponible pour ce type",
+    no_mapping_available: "Pas de mappage de modèle",
     missing_question_template: "Modèle de questions manquant",
     missing_protocol_template: "Modèle de protocole manquant",
     question_template: "Modèle de Questions",
     protocol_template: "Modèle de Protocole",
-    error_loading_lift_types: "Erreur lors du chargement des types d'ascenseurs",
-    back_to_start: "Retour à l'écran de démarrage",
+    error_loading_lift_types: "Erreur lors du chargement des types d'ascenseurs.",
+    back_to_start: "Retour",
+    no_lift_types_available: "Aucun type d'ascenseur disponible!",
+    open_admin_panel_message: "Veuillez ouvrir le panneau d'administration (en haut à droite) et créer des types d'ascenseurs et des modèles.",
+    no_subtypes_for_type: "Aucun sous-type pour ce type!",
+    no_active_mapping: "Aucun mappage de modèle actif!",
+    subtype_singular: "sous-type",
+    continue_button: "Continuer",
+    start_button: "Démarrer",
+    lift_type_selection_title: "Sélection du Type d'Ascenseur",
+    subtype_selection_title: "Sélection du Sous-type",
     
     // Admin UI (New)
     lift_type_management: "Gestion des Types d'Ascenseurs",
@@ -2616,17 +2661,26 @@ export const translations: Record<string, Translation> = {
 
     // Lift Selector
     select_lift_type: "Seleziona Tipo di Ascensore",
-    select_lift_type_description: "Si prega di selezionare la categoria di ascensore appropriata",
+    select_lift_type_description: "Seleziona il tipo di ascensore per creare il protocollo.",
     select_subtype: "Seleziona Sottotipo",
     select_subtype_description: "Si prega di selezionare il tipo di ascensore specifico",
     subtypes_available: "sottotipi disponibili",
-    no_mapping_available: "Nessun modello disponibile per questo tipo",
+    no_mapping_available: "Nessuna mappatura modello",
     missing_question_template: "Modello domande mancante",
     missing_protocol_template: "Modello protocollo mancante",
     question_template: "Modello Domande",
     protocol_template: "Modello Protocollo",
-    error_loading_lift_types: "Errore durante il caricamento dei tipi di ascensori",
-    back_to_start: "Torna alla schermata iniziale",
+    error_loading_lift_types: "Errore durante il caricamento dei tipi di ascensori.",
+    back_to_start: "Indietro",
+    no_lift_types_available: "Nessun tipo di ascensore disponibile!",
+    open_admin_panel_message: "Apri il pannello di amministrazione (in alto a destra) e crea tipi di ascensori e modelli.",
+    no_subtypes_for_type: "Nessun sottotipo per questo tipo!",
+    no_active_mapping: "Nessuna mappatura modello attiva!",
+    subtype_singular: "sottotipo",
+    continue_button: "Continua",
+    start_button: "Avvia",
+    lift_type_selection_title: "Selezione Tipo di Ascensore",
+    subtype_selection_title: "Selezione Sottotipo",
     
     // Admin UI (New)
     lift_type_management: "Gestione Tipi di Ascensori",

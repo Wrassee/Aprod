@@ -4,7 +4,7 @@ hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
 [nix]
 channel = "stable-24_05"
-packages = ["glibcLocales", "unzip", "libreoffice", "chromium", "nss"]
+packages = ["glibcLocales", "unzip", "libreoffice", "chromium", "nss", "psmisc"]
 
 [deployment]
 deploymentTarget = "autoscale"
@@ -12,8 +12,16 @@ build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
 [[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 24678
+externalPort = 3001
 
 [env]
 PORT = "5000"

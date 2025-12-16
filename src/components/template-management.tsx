@@ -138,7 +138,7 @@ export function TemplateManagement() {
     console.log('🔍 fetchTemplates() - END');
   };
 
-  const fetchHybridTemplates = async () => {
+  const fetchHybridTemplates = async (resetSelection: boolean = true) => {
     try {
       const headers = await getAuthHeaders();
       // 🔥 JAVÍTVA: BASE_URL használata
@@ -146,7 +146,10 @@ export function TemplateManagement() {
       if (response.ok) {
         const data = await response.json();
         setHybridTemplates(data);
-        setSelectedTemplate(data.current.templateId);
+        // Csak akkor állítjuk be az aktív sablont, ha resetSelection=true (első betöltéskor)
+        if (resetSelection) {
+          setSelectedTemplate(data.current.templateId || '');
+        }
         setLoadStrategy(data.current.loadStrategy);
       }
     } catch (error) {
@@ -174,7 +177,7 @@ export function TemplateManagement() {
           title: t("success"),
           description: language === 'hu' ? 'Beállítások mentve' : 'Einstellungen gespeichert',
         });
-        fetchHybridTemplates();
+        fetchHybridTemplates(false); // Ne állítsa vissza a kiválasztást
       } else {
         setLoadStrategy(previousStrategy);
         throw new Error('Settings save failed');
@@ -213,7 +216,8 @@ export function TemplateManagement() {
           title: t("success"),
           description: t("templateSwitchSuccess").replace('{name}', result.template?.name || 'Template'),
         });
-        fetchHybridTemplates();
+        // Sikeres váltás után frissítjük a listát, és MOST már beállítjuk az új aktív sablont
+        fetchHybridTemplates(true);
       } else {
         throw new Error('Template selection failed');
       }

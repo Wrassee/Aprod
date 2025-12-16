@@ -71,9 +71,39 @@ function Questionnaire({
     setLocalAnswers(answers);
   }, [answers]);
 
-  // 🔥 ÚJ: LIFT SELECTION VALIDATION
+  // 🔥 ÚJ: LIFT SELECTION VALIDATION + QUICK START SUPPORT
   useEffect(() => {
-    // Check if user has selected a lift type
+    // 1. Check for Quick Start templates first
+    const quickStartQuestionTemplate = localStorage.getItem("otis-quick-start-question-template");
+    const quickStartProtocolTemplate = localStorage.getItem("otis-quick-start-protocol-template");
+    
+    if (quickStartQuestionTemplate) {
+      console.log("🚀 Quick Start mode detected:", {
+        questionTemplateId: quickStartQuestionTemplate,
+        protocolTemplateId: quickStartProtocolTemplate,
+      });
+      
+      // Create a virtual lift selection for quick start
+      const quickStartSelection = {
+        liftType: "quick-start",
+        liftSubtype: null,
+        questionTemplateId: quickStartQuestionTemplate,
+        protocolTemplateId: quickStartProtocolTemplate,
+        isQuickStart: true,
+      };
+      
+      // Store it in the standard liftSelection location
+      localStorage.setItem("liftSelection", JSON.stringify(quickStartSelection));
+      
+      // Clear the quick start flags (one-time use)
+      localStorage.removeItem("otis-quick-start-question-template");
+      localStorage.removeItem("otis-quick-start-protocol-template");
+      
+      setLiftSelectionError(null);
+      return;
+    }
+    
+    // 2. Check if user has selected a lift type (normal flow)
     const liftSelectionStr = localStorage.getItem("liftSelection");
     
     if (!liftSelectionStr) {
@@ -98,6 +128,7 @@ function Questionnaire({
         subtype: liftSelection.liftSubtype,
         questionTemplateId: liftSelection.questionTemplateId,
         protocolTemplateId: liftSelection.protocolTemplateId,
+        isQuickStart: liftSelection.isQuickStart || false,
       });
       
       // Clear any previous error

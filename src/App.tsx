@@ -631,7 +631,19 @@ function AppContent({
         return (
           <Admin 
             onBack={() => setCurrentScreen('questionnaire')} 
-            onHome={() => setCurrentScreen('start')} 
+            onHome={() => setCurrentScreen('start')}
+            onQuickStart={(questionTemplateId, protocolTemplateId) => {
+              console.log('🚀 Quick Start with templates:', { questionTemplateId, protocolTemplateId });
+              // Mentjük localStorage-ba a kiválasztott sablonokat
+              localStorage.setItem('otis-quick-start-question-template', questionTemplateId);
+              if (protocolTemplateId) {
+                localStorage.setItem('otis-quick-start-protocol-template', protocolTemplateId);
+              } else {
+                localStorage.removeItem('otis-quick-start-protocol-template');
+              }
+              // Navigálunk a kérdőívre
+              setCurrentScreen('questionnaire');
+            }}
           />
         );
         

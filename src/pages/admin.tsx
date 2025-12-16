@@ -32,9 +32,10 @@ import { getApiUrl, getAuthHeaders } from '@/lib/queryClient';
 interface AdminProps {
   onBack: () => void;
   onHome?: () => void;
+  onQuickStart?: (questionTemplateId: string, protocolTemplateId: string | null) => void;
 }
 
-export function Admin({ onBack, onHome }: AdminProps) {
+export function Admin({ onBack, onHome, onQuickStart }: AdminProps) {
   const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
@@ -327,7 +328,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
               </TabsContent>
 
               <TabsContent value="templates" className="space-y-6 mt-6">
-                <TemplateManagement />
+                <TemplateManagement onQuickStart={onQuickStart} />
               </TabsContent>
 
               {/* LIFT MANAGEMENT CONTENT */}
@@ -481,7 +482,7 @@ export function Admin({ onBack, onHome }: AdminProps) {
             </TabsContent>
 
             <TabsContent value="templates" className="space-y-6 mt-6">
-              <TemplateManagement />
+              <TemplateManagement onQuickStart={onQuickStart} />
             </TabsContent>
 
             {/* LIFT MANAGEMENT CONTENT (Classic) */}

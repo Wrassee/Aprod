@@ -49,7 +49,11 @@ interface HybridTemplateData {
   };
 }
 
-export function TemplateManagement() {
+interface TemplateManagementProps {
+  onQuickStart?: (questionTemplateId: string, protocolTemplateId: string | null) => void;
+}
+
+export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {}) {
   const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
@@ -820,6 +824,17 @@ export function TemplateManagement() {
                         </div>
                       )}
                     </div>
+                    
+                    {/* Gyors Indítás gomb */}
+                    {onQuickStart && selectedQuestionTemplate && (
+                      <button
+                        onClick={() => onQuickStart(selectedQuestionTemplate, selectedProtocolTemplate || null)}
+                        className="mt-4 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
+                        data-testid="button-quick-start"
+                      >
+                        🚀 {language === 'hu' ? 'Gyors Indítás ezzel a sablonnal' : 'Schnellstart mit dieser Vorlage'}
+                      </button>
+                    )}
                   </div>
                 )}
                     

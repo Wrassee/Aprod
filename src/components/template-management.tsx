@@ -72,9 +72,11 @@ export function TemplateManagement() {
   });
   
   const [hybridTemplates, setHybridTemplates] = useState<HybridTemplateData | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<string>('');
+  const [selectedQuestionTemplate, setSelectedQuestionTemplate] = useState<string>('');
+  const [selectedProtocolTemplate, setSelectedProtocolTemplate] = useState<string>('');
   const [loadStrategy, setLoadStrategy] = useState<string>('local_first');
   const [savingSettings, setSavingSettings] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     console.log('🔍 TemplateManagement useEffect triggered');
@@ -138,17 +140,26 @@ export function TemplateManagement() {
     console.log('🔍 fetchTemplates() - END');
   };
 
-  const fetchHybridTemplates = async (resetSelection: boolean = true) => {
+  const fetchHybridTemplates = async () => {
     try {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTVA: BASE_URL használata
       const response = await fetch(`${BASE_URL}/api/admin/templates/available`, { headers });
       if (response.ok) {
         const data = await response.json();
         setHybridTemplates(data);
-        // Csak akkor állítjuk be az aktív sablont, ha resetSelection=true (első betöltéskor)
-        if (resetSelection) {
-          setSelectedTemplate(data.current.templateId || '');
+        // Csak első betöltéskor állítjuk be az alapértelmezett értékeket
+        if (isInitialLoad) {
+          // Kérdés sablon: első questions típusú helyi sablon
+          const defaultQuestion = data.local.find((t: any) => t.type === 'questions' || t.type === 'unified');
+          if (defaultQuestion) {
+            setSelectedQuestionTemplate(defaultQuestion.id);
+          }
+          // Protokoll sablon: első protocol típusú helyi sablon
+          const defaultProtocol = data.local.find((t: any) => t.type === 'protocol');
+          if (defaultProtocol) {
+            setSelectedProtocolTemplate(defaultProtocol.id);
+          }
+          setIsInitialLoad(false);
         }
         setLoadStrategy(data.current.loadStrategy);
       }
@@ -177,7 +188,7 @@ export function TemplateManagement() {
           title: t("success"),
           description: language === 'hu' ? 'Beállítások mentve' : 'Einstellungen gespeichert',
         });
-        fetchHybridTemplates(false); // Ne állítsa vissza a kiválasztást
+        fetchHybridTemplates();
       } else {
         setLoadStrategy(previousStrategy);
         throw new Error('Settings save failed');
@@ -196,7 +207,7 @@ export function TemplateManagement() {
   };
 
   const handleTemplateSelect = async () => {
-    if (!selectedTemplate) return;
+    if (!selectedQuestionTemplate) return;
 
     setLoading(true);
     try {
@@ -205,7 +216,7 @@ export function TemplateManagement() {
         method: 'POST',
         headers: { ...headers, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          templateId: selectedTemplate,
+          templateId: selectedQuestionTemplate,
           loadStrategy: loadStrategy
         }),
       });
@@ -216,8 +227,7 @@ export function TemplateManagement() {
           title: t("success"),
           description: t("templateSwitchSuccess").replace('{name}', result.template?.name || 'Template'),
         });
-        // Sikeres váltás után frissítjük a listát, és MOST már beállítjuk az új aktív sablont
-        fetchHybridTemplates(true);
+        fetchHybridTemplates();
       } else {
         throw new Error('Template selection failed');
       }
@@ -698,49 +708,124 @@ export function TemplateManagement() {
                   </div>
                 </div>
 
-                {/* Sablon Választó */}
+                {/* Kérdés Sablon Választó */}
                 {hybridTemplates && (
                   <div className="space-y-3">
                     <Label className="font-semibold text-gray-700 dark:text-gray-300">
-                      {t("chooseTemplate")}
+                      📝 {language === 'hu' ? 'Kérdés sablon' : 'Fragenvorlage'}
                     </Label>
-                    <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                      <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-purple-500/30">
-                        <SelectValue placeholder={t("chooseTemplate")} />
+                    <Select value={selectedQuestionTemplate} onValueChange={setSelectedQuestionTemplate}>
+                      <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-blue-500/30">
+                        <SelectValue placeholder={language === 'hu' ? 'Válassz kérdés sablont...' : 'Fragenvorlage wählen...'} />
                       </SelectTrigger>
                       <SelectContent>
-                        {hybridTemplates.local.length > 0 && (
+                        {hybridTemplates.local.filter(t => t.type === 'questions' || t.type === 'unified').length > 0 && (
                           <>
-                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-gray-100">
-                              📁 {t("localTemplates")} ({hybridTemplates.local.length})
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-blue-50">
+                              📁 {t("localTemplates")}
                             </div>
-                            {hybridTemplates.local.map((template) => (
-                              <SelectItem key={template.id} value={template.id}>
-                                {language === 'de' ? template.name_de : template.name}
-                              </SelectItem>
-                            ))}
+                            {hybridTemplates.local
+                              .filter(template => template.type === 'questions' || template.type === 'unified')
+                              .map((template) => (
+                                <SelectItem key={template.id} value={template.id}>
+                                  {language === 'de' ? template.name_de : template.name}
+                                </SelectItem>
+                              ))}
                           </>
                         )}
-                        {hybridTemplates.remote.length > 0 && (
+                        {hybridTemplates.remote.filter(t => t.type === 'questions' || t.type === 'unified').length > 0 && (
                           <>
-                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-gray-100 mt-2">
-                              ☁️ {language === 'hu' ? 'Távoli sablonok' : 'Remote-Vorlagen'} ({hybridTemplates.remote.length})
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-blue-50 mt-2">
+                              ☁️ {language === 'hu' ? 'Feltöltött sablonok' : 'Hochgeladene Vorlagen'}
                             </div>
-                            {hybridTemplates.remote.map((template) => (
-                              <SelectItem key={template.id} value={template.id}>
-                                {template.name}
-                              </SelectItem>
-                            ))}
+                            {hybridTemplates.remote
+                              .filter(template => template.type === 'questions' || template.type === 'unified')
+                              .map((template) => (
+                                <SelectItem key={template.id} value={template.id}>
+                                  {template.name}
+                                </SelectItem>
+                              ))}
                           </>
                         )}
                       </SelectContent>
                     </Select>
                   </div>
                 )}
+
+                {/* Protokoll Sablon Választó */}
+                {hybridTemplates && (
+                  <div className="space-y-3">
+                    <Label className="font-semibold text-gray-700 dark:text-gray-300">
+                      📋 {language === 'hu' ? 'Protokoll sablon' : 'Protokollvorlage'}
+                    </Label>
+                    <Select value={selectedProtocolTemplate} onValueChange={setSelectedProtocolTemplate}>
+                      <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-green-500/30">
+                        <SelectValue placeholder={language === 'hu' ? 'Válassz protokoll sablont...' : 'Protokollvorlage wählen...'} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {hybridTemplates.local.filter(t => t.type === 'protocol').length > 0 && (
+                          <>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-green-50">
+                              📁 {t("localTemplates")}
+                            </div>
+                            {hybridTemplates.local
+                              .filter(template => template.type === 'protocol')
+                              .map((template) => (
+                                <SelectItem key={template.id} value={template.id}>
+                                  {language === 'de' ? template.name_de : template.name}
+                                </SelectItem>
+                              ))}
+                          </>
+                        )}
+                        {hybridTemplates.remote.filter(t => t.type === 'protocol').length > 0 && (
+                          <>
+                            <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-green-50 mt-2">
+                              ☁️ {language === 'hu' ? 'Feltöltött sablonok' : 'Hochgeladene Vorlagen'}
+                            </div>
+                            {hybridTemplates.remote
+                              .filter(template => template.type === 'protocol')
+                              .map((template) => (
+                                <SelectItem key={template.id} value={template.id}>
+                                  {template.name}
+                                </SelectItem>
+                              ))}
+                          </>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {/* Kiválasztott sablonok összefoglalója */}
+                {(selectedQuestionTemplate || selectedProtocolTemplate) && (
+                  <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200">
+                    <div className="text-sm font-semibold text-gray-700 mb-2">
+                      {language === 'hu' ? 'Kiválasztott sablonok:' : 'Ausgewählte Vorlagen:'}
+                    </div>
+                    <div className="space-y-1 text-sm">
+                      {selectedQuestionTemplate && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-blue-600">📝</span>
+                          <span>{hybridTemplates?.local.find(t => t.id === selectedQuestionTemplate)?.name || 
+                                 hybridTemplates?.remote.find(t => t.id === selectedQuestionTemplate)?.name || 
+                                 selectedQuestionTemplate}</span>
+                        </div>
+                      )}
+                      {selectedProtocolTemplate && (
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-600">📋</span>
+                          <span>{hybridTemplates?.local.find(t => t.id === selectedProtocolTemplate)?.name || 
+                                 hybridTemplates?.remote.find(t => t.id === selectedProtocolTemplate)?.name || 
+                                 selectedProtocolTemplate}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
                     
                 <button
                   onClick={handleTemplateSelect}
-                  disabled={loading || !selectedTemplate}
+                  disabled={loading || !selectedQuestionTemplate}
                   className="group relative overflow-hidden w-full px-6 py-4 rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -1104,22 +1189,51 @@ export function TemplateManagement() {
             {hybridTemplates && (
               <div className="space-y-4">
                 <div>
-                  <Label>{t("localTemplates")} ({hybridTemplates.local.length})</Label>
-                  <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
+                  <Label>{language === 'hu' ? 'Kérdés sablon' : 'Fragenvorlage'}</Label>
+                  <Select value={selectedQuestionTemplate} onValueChange={setSelectedQuestionTemplate}>
                     <SelectTrigger>
                       <SelectValue placeholder={t("chooseTemplate")} />
                     </SelectTrigger>
                     <SelectContent>
-                      {hybridTemplates.local.map((template) => (
-                        <SelectItem key={template.id} value={template.id}>
-                          {template.name} (helyi)
-                        </SelectItem>
-                      ))}
-                      {hybridTemplates.remote.map((template) => (
-                        <SelectItem key={template.id} value={template.id}>
-                          {template.name} (távoli)
-                        </SelectItem>
-                      ))}
+                      {hybridTemplates.local
+                        .filter(template => template.type === 'questions' || template.type === 'unified')
+                        .map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name} (helyi)
+                          </SelectItem>
+                        ))}
+                      {hybridTemplates.remote
+                        .filter(template => template.type === 'questions' || template.type === 'unified')
+                        .map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name} (távoli)
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label>{language === 'hu' ? 'Protokoll sablon' : 'Protokollvorlage'}</Label>
+                  <Select value={selectedProtocolTemplate} onValueChange={setSelectedProtocolTemplate}>
+                    <SelectTrigger>
+                      <SelectValue placeholder={language === 'hu' ? 'Válassz protokoll sablont...' : 'Protokollvorlage wählen...'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {hybridTemplates.local
+                        .filter(template => template.type === 'protocol')
+                        .map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name} (helyi)
+                          </SelectItem>
+                        ))}
+                      {hybridTemplates.remote
+                        .filter(template => template.type === 'protocol')
+                        .map((template) => (
+                          <SelectItem key={template.id} value={template.id}>
+                            {template.name} (távoli)
+                          </SelectItem>
+                        ))}
                     </SelectContent>
                   </Select>
                 </div>
@@ -1140,7 +1254,7 @@ export function TemplateManagement() {
                 
                 <Button 
                   onClick={handleTemplateSelect} 
-                  disabled={loading || !selectedTemplate}
+                  disabled={loading || !selectedQuestionTemplate}
                   className="w-full"
                 >
                   {loading ? t("switching") : t("templateSwitch")}

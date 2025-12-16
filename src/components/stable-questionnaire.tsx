@@ -19,7 +19,7 @@ interface StableQuestionnaireProps {
   onErrorsChange: (errors: ProtocolError[]) => void;
   onNext: () => void;
   onSave: () => void;
-  language: 'hu' | 'de';
+  language: 'hu' | 'de' | 'en' | 'fr' | 'it';
   onAdminAccess?: () => void;
   onHome?: () => void;
 }

@@ -111,7 +111,7 @@ function AppContent({
     }
   }, [user, currentScreen, setCurrentScreen]);
 
-  const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de') => {
+  const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de' | 'en' | 'fr' | 'it') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
     setLanguage(selectedLanguage);
     localStorage.setItem('otis-protocol-language', selectedLanguage);

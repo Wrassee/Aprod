@@ -52,7 +52,7 @@ interface ErdungskontrolleProps {
   onHome?: () => void;
   onAdminAccess?: () => void;
   onStartNew?: () => void;
-  language: 'hu' | 'de';
+  language: 'hu' | 'de' | 'en' | 'fr' | 'it';
   receptionDate: string;
   onReceptionDateChange: (date: string) => void;
 }
@@ -67,7 +67,7 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
 }: {
   question: GroundingQuestion;
   currentAnswer?: GroundingAnswer;
-  language: 'hu' | 'de';
+  language: 'hu' | 'de' | 'en' | 'fr' | 'it';
   onChange: (id: string, value: GroundingAnswer) => void;
   theme: 'modern' | 'classic';
 }) {

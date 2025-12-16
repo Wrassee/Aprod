@@ -190,13 +190,86 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
     setSelectedSubtype(null);
   }, [language]);
 
-  // Get localized text
+  // Lift type/subtype translations for EN/FR/IT languages
+  const liftTypeTranslations: Record<string, Record<string, { name: string; description?: string }>> = {
+    // English translations
+    en: {
+      MOD: { name: "Modernization", description: "Elevator modernization projects" },
+      BEX: { name: "New Installation", description: "New elevator installations" },
+      NEU: { name: "New Build", description: "New building elevator systems" },
+      EGYEDI: { name: "Custom", description: "Custom elevator solutions" },
+      // Subtypes
+      MOD_DR: { name: "Door Replacement", description: "Elevator door modernization" },
+      MOD_GEN2: { name: "Gen2 Modernization", description: "Gen2 system modernization" },
+      MOD_FULL: { name: "Full Modernization", description: "Complete elevator modernization" },
+      BEX_GEN2: { name: "Gen2 New Installation", description: "Gen2 new installation" },
+      BEX_HCMC: { name: "HCMC Installation", description: "HCMC elevator installation" },
+      NEU_STD: { name: "Standard New Build", description: "Standard new building elevator" },
+      NEU_PREM: { name: "Premium New Build", description: "Premium new building elevator" },
+    },
+    // French translations
+    fr: {
+      MOD: { name: "Modernisation", description: "Projets de modernisation d'ascenseurs" },
+      BEX: { name: "Nouvelle Installation", description: "Nouvelles installations d'ascenseurs" },
+      NEU: { name: "Construction Neuve", description: "Systèmes d'ascenseurs pour nouveaux bâtiments" },
+      EGYEDI: { name: "Personnalisé", description: "Solutions d'ascenseurs personnalisées" },
+      // Subtypes
+      MOD_DR: { name: "Remplacement de Porte", description: "Modernisation des portes d'ascenseur" },
+      MOD_GEN2: { name: "Modernisation Gen2", description: "Modernisation du système Gen2" },
+      MOD_FULL: { name: "Modernisation Complète", description: "Modernisation complète de l'ascenseur" },
+      BEX_GEN2: { name: "Installation Gen2", description: "Nouvelle installation Gen2" },
+      BEX_HCMC: { name: "Installation HCMC", description: "Installation d'ascenseur HCMC" },
+      NEU_STD: { name: "Construction Standard", description: "Ascenseur standard pour nouveau bâtiment" },
+      NEU_PREM: { name: "Construction Premium", description: "Ascenseur premium pour nouveau bâtiment" },
+    },
+    // Italian translations
+    it: {
+      MOD: { name: "Modernizzazione", description: "Progetti di modernizzazione ascensori" },
+      BEX: { name: "Nuova Installazione", description: "Nuove installazioni di ascensori" },
+      NEU: { name: "Nuova Costruzione", description: "Sistemi di ascensori per nuovi edifici" },
+      EGYEDI: { name: "Personalizzato", description: "Soluzioni di ascensori personalizzate" },
+      // Subtypes
+      MOD_DR: { name: "Sostituzione Porte", description: "Modernizzazione porte ascensore" },
+      MOD_GEN2: { name: "Modernizzazione Gen2", description: "Modernizzazione sistema Gen2" },
+      MOD_FULL: { name: "Modernizzazione Completa", description: "Modernizzazione completa ascensore" },
+      BEX_GEN2: { name: "Installazione Gen2", description: "Nuova installazione Gen2" },
+      BEX_HCMC: { name: "Installazione HCMC", description: "Installazione ascensore HCMC" },
+      NEU_STD: { name: "Costruzione Standard", description: "Ascensore standard per nuovo edificio" },
+      NEU_PREM: { name: "Costruzione Premium", description: "Ascensore premium per nuovo edificio" },
+    },
+  };
+
+  // Get localized text with fallback chain: current language → German → Hungarian
   const getName = (item: LiftType | LiftSubtype) => {
-    return language === "de" && item.name_de ? item.name_de : item.name_hu;
+    // For EN/FR/IT, check the translations object first
+    if (language === "en" || language === "fr" || language === "it") {
+      const langTranslations = liftTypeTranslations[language];
+      if (langTranslations && langTranslations[item.code]) {
+        return langTranslations[item.code].name;
+      }
+    }
+    // German
+    if (language === "de" && item.name_de) {
+      return item.name_de;
+    }
+    // Fallback to Hungarian
+    return item.name_hu;
   };
 
   const getDescription = (item: LiftType | LiftSubtype) => {
-    return language === "de" && item.description_de ? item.description_de : item.description_hu;
+    // For EN/FR/IT, check the translations object first
+    if (language === "en" || language === "fr" || language === "it") {
+      const langTranslations = liftTypeTranslations[language];
+      if (langTranslations && langTranslations[item.code]) {
+        return langTranslations[item.code].description || null;
+      }
+    }
+    // German
+    if (language === "de" && item.description_de) {
+      return item.description_de;
+    }
+    // Fallback to Hungarian
+    return item.description_hu;
   };
 
   // Handle subtype selection and navigation

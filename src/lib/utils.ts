@@ -5,17 +5,41 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatDate(date: Date, language: 'hu' | 'de'): string {
+export function formatDate(date: Date, language: 'hu' | 'de' | 'en' | 'fr' | 'it'): string {
+  const localeMap: Record<string, string> = {
+    hu: 'hu-HU',
+    de: 'de-DE',
+    en: 'en-US',
+    fr: 'fr-FR',
+    it: 'it-IT',
+  };
+  
+  const locale = localeMap[language] || 'hu-HU';
+  
   if (language === 'de') {
     // German format: DD.MM.YYYY
-    return date.toLocaleDateString('de-DE', {
+    return date.toLocaleDateString(locale, {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  } else if (language === 'en') {
+    // English format: MM/DD/YYYY
+    return date.toLocaleDateString(locale, {
+      month: '2-digit',
+      day: '2-digit',
+      year: 'numeric'
+    });
+  } else if (language === 'fr' || language === 'it') {
+    // French/Italian format: DD/MM/YYYY
+    return date.toLocaleDateString(locale, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
     });
   } else {
     // Hungarian format: YYYY.MM.DD
-    return date.toLocaleDateString('hu-HU', {
+    return date.toLocaleDateString(locale, {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'

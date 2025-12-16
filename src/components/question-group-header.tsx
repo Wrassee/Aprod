@@ -5,7 +5,7 @@ interface QuestionGroupHeaderProps {
   questionCount: number;
   totalGroups: number;
   currentGroupIndex: number;
-  language?: 'hu' | 'de';
+  language?: 'hu' | 'de' | 'en' | 'fr' | 'it';
 }
 
 export function QuestionGroupHeader({ 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Question } from '@shared/schema';
 
-export function useStableQuestions(language: 'hu' | 'de') {
+export function useStableQuestions(language: 'hu' | 'de' | 'en' | 'fr' | 'it') {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const currentLanguageRef = useRef(language);

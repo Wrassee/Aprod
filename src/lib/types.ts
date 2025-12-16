@@ -30,7 +30,7 @@ export interface QuestionPage {
 
 export interface AppState {
   currentScreen: 'start' | 'questionnaire' | 'signature' | 'completion';
-  language: 'hu' | 'de';
+  language: 'hu' | 'de' | 'en' | 'fr' | 'it';
   currentPage: number;
   totalPages: number;
   formData: FormData;

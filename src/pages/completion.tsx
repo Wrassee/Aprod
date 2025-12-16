@@ -48,7 +48,7 @@ interface CompletionProps {
     inspectorName?: string;
     inspectionDate?: string;
   };
-  language: 'hu' | 'de';
+  language: 'hu' | 'de' | 'en' | 'fr' | 'it';
 }
 
 export function Completion({

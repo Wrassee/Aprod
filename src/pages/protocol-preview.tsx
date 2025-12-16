@@ -14,7 +14,7 @@ interface Protocol extends FormData {}
 interface ProtocolPreviewProps {
   onBack: () => void;
   formData: FormData; // JAVÍTÁS: Prop fogadása
-  language: 'hu' | 'de'; // JAVÍTÁS: Prop fogadása
+  language: 'hu' | 'de' | 'en' | 'fr' | 'it'; // JAVÍTÁS: Prop fogadása
 }
 
 export function ProtocolPreview({ onBack, formData, language }: ProtocolPreviewProps) {

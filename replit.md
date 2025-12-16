@@ -17,11 +17,14 @@ Excel writing functionality must remain untouched to prevent corruption.
 - **Styling**: TailwindCSS with custom OTIS brand colors.
 - **State Management**: React hooks and context for local state, with localStorage persistence.
 - **Data Fetching**: TanStack Query.
-- **Localization**: Complete Hungarian/German translation system using LanguageProvider context and translation objects (src/lib/translations.ts). All UI components dynamically switch languages based on user preference.
+- **Localization**: Complete 5-language support (Hungarian/German/English/French/Italian) using LanguageProvider context and translation objects (src/lib/translations.ts). All UI components dynamically switch languages based on user preference.
   - **Language Persistence**: Language preference stored in localStorage ('otis-protocol-language') and loaded immediately on init
   - **Multilingual Coverage**: 180+ translation keys covering main app, admin interface, login/registration, and all UI feedback
+  - **SupportedLanguage Type**: Centralized type definition in language-context.tsx: `'hu' | 'de' | 'en' | 'fr' | 'it'`
+  - **Lift Selector Translations**: Added frontend translation mapping for EN/FR/IT languages for lift types and subtypes (MOD, BEX, NEU, EGYEDI and their subtypes)
   - **Login Page Navigation**: OTIS logo on login page acts as clickable home button, returning users to language selection screen
   - **Bug Fix (2025-10-26)**: useLanguage hook now initializes with localStorage value immediately instead of defaulting to 'hu' first
+  - **Bug Fix (2025-12-16)**: Lift selector card texts now properly translated for EN/FR/IT languages using frontend translation mapping
 - **UI/UX Decisions**: Mobile-first, tablet-optimized interface with official OTIS branding. Prioritized input stability, debouncing to prevent cursor jumping, and a global Map cache for radio button functionality. Advanced save system with visual feedback.
 
 ### Backend

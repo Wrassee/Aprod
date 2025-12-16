@@ -9,7 +9,7 @@ interface TrueFalseGroupProps {
   values: Record<string, AnswerValue>;
   onChange: (questionId: string, value: AnswerValue) => void;
   groupName: string;  // Display name (already localized from parent)
-  language?: 'hu' | 'de';  // Optional language for direct group.title access
+  language?: 'hu' | 'de' | 'en' | 'fr' | 'it';  // Optional language for direct group.title access
 }
 
 export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, language }: TrueFalseGroupProps) => {

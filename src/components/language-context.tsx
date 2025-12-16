@@ -1,9 +1,11 @@
 import { createContext, useContext } from 'react';
 import { Translation } from '@/lib/translations';
 
+export type SupportedLanguage = 'hu' | 'de' | 'en' | 'fr' | 'it';
+
 export interface LanguageContextType {
-  language: 'hu' | 'de';
-  setLanguage: (lang: 'hu' | 'de') => void;
+  language: SupportedLanguage;
+  setLanguage: (lang: SupportedLanguage) => void;
   t: (key: string) => string;
 }
 

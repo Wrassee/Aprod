@@ -286,7 +286,7 @@ router.post('/email', requireAuth, async (req, res) => {
     console.log("📧 Email sending request received");
 
     // 1. Adatok kinyerése a kérésből (az App.tsx küldi)
-    const { formData, language } = req.body;
+    const { formData, language, recipient } = req.body;
     
     // 2. Hitelesített felhasználó adatainak kinyerése (a requireAuth middleware-ből)
     const authenticatedUser = (req as any).user;
@@ -295,13 +295,13 @@ router.post('/email', requireAuth, async (req, res) => {
     if (!formData) {
       return res.status(400).json({ message: "Form data is required" });
     }
-    if (!authenticatedUser || !authenticatedUser.email) {
-      return res.status(401).json({ message: "Authenticated user email not found" });
+    if (!recipient || !recipient.includes('@')) {
+      return res.status(400).json({ message: "Valid recipient email is required" });
     }
 
     // 3. Adatok kinyerése a formData-ból az email service számára
     const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
-    const recipientEmail = authenticatedUser.email; // A címzett a bejelentkezett felhasználó lesz
+    const recipientEmail = recipient; // A frontend által megadott címzett
 
     // 4. Excel generálás (a többi PDF endpoint mintájára)
     // Megjegyzés: a simpleXmlExcelService importálása a függvényen belül van a többi route-nál is

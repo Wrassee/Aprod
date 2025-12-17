@@ -1,3 +1,5 @@
+import nodemailer from 'nodemailer';
+
 interface EmailOptions {
   recipient: string;
   language: string;
@@ -7,29 +9,48 @@ interface EmailOptions {
 }
 
 class EmailService {
+  private transporter: nodemailer.Transporter | null = null;
+
+  private getTransporter() {
+    if (!this.transporter) {
+      const gmailUser = process.env.GMAIL_USER;
+      const gmailPass = process.env.GMAIL_PASS;
+
+      if (!gmailUser || !gmailPass) {
+        throw new Error('GMAIL_USER or GMAIL_PASS environment variables are not set');
+      }
+
+      this.transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: gmailUser,
+          pass: gmailPass,
+        },
+      });
+    }
+    return this.transporter;
+  }
+
   async sendProtocolEmail(options: EmailOptions): Promise<void> {
     try {
-      // Check if RESEND_API_KEY is available
-      const apiKey = process.env.RESEND_API_KEY;
-      if (!apiKey) {
-        console.log('RESEND_API_KEY not found, using mock email service');
+      const gmailUser = process.env.GMAIL_USER;
+      const gmailPass = process.env.GMAIL_PASS;
+
+      if (!gmailUser || !gmailPass) {
+        console.log('GMAIL_USER or GMAIL_PASS not found, using mock email service');
         console.log('Sending email to:', options.recipient);
         console.log('Language:', options.language);
         console.log('Reception date:', options.receptionDate);
         console.log('Protocol PDF size:', options.protocolPdf.length);
         await new Promise(resolve => setTimeout(resolve, 1000));
-        console.log('Email sent successfully');
+        console.log('Email sent successfully (mock)');
         return;
       }
 
-      // Use Resend API for actual email sending
-      const { Resend } = await import('resend');
-      const resend = new Resend(apiKey);
-
+      const transporter = this.getTransporter();
       const emailContent = this.getEmailContent(options.language, options.receptionDate);
       
-      // Prepare attachments
-      const attachments = [
+      const attachments: nodemailer.SendMailOptions['attachments'] = [
         {
           filename: `OTIS-Protocol-${options.receptionDate}.pdf`,
           content: options.protocolPdf,
@@ -43,19 +64,19 @@ class EmailService {
         });
       }
 
-      // Send email via Resend (test mode: only to verified email)
-      const result = await resend.emails.send({
-        from: 'onboarding@resend.dev', // Use Resend's test domain
-        to: options.recipient, // Test mode restriction
+      const mailOptions: nodemailer.SendMailOptions = {
+        from: gmailUser,
+        to: options.recipient,
         subject: emailContent.subject,
         html: emailContent.body,
-        attachments: attachments as any,
-      });
+        attachments,
+      };
 
-      console.log('Email sent successfully via Resend:', result);
+      const result = await transporter.sendMail(mailOptions);
+      console.log('Email sent successfully via Gmail SMTP:', result.messageId);
     } catch (error) {
       console.error('Error sending email:', error);
-      throw new Error('Failed to send email');
+      throw new Error('Failed to send email: ' + (error as Error).message);
     }
   }
 

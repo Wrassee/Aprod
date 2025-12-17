@@ -8,6 +8,15 @@
 import PageHeader from '@/components/PageHeader';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { ErrorExport } from '@/components/error-export';
@@ -34,9 +43,8 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { FileOpener } from '@capacitor-community/file-opener';
 
 interface CompletionProps {
-  onEmailPDF: () => void;
+  onEmailPDF: (recipient: string) => Promise<void>;
   onSaveToCloud: () => void;
-  // onDownloadExcel / onViewProtocol kept out — Excel is handled locally in this component
   onStartNew: () => void;
   onGoHome: () => void;
   onSettings: () => void;
@@ -71,6 +79,8 @@ export function Completion({
   const [isGroundingPdfDownloading, setIsGroundingPdfDownloading] = useState(false);
   const [isExcelDownloading, setIsExcelDownloading] = useState(false);
   const [isPdfPreviewing, setIsPdfPreviewing] = useState(false);
+  const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
+  const [recipientEmail, setRecipientEmail] = useState('');
 
   // === 🛠️ HELPER: BLOB → BASE64 ===
   const convertBlobToBase64 = (blob: Blob): Promise<string> => {
@@ -140,17 +150,40 @@ export function Completion({
   };
 
   // === EMAIL ===
-  const handleEmailClick = async () => {
+  const handleEmailClick = () => {
+    setIsEmailDialogOpen(true);
+  };
+
+  const handleSendEmail = async () => {
+    if (!recipientEmail || !recipientEmail.includes('@')) {
+      toast({
+        title: t("error"),
+        description: language === 'hu' ? 'Kérlek adj meg egy érvényes email címet!' : 'Bitte geben Sie eine gültige E-Mail-Adresse ein!',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    setIsEmailDialogOpen(false);
     setIsEmailSending(true);
     setEmailStatus(t("emailSending"));
 
     try {
-      await onEmailPDF();
+      await onEmailPDF(recipientEmail);
       setEmailStatus(`✅ ${t("emailSentSuccess")}`);
+      toast({
+        title: language === 'hu' ? 'Email elküldve!' : 'E-Mail gesendet!',
+        description: language === 'hu' ? `Sikeres küldés: ${recipientEmail}` : `Erfolgreich gesendet an: ${recipientEmail}`,
+      });
       setTimeout(() => setEmailStatus(''), 5000);
     } catch (error) {
       console.error('Error sending email:', error);
       setEmailStatus(`❌ ${t("emailSentError")}`);
+      toast({
+        title: t("error"),
+        description: (error as Error).message || t("emailSentError"),
+        variant: 'destructive',
+      });
       setTimeout(() => setEmailStatus(''), 5000);
     } finally {
       setIsEmailSending(false);
@@ -801,6 +834,67 @@ export function Completion({
           </div>
         </main>
       </div>
+
+      {/* EMAIL RECIPIENT DIALOG */}
+      <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {language === 'hu' ? 'Címzett megadása' : 
+               language === 'de' ? 'Empfänger eingeben' :
+               language === 'fr' ? 'Entrer le destinataire' :
+               language === 'it' ? 'Inserire il destinatario' :
+               'Enter Recipient'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="recipient-email">
+                {language === 'hu' ? 'Email cím' : 
+                 language === 'de' ? 'E-Mail-Adresse' :
+                 language === 'fr' ? 'Adresse e-mail' :
+                 language === 'it' ? 'Indirizzo email' :
+                 'Email Address'}
+              </Label>
+              <Input
+                id="recipient-email"
+                type="email"
+                placeholder={language === 'hu' ? 'pelda@email.com' : 'example@email.com'}
+                value={recipientEmail}
+                onChange={(e) => setRecipientEmail(e.target.value)}
+                className="w-full"
+                data-testid="input-recipient-email"
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => setIsEmailDialogOpen(false)}
+              data-testid="button-cancel-email"
+            >
+              {language === 'hu' ? 'Mégse' : 
+               language === 'de' ? 'Abbrechen' :
+               language === 'fr' ? 'Annuler' :
+               language === 'it' ? 'Annulla' :
+               'Cancel'}
+            </Button>
+            <Button
+              onClick={handleSendEmail}
+              disabled={!recipientEmail}
+              className="bg-blue-600 hover:bg-blue-700"
+              data-testid="button-send-email"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              {language === 'hu' ? 'Küldés' : 
+               language === 'de' ? 'Senden' :
+               language === 'fr' ? 'Envoyer' :
+               language === 'it' ? 'Invia' :
+               'Send'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

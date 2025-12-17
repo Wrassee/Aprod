@@ -286,7 +286,7 @@ router.post('/email', requireAuth, async (req, res) => {
     console.log("📧 Email sending request received");
 
     // 1. Adatok kinyerése a kérésből (az App.tsx küldi)
-    const { formData, language, recipient } = req.body;
+    const { formData, language, recipient, attachments } = req.body;
     
     // 2. Hitelesített felhasználó adatainak kinyerése (a requireAuth middleware-ből)
     const authenticatedUser = (req as any).user;
@@ -299,29 +299,63 @@ router.post('/email', requireAuth, async (req, res) => {
       return res.status(400).json({ message: "Valid recipient email is required" });
     }
 
+    // Melléklet beállítások (alapértelmezett: csak protokoll)
+    const attachmentSettings = attachments || { protocol: true, grounding: false, errorList: false };
+    
+    // Legalább egy melléklet szükséges
+    if (!attachmentSettings.protocol && !attachmentSettings.grounding && !attachmentSettings.errorList) {
+      return res.status(400).json({ message: "At least one attachment is required" });
+    }
+
     // 3. Adatok kinyerése a formData-ból az email service számára
     const receptionDate = formData.receptionDate || new Date().toISOString().split('T')[0];
-    const recipientEmail = recipient; // A frontend által megadott címzett
+    const recipientEmail = recipient;
+    const lang = language || 'hu';
 
-    // 4. Excel generálás (a többi PDF endpoint mintájára)
-    // Megjegyzés: a simpleXmlExcelService importálása a függvényen belül van a többi route-nál is
-    const { simpleXmlExcelService } = await import('../services/simple-xml-excel.js');
-    const excelBuffer = await simpleXmlExcelService.generateExcelFromTemplate(formData, language || 'hu');
-    
-    // 5. PDF generálás az Excel bufferből
-    console.log("Generating PDF from Excel buffer for email...");
-    const pdfBuffer = await pdfService.generatePDF(excelBuffer);
+    let protocolPdf: Buffer | null = null;
+    let groundingPdf: Buffer | null = null;
+    let errorListPdf: Buffer | null = null;
 
-    // 6. Opcionális: Hiba lista PDF generálása (ha van rá logika)
-    // Jelenleg null-t adunk át, de az emailService képes kezelni.
-    const errorListPdf = null; 
+    // 4. Protokoll PDF generálása (ha szükséges)
+    if (attachmentSettings.protocol) {
+      console.log("Generating protocol PDF for email...");
+      const { simpleXmlExcelService } = await import('../services/simple-xml-excel.js');
+      const excelBuffer = await simpleXmlExcelService.generateExcelFromTemplate(formData, lang);
+      protocolPdf = await pdfService.generatePDF(excelBuffer);
+      console.log("✅ Protocol PDF generated");
+    }
+
+    // 5. Földelési PDF generálása (ha szükséges)
+    if (attachmentSettings.grounding) {
+      console.log("Generating grounding PDF for email...");
+      groundingPdf = await GroundingPdfService.generateFilledPdf(formData, lang);
+      console.log("✅ Grounding PDF generated");
+    }
+
+    // 6. Hibalista PDF generálása (ha szükséges és van hiba)
+    if (attachmentSettings.errorList && formData.errors && formData.errors.length > 0) {
+      console.log("Generating error list PDF for email...");
+      const { ErrorExportService } = await import('../services/error-export.js');
+      errorListPdf = await ErrorExportService.generatePDF({
+        errors: formData.errors,
+        protocolData: {
+          buildingAddress: formData.answers?.['1'] || '',
+          liftId: formData.answers?.['7'] || '',
+          inspectorName: formData.answers?.['4'] || '',
+          inspectionDate: receptionDate,
+        },
+        language: lang as 'hu' | 'de',
+      });
+      console.log("✅ Error list PDF generated");
+    }
     
     // 7. Email küldése a service-en keresztül
-    console.log(`Sending email for user ${recipientEmail}...`);
+    console.log(`Sending email to ${recipientEmail}...`);
     await emailService.sendProtocolEmail({
-      recipient: recipientEmail, // Ezt használja az interface
-      language: language || 'hu',
-      protocolPdf: pdfBuffer,
+      recipient: recipientEmail,
+      language: lang,
+      protocolPdf: protocolPdf,
+      groundingPdf: groundingPdf,
       errorListPdf: errorListPdf, 
       receptionDate: receptionDate
     });

@@ -69,7 +69,27 @@ Excel writing functionality must remain untouched to prevent corruption.
   - **Privilege Escalation Prevention**: Server-side role and user_id field protection with database-backed role verification
   - **Secure API Calls**: All profile operations use Authorization Bearer headers with Zod validation
 
-## Recent Changes (October 26, 2025)
+## Recent Changes (December 17, 2025)
+### Email Attachment Selection System
+1. **Attachment Selection Dialog**
+   - Users can now select which documents to attach when sending email
+   - Three attachment options: Acceptance Protocol / Grounding Resistance Measurement / Error List
+   - Checkbox-based selection with at least one required
+   - Full 5-language support (HU/DE/EN/FR/IT) for all dialog text
+
+2. **Backend Email Improvements**
+   - Email endpoint now accepts `attachments` parameter with `{ protocol, grounding, errorList }` booleans
+   - Dynamic PDF generation based on selected attachments
+   - Language-appropriate email body with attachment list in recipient's language
+   - HTML-formatted email with OTIS branding
+
+3. **Files Modified**
+   - `src/pages/completion.tsx`: Added attachment checkboxes and state management
+   - `src/App.tsx`: Updated handleEmailPDF signature to include attachments
+   - `server/routes/protocol-mapping.ts`: Dynamic attachment generation based on selection
+   - `server/services/email-service.ts`: Full 5-language email templates with attachment listing
+
+## Previous Changes (October 26, 2025)
 ### Multilingual System Enhancements
 1. **Complete Login Page Localization**
    - Added 21+ new translation keys for login/registration interface

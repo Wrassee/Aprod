@@ -353,13 +353,13 @@ function AppContent({
   };
 
   // === ADMIN MŰVELETEK ===
-  const handleEmailPDF = async (recipient: string) => {
+  const handleEmailPDF = async (recipient: string, attachments: { protocol: boolean; grounding: boolean; errorList: boolean }) => {
     try {
       const headers = await getAuthHeaders();
       const response = await fetch(getApiUrl('/api/protocols/email'), {
         method: 'POST',
         headers,
-        body: JSON.stringify({ formData, language, recipient }),
+        body: JSON.stringify({ formData, language, recipient, attachments }),
       });
       
       if (!response.ok) {
@@ -367,7 +367,7 @@ function AppContent({
         throw new Error(errorText || 'Email küldés sikertelen');
       }
       
-      console.log('PDF emailed successfully to:', recipient);
+      console.log('PDF emailed successfully to:', recipient, 'with attachments:', attachments);
     } catch (error) {
       console.error('Error emailing PDF:', error);
       throw error;

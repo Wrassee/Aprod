@@ -10,6 +10,7 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -43,7 +44,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { FileOpener } from '@capacitor-community/file-opener';
 
 interface CompletionProps {
-  onEmailPDF: (recipient: string) => Promise<void>;
+  onEmailPDF: (recipient: string, attachments: { protocol: boolean; grounding: boolean; errorList: boolean }) => Promise<void>;
   onSaveToCloud: () => void;
   onStartNew: () => void;
   onGoHome: () => void;
@@ -81,6 +82,9 @@ export function Completion({
   const [isPdfPreviewing, setIsPdfPreviewing] = useState(false);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
   const [recipientEmail, setRecipientEmail] = useState('');
+  const [attachProtocol, setAttachProtocol] = useState(true);
+  const [attachGrounding, setAttachGrounding] = useState(false);
+  const [attachErrorList, setAttachErrorList] = useState(false);
 
   // === 🛠️ HELPER: BLOB → BASE64 ===
   const convertBlobToBase64 = (blob: Blob): Promise<string> => {
@@ -158,7 +162,24 @@ export function Completion({
     if (!recipientEmail || !recipientEmail.includes('@')) {
       toast({
         title: t("error"),
-        description: language === 'hu' ? 'Kérlek adj meg egy érvényes email címet!' : 'Bitte geben Sie eine gültige E-Mail-Adresse ein!',
+        description: language === 'hu' ? 'Kérlek adj meg egy érvényes email címet!' : 
+                     language === 'de' ? 'Bitte geben Sie eine gültige E-Mail-Adresse ein!' :
+                     language === 'fr' ? 'Veuillez entrer une adresse e-mail valide!' :
+                     language === 'it' ? 'Inserisci un indirizzo email valido!' :
+                     'Please enter a valid email address!',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!attachProtocol && !attachGrounding && !attachErrorList) {
+      toast({
+        title: t("error"),
+        description: language === 'hu' ? 'Válassz legalább egy mellékletet!' : 
+                     language === 'de' ? 'Wählen Sie mindestens einen Anhang!' :
+                     language === 'fr' ? 'Sélectionnez au moins une pièce jointe!' :
+                     language === 'it' ? 'Seleziona almeno un allegato!' :
+                     'Select at least one attachment!',
         variant: 'destructive',
       });
       return;
@@ -169,11 +190,23 @@ export function Completion({
     setEmailStatus(t("emailSending"));
 
     try {
-      await onEmailPDF(recipientEmail);
+      await onEmailPDF(recipientEmail, {
+        protocol: attachProtocol,
+        grounding: attachGrounding,
+        errorList: attachErrorList,
+      });
       setEmailStatus(`✅ ${t("emailSentSuccess")}`);
       toast({
-        title: language === 'hu' ? 'Email elküldve!' : 'E-Mail gesendet!',
-        description: language === 'hu' ? `Sikeres küldés: ${recipientEmail}` : `Erfolgreich gesendet an: ${recipientEmail}`,
+        title: language === 'hu' ? 'Email elküldve!' : 
+               language === 'de' ? 'E-Mail gesendet!' :
+               language === 'fr' ? 'E-mail envoyé!' :
+               language === 'it' ? 'Email inviata!' :
+               'Email sent!',
+        description: language === 'hu' ? `Sikeres küldés: ${recipientEmail}` : 
+                     language === 'de' ? `Erfolgreich gesendet an: ${recipientEmail}` :
+                     language === 'fr' ? `Envoyé avec succès à: ${recipientEmail}` :
+                     language === 'it' ? `Inviato con successo a: ${recipientEmail}` :
+                     `Successfully sent to: ${recipientEmail}`,
       });
       setTimeout(() => setEmailStatus(''), 5000);
     } catch (error) {
@@ -840,21 +873,21 @@ export function Completion({
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
-              {language === 'hu' ? 'Címzett megadása' : 
-               language === 'de' ? 'Empfänger eingeben' :
-               language === 'fr' ? 'Entrer le destinataire' :
-               language === 'it' ? 'Inserire il destinatario' :
-               'Enter Recipient'}
+              {language === 'hu' ? 'Email küldése' : 
+               language === 'de' ? 'E-Mail senden' :
+               language === 'fr' ? 'Envoyer un e-mail' :
+               language === 'it' ? 'Invia email' :
+               'Send Email'}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="recipient-email">
-                {language === 'hu' ? 'Email cím' : 
-                 language === 'de' ? 'E-Mail-Adresse' :
-                 language === 'fr' ? 'Adresse e-mail' :
-                 language === 'it' ? 'Indirizzo email' :
-                 'Email Address'}
+                {language === 'hu' ? 'Címzett email cím' : 
+                 language === 'de' ? 'Empfänger E-Mail-Adresse' :
+                 language === 'fr' ? 'Adresse e-mail du destinataire' :
+                 language === 'it' ? 'Indirizzo email del destinatario' :
+                 'Recipient Email Address'}
               </Label>
               <Input
                 id="recipient-email"
@@ -865,6 +898,64 @@ export function Completion({
                 className="w-full"
                 data-testid="input-recipient-email"
               />
+            </div>
+            
+            <div className="space-y-3">
+              <Label>
+                {language === 'hu' ? 'Mellékletek' : 
+                 language === 'de' ? 'Anhänge' :
+                 language === 'fr' ? 'Pièces jointes' :
+                 language === 'it' ? 'Allegati' :
+                 'Attachments'}
+              </Label>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="attach-protocol" 
+                  checked={attachProtocol}
+                  onCheckedChange={(checked) => setAttachProtocol(checked === true)}
+                  data-testid="checkbox-attach-protocol"
+                />
+                <Label htmlFor="attach-protocol" className="font-normal cursor-pointer">
+                  {language === 'hu' ? 'Átvételi protokoll' : 
+                   language === 'de' ? 'Abnahmeprotokoll' :
+                   language === 'fr' ? 'Protocole de réception' :
+                   language === 'it' ? 'Protocollo di accettazione' :
+                   'Acceptance Protocol'}
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="attach-grounding" 
+                  checked={attachGrounding}
+                  onCheckedChange={(checked) => setAttachGrounding(checked === true)}
+                  data-testid="checkbox-attach-grounding"
+                />
+                <Label htmlFor="attach-grounding" className="font-normal cursor-pointer">
+                  {language === 'hu' ? 'Földelési ellenállás mérés' : 
+                   language === 'de' ? 'Erdungswiderstandsmessung' :
+                   language === 'fr' ? 'Mesure de résistance de mise à la terre' :
+                   language === 'it' ? 'Misurazione resistenza di messa a terra' :
+                   'Grounding Resistance Measurement'}
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="attach-error-list" 
+                  checked={attachErrorList}
+                  onCheckedChange={(checked) => setAttachErrorList(checked === true)}
+                  data-testid="checkbox-attach-error-list"
+                />
+                <Label htmlFor="attach-error-list" className="font-normal cursor-pointer">
+                  {language === 'hu' ? 'Hibalista' : 
+                   language === 'de' ? 'Fehlerliste' :
+                   language === 'fr' ? 'Liste des erreurs' :
+                   language === 'it' ? 'Elenco errori' :
+                   'Error List'}
+                </Label>
+              </div>
             </div>
           </div>
           <DialogFooter className="flex gap-2 sm:gap-0">
@@ -881,7 +972,7 @@ export function Completion({
             </Button>
             <Button
               onClick={handleSendEmail}
-              disabled={!recipientEmail}
+              disabled={!recipientEmail || (!attachProtocol && !attachGrounding && !attachErrorList)}
               className="bg-blue-600 hover:bg-blue-700"
               data-testid="button-send-email"
             >

@@ -2,7 +2,7 @@
 
 import { FC } from "react";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Settings, Home, Sparkles } from "lucide-react";
+import { RotateCcw, Settings, Sparkles } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useLanguageContext } from "@/components/language-context";
@@ -235,19 +235,24 @@ const PageHeader: FC<PageHeaderProps> = ({
         <div className="flex items-center justify-between mb-4 w-full">
 
           <div className="flex-1 flex justify-start items-center space-x-2 overflow-hidden">
-            <img
-              src="/otis-elevators-seeklogo_1753525178175.png"
-              alt="OTIS Logo"
-              className="h-12 w-12 flex-shrink-0"
-            />
-            {onHome && (
+            {onHome ? (
               <button
                 onClick={onHome}
-                className="flex-shrink-0 p-1 rounded hover:bg-gray-100 transition-colors"
+                className="flex-shrink-0 hover:opacity-80 transition-opacity"
                 aria-label="Home"
               >
-                <Home className="h-6 w-6 text-gray-600 hover:text-blue-600" />
+                <img
+                  src="/otis-elevators-seeklogo_1753525178175.png"
+                  alt="OTIS Logo"
+                  className="h-12 w-12"
+                />
               </button>
+            ) : (
+              <img
+                src="/otis-elevators-seeklogo_1753525178175.png"
+                alt="OTIS Logo"
+                className="h-12 w-12 flex-shrink-0"
+              />
             )}
             
             {/* 🔥 MÓDOSÍTÁS: MOBILON RÖVID CÍM, PC-N HOSSZÚ (CLASSIC TÉMA) 🔥 */}

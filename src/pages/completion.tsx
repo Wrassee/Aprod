@@ -868,11 +868,19 @@ export function Completion({
         </main>
       </div>
 
-      {/* EMAIL RECIPIENT DIALOG */}
+      {/* EMAIL RECIPIENT DIALOG - Theme Aware */}
       <Dialog open={isEmailDialogOpen} onOpenChange={setIsEmailDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className={`sm:max-w-md ${
+          theme === 'modern' 
+            ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl border-0 shadow-2xl rounded-2xl' 
+            : 'bg-white border border-gray-200 rounded-lg shadow-lg'
+        }`}>
           <DialogHeader>
-            <DialogTitle>
+            <DialogTitle className={
+              theme === 'modern'
+                ? 'text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent'
+                : 'text-xl font-semibold text-gray-800'
+            }>
               {language === 'hu' ? 'Email küldése' : 
                language === 'de' ? 'E-Mail senden' :
                language === 'fr' ? 'Envoyer un e-mail' :
@@ -882,7 +890,9 @@ export function Completion({
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="recipient-email">
+              <Label htmlFor="recipient-email" className={
+                theme === 'modern' ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-gray-600'
+              }>
                 {language === 'hu' ? 'Címzett email cím' : 
                  language === 'de' ? 'Empfänger E-Mail-Adresse' :
                  language === 'fr' ? 'Adresse e-mail du destinataire' :
@@ -895,13 +905,19 @@ export function Completion({
                 placeholder={language === 'hu' ? 'pelda@email.com' : 'example@email.com'}
                 value={recipientEmail}
                 onChange={(e) => setRecipientEmail(e.target.value)}
-                className="w-full"
+                className={`w-full ${
+                  theme === 'modern' 
+                    ? 'border-gray-200 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 rounded-xl' 
+                    : ''
+                }`}
                 data-testid="input-recipient-email"
               />
             </div>
             
             <div className="space-y-3">
-              <Label>
+              <Label className={
+                theme === 'modern' ? 'text-gray-700 dark:text-gray-300 font-medium' : 'text-gray-600'
+              }>
                 {language === 'hu' ? 'Mellékletek' : 
                  language === 'de' ? 'Anhänge' :
                  language === 'fr' ? 'Pièces jointes' :
@@ -909,52 +925,71 @@ export function Completion({
                  'Attachments'}
               </Label>
               
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="attach-protocol" 
-                  checked={attachProtocol}
-                  onCheckedChange={(checked) => setAttachProtocol(checked === true)}
-                  data-testid="checkbox-attach-protocol"
-                />
-                <Label htmlFor="attach-protocol" className="font-normal cursor-pointer">
-                  {language === 'hu' ? 'Átvételi protokoll' : 
-                   language === 'de' ? 'Abnahmeprotokoll' :
-                   language === 'fr' ? 'Protocole de réception' :
-                   language === 'it' ? 'Protocollo di accettazione' :
-                   'Acceptance Protocol'}
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="attach-grounding" 
-                  checked={attachGrounding}
-                  onCheckedChange={(checked) => setAttachGrounding(checked === true)}
-                  data-testid="checkbox-attach-grounding"
-                />
-                <Label htmlFor="attach-grounding" className="font-normal cursor-pointer">
-                  {language === 'hu' ? 'Földelési ellenállás mérés' : 
-                   language === 'de' ? 'Erdungswiderstandsmessung' :
-                   language === 'fr' ? 'Mesure de résistance de mise à la terre' :
-                   language === 'it' ? 'Misurazione resistenza di messa a terra' :
-                   'Grounding Resistance Measurement'}
-                </Label>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="attach-error-list" 
-                  checked={attachErrorList}
-                  onCheckedChange={(checked) => setAttachErrorList(checked === true)}
-                  data-testid="checkbox-attach-error-list"
-                />
-                <Label htmlFor="attach-error-list" className="font-normal cursor-pointer">
-                  {language === 'hu' ? 'Hibalista' : 
-                   language === 'de' ? 'Fehlerliste' :
-                   language === 'fr' ? 'Liste des erreurs' :
-                   language === 'it' ? 'Elenco errori' :
-                   'Error List'}
-                </Label>
+              <div className={`space-y-2 ${
+                theme === 'modern' ? 'bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3' : ''
+              }`}>
+                <div className={`flex items-center space-x-3 ${
+                  theme === 'modern' ? 'p-2 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-colors' : ''
+                }`}>
+                  <Checkbox 
+                    id="attach-protocol" 
+                    checked={attachProtocol}
+                    onCheckedChange={(checked) => setAttachProtocol(checked === true)}
+                    className={theme === 'modern' ? 'data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600' : ''}
+                    data-testid="checkbox-attach-protocol"
+                  />
+                  <Label htmlFor="attach-protocol" className={`font-normal cursor-pointer flex-1 ${
+                    theme === 'modern' ? 'text-gray-700 dark:text-gray-300' : ''
+                  }`}>
+                    {language === 'hu' ? 'Átvételi protokoll' : 
+                     language === 'de' ? 'Abnahmeprotokoll' :
+                     language === 'fr' ? 'Protocole de réception' :
+                     language === 'it' ? 'Protocollo di accettazione' :
+                     'Acceptance Protocol'}
+                  </Label>
+                </div>
+                
+                <div className={`flex items-center space-x-3 ${
+                  theme === 'modern' ? 'p-2 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-colors' : ''
+                }`}>
+                  <Checkbox 
+                    id="attach-grounding" 
+                    checked={attachGrounding}
+                    onCheckedChange={(checked) => setAttachGrounding(checked === true)}
+                    className={theme === 'modern' ? 'data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600' : ''}
+                    data-testid="checkbox-attach-grounding"
+                  />
+                  <Label htmlFor="attach-grounding" className={`font-normal cursor-pointer flex-1 ${
+                    theme === 'modern' ? 'text-gray-700 dark:text-gray-300' : ''
+                  }`}>
+                    {language === 'hu' ? 'Földelési ellenállás mérés' : 
+                     language === 'de' ? 'Erdungswiderstandsmessung' :
+                     language === 'fr' ? 'Mesure de résistance de mise à la terre' :
+                     language === 'it' ? 'Misurazione resistenza di messa a terra' :
+                     'Grounding Resistance Measurement'}
+                  </Label>
+                </div>
+                
+                <div className={`flex items-center space-x-3 ${
+                  theme === 'modern' ? 'p-2 rounded-lg hover:bg-white dark:hover:bg-gray-700 transition-colors' : ''
+                }`}>
+                  <Checkbox 
+                    id="attach-error-list" 
+                    checked={attachErrorList}
+                    onCheckedChange={(checked) => setAttachErrorList(checked === true)}
+                    className={theme === 'modern' ? 'data-[state=checked]:bg-blue-600 data-[state=checked]:border-blue-600' : ''}
+                    data-testid="checkbox-attach-error-list"
+                  />
+                  <Label htmlFor="attach-error-list" className={`font-normal cursor-pointer flex-1 ${
+                    theme === 'modern' ? 'text-gray-700 dark:text-gray-300' : ''
+                  }`}>
+                    {language === 'hu' ? 'Hibalista' : 
+                     language === 'de' ? 'Fehlerliste' :
+                     language === 'fr' ? 'Liste des erreurs' :
+                     language === 'it' ? 'Elenco errori' :
+                     'Error List'}
+                  </Label>
+                </div>
               </div>
             </div>
           </div>
@@ -962,6 +997,7 @@ export function Completion({
             <Button
               variant="outline"
               onClick={() => setIsEmailDialogOpen(false)}
+              className={theme === 'modern' ? 'rounded-xl border-gray-300 hover:bg-gray-100' : ''}
               data-testid="button-cancel-email"
             >
               {language === 'hu' ? 'Mégse' : 
@@ -973,7 +1009,11 @@ export function Completion({
             <Button
               onClick={handleSendEmail}
               disabled={!recipientEmail || (!attachProtocol && !attachGrounding && !attachErrorList)}
-              className="bg-blue-600 hover:bg-blue-700"
+              className={
+                theme === 'modern'
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all'
+                  : 'bg-blue-600 hover:bg-blue-700'
+              }
               data-testid="button-send-email"
             >
               <Mail className="h-4 w-4 mr-2" />

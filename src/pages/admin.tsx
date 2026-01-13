@@ -11,7 +11,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
 import { 
-  Home, User, FileSpreadsheet, LayoutDashboard, FileText, 
+  User, FileSpreadsheet, LayoutDashboard, FileText, 
   Shield, Settings, ArrowLeft, Sparkles, Upload, Loader2,
   Layers
 } from 'lucide-react';
@@ -385,21 +385,24 @@ export function Admin({ onBack, onHome, onQuickStart }: AdminProps) {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <img
-                src="/otis-elevators-seeklogo_1753525178175.png"
-                alt="OTIS Logo"
-                className="h-12 w-12 mr-4"
-              />
-              {onHome && (
-                <Button
-                  variant="ghost"
-                  size="sm"
+              {onHome ? (
+                <button
                   onClick={onHome}
-                  className="text-gray-600 hover:text-gray-800 mr-4"
+                  className="mr-4 hover:opacity-80 transition-opacity"
                   title={t("homeTooltip")}
                 >
-                  <Home className="h-4 w-4" />
-                </Button>
+                  <img
+                    src="/otis-elevators-seeklogo_1753525178175.png"
+                    alt="OTIS Logo"
+                    className="h-12 w-12"
+                  />
+                </button>
+              ) : (
+                <img
+                  src="/otis-elevators-seeklogo_1753525178175.png"
+                  alt="OTIS Logo"
+                  className="h-12 w-12 mr-4"
+                />
               )}
               <div className="flex items-center">
                 <span className="text-lg font-medium text-gray-800 mr-3">{t("admin")}</span>

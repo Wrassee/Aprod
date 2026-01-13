@@ -209,7 +209,7 @@ export function StartScreen({ onLanguageSelect }: StartScreenProps) {
                   key={idx}
                   onClick={() => setCurrentIndex(idx)}
                   className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    idx === currentIndex ? 'bg-blue-500 w-8' : 'bg-gray-300 hover:bg-gray-400'
+                    idx === currentIndex ? 'bg-blue-500' : 'bg-gray-300 hover:bg-gray-400'
                   }`}
                   aria-label={`Go to language ${idx + 1}`}
                 />
@@ -296,7 +296,7 @@ export function StartScreen({ onLanguageSelect }: StartScreenProps) {
               key={idx}
               onClick={() => setCurrentIndex(idx)}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                idx === currentIndex ? 'bg-blue-600 w-6' : 'bg-gray-300 hover:bg-gray-400'
+                idx === currentIndex ? 'bg-blue-600' : 'bg-gray-300 hover:bg-gray-400'
               }`}
               aria-label={`Go to language ${idx + 1}`}
             />

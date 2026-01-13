@@ -211,7 +211,7 @@ export function Admin({ onBack, onHome, onQuickStart }: AdminProps) {
                   </h1>
                   <div className="flex items-center gap-2 mt-1">
                     <Badge variant="outline" className="bg-blue-50 text-blue-600 font-mono text-xs border-blue-200">
-                      v1.0.0
+                      v0.9.5.0
                     </Badge>
                     <Sparkles className="h-3 w-3 text-cyan-500" />
                   </div>
@@ -407,7 +407,7 @@ export function Admin({ onBack, onHome, onQuickStart }: AdminProps) {
               <div className="flex items-center">
                 <span className="text-lg font-medium text-gray-800 mr-3">{t("admin")}</span>
                 <Badge variant="outline" className="bg-gray-50 text-gray-600 font-mono text-xs">
-                  v1.0.0 (Classic)
+                  v0.9.5.0
                 </Badge>
               </div>
             </div>

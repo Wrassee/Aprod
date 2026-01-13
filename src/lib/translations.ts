@@ -24,6 +24,7 @@ export interface Translation {
   back: string;
   complete: string;
   startNew: string;
+  selectedLiftType: string;
   
   // Answers
   yes: string;
@@ -515,6 +516,7 @@ export const translations: Record<string, Translation> = {
     back: "Vissza",
     complete: "Protokoll befejezése",
     startNew: "Új protokoll indítása",
+    selectedLiftType: "Kiválasztott lift típus:",
     
     // Answers
     yes: "Igen",
@@ -1002,6 +1004,7 @@ export const translations: Record<string, Translation> = {
     back: "Zurück",
     complete: "Protokoll abschließen",
     startNew: "Neues Protokoll starten",
+    selectedLiftType: "Ausgewählter Aufzugstyp:",
     
     // Answers
     yes: "Ja",
@@ -1494,6 +1497,7 @@ export const translations: Record<string, Translation> = {
     back: "Back",
     complete: "Complete Protocol",
     startNew: "Start New Protocol",
+    selectedLiftType: "Selected Lift Type:",
     
     // Answers
     yes: "Yes",
@@ -1971,6 +1975,7 @@ export const translations: Record<string, Translation> = {
     back: "Retour",
     complete: "Terminer le Protocole",
     startNew: "Démarrer un Nouveau Protocole",
+    selectedLiftType: "Type d'ascenseur sélectionné:",
     
     // Answers
     yes: "Oui",
@@ -2447,6 +2452,7 @@ export const translations: Record<string, Translation> = {
     back: "Indietro",
     complete: "Completa Protocollo",
     startNew: "Avvia Nuovo Protocollo",
+    selectedLiftType: "Tipo di ascensore selezionato:",
     
     // Answers
     yes: "Sì",

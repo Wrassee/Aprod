@@ -70,6 +70,15 @@ Excel writing functionality must remain untouched to prevent corruption.
   - **Secure API Calls**: All profile operations use Authorization Bearer headers with Zod validation
 
 ## Recent Changes (January 13, 2026)
+### Version 0.9.5.1 - Error List PDF Fix
+6. **Error List PDF Header Data Fix**
+   - Fixed incorrect field mapping in error list PDF generation
+   - Address now shows full format: PLZ, Stadt, Strasse Hausnummer (fields #3, #4, #5, #6)
+   - Inspector name now correctly reads from "Name des Prüfer" (field #1)
+   - Lift ID label changed to "Otis Anlage Nummer" (DE) / "Otis telepítési szám" (HU)
+   - Updated both backend (error-export.ts, protocol-mapping.ts) and frontend (error-export.tsx, completion.tsx, App.tsx)
+   - Consistent display in PDF generation, email attachments, and preview modals (Modern & Classic themes)
+
 ### Version 0.9.5.0 - UI Consistency Updates
 1. **Classic Theme Home Button**
    - Replaced house icon with OTIS logo as home button across all pages

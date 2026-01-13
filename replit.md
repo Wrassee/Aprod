@@ -90,6 +90,12 @@ Excel writing functionality must remain untouched to prevent corruption.
    - Covers all 23 major sections of the application
    - Updated version to 0.9.5.0 in admin panel
 
+5. **Lift Type Notification Bar Fix**
+   - Fixed lift type display in questionnaire notification bar
+   - Now shows translated names instead of codes (e.g., "Modernization - Rope Drive" instead of "MOD - MOD_SEIL")
+   - Centralized liftTypeTranslations and getTranslatedLiftName in src/lib/translations.ts
+   - Supports all 5 languages (HU/DE/EN/FR/IT)
+
 ## Previous Changes (December 17, 2025)
 ### Email Attachment Selection System
 1. **Attachment Selection Dialog**

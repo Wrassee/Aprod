@@ -16,6 +16,7 @@ import { MeasurementBlock } from '@/components/measurement-block';
 import { useConditionalQuestionFilter, updateAnswersWithDisabled } from '@/components/conditional-question-filter';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { getApiUrl } from '@/lib/queryClient';
+import { getTranslatedLiftName } from '@/lib/translations';
 
 interface QuestionnaireProps {
   receptionDate: string;
@@ -392,13 +393,14 @@ function Questionnaire({
     
     try {
       const liftSelection = JSON.parse(liftSelectionStr);
+      const translatedType = getTranslatedLiftName(liftSelection.liftType, language);
+      const translatedSubtype = getTranslatedLiftName(liftSelection.liftSubtype, language);
       return (
         <div className="mb-4 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-2">
           <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
             <Sparkles className="h-4 w-4" />
-            {/* ITT VOLT A HIBA: Beégetett szöveg helyett t("...") */}
             <span className="font-medium">{t("selectedLiftType")}</span>
-            <span>{liftSelection.liftType} - {liftSelection.liftSubtype}</span>
+            <span>{translatedType} - {translatedSubtype}</span>
           </div>
         </div>
       );

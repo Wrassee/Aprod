@@ -2898,3 +2898,79 @@ export const translations: Record<string, Translation> = {
     },
   },
 };
+
+export const liftTypeTranslations: Record<string, Record<string, { name: string; description?: string }>> = {
+  hu: {
+    MOD: { name: "Modernizáció", description: "Lift modernizációs projektek" },
+    BEX: { name: "Meglévő épület", description: "Meglévő épületi liftek" },
+    NEU: { name: "Újépítés", description: "Újépítési lift rendszerek" },
+    CUSTOM: { name: "Egyedi", description: "Egyedi lift megoldások" },
+    MOD_SEIL: { name: "Kötélhajtás", description: "Kötélhajtásos lift modernizáció" },
+    MOD_BELT: { name: "Szíjhajtás", description: "Szíjhajtásos lift modernizáció" },
+    MOD_HYD: { name: "Hidraulikus", description: "Hidraulikus lift modernizáció" },
+    BEX_GEN2: { name: "Gen2", description: "Gen2 felújítási projekt" },
+    BEX_GEN360: { name: "Gen360", description: "Gen360 felújítási projekt" },
+    NEU_GEN2: { name: "Gen2", description: "Gen2 újépítési projekt" },
+    NEU_GEN360: { name: "Gen360", description: "Gen360 újépítési projekt" },
+  },
+  de: {
+    MOD: { name: "Modernisierung", description: "Aufzug-Modernisierungsprojekte" },
+    BEX: { name: "Bestandsgebäude", description: "Aufzüge in Bestandsgebäuden" },
+    NEU: { name: "Neubau", description: "Aufzugsanlagen für Neubauten" },
+    CUSTOM: { name: "Individuell", description: "Individuelle Aufzugslösungen" },
+    MOD_SEIL: { name: "Seilantrieb", description: "Seilantrieb-Aufzug Modernisierung" },
+    MOD_BELT: { name: "Riemenantrieb", description: "Riemenantrieb-Aufzug Modernisierung" },
+    MOD_HYD: { name: "Hydraulik", description: "Hydraulik-Aufzug Modernisierung" },
+    BEX_GEN2: { name: "Gen2", description: "Gen2 Renovierungsprojekt" },
+    BEX_GEN360: { name: "Gen360", description: "Gen360 Renovierungsprojekt" },
+    NEU_GEN2: { name: "Gen2", description: "Gen2 Neubauprojekt" },
+    NEU_GEN360: { name: "Gen360", description: "Gen360 Neubauprojekt" },
+  },
+  en: {
+    MOD: { name: "Modernization", description: "Elevator modernization projects" },
+    BEX: { name: "Existing Building", description: "Existing building elevators" },
+    NEU: { name: "New Build", description: "New building elevator systems" },
+    CUSTOM: { name: "Custom", description: "Custom elevator solutions" },
+    MOD_SEIL: { name: "Rope Drive", description: "Rope drive elevator modernization" },
+    MOD_BELT: { name: "Belt Drive", description: "Belt drive elevator modernization" },
+    MOD_HYD: { name: "Hydraulic", description: "Hydraulic elevator modernization" },
+    BEX_GEN2: { name: "Gen2", description: "Gen2 renovation project" },
+    BEX_GEN360: { name: "Gen360", description: "Gen360 renovation project" },
+    NEU_GEN2: { name: "Gen2", description: "Gen2 new building project" },
+    NEU_GEN360: { name: "Gen360", description: "Gen360 new building project" },
+  },
+  fr: {
+    MOD: { name: "Modernisation", description: "Projets de modernisation d'ascenseurs" },
+    BEX: { name: "Bâtiment Existant", description: "Ascenseurs de bâtiments existants" },
+    NEU: { name: "Construction Neuve", description: "Systèmes d'ascenseurs pour bâtiments neufs" },
+    CUSTOM: { name: "Personnalisé", description: "Solutions d'ascenseurs personnalisées" },
+    MOD_SEIL: { name: "Entraînement Câble", description: "Modernisation ascenseur à câble" },
+    MOD_BELT: { name: "Entraînement Courroie", description: "Modernisation ascenseur à courroie" },
+    MOD_HYD: { name: "Hydraulique", description: "Modernisation ascenseur hydraulique" },
+    BEX_GEN2: { name: "Gen2", description: "Projet de rénovation Gen2" },
+    BEX_GEN360: { name: "Gen360", description: "Projet de rénovation Gen360" },
+    NEU_GEN2: { name: "Gen2", description: "Projet construction neuve Gen2" },
+    NEU_GEN360: { name: "Gen360", description: "Projet construction neuve Gen360" },
+  },
+  it: {
+    MOD: { name: "Modernizzazione", description: "Progetti di modernizzazione ascensori" },
+    BEX: { name: "Edificio Esistente", description: "Ascensori in edifici esistenti" },
+    NEU: { name: "Nuova Costruzione", description: "Impianti ascensore per nuovi edifici" },
+    CUSTOM: { name: "Personalizzato", description: "Soluzioni ascensore personalizzate" },
+    MOD_SEIL: { name: "Azionamento Fune", description: "Modernizzazione ascensore a fune" },
+    MOD_BELT: { name: "Azionamento Cinghia", description: "Modernizzazione ascensore a cinghia" },
+    MOD_HYD: { name: "Idraulico", description: "Modernizzazione ascensore idraulico" },
+    BEX_GEN2: { name: "Gen2", description: "Progetto ristrutturazione Gen2" },
+    BEX_GEN360: { name: "Gen360", description: "Progetto ristrutturazione Gen360" },
+    NEU_GEN2: { name: "Gen2", description: "Progetto nuova costruzione Gen2" },
+    NEU_GEN360: { name: "Gen360", description: "Progetto nuova costruzione Gen360" },
+  },
+};
+
+export function getTranslatedLiftName(code: string, language: string): string {
+  const langTranslations = liftTypeTranslations[language];
+  if (langTranslations && langTranslations[code]) {
+    return langTranslations[code].name;
+  }
+  return code;
+}

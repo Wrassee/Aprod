@@ -69,7 +69,28 @@ Excel writing functionality must remain untouched to prevent corruption.
   - **Privilege Escalation Prevention**: Server-side role and user_id field protection with database-backed role verification
   - **Secure API Calls**: All profile operations use Authorization Bearer headers with Zod validation
 
-## Recent Changes (December 17, 2025)
+## Recent Changes (January 13, 2026)
+### Version 0.9.5.0 - UI Consistency Updates
+1. **Classic Theme Home Button**
+   - Replaced house icon with OTIS logo as home button across all pages
+   - Consistent navigation experience between Modern and Classic themes
+   - PageHeader.tsx and admin.tsx updated
+
+2. **Language Selector Indicator**
+   - Changed active language indicator from line to dot
+   - Uniform styling: blue dot for active, gray dots for inactive
+   - Both Modern and Classic themes updated
+
+3. **Email Auto-Fill**
+   - Recipient email field auto-fills with logged-in user's email
+   - Uses AuthContext profile data
+
+4. **Technical Documentation**
+   - Created comprehensive English technical documentation (TECHNICAL_DOCUMENTATION.md)
+   - Covers all 23 major sections of the application
+   - Updated version to 0.9.5.0 in admin panel
+
+## Previous Changes (December 17, 2025)
 ### Email Attachment Selection System
 1. **Attachment Selection Dialog**
    - Users can now select which documents to attach when sending email

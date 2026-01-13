@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
+import { useAuth } from '@/contexts/auth-context';
 import { ErrorExport } from '@/components/error-export';
 import { ProtocolError } from '@shared/schema';
 import { useToast } from '@/hooks/use-toast';
@@ -74,6 +75,7 @@ export function Completion({
   const { t } = useLanguageContext();
   const { theme } = useTheme();
   const { toast } = useToast();
+  const { profile } = useAuth();
   const [emailStatus, setEmailStatus] = useState<string>('');
   const [isEmailSending, setIsEmailSending] = useState(false);
   const [isPdfDownloading, setIsPdfDownloading] = useState(false);
@@ -81,7 +83,8 @@ export function Completion({
   const [isExcelDownloading, setIsExcelDownloading] = useState(false);
   const [isPdfPreviewing, setIsPdfPreviewing] = useState(false);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
-  const [recipientEmail, setRecipientEmail] = useState('');
+  // Alapértelmezetten a bejelentkezett felhasználó email címe
+  const [recipientEmail, setRecipientEmail] = useState(profile?.email || '');
   const [attachProtocol, setAttachProtocol] = useState(true);
   const [attachGrounding, setAttachGrounding] = useState(false);
   const [attachErrorList, setAttachErrorList] = useState(false);

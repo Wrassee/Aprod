@@ -9,6 +9,10 @@ interface ProtocolData {
   liftId?: string;
   inspectorName?: string;
   inspectionDate?: string;
+  plz?: string;
+  city?: string;
+  street?: string;
+  houseNumber?: string;
 }
 
 interface ExportData {
@@ -22,14 +26,14 @@ export class ErrorExportService {
     const { errors, protocolData, language } = data;
     const translations = { 
       hu: { 
-        title: 'OTIS Hibalista', building: 'Épület', liftId: 'Lift ID', inspector: 'Ellenőr', 
+        title: 'OTIS Hibalista', building: 'Cím', liftId: 'Otis telepítési szám', inspector: 'Ellenőr neve', 
         date: 'Dátum', errorNumber: 'Hiba száma', severity: 'Súlyossági szint', 
         errorTitle: 'Hiba címe', description: 'Leírás', photos: 'Fotók száma', 
         critical: 'Kritikus', medium: 'Közepes', low: 'Alacsony', summary: 'Összesítő', 
         totalErrors: 'Összes hiba', generatedOn: 'Generálva' 
       }, 
       de: { 
-        title: 'OTIS Fehlerliste', building: 'Gebäude', liftId: 'Aufzug ID', inspector: 'Prüfer', 
+        title: 'OTIS Fehlerliste', building: 'Adresse', liftId: 'Otis Anlage Nummer', inspector: 'Prüfer', 
         date: 'Datum', errorNumber: 'Fehlernummer', severity: 'Schweregrad', 
         errorTitle: 'Fehler Titel', description: 'Beschreibung', photos: 'Anzahl Fotos', 
         critical: 'Kritisch', medium: 'Mittel', low: 'Niedrig', summary: 'Zusammenfassung', 
@@ -103,14 +107,14 @@ export class ErrorExportService {
 
     const translations = {
       hu: {
-        title: 'OTIS Hibalista', building: 'Épület', liftId: 'Lift ID',
-        inspector: 'Ellenőr', date: 'Dátum', severity: 'Súlyossági szint',
+        title: 'OTIS Hibalista', building: 'Cím', liftId: 'Otis telepítési szám',
+        inspector: 'Ellenőr neve', date: 'Dátum', severity: 'Súlyossági szint',
         description: 'Leírás', photos: 'Fotók', critical: 'Kritikus',
         medium: 'Közepes', low: 'Alacsony', summary: 'Összesítő',
         totalErrors: 'Összes hiba', generatedOn: 'Generálva'
       },
       de: {
-        title: 'OTIS Fehlerliste', building: 'Gebäude', liftId: 'Aufzug ID',
+        title: 'OTIS Fehlerliste', building: 'Adresse', liftId: 'Otis Anlage Nummer',
         inspector: 'Prüfer', date: 'Datum', severity: 'Schweregrad',
         description: 'Beschreibung', photos: 'Fotos', critical: 'Kritisch',
         medium: 'Mittel', low: 'Niedrig', summary: 'Zusammenfassung',
@@ -163,8 +167,15 @@ export class ErrorExportService {
       doc.setTextColor(0, 0, 0);
       let yPos = 35;
       
-      if (protocolData?.buildingAddress) {
-        doc.text(`${t.building}: ${protocolData.buildingAddress}`, 20, yPos);
+      // Full address: PLZ Stadt, Strasse Hausnummer
+      const fullAddress = [
+        protocolData?.plz,
+        protocolData?.city,
+        protocolData?.street ? `${protocolData.street} ${protocolData?.houseNumber || ''}`.trim() : null
+      ].filter(Boolean).join(', ') || protocolData?.buildingAddress;
+      
+      if (fullAddress) {
+        doc.text(`${t.building}: ${fullAddress}`, 20, yPos);
         yPos += 6;
       }
       if (protocolData?.liftId) {

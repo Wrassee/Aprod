@@ -339,9 +339,12 @@ router.post('/email', requireAuth, async (req, res) => {
       errorListPdf = await ErrorExportService.generatePDF({
         errors: formData.errors,
         protocolData: {
-          buildingAddress: formData.answers?.['1'] || '',
+          plz: formData.answers?.['3'] || '',
+          city: formData.answers?.['4'] || '',
+          street: formData.answers?.['5'] || '',
+          houseNumber: formData.answers?.['6'] || '',
           liftId: formData.answers?.['7'] || '',
-          inspectorName: formData.answers?.['4'] || '',
+          inspectorName: formData.answers?.['1'] || '',
           inspectionDate: receptionDate,
         },
         language: lang as 'hu' | 'de',

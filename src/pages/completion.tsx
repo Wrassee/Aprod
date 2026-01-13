@@ -53,7 +53,10 @@ interface CompletionProps {
   onBackToSignature: () => void;
   errors?: ProtocolError[];
   protocolData?: {
-    buildingAddress?: string;
+    plz?: string;
+    city?: string;
+    street?: string;
+    houseNumber?: string;
     liftId?: string;
     inspectorName?: string;
     inspectionDate?: string;
@@ -836,7 +839,10 @@ export function Completion({
                   <ErrorExport
                     errors={errorList}
                     protocolData={protocolData || {
-                      buildingAddress: '',
+                      plz: '',
+                      city: '',
+                      street: '',
+                      houseNumber: '',
                       liftId: '',
                       inspectorName: '',
                       inspectionDate: new Date().toISOString().split('T')[0]
@@ -849,7 +855,10 @@ export function Completion({
                 <ErrorExport
                   errors={errorList}
                   protocolData={protocolData || {
-                    buildingAddress: '',
+                    plz: '',
+                    city: '',
+                    street: '',
+                    houseNumber: '',
                     liftId: '',
                     inspectorName: '',
                     inspectionDate: new Date().toISOString().split('T')[0]

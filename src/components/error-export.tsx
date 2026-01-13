@@ -14,7 +14,10 @@ import { getApiUrl } from '@/lib/queryClient';
 interface ErrorExportProps {
   errors: ProtocolError[];
   protocolData?: {
-    buildingAddress?: string;
+    plz?: string;
+    city?: string;
+    street?: string;
+    houseNumber?: string;
     liftId?: string;
     inspectorName?: string;
     inspectionDate?: string;
@@ -310,14 +313,18 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                       OTIS {language === 'hu' ? 'Hibalista' : 'Fehlerliste'}
                     </h1>
                     <div className="text-sm text-gray-600 space-y-1">
-                      {protocolData?.buildingAddress && (
-                        <p><strong>{language === 'hu' ? 'Épület:' : 'Gebäude:'}</strong> {protocolData.buildingAddress}</p>
+                      {(protocolData?.plz || protocolData?.city || protocolData?.street) && (
+                        <p><strong>{language === 'hu' ? 'Cím:' : 'Adresse:'}</strong> {[
+                          protocolData?.plz,
+                          protocolData?.city,
+                          protocolData?.street ? `${protocolData.street} ${protocolData?.houseNumber || ''}`.trim() : null
+                        ].filter(Boolean).join(', ')}</p>
                       )}
                       {protocolData?.liftId && (
-                        <p><strong>{language === 'hu' ? 'Lift ID:' : 'Aufzug ID:'}</strong> {protocolData.liftId}</p>
+                        <p><strong>{language === 'hu' ? 'Otis telepítési szám:' : 'Otis Anlage Nummer:'}</strong> {protocolData.liftId}</p>
                       )}
                       {protocolData?.inspectorName && (
-                        <p><strong>{language === 'hu' ? 'Ellenőr:' : 'Prüfer:'}</strong> {protocolData.inspectorName}</p>
+                        <p><strong>{language === 'hu' ? 'Ellenőr neve:' : 'Prüfer:'}</strong> {protocolData.inspectorName}</p>
                       )}
                       <p><strong>{language === 'hu' ? 'Dátum:' : 'Datum:'}</strong> {new Date().toLocaleDateString()}</p>
                     </div>
@@ -517,14 +524,18 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                 OTIS {language === 'hu' ? 'Hibalista' : 'Fehlerliste'}
               </h1>
               <div className="text-sm text-gray-600 space-y-1">
-                {protocolData?.buildingAddress && (
-                  <p><strong>{language === 'hu' ? 'Épület:' : 'Gebäude:'}</strong> {protocolData.buildingAddress}</p>
+                {(protocolData?.plz || protocolData?.city || protocolData?.street) && (
+                  <p><strong>{language === 'hu' ? 'Cím:' : 'Adresse:'}</strong> {[
+                    protocolData?.plz,
+                    protocolData?.city,
+                    protocolData?.street ? `${protocolData.street} ${protocolData?.houseNumber || ''}`.trim() : null
+                  ].filter(Boolean).join(', ')}</p>
                 )}
                 {protocolData?.liftId && (
-                  <p><strong>{language === 'hu' ? 'Lift ID:' : 'Aufzug ID:'}</strong> {protocolData.liftId}</p>
+                  <p><strong>{language === 'hu' ? 'Otis telepítési szám:' : 'Otis Anlage Nummer:'}</strong> {protocolData.liftId}</p>
                 )}
                 {protocolData?.inspectorName && (
-                  <p><strong>{language === 'hu' ? 'Ellenőr:' : 'Prüfer:'}</strong> {protocolData.inspectorName}</p>
+                  <p><strong>{language === 'hu' ? 'Ellenőr neve:' : 'Prüfer:'}</strong> {protocolData.inspectorName}</p>
                 )}
                 <p><strong>{language === 'hu' ? 'Dátum:' : 'Datum:'}</strong> {new Date().toLocaleDateString()}</p>
               </div>

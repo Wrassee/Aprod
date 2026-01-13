@@ -622,9 +622,12 @@ function AppContent({
             onBackToSignature={handleBackToSignature}
             errors={formData.errors}
             protocolData={{
-              buildingAddress: formData.answers['1'] as string || '',
+              plz: formData.answers['3'] as string || '',
+              city: formData.answers['4'] as string || '',
+              street: formData.answers['5'] as string || '',
+              houseNumber: formData.answers['6'] as string || '',
               liftId: formData.answers['7'] as string || '',
-              inspectorName: formData.answers['4'] as string || '',
+              inspectorName: formData.answers['1'] as string || '',
               inspectionDate: formData.receptionDate
             }}
             language={language}

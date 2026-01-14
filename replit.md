@@ -70,7 +70,7 @@ Excel writing functionality must remain untouched to prevent corruption.
   - **Secure API Calls**: All profile operations use Authorization Bearer headers with Zod validation
 
 ## Recent Changes (January 13, 2026)
-### Version 0.9.5.1 - Error List PDF Fix
+### Version 0.9.5.1 - Error List PDF Fix & Mobile Signature Support
 6. **Error List PDF Header Data Fix**
    - Fixed incorrect field mapping in error list PDF generation
    - Address now shows full format: PLZ, Stadt, Strasse Hausnummer (fields #3, #4, #5, #6)
@@ -78,6 +78,12 @@ Excel writing functionality must remain untouched to prevent corruption.
    - Lift ID label changed to "Otis Anlage Nummer" (DE) / "Otis telepítési szám" (HU)
    - Updated both backend (error-export.ts, protocol-mapping.ts) and frontend (error-export.tsx, completion.tsx, App.tsx)
    - Consistent display in PDF generation, email attachments, and preview modals (Modern & Classic themes)
+
+7. **High-DPI Mobile Signature Support**
+   - Increased Express body-parser limit from 100KB to 10MB
+   - Fixes "request entity too large" error on high-DPI mobile devices (Samsung Galaxy Fold5, etc.)
+   - Updated all server entry points: app.ts, production-entry.ts, production-clean.ts, minimal-production.ts
+   - Requires Render re-deploy to take effect
 
 ### Version 0.9.5.0 - UI Consistency Updates
 1. **Classic Theme Home Button**

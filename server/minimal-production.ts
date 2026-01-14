@@ -56,8 +56,9 @@ function serveStatic(app: Express) {
 /* -------------------------------------------------------------------------
  *  Middlewares
  * ----------------------------------------------------------------------- */
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+// 🔧 Increased limit for high-DPI mobile signatures (Samsung Fold5, etc.)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Request‑logging middleware (only for /api routes)
 app.use((req, res, next) => {

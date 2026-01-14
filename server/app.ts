@@ -63,7 +63,9 @@ export async function createApp(config: AppConfig) {
     credentials: true,
   }));
 
-  app.use(express.json());
+  // 🔧 Increased limit for high-DPI mobile signatures (Samsung Fold5, etc.)
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
   // ===================================================
   // SECURITY HEADERS

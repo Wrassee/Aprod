@@ -8,6 +8,9 @@ export interface ParsedQuestion {
   title: string;
   titleHu?: string;
   titleDe?: string;
+  titleEn?: string;
+  titleFr?: string;
+  titleIt?: string;
   type: QuestionType;
   required: boolean;
   placeholder?: string;
@@ -188,6 +191,9 @@ class ExcelParserService {
         TITLE: this.findHeaderIndex(headers, 'title', 'name', 'név', 'kérdés'),
         TITLE_HU: this.findHeaderIndex(headers, 'title_hu', 'titleHu', 'magyar_cím'),
         TITLE_DE: this.findHeaderIndex(headers, 'title_de', 'titleDe', 'német_cím'),
+        TITLE_EN: this.findHeaderIndex(headers, 'title_en', 'titleEn', 'angol_cím'),
+        TITLE_FR: this.findHeaderIndex(headers, 'title_fr', 'titleFr', 'francia_cím'),
+        TITLE_IT: this.findHeaderIndex(headers, 'title_it', 'titleIt', 'olasz_cím'),
         TYPE: this.findHeaderIndex(headers, 'type', 'típus', 'tipus'),
         OPTIONS: this.findHeaderIndex(headers, 'options', 'choices', 'választások', 'opciók'), // ÚJ
         MAX_LENGTH: this.findHeaderIndex(headers, 'maxlength', 'max_length', 'maxLength'), // ÚJ
@@ -239,6 +245,15 @@ class ExcelParserService {
             : undefined,
           titleDe: colIndices.TITLE_DE !== -1 && row[colIndices.TITLE_DE] 
             ? String(row[colIndices.TITLE_DE]).trim() 
+            : undefined,
+          titleEn: colIndices.TITLE_EN !== -1 && row[colIndices.TITLE_EN] 
+            ? String(row[colIndices.TITLE_EN]).trim() 
+            : undefined,
+          titleFr: colIndices.TITLE_FR !== -1 && row[colIndices.TITLE_FR] 
+            ? String(row[colIndices.TITLE_FR]).trim() 
+            : undefined,
+          titleIt: colIndices.TITLE_IT !== -1 && row[colIndices.TITLE_IT] 
+            ? String(row[colIndices.TITLE_IT]).trim() 
             : undefined,
           type: questionType,
           

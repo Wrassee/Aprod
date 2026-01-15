@@ -73,7 +73,8 @@ export async function registerRoutes(app: Express) {
       const { language } = req.params;
       const { templateId } = req.query; // 🔥 ÚJ: Template ID query parameter
       
-      if (language !== "hu" && language !== "de") {
+      const supportedLanguages = ["hu", "de", "en", "fr", "it"];
+      if (!supportedLanguages.includes(language)) {
         return res.status(400).json({ message: "Invalid language specified" });
       }
 
@@ -146,11 +147,23 @@ export async function registerRoutes(app: Express) {
           options = ['true', 'false', 'n.a.'];
         }
 
+        // Nyelvfüggő cím kiválasztása
+        let title = config.title;
+        if (language === "hu" && config.titleHu) {
+          title = config.titleHu;
+        } else if (language === "de" && config.titleDe) {
+          title = config.titleDe;
+        } else if (language === "en" && config.titleEn) {
+          title = config.titleEn;
+        } else if (language === "fr" && config.titleFr) {
+          title = config.titleFr;
+        } else if (language === "it" && config.titleIt) {
+          title = config.titleIt;
+        }
+
         return {
           id: config.questionId,
-          title: language === "hu" 
-            ? (config.titleHu || config.title) 
-            : (config.titleDe || config.title),
+          title: title,
           groupName: groupName,
           groupKey: config.groupKey,
           type: correctedType,

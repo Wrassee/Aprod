@@ -52,16 +52,12 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   };
 
   const getSeverityText = (severity: ProtocolError['severity']) => {
-    switch (severity) {
-      case 'critical':
-        return language === 'hu' ? 'Kritikus' : 'Kritisch';
-      case 'medium':
-        return language === 'hu' ? 'Közepes' : 'Mittel';
-      case 'low':
-        return language === 'hu' ? 'Alacsony' : 'Niedrig';
-      default:
-        return severity;
-    }
+    const texts: Record<string, Record<string, string>> = {
+      critical: {hu: 'Kritikus', de: 'Kritisch', en: 'Critical', fr: 'Critique', it: 'Critico'},
+      medium: {hu: 'Közepes', de: 'Mittel', en: 'Medium', fr: 'Moyen', it: 'Medio'},
+      low: {hu: 'Alacsony', de: 'Niedrig', en: 'Low', fr: 'Faible', it: 'Basso'}
+    };
+    return texts[severity]?.[language] || severity;
   };
 
   const generatePDF = async () => {
@@ -127,7 +123,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
   };
 
   const sendEmail = async () => {
-    alert(language === 'hu' ? 'Email funkció fejlesztés alatt' : 'Email-Funktion in Entwicklung');
+    alert({hu: 'Email funkció fejlesztés alatt', de: 'Email-Funktion in Entwicklung', en: 'Email function under development', fr: 'Fonction email en développement', it: 'Funzione email in sviluppo'}[language]);
   };
 
   const printReport = () => {
@@ -151,13 +147,11 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               </div>
               
               <h3 className="text-2xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-500 bg-clip-text text-transparent mb-3">
-                {language === 'hu' ? 'Nincs jelentett hiba' : 'Keine Fehler gemeldet'}
+                {{hu: 'Nincs jelentett hiba', de: 'Keine Fehler gemeldet', en: 'No errors reported', fr: 'Aucune erreur signalée', it: 'Nessun errore segnalato'}[language]}
               </h3>
               <p className="text-gray-600 flex items-center justify-center gap-2">
                 <Sparkles className="h-4 w-4 text-green-500" />
-                {language === 'hu' 
-                  ? 'Az átvételi protokoll hibamentesen befejezve.'
-                  : 'Das Abnahmeprotokoll wurde fehlerfrei abgeschlossen.'}
+                {{hu: 'Az átvételi protokoll hibamentesen befejezve.', de: 'Das Abnahmeprotokoll wurde fehlerfrei abgeschlossen.', en: 'The acceptance protocol was completed without errors.', fr: 'Le protocole d\'acceptation a été complété sans erreurs.', it: 'Il protocollo di accettazione è stato completato senza errori.'}[language]}
               </p>
             </CardContent>
           </Card>
@@ -176,16 +170,16 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                 <div>
                   <h2 className="text-2xl font-bold bg-gradient-to-r from-red-600 via-rose-600 to-pink-500 bg-clip-text text-transparent mb-2 flex items-center gap-2">
                     <AlertTriangle className="h-6 w-6 text-red-600" />
-                    {language === 'hu' ? 'Hibalista Exportálás' : 'Fehlerliste Export'}
+                    {{hu: 'Hibalista Exportálás', de: 'Fehlerliste Export', en: 'Error List Export', fr: 'Exporter Liste d\'Erreurs', it: 'Esporta Lista Errori'}[language]}
                   </h2>
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <span className="flex items-center gap-1">
                       <Sparkles className="h-4 w-4 text-rose-500" />
-                      {allErrors.length} {language === 'hu' ? 'hiba dokumentálva' : 'Fehler dokumentiert'}
+                      {allErrors.length} {{hu: 'hiba dokumentálva', de: 'Fehler dokumentiert', en: 'errors documented', fr: 'erreurs documentées', it: 'errori documentati'}[language]}
                     </span>
                     <span className="flex items-center gap-1">
                       <Camera className="h-4 w-4 text-rose-500" />
-                      {allErrors.filter(e => e.images?.length > 0).length} {language === 'hu' ? 'fotóval' : 'mit Fotos'}
+                      {allErrors.filter(e => e.images?.length > 0).length} {{hu: 'fotóval', de: 'mit Fotos', en: 'with photos', fr: 'avec photos', it: 'con foto'}[language]}
                     </span>
                   </div>
                 </div>
@@ -194,7 +188,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   className="relative overflow-hidden border-2 border-blue-500 text-blue-600 hover:bg-blue-50 bg-white group"
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  {language === 'hu' ? 'Előnézet' : 'Vorschau'}
+                  {{hu: 'Előnézet', de: 'Vorschau', en: 'Preview', fr: 'Aperçu', it: 'Anteprima'}[language]}
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-blue-400/10 to-transparent transition-transform duration-700" />
                 </Button>
               </div>
@@ -207,7 +201,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   className="relative overflow-hidden bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-lg hover:shadow-xl transition-all group"
                 >
                   <FileText className="h-4 w-4 mr-2" />
-                  {isGenerating ? (language === 'hu' ? 'Generálás...' : 'Erstellen...') : 'PDF'}
+                  {isGenerating ? ({hu: 'Generálás...', de: 'Erstellen...', en: 'Generating...', fr: 'Génération...', it: 'Generazione...'}[language]) : 'PDF'}
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
                 </Button>
 
@@ -218,7 +212,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   className="relative overflow-hidden bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-xl transition-all group"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  {isGenerating ? (language === 'hu' ? 'Generálás...' : 'Erstellen...') : 'Excel'}
+                  {isGenerating ? ({hu: 'Generálás...', de: 'Erstellen...', en: 'Generating...', fr: 'Génération...', it: 'Generazione...'}[language]) : 'Excel'}
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
                 </Button>
 
@@ -228,7 +222,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white shadow-lg hover:shadow-xl transition-all group"
                 >
                   <Mail className="h-4 w-4 mr-2" />
-                  {language === 'hu' ? 'Email' : 'E-Mail'}
+                  {{hu: 'Email', de: 'E-Mail', en: 'Email', fr: 'Email', it: 'Email'}[language]}
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
                 </Button>
 
@@ -238,7 +232,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   className="relative overflow-hidden border-2 border-purple-500 text-purple-600 hover:bg-purple-50 bg-white shadow-lg hover:shadow-xl transition-all group"
                 >
                   <Printer className="h-4 w-4 mr-2" />
-                  {language === 'hu' ? 'Nyomtatás' : 'Drucken'}
+                  {{hu: 'Nyomtatás', de: 'Drucken', en: 'Print', fr: 'Imprimer', it: 'Stampa'}[language]}
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-purple-400/10 to-transparent transition-transform duration-700" />
                 </Button>
               </div>
@@ -301,7 +295,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                 <DialogHeader className="p-6 pb-4 flex-shrink-0 bg-white z-10 relative">
                   <DialogTitle className="text-2xl bg-gradient-to-r from-blue-600 via-sky-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
                     <FileText className="h-6 w-6 text-blue-600" />
-                    {language === 'hu' ? 'Hibalista Előnézet' : 'Fehlerliste Vorschau'}
+                    {{hu: 'Hibalista Előnézet', de: 'Fehlerliste Vorschau', en: 'Error List Preview', fr: 'Aperçu Liste d\'Erreurs', it: 'Anteprima Lista Errori'}[language]}
                   </DialogTitle>
                 </DialogHeader>
 
@@ -310,23 +304,23 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   {/* Report Header */}
                   <div className="text-center border-b-2 border-gray-200 pb-4">
                     <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-3">
-                      OTIS {language === 'hu' ? 'Hibalista' : 'Fehlerliste'}
+                      OTIS {{hu: 'Hibalista', de: 'Fehlerliste', en: 'Error List', fr: 'Liste d\'Erreurs', it: 'Lista Errori'}[language]}
                     </h1>
                     <div className="text-sm text-gray-600 space-y-1">
                       {(protocolData?.plz || protocolData?.city || protocolData?.street) && (
-                        <p><strong>{language === 'hu' ? 'Cím:' : 'Adresse:'}</strong> {[
+                        <p><strong>{{hu: 'Cím:', de: 'Adresse:', en: 'Address:', fr: 'Adresse:', it: 'Indirizzo:'}[language]}</strong> {[
                           protocolData?.plz,
                           protocolData?.city,
                           protocolData?.street ? `${protocolData.street} ${protocolData?.houseNumber || ''}`.trim() : null
                         ].filter(Boolean).join(', ')}</p>
                       )}
                       {protocolData?.liftId && (
-                        <p><strong>{language === 'hu' ? 'Otis telepítési szám:' : 'Otis Anlage Nummer:'}</strong> {protocolData.liftId}</p>
+                        <p><strong>{{hu: 'Otis telepítési szám:', de: 'Otis Anlage Nummer:', en: 'Otis Installation Number:', fr: 'Numéro d\'Installation Otis:', it: 'Numero Impianto Otis:'}[language]}</strong> {protocolData.liftId}</p>
                       )}
                       {protocolData?.inspectorName && (
-                        <p><strong>{language === 'hu' ? 'Ellenőr neve:' : 'Prüfer:'}</strong> {protocolData.inspectorName}</p>
+                        <p><strong>{{hu: 'Ellenőr neve:', de: 'Prüfer:', en: 'Inspector:', fr: 'Inspecteur:', it: 'Ispettore:'}[language]}</strong> {protocolData.inspectorName}</p>
                       )}
-                      <p><strong>{language === 'hu' ? 'Dátum:' : 'Datum:'}</strong> {new Date().toLocaleDateString()}</p>
+                      <p><strong>{{hu: 'Dátum:', de: 'Datum:', en: 'Date:', fr: 'Date:', it: 'Data:'}[language]}</strong> {new Date().toLocaleDateString()}</p>
                     </div>
                   </div>
 
@@ -352,7 +346,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                               {error.images?.length > 0 && (
                                 <div className="flex items-center text-sm text-gray-500 gap-1">
                                   <Camera className="h-4 w-4" />
-                                  {error.images.length} {language === 'hu' ? 'fotó' : 'Foto(s)'}
+                                  {error.images.length} {{hu: 'fotó', de: 'Foto(s)', en: 'photo(s)', fr: 'photo(s)', it: 'foto'}[language]}
                                 </div>
                               )}
                             </div>
@@ -366,7 +360,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                                   <div key={imgIndex} className="relative group">
                                     <img
                                       src={image}
-                                      alt={`${language === 'hu' ? 'Hiba fotó' : 'Fehlerfoto'} ${imgIndex + 1}`}
+                                      alt={`${{hu: 'Hiba fotó', de: 'Fehlerfoto', en: 'Error photo', fr: 'Photo erreur', it: 'Foto errore'}[language]} ${imgIndex + 1}`}
                                       className="w-full h-32 object-cover rounded-xl border-2 border-gray-200 shadow-md group-hover:shadow-lg transition-all"
                                     />
                                     <div className="absolute top-2 right-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xs font-bold px-2 py-1 rounded-lg shadow">
@@ -386,10 +380,10 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                   <div className="text-center text-sm text-gray-500 border-t-2 border-gray-200 pt-4 pb-2">
                     <p className="flex items-center justify-center gap-2">
                       <Sparkles className="h-4 w-4 text-blue-500" />
-                      {language === 'hu' ? 'Generálva' : 'Erstellt'}: {new Date().toLocaleString()}
+                      {{hu: 'Generálva', de: 'Erstellt', en: 'Generated', fr: 'Généré', it: 'Generato'}[language]}: {new Date().toLocaleString()}
                     </p>
                     <p className="font-semibold text-gray-700 mt-1">
-                      OTIS APROD - {language === 'hu' ? 'Átvételi Protokoll Alkalmazás' : 'Abnahmeprotokoll Anwendung'}
+                      OTIS APROD - {{hu: 'Átvételi Protokoll Alkalmazás', de: 'Abnahmeprotokoll Anwendung', en: 'Acceptance Protocol Application', fr: 'Application Protocole d\'Acceptation', it: 'Applicazione Protocollo di Accettazione'}[language]}
                     </p>
                   </div>
                 </div>
@@ -410,12 +404,10 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
         <CardContent className="p-6 text-center">
           <div className="text-green-600 mb-2 text-4xl">✅</div>
           <h3 className="text-lg font-semibold text-green-800 mb-2">
-            {language === 'hu' ? 'Nincs jelentett hiba' : 'Keine Fehler gemeldet'}
+            {{hu: 'Nincs jelentett hiba', de: 'Keine Fehler gemeldet', en: 'No errors reported', fr: 'Aucune erreur signalée', it: 'Nessun errore segnalato'}[language]}
           </h3>
           <p className="text-green-600">
-            {language === 'hu' 
-              ? 'Az átvételi protokoll hibamentesen befejezve.'
-              : 'Das Abnahmeprotokoll wurde fehlerfrei abgeschlossen.'}
+            {{hu: 'Az átvételi protokoll hibamentesen befejezve.', de: 'Das Abnahmeprotokoll wurde fehlerfrei abgeschlossen.', en: 'The acceptance protocol was completed without errors.', fr: 'Le protocole d\'acceptation a été complété sans erreurs.', it: 'Il protocollo di accettazione è stato completato senza errori.'}[language]}
           </p>
         </CardContent>
       </Card>
@@ -429,12 +421,12 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-xl font-semibold text-gray-800 mb-2">
-                {language === 'hu' ? 'Hibalista Exportálás' : 'Fehlerliste Export'}
+                {{hu: 'Hibalista Exportálás', de: 'Fehlerliste Export', en: 'Error List Export', fr: 'Exporter Liste d\'Erreurs', it: 'Esporta Lista Errori'}[language]}
               </h2>
               <p className="text-sm text-gray-600">
-                {allErrors.length} {language === 'hu' ? 'hiba dokumentálva' : 'Fehler dokumentiert'}
+                {allErrors.length} {{hu: 'hiba dokumentálva', de: 'Fehler dokumentiert', en: 'errors documented', fr: 'erreurs documentées', it: 'errori documentati'}[language]}
                 {' • '}
-                {allErrors.filter(e => e.images?.length > 0).length} {language === 'hu' ? 'fotóval' : 'mit Fotos'}
+                {allErrors.filter(e => e.images?.length > 0).length} {{hu: 'fotóval', de: 'mit Fotos', en: 'with photos', fr: 'avec photos', it: 'con foto'}[language]}
               </p>
             </div>
             <Button
@@ -443,7 +435,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               className="border-blue-600 text-blue-600 hover:bg-blue-50"
             >
               <FileText className="h-4 w-4 mr-2" />
-              {language === 'hu' ? 'Előnézet' : 'Vorschau'}
+              {{hu: 'Előnézet', de: 'Vorschau', en: 'Preview', fr: 'Aperçu', it: 'Anteprima'}[language]}
             </Button>
           </div>
 
@@ -454,7 +446,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               className="bg-red-600 hover:bg-red-700 text-white"
             >
               <FileText className="h-4 w-4 mr-2" />
-              {isGenerating ? (language === 'hu' ? 'Generálás...' : 'Erstellen...') : 'PDF'}
+              {isGenerating ? ({hu: 'Generálás...', de: 'Erstellen...', en: 'Generating...', fr: 'Génération...', it: 'Generazione...'}[language]) : 'PDF'}
             </Button>
 
             <Button
@@ -463,7 +455,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               className="bg-green-600 hover:bg-green-700 text-white"
             >
               <Download className="h-4 w-4 mr-2" />
-              {isGenerating ? (language === 'hu' ? 'Generálás...' : 'Erstellen...') : 'Excel'}
+              {isGenerating ? ({hu: 'Generálás...', de: 'Erstellen...', en: 'Generating...', fr: 'Génération...', it: 'Generazione...'}[language]) : 'Excel'}
             </Button>
 
             <Button
@@ -471,7 +463,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               className="bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Mail className="h-4 w-4 mr-2" />
-              {language === 'hu' ? 'Email' : 'E-Mail'}
+              {{hu: 'Email', de: 'E-Mail', en: 'Email', fr: 'Email', it: 'Email'}[language]}
             </Button>
 
             <Button
@@ -480,7 +472,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
               className="text-blue-600 border-2 border-blue-600 hover:bg-blue-50"
             >
               <Printer className="h-4 w-4 mr-2" />
-              {language === 'hu' ? 'Nyomtatás' : 'Drucken'}
+              {{hu: 'Nyomtatás', de: 'Drucken', en: 'Print', fr: 'Imprimer', it: 'Stampa'}[language]}
             </Button>
           </div>
 
@@ -513,7 +505,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto border border-gray-300 shadow-lg bg-white">
           <DialogHeader className="border-b pb-4">
             <DialogTitle className="text-gray-900">
-              {language === 'hu' ? 'Hibalista Előnézet' : 'Fehlerliste Vorschau'}
+              {{hu: 'Hibalista Előnézet', de: 'Fehlerliste Vorschau', en: 'Error List Preview', fr: 'Aperçu Liste d\'Erreurs', it: 'Anteprima Lista Errori'}[language]}
             </DialogTitle>
           </DialogHeader>
 
@@ -521,23 +513,23 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
             {/* Header */}
             <div className="text-center border-b pb-4">
               <h1 className="text-2xl font-bold text-blue-600 mb-2">
-                OTIS {language === 'hu' ? 'Hibalista' : 'Fehlerliste'}
+                OTIS {{hu: 'Hibalista', de: 'Fehlerliste', en: 'Error List', fr: 'Liste d\'Erreurs', it: 'Lista Errori'}[language]}
               </h1>
               <div className="text-sm text-gray-600 space-y-1">
                 {(protocolData?.plz || protocolData?.city || protocolData?.street) && (
-                  <p><strong>{language === 'hu' ? 'Cím:' : 'Adresse:'}</strong> {[
+                  <p><strong>{{hu: 'Cím:', de: 'Adresse:', en: 'Address:', fr: 'Adresse:', it: 'Indirizzo:'}[language]}</strong> {[
                     protocolData?.plz,
                     protocolData?.city,
                     protocolData?.street ? `${protocolData.street} ${protocolData?.houseNumber || ''}`.trim() : null
                   ].filter(Boolean).join(', ')}</p>
                 )}
                 {protocolData?.liftId && (
-                  <p><strong>{language === 'hu' ? 'Otis telepítési szám:' : 'Otis Anlage Nummer:'}</strong> {protocolData.liftId}</p>
+                  <p><strong>{{hu: 'Otis telepítési szám:', de: 'Otis Anlage Nummer:', en: 'Otis Installation Number:', fr: 'Numéro d\'Installation Otis:', it: 'Numero Impianto Otis:'}[language]}</strong> {protocolData.liftId}</p>
                 )}
                 {protocolData?.inspectorName && (
-                  <p><strong>{language === 'hu' ? 'Ellenőr neve:' : 'Prüfer:'}</strong> {protocolData.inspectorName}</p>
+                  <p><strong>{{hu: 'Ellenőr neve:', de: 'Prüfer:', en: 'Inspector:', fr: 'Inspecteur:', it: 'Ispettore:'}[language]}</strong> {protocolData.inspectorName}</p>
                 )}
-                <p><strong>{language === 'hu' ? 'Dátum:' : 'Datum:'}</strong> {new Date().toLocaleDateString()}</p>
+                <p><strong>{{hu: 'Dátum:', de: 'Datum:', en: 'Date:', fr: 'Date:', it: 'Data:'}[language]}</strong> {new Date().toLocaleDateString()}</p>
               </div>
             </div>
 
@@ -556,7 +548,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                       {error.images?.length > 0 && (
                         <div className="flex items-center text-sm text-gray-500">
                           <Camera className="h-4 w-4 mr-1" />
-                          {error.images.length} {language === 'hu' ? 'fotó' : 'Foto(s)'}
+                          {error.images.length} {{hu: 'fotó', de: 'Foto(s)', en: 'photo(s)', fr: 'photo(s)', it: 'foto'}[language]}
                         </div>
                       )}
                     </div>
@@ -570,7 +562,7 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
                           <div key={imgIndex} className="relative">
                             <img
                               src={image}
-                              alt={`${language === 'hu' ? 'Hiba fotó' : 'Fehlerfoto'} ${imgIndex + 1}`}
+                              alt={`${{hu: 'Hiba fotó', de: 'Fehlerfoto', en: 'Error photo', fr: 'Photo erreur', it: 'Foto errore'}[language]} ${imgIndex + 1}`}
                               className="w-full h-32 object-cover rounded border border-gray-300"
                             />
                             <div className="absolute top-1 right-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">
@@ -587,8 +579,8 @@ export function ErrorExport({ errors, protocolData }: ErrorExportProps) {
 
             {/* Footer */}
             <div className="text-center text-sm text-gray-500 border-t pt-4">
-              <p>{language === 'hu' ? 'Generálva' : 'Erstellt'}: {new Date().toLocaleString()}</p>
-              <p>OTIS APROD - {language === 'hu' ? 'Átvételi Protokoll Alkalmazás' : 'Abnahmeprotokoll Anwendung'}</p>
+              <p>{{hu: 'Generálva', de: 'Erstellt', en: 'Generated', fr: 'Généré', it: 'Generato'}[language]}: {new Date().toLocaleString()}</p>
+              <p>OTIS APROD - {{hu: 'Átvételi Protokoll Alkalmazás', de: 'Abnahmeprotokoll Anwendung', en: 'Acceptance Protocol Application', fr: 'Application Protocole d\'Acceptation', it: 'Applicazione Protocollo di Accettazione'}[language]}</p>
             </div>
           </div>
         </DialogContent>

@@ -122,11 +122,14 @@ export function Completion({
 
         console.log('✅ File saved to:', result.uri);
         toast({
-          title: language === 'hu' ? 'Sikeres mentés!' : 'Erfolgreich gespeichert!',
-          description:
-            language === 'hu'
-              ? `A fájl a Dokumentumok mappába került: ${filename}`
-              : `Datei im Dokumente-Ordner gespeichert: ${filename}`,
+          title: {hu: 'Sikeres mentés!', de: 'Erfolgreich gespeichert!', en: 'Successfully saved!', fr: 'Sauvegarde réussie!', it: 'Salvato con successo!'}[language],
+          description: {
+            hu: `A fájl a Dokumentumok mappába került: ${filename}`,
+            de: `Datei im Dokumente-Ordner gespeichert: ${filename}`,
+            en: `File saved to Documents folder: ${filename}`,
+            fr: `Fichier enregistré dans le dossier Documents: ${filename}`,
+            it: `File salvato nella cartella Documenti: ${filename}`
+          }[language],
           duration: 5000,
         });
 
@@ -135,10 +138,13 @@ export function Completion({
         console.error('❌ Mobile save failed:', e);
         toast({
           title: t("error"),
-          description:
-            language === 'hu'
-              ? "Nem sikerült a fájlt a telefonra menteni. Ellenőrizd a jogosultságokat."
-              : "Datei konnte nicht auf dem Telefon gespeichert werden. Berechtigungen überprüfen.",
+          description: {
+            hu: "Nem sikerült a fájlt a telefonra menteni. Ellenőrizd a jogosultságokat.",
+            de: "Datei konnte nicht auf dem Telefon gespeichert werden. Berechtigungen überprüfen.",
+            en: "Could not save file to phone. Check permissions.",
+            fr: "Impossible d'enregistrer le fichier sur le téléphone. Vérifiez les autorisations.",
+            it: "Impossibile salvare il file sul telefono. Controlla i permessi."
+          }[language],
           variant: "destructive"
         });
         throw e;
@@ -259,8 +265,8 @@ export function Completion({
       await saveFile(blob, filename);
 
       toast({
-        title: language === 'hu' ? 'Excel letöltve!' : 'Excel heruntergeladen!',
-        description: language === 'hu' ? 'A fájlt a Dokumentumok mappában találod.' : 'Datei im Dokumente-Ordner gespeichert.',
+        title: {hu: 'Excel letöltve!', de: 'Excel heruntergeladen!', en: 'Excel downloaded!', fr: 'Excel téléchargé!', it: 'Excel scaricato!'}[language],
+        description: {hu: 'A fájlt a Dokumentumok mappában találod.', de: 'Datei im Dokumente-Ordner gespeichert.', en: 'File saved in Documents folder.', fr: 'Fichier enregistré dans le dossier Documents.', it: 'File salvato nella cartella Documenti.'}[language],
         duration: 3000,
       });
 

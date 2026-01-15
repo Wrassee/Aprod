@@ -416,7 +416,7 @@ export function NiedervoltTable({
                       </CardTitle>
                       <p className="text-sm text-white/80 flex items-center gap-1 mt-1">
                         <Sparkles className="h-3 w-3" />
-                        Niedervolt Installations Verordnung art.14
+                        {{hu: 'Niedervolt szabályzat 14. cikkely', de: 'Niedervolt Installations Verordnung art.14', en: 'Low Voltage Installation Regulation art.14', fr: 'Règlement Installation Basse Tension art.14', it: 'Regolamento Impianti Bassa Tensione art.14'}[language]}
                       </p>
                     </div>
                   </div>

@@ -63,6 +63,16 @@ export async function createApp(config: AppConfig) {
     credentials: true,
   }));
 
+  // 🔍 DIAGNOSTIC: Log incoming request size BEFORE body-parser
+  app.use((req, res, next) => {
+    const contentLength = req.headers['content-length'];
+    const contentType = req.headers['content-type'];
+    if (req.path.startsWith('/api')) {
+      console.log(`📥 [INCOMING] ${req.method} ${req.path} | Content-Length: ${contentLength || 'N/A'} | Content-Type: ${contentType || 'N/A'}`);
+    }
+    next();
+  });
+
   // 🔧 Increased limit for high-DPI mobile signatures (Samsung Fold5, etc.)
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));

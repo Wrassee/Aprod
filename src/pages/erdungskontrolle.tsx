@@ -633,7 +633,7 @@ export function Erdungskontrolle({
                             <GroundingQuestionItem
                               question={{ 
                                 id: customQuestion.id, 
-                                text: customRowTexts[customQuestion.pdfTextFieldName] || {{hu: 'Egyéni tétel', de: 'Benutzerdefiniert', en: 'Custom item', fr: 'Article personnalise', it: 'Articolo personalizzato'}[language]}
+                                text: customRowTexts[customQuestion.pdfTextFieldName] || ({hu: 'Egyéni tétel', de: 'Benutzerdefiniert', en: 'Custom item', fr: 'Article personnalisé', it: 'Articolo personalizzato'}[language] as string)
                               }}
                               currentAnswer={answers[customQuestion.id]}
                               language={language}
@@ -697,7 +697,7 @@ export function Erdungskontrolle({
                             <GroundingQuestionItem
                               question={{ 
                                 id: customQuestion.id, 
-                                text: customRowTexts[customQuestion.pdfTextFieldName] || {{hu: 'Egyéni tétel', de: 'Benutzerdefiniert', en: 'Custom item', fr: 'Article personnalise', it: 'Articolo personalizzato'}[language]}
+                                text: customRowTexts[customQuestion.pdfTextFieldName] || ({hu: 'Egyéni tétel', de: 'Benutzerdefiniert', en: 'Custom item', fr: 'Article personnalisé', it: 'Articolo personalizzato'}[language] as string)
                               }}
                               currentAnswer={answers[customQuestion.id]}
                               language={language}
@@ -787,10 +787,10 @@ export function Erdungskontrolle({
                   )}
                   <span>
                     {saveStatus === 'saving'
-                      ? {{hu: 'Mentés...', de: 'Speichern...', en: 'Saving...', fr: 'Sauvegarde...', it: 'Salvataggio...'}[language]}
+                      ? ({hu: 'Mentés...', de: 'Speichern...', en: 'Saving...', fr: 'Sauvegarde...', it: 'Salvataggio...'}[language])
                       : saveStatus === 'saved'
-                      ? {{hu: 'Mentve', de: 'Gespeichert', en: 'Saved', fr: 'Sauvegarde', it: 'Salvato'}[language]}
-                      : {{hu: 'Mentés', de: 'Speichern', en: 'Save', fr: 'Sauvegarder', it: 'Salva'}[language]}}
+                      ? ({hu: 'Mentve', de: 'Gespeichert', en: 'Saved', fr: 'Sauvegardé', it: 'Salvato'}[language])
+                      : ({hu: 'Mentés', de: 'Speichern', en: 'Save', fr: 'Sauvegarder', it: 'Salva'}[language])}
                   </span>
                 </Button>
               )}

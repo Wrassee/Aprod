@@ -125,9 +125,18 @@ export function NiedervoltTable({
 
   const getDeviceName = (device: any) => {
     if (device.name && typeof device.name === 'object') {
-      return language === 'hu' ? device.name.hu : device.name.de;
+      // Support 5 languages with fallback to DE
+      return device.name[language] || device.name.de || device.name.hu || '';
     }
-    return language === 'hu' ? (device.nameHU || device.name.hu) : (device.nameDE || device.name.de);
+    // Legacy format support
+    const langMap: Record<string, string> = {
+      hu: device.nameHU || device.name?.hu || '',
+      de: device.nameDE || device.name?.de || '',
+      en: device.nameEN || device.name?.en || device.nameDE || device.name?.de || '',
+      fr: device.nameFR || device.name?.fr || device.nameDE || device.name?.de || '',
+      it: device.nameIT || device.name?.it || device.nameDE || device.name?.de || ''
+    };
+    return langMap[language] || langMap.de;
   };
 
   const updateMeasurement = useCallback(
@@ -170,24 +179,24 @@ export function NiedervoltTable({
   );
     
   const getFieldLabel = (field: string) => {
-    const labels = {
-      nevlegesAram: { hu: 'Névleges áram (A)', de: 'Nennstrom (A)' },
-      tipusjelzes: { hu: 'Típusjelzés', de: 'Merkmal' },
-      szigetelesVizsgalat: { hu: 'Szigetelés vizsgálat (MΩ)', de: 'Isolationsprüfung (MΩ)' },
-      rovidzarasiAram: { hu: 'Rövidzárási áram (Icc)', de: 'Kurzschlussstrom (Icc)' },
-      biztositek: { hu: 'Biztosíték', de: 'Sicherung' },
-      kismegszakito: { hu: 'Kismegszakító', de: 'LS-Schalter' },
-      npe: { hu: 'N-PE', de: 'N-PE' },
-      l1pe: { hu: 'L1-PE', de: 'L1-PE' },
-      l2pe: { hu: 'L2-PE', de: 'L2-PE' },
-      l3pe: { hu: 'L3-PE', de: 'L3-PE' },
-      ln: { hu: 'L-N', de: 'L-N' },
-      lpe: { hu: 'L-PE', de: 'L-PE' },
-      fiIn: { hu: 'FI In (mA)', de: 'FI In (mA)' },
-      fiDin: { hu: 'FI ΔIn (ms)', de: 'FI ΔIn (ms)' },
-      fiTest: { hu: 'FI teszt', de: 'FI teszt' },
-    } as any;
-    return language === 'hu' ? labels[field]?.hu || field : labels[field]?.de || field;
+    const labels: Record<string, Record<string, string>> = {
+      nevlegesAram: { hu: 'Névleges áram (A)', de: 'Nennstrom (A)', en: 'Rated current (A)', fr: 'Courant nominal (A)', it: 'Corrente nominale (A)' },
+      tipusjelzes: { hu: 'Típusjelzés', de: 'Merkmal', en: 'Type marking', fr: 'Marquage type', it: 'Marcatura tipo' },
+      szigetelesVizsgalat: { hu: 'Szigetelés vizsgálat (MΩ)', de: 'Isolationsprüfung (MΩ)', en: 'Insulation test (MΩ)', fr: 'Test d\'isolation (MΩ)', it: 'Test isolamento (MΩ)' },
+      rovidzarasiAram: { hu: 'Rövidzárási áram (Icc)', de: 'Kurzschlussstrom (Icc)', en: 'Short-circuit current (Icc)', fr: 'Courant de court-circuit (Icc)', it: 'Corrente di cortocircuito (Icc)' },
+      biztositek: { hu: 'Biztosíték', de: 'Sicherung', en: 'Fuse', fr: 'Fusible', it: 'Fusibile' },
+      kismegszakito: { hu: 'Kismegszakító', de: 'LS-Schalter', en: 'Circuit breaker', fr: 'Disjoncteur', it: 'Interruttore' },
+      npe: { hu: 'N-PE', de: 'N-PE', en: 'N-PE', fr: 'N-PE', it: 'N-PE' },
+      l1pe: { hu: 'L1-PE', de: 'L1-PE', en: 'L1-PE', fr: 'L1-PE', it: 'L1-PE' },
+      l2pe: { hu: 'L2-PE', de: 'L2-PE', en: 'L2-PE', fr: 'L2-PE', it: 'L2-PE' },
+      l3pe: { hu: 'L3-PE', de: 'L3-PE', en: 'L3-PE', fr: 'L3-PE', it: 'L3-PE' },
+      ln: { hu: 'L-N', de: 'L-N', en: 'L-N', fr: 'L-N', it: 'L-N' },
+      lpe: { hu: 'L-PE', de: 'L-PE', en: 'L-PE', fr: 'L-PE', it: 'L-PE' },
+      fiIn: { hu: 'FI In (mA)', de: 'FI In (mA)', en: 'RCD In (mA)', fr: 'DDR In (mA)', it: 'FI In (mA)' },
+      fiDin: { hu: 'FI ΔIn (ms)', de: 'FI ΔIn (ms)', en: 'RCD ΔIn (ms)', fr: 'DDR ΔIn (ms)', it: 'FI ΔIn (ms)' },
+      fiTest: { hu: 'FI teszt', de: 'FI Test', en: 'RCD test', fr: 'Test DDR', it: 'Test FI' },
+    };
+    return labels[field]?.[language] || labels[field]?.de || field;
   };
 
   const toggleDeviceSelection = useCallback((deviceId: string, forceState?: boolean) => {
@@ -334,7 +343,7 @@ export function NiedervoltTable({
                       <div className="flex items-center gap-2 mb-2">
                         <Settings className="h-5 w-5 text-blue-600" />
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                          {language === 'hu' ? 'Összes Eszköz' : 'Gesamte Geräte'}
+                          {{hu: 'Összes Eszköz', de: 'Gesamte Geräte', en: 'Total Devices', fr: 'Total Appareils', it: 'Totale Dispositivi'}[language]}
                         </p>
                       </div>
                       <p className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
@@ -356,7 +365,7 @@ export function NiedervoltTable({
                       <div className="flex items-center gap-2 mb-2">
                         <CheckCircle className="h-5 w-5 text-green-600" />
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                          {language === 'hu' ? 'Kitöltött' : 'Ausgefüllt'}
+                          {{hu: 'Kitöltött', de: 'Ausgefüllt', en: 'Filled', fr: 'Rempli', it: 'Compilato'}[language]}
                         </p>
                       </div>
                       <p className="text-4xl font-bold bg-gradient-to-r from-green-600 to-teal-500 bg-clip-text text-transparent">
@@ -378,7 +387,7 @@ export function NiedervoltTable({
                       <div className="flex items-center gap-2 mb-2">
                         <Sparkles className="h-5 w-5 text-purple-600" />
                         <p className="text-sm font-semibold text-gray-600 dark:text-gray-400">
-                          {language === 'hu' ? 'Kitöltöttség' : 'Fortschritt'}
+                          {{hu: 'Kitöltöttség', de: 'Fortschritt', en: 'Progress', fr: 'Progression', it: 'Progresso'}[language]}
                         </p>
                       </div>
                       <p className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-fuchsia-500 bg-clip-text text-transparent">
@@ -403,7 +412,7 @@ export function NiedervoltTable({
                     </div>
                     <div>
                       <CardTitle className="text-2xl font-bold">
-                        {language === 'hu' ? 'Niedervolt Installációk Mérései' : 'Niedervolt Installations Messungen'}
+                        {{hu: 'Niedervolt Installációk Mérései', de: 'Niedervolt Installations Messungen', en: 'Low Voltage Installation Measurements', fr: 'Mesures des Installations Basse Tension', it: 'Misure Impianti Bassa Tensione'}[language]}
                       </CardTitle>
                       <p className="text-sm text-white/80 flex items-center gap-1 mt-1">
                         <Sparkles className="h-3 w-3" />
@@ -418,7 +427,7 @@ export function NiedervoltTable({
                     className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white border-white/30"
                   >
                     <Filter className="h-4 w-4 mr-2" />
-                    {language === 'hu' ? 'Eszközök' : 'Geräte'} ({activeDevices.length})
+                    {{hu: 'Eszközök', de: 'Geräte', en: 'Devices', fr: 'Appareils', it: 'Dispositivi'}[language]} ({activeDevices.length})
                   </Button>
                 </div>
               </CardHeader>
@@ -429,7 +438,7 @@ export function NiedervoltTable({
                     <thead className="bg-gradient-to-r from-blue-50 via-sky-50 to-cyan-50 dark:from-blue-950/20 dark:via-sky-950/20 dark:to-cyan-950/20">
                       <tr>
                         <th rowSpan={2} className="border-r border-blue-200 p-4 text-left text-sm font-bold text-blue-800 dark:text-blue-300 align-bottom min-w-[200px]">
-                          {language === 'hu' ? 'Eszköz / Baugruppe' : 'Gerät / Baugruppe'}
+                          {{hu: 'Eszköz / Baugruppe', de: 'Gerät / Baugruppe', en: 'Device / Assembly', fr: 'Appareil / Assemblage', it: 'Dispositivo / Gruppo'}[language]}
                         </th>
                         <th colSpan={2} className="border-r border-blue-200 p-4 text-center text-sm font-bold text-blue-800 dark:text-blue-300">
                           {getFieldLabel('nevlegesAram')}
@@ -536,7 +545,7 @@ export function NiedervoltTable({
               >
                 <div className="flex items-center justify-center gap-2">
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="font-semibold">{language === 'hu' ? 'Vissza' : 'Zurück'}</span>
+                  <span className="font-semibold">{{hu: 'Vissza', de: 'Zurück', en: 'Back', fr: 'Retour', it: 'Indietro'}[language]}</span>
                 </div>
               </button>
 
@@ -554,17 +563,17 @@ export function NiedervoltTable({
                     {saveStatus === 'saving' ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-blue-300 border-t-blue-600 rounded-full"></div>
-                        <span>{language === 'hu' ? 'Mentés...' : 'Speichern...'}</span>
+                        <span>{{hu: 'Mentés...', de: 'Speichern...', en: 'Saving...', fr: 'Sauvegarde...', it: 'Salvataggio...'}[language]}</span>
                       </>
                     ) : saveStatus === 'saved' ? (
                       <>
                         <Check className="h-5 w-5" />
-                        <span>{language === 'hu' ? 'Elmentve' : 'Gespeichert'}</span>
+                        <span>{{hu: 'Elmentve', de: 'Gespeichert', en: 'Saved', fr: 'Sauvegardé', it: 'Salvato'}[language]}</span>
                       </>
                     ) : (
                       <>
                         <Save className="h-5 w-5" />
-                        <span>{language === 'hu' ? 'Mentés' : 'Speichern'}</span>
+                        <span>{{hu: 'Mentés', de: 'Speichern', en: 'Save', fr: 'Sauvegarder', it: 'Salva'}[language]}</span>
                       </>
                     )}
                   </div>
@@ -577,7 +586,7 @@ export function NiedervoltTable({
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400"></div>
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400 opacity-0 group-hover:opacity-30 blur-xl transition-opacity"></div>
                   <div className="relative flex items-center gap-2">
-                    <span>{language === 'hu' ? 'Tovább' : 'Weiter'}</span>
+                    <span>{{hu: 'Tovább', de: 'Weiter', en: 'Next', fr: 'Suivant', it: 'Avanti'}[language]}</span>
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </div>
                   <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
@@ -591,7 +600,7 @@ export function NiedervoltTable({
               <DialogHeader>
                 <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
                   <Filter className="h-6 w-6 text-blue-600" />
-                  {t("deviceSelection") || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}
+                  {t("deviceSelection") || ({hu: 'Eszközök kiválasztása', de: 'Geräteauswahl', en: 'Device Selection', fr: 'Sélection des Appareils', it: 'Selezione Dispositivi'}[language])}
                 </DialogTitle>
               </DialogHeader>
 
@@ -642,12 +651,12 @@ export function NiedervoltTable({
                     <div className="relative bg-white dark:bg-gray-900 rounded-xl p-6">
                       <h4 className="font-bold text-lg mb-4 bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent flex items-center gap-2">
                         <Plus className="h-5 w-5 text-blue-600" />
-                        {language === 'hu' ? 'Saját eszköz hozzáadása' : 'Eigenes Gerät hinzufügen'}
+                        {{hu: 'Saját eszköz hozzáadása', de: 'Eigenes Gerät hinzufügen', en: 'Add custom device', fr: 'Ajouter un appareil personnalisé', it: 'Aggiungi dispositivo personalizzato'}[language]}
                       </h4>
                       <div className="flex flex-col md:flex-row gap-3">
                         <div className="relative group flex-1">
                           <Input
-                            placeholder={language === 'hu' ? 'Eszköz neve' : 'Gerätename'}
+                            placeholder={{hu: 'Eszköz neve', de: 'Gerätename', en: 'Device name', fr: 'Nom de l\'appareil', it: 'Nome dispositivo'}[language]}
                             value={newDeviceName}
                             onChange={(e) => setNewDeviceName(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && addCustomDevice()}
@@ -664,7 +673,7 @@ export function NiedervoltTable({
                           <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
                           <div className="relative flex items-center gap-2">
                             <Plus className="h-5 w-5" />
-                            <span>{language === 'hu' ? 'Hozzáadás' : 'Hinzufügen'}</span>
+                            <span>{{hu: 'Hozzáadás', de: 'Hinzufügen', en: 'Add', fr: 'Ajouter', it: 'Aggiungi'}[language]}</span>
                           </div>
                           <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700"></div>
                         </button>
@@ -723,7 +732,7 @@ export function NiedervoltTable({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-blue-100">{language === 'hu' ? 'Összes Eszköz' : 'Gesamte Geräte'}</p>
+                    <p className="text-blue-100">{{hu: 'Összes Eszköz', de: 'Gesamte Geräte', en: 'Total Devices', fr: 'Total Appareils', it: 'Totale Dispositivi'}[language]}</p>
                     <p className="text-3xl font-bold">{totalDevices}</p>
                   </div>
                   <Settings className="h-8 w-8 text-blue-200" />
@@ -734,7 +743,7 @@ export function NiedervoltTable({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-green-100">{language === 'hu' ? 'Kitöltött' : 'Ausgefüllt'}</p>
+                    <p className="text-green-100">{{hu: 'Kitöltött', de: 'Ausgefüllt', en: 'Filled', fr: 'Rempli', it: 'Compilato'}[language]}</p>
                     <p className="text-3xl font-bold">{filledDevices}</p>
                   </div>
                   <Check className="h-8 w-8 text-green-200" />
@@ -745,7 +754,7 @@ export function NiedervoltTable({
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-purple-100">{language === 'hu' ? 'Kitöltöttség' : 'Fortschritt'}</p>
+                    <p className="text-purple-100">{{hu: 'Kitöltöttség', de: 'Fortschritt', en: 'Progress', fr: 'Progression', it: 'Progresso'}[language]}</p>
                     <p className="text-3xl font-bold">{tableProgressPercent}%</p>
                   </div>
                   <ArrowRight className="h-8 w-8 text-purple-200" />
@@ -756,10 +765,10 @@ export function NiedervoltTable({
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xl">{language === 'hu' ? 'Niedervolt Installációk Mérései' : 'Niedervolt Installations Messungen'}</CardTitle>
+                <CardTitle className="text-xl">{{hu: 'Niedervolt Installációk Mérései', de: 'Niedervolt Installations Messungen', en: 'Low Voltage Installation Measurements', fr: 'Mesures des Installations Basse Tension', it: 'Misure Impianti Bassa Tensione'}[language]}</CardTitle>
                 <Button variant="outline" size="sm" onClick={() => setShowDeviceSelector(true)}>
                   <Filter className="h-4 w-4 mr-2" />
-                  {language === 'hu' ? 'Eszközök' : 'Geräte'} ({activeDevices.length})
+                  {{hu: 'Eszközök', de: 'Geräte', en: 'Devices', fr: 'Appareils', it: 'Dispositivi'}[language]} ({activeDevices.length})
                 </Button>
               </div>
             </CardHeader>
@@ -768,7 +777,7 @@ export function NiedervoltTable({
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
                     <tr>
-                      <th rowSpan={2} className="border border-gray-300 p-3 text-left font-semibold align-bottom">{language === 'hu' ? 'Eszköz / Baugruppe' : 'Gerät / Baugruppe'}</th>
+                      <th rowSpan={2} className="border border-gray-300 p-3 text-left font-semibold align-bottom">{{hu: 'Eszköz / Baugruppe', de: 'Gerät / Baugruppe', en: 'Device / Assembly', fr: 'Appareil / Assemblage', it: 'Dispositivo / Gruppo'}[language]}</th>
                       <th colSpan={2} className="border border-gray-300 p-3 text-center font-semibold">{getFieldLabel('nevlegesAram')}</th>
                       <th rowSpan={2} className="border border-gray-300 p-3 text-center font-semibold align-bottom">{getFieldLabel('tipusjelzes')}</th>
                       <th colSpan={4} className="border border-gray-300 p-3 text-center font-semibold">{getFieldLabel('szigetelesVizsgalat')}</th>
@@ -850,7 +859,7 @@ export function NiedervoltTable({
               className="border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {language === 'hu' ? 'Vissza' : 'Zurück'}
+              {{hu: 'Vissza', de: 'Zurück', en: 'Back', fr: 'Retour', it: 'Indietro'}[language]}
             </Button>
 
             <div className="flex items-center space-x-4">
@@ -862,17 +871,17 @@ export function NiedervoltTable({
                 {saveStatus === 'saving' ? (
                   <>
                     <Save className="h-4 w-4 mr-2 animate-spin" />
-                    {language === 'hu' ? 'Mentés...' : 'Speichern...'}
+                    {{hu: 'Mentés...', de: 'Speichern...', en: 'Saving...', fr: 'Sauvegarde...', it: 'Salvataggio...'}[language]}
                   </>
                 ) : saveStatus === 'saved' ? (
                   <>
                     <Check className="h-4 w-4 mr-2 text-green-500" />
-                    {language === 'hu' ? 'Elmentve' : 'Gespeichert'}
+                    {{hu: 'Elmentve', de: 'Gespeichert', en: 'Saved', fr: 'Sauvegardé', it: 'Salvato'}[language]}
                   </>
                 ) : (
                   <>
                     <Save className="h-4 w-4 mr-2" />
-                    {language === 'hu' ? 'Mentés' : 'Speichern'}
+                    {{hu: 'Mentés', de: 'Speichern', en: 'Save', fr: 'Sauvegarder', it: 'Salva'}[language]}
                   </>
                 )}
               </Button> 
@@ -881,7 +890,7 @@ export function NiedervoltTable({
                 onClick={handleSaveAndProceed}
                 className="bg-otis-blue text-white hover:bg-white hover:text-otis-blue border border-otis-blue"
               >
-                {language === 'hu' ? 'Tovább' : 'Weiter'}
+                {{hu: 'Tovább', de: 'Weiter', en: 'Next', fr: 'Suivant', it: 'Avanti'}[language]}
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
             </div>
@@ -891,7 +900,7 @@ export function NiedervoltTable({
         <Dialog open={showDeviceSelector} onOpenChange={setShowDeviceSelector}>
           <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
             <DialogHeader>
-              <DialogTitle>{t("deviceSelection") || (language === 'hu' ? 'Eszközök kiválasztása' : 'Geräteauswahl')}</DialogTitle>
+              <DialogTitle>{t("deviceSelection") || ({hu: 'Eszközök kiválasztása', de: 'Geräteauswahl', en: 'Device Selection', fr: 'Sélection des Appareils', it: 'Selezione Dispositivi'}[language])}</DialogTitle>
             </DialogHeader>
 
             <div className="flex-grow overflow-y-auto pr-4 -mr-4 space-y-4">
@@ -923,10 +932,10 @@ export function NiedervoltTable({
               </div>
 
               <div className="border-t pt-4 mt-4 p-1">
-                <h4 className="font-medium mb-2">{language === 'hu' ? 'Saját eszköz hozzáadása' : 'Eigenes Gerät hinzufügen'}</h4>
+                <h4 className="font-medium mb-2">{{hu: 'Saját eszköz hozzáadása', de: 'Eigenes Gerät hinzufügen', en: 'Add custom device', fr: 'Ajouter un appareil personnalisé', it: 'Aggiungi dispositivo personalizzato'}[language]}</h4>
                 <div className="flex gap-2">
                   <Input
-                    placeholder={language === 'hu' ? 'Eszköz neve' : 'Gerätename'}
+                    placeholder={{hu: 'Eszköz neve', de: 'Gerätename', en: 'Device name', fr: 'Nom de l\'appareil', it: 'Nome dispositivo'}[language]}
                     value={newDeviceName}
                     onChange={(e) => setNewDeviceName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && addCustomDevice()}
@@ -938,7 +947,7 @@ export function NiedervoltTable({
                     className="flex-shrink-0"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    {language === 'hu' ? 'Hozzáadás' : 'Hinzufügen'}
+                    {{hu: 'Hozzáadás', de: 'Hinzufügen', en: 'Add', fr: 'Ajouter', it: 'Aggiungi'}[language]}
                   </Button>
                 </div>
               </div>

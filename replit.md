@@ -80,9 +80,10 @@ Excel writing functionality must remain untouched to prevent corruption.
    - Consistent display in PDF generation, email attachments, and preview modals (Modern & Classic themes)
 
 7. **High-DPI Mobile Signature Support**
-   - Increased Express body-parser limit from 100KB to 10MB
+   - Increased Express body-parser limit from 100KB to 50MB
    - Fixes "request entity too large" error on high-DPI mobile devices (Samsung Galaxy Fold5, etc.)
-   - Updated all server entry points: app.ts, production-entry.ts, production-clean.ts, minimal-production.ts
+   - Updated all server entry points: app.ts, production-entry.ts, production-clean.ts, minimal-production.ts, production-only.ts
+   - render.yaml updated to use main branch
    - Requires Render re-deploy to take effect
 
 ### Version 0.9.5.0 - UI Consistency Updates

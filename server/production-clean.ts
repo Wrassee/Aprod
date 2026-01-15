@@ -38,8 +38,8 @@ const app = express();
 export default app;
 
 // 🔧 Increased limit for high-DPI mobile signatures (Samsung Fold5, etc.)
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Simple logging middleware
 app.use((req, res, next) => {

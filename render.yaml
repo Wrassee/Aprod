@@ -3,7 +3,7 @@ services:
     name: aprod-otis
     env: node
     plan: free
-    branch: vegleges-javitas # VAGY main, amelyiket használni akarod
+    branch: main
     buildCommand: "npm run build"
     startCommand: "npm start"
     envVars:

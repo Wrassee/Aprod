@@ -68,7 +68,7 @@ export function TypeSelectorInput({ value, onChange }: TypeSelectorInputProps) {
                 // 3. LÉPÉS: JAVÍTVA
                 <span className="text-gray-400 flex items-center gap-2">
                   <Sparkles className="h-3 w-3" />
-                  {language === 'de' ? 'Typ auswählen...' : 'Válassz típust...'}
+                  {{hu: 'Válassz típust...', de: 'Typ auswählen...', en: 'Select type...', fr: 'Sélectionner le type...', it: 'Seleziona tipo...'}[language]}
                 </span>
               )}
             </span>
@@ -104,7 +104,7 @@ export function TypeSelectorInput({ value, onChange }: TypeSelectorInputProps) {
             <div className="relative group">
               <Input
                 // 4. LÉPÉS: JAVÍTVA
-                placeholder={language === 'de' ? 'Eigener Typ...' : 'Egyedi típus...'}
+                placeholder={{hu: 'Egyedi típus...', de: 'Eigener Typ...', en: 'Custom type...', fr: 'Type personnalisé...', it: 'Tipo personalizzato...'}[language]}
                 value={customValue}
                 onChange={handleCustomChange}
                 onClick={(e) => e.stopPropagation()}
@@ -121,7 +121,7 @@ export function TypeSelectorInput({ value, onChange }: TypeSelectorInputProps) {
               // 5. LÉPÉS: JAVÍTVA
               <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
                 <Sparkles className="h-3 w-3" />
-                {language === 'de' ? 'Eigener Typ wird verwendet' : 'Egyedi típus használva'}
+                {{hu: 'Egyedi típus használva', de: 'Eigener Typ wird verwendet', en: 'Custom type used', fr: 'Type personnalisé utilisé', it: 'Tipo personalizzato usato'}[language]}
               </p>
             )}
           </div>
@@ -167,7 +167,7 @@ export function TypeSelectorInput({ value, onChange }: TypeSelectorInputProps) {
         <div className="p-2">
           <Input
             // 6. LÉPÉS: JAVÍTVA
-            placeholder={language === 'de' ? 'Eigener Typ...' : 'Egyedi típus...'}
+            placeholder={{hu: 'Egyedi típus...', de: 'Eigener Typ...', en: 'Custom type...', fr: 'Type personnalisé...', it: 'Tipo personalizzato...'}[language]}
             value={customValue}
             onChange={handleCustomChange}
             onClick={(e) => e.stopPropagation()}
@@ -177,7 +177,7 @@ export function TypeSelectorInput({ value, onChange }: TypeSelectorInputProps) {
           {isCustom && (
             // 7. LÉPÉS: JAVÍTVA
             <p className="text-xs text-gray-600 mt-1">
-              ℹ️ {language === 'de' ? 'Eigener Typ' : 'Egyedi típus'}
+              ℹ️ {{hu: 'Egyedi típus', de: 'Eigener Typ', en: 'Custom type', fr: 'Type personnalisé', it: 'Tipo personalizzato'}[language]}
             </p>
           )}
         </div>

@@ -166,11 +166,14 @@ export interface FormData {
 // ------------------------------------------------------------
 
 /**
- * Localized text structure for multi-language support
+ * Localized text structure for multi-language support (5 languages)
  */
 export interface LocalizedText {
   hu: string;
   de: string;
+  en?: string;
+  fr?: string;
+  it?: string;
 }
 
 /**
@@ -204,8 +207,16 @@ export interface QuestionConfig {
   type: QuestionType;
   /** Whether the field is mandatory */
   required: boolean;
-  /** Placeholder text shown in the UI */
+  /** Placeholder text shown in the UI (HU default) */
   placeholder?: string;
+  /** German placeholder */
+  placeholderDe?: string;
+  /** English placeholder */
+  placeholderEn?: string;
+  /** French placeholder */
+  placeholderFr?: string;
+  /** Italian placeholder */
+  placeholderIt?: string;
   /** Optional Excel‑style cell reference (e.g. "A1") */
   cellReference?: string;
   /** Optional sheet name */
@@ -222,6 +233,12 @@ export interface QuestionConfig {
   groupName?: string;
   /** @deprecated Use group.title.de instead */
   groupNameDe?: string;
+  /** English group name */
+  groupNameEn?: string;
+  /** French group name */
+  groupNameFr?: string;
+  /** Italian group name */
+  groupNameIt?: string;
   /** @deprecated Use group.key instead */
   groupKey?: string;
   

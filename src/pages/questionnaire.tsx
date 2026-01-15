@@ -212,14 +212,29 @@ function Questionnaire({
           const questionsData = await response.json();
           console.log('✅ Questions loaded:', questionsData.length);
 
-          // Nyelvi placeholder beállítása
-          const langSuffix = language.toUpperCase(); // 'HU' vagy 'DE'
-          const placeholderKey = `placeholder${langSuffix}`; // 'placeholderHU' vagy 'placeholderDE'
-
-          const transformedQuestions = questionsData.map((q: any) => ({
-            ...q,
-            placeholder: q[placeholderKey] || q.placeholder || ''
-          }));
+          // Nyelvi placeholder és groupName beállítása (5 nyelv támogatás)
+          const langMap: Record<string, string> = { hu: 'Hu', de: 'De', en: 'En', fr: 'Fr', it: 'It' };
+          const langSuffix = langMap[language] || 'Hu';
+          
+          const transformedQuestions = questionsData.map((q: any) => {
+            // Placeholder kiválasztása nyelv szerint (fallback: hu -> placeholder alap)
+            const placeholderByLang = 
+              q[`placeholder${langSuffix}`] || 
+              q.placeholderDe || 
+              q.placeholder || '';
+            
+            // GroupName kiválasztása nyelv szerint (fallback: hu -> groupName alap)
+            const groupNameByLang = 
+              q[`groupName${langSuffix}`] || 
+              q.groupNameDe || 
+              q.groupName || '';
+            
+            return {
+              ...q,
+              placeholder: placeholderByLang,
+              groupName: groupNameByLang
+            };
+          });
 
           setAllQuestions(transformedQuestions);
         } else {

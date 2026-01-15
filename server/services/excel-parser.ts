@@ -14,13 +14,19 @@ export interface ParsedQuestion {
   type: QuestionType;
   required: boolean;
   placeholder?: string;
-  placeholderDe?: string; // NEW: German placeholder text
+  placeholderDe?: string;
+  placeholderEn?: string;
+  placeholderFr?: string;
+  placeholderIt?: string;
   cellReference?: string;
   sheetName?: string;
   multiCell?: boolean;
   groupName?: string;
   groupNameDe?: string;
-  groupKey?: string;  // NEW: Generated slug from groupName
+  groupNameEn?: string;
+  groupNameFr?: string;
+  groupNameIt?: string;
+  groupKey?: string;
   groupOrder?: number;
   conditionalGroupKey?: string;
   unit?: string;
@@ -200,11 +206,17 @@ class ExcelParserService {
         REQUIRED: this.findHeaderIndex(headers, 'required', 'kötelező', 'kell'),
         PLACEHOLDER: this.findHeaderIndex(headers, 'placeholder', 'description', 'leírás', 'leiras'),
         PLACEHOLDER_DE: this.findHeaderIndex(headers, 'placeholderDE', 'placeholder_de', 'német_leírás'),
+        PLACEHOLDER_EN: this.findHeaderIndex(headers, 'placeholderEN', 'placeholder_en', 'angol_leírás'),
+        PLACEHOLDER_FR: this.findHeaderIndex(headers, 'placeholderFR', 'placeholder_fr', 'francia_leírás'),
+        PLACEHOLDER_IT: this.findHeaderIndex(headers, 'placeholderIT', 'placeholder_it', 'olasz_leírás'),
         CELL_REF: this.findHeaderIndex(headers, 'cell_reference', 'cellReference', 'cella', 'cel'),
         SHEET_NAME: this.findHeaderIndex(headers, 'sheet_name', 'sheetName', 'munkalap'),
         MULTI_CELL: this.findHeaderIndex(headers, 'multi_cell', 'multiCell', 'több_cella'),
         GROUP_NAME: this.findHeaderIndex(headers, 'group_name', 'groupName', 'csoport'),
         GROUP_NAME_DE: this.findHeaderIndex(headers, 'group_name_de', 'groupNameDe', 'német_csoport'),
+        GROUP_NAME_EN: this.findHeaderIndex(headers, 'group_name_en', 'groupNameEn', 'angol_csoport'),
+        GROUP_NAME_FR: this.findHeaderIndex(headers, 'group_name_fr', 'groupNameFr', 'francia_csoport'),
+        GROUP_NAME_IT: this.findHeaderIndex(headers, 'group_name_it', 'groupNameIt', 'olasz_csoport'),
         GROUP_KEY: this.findHeaderIndex(headers, 'groupKey', 'group_key'), // NEW: Stable slug from Excel
         GROUP_ORDER: this.findHeaderIndex(headers, 'group_order', 'groupOrder', 'sorrend'),
         CONDITIONAL_GROUP_KEY: this.findHeaderIndex(headers, 'conditionalGroupKey', 'conditional_group_key'),
@@ -275,6 +287,15 @@ class ExcelParserService {
           placeholderDe: colIndices.PLACEHOLDER_DE !== -1 && row[colIndices.PLACEHOLDER_DE] 
             ? String(row[colIndices.PLACEHOLDER_DE]).trim() 
             : undefined,
+          placeholderEn: colIndices.PLACEHOLDER_EN !== -1 && row[colIndices.PLACEHOLDER_EN] 
+            ? String(row[colIndices.PLACEHOLDER_EN]).trim() 
+            : undefined,
+          placeholderFr: colIndices.PLACEHOLDER_FR !== -1 && row[colIndices.PLACEHOLDER_FR] 
+            ? String(row[colIndices.PLACEHOLDER_FR]).trim() 
+            : undefined,
+          placeholderIt: colIndices.PLACEHOLDER_IT !== -1 && row[colIndices.PLACEHOLDER_IT] 
+            ? String(row[colIndices.PLACEHOLDER_IT]).trim() 
+            : undefined,
           cellReference: colIndices.CELL_REF !== -1 && row[colIndices.CELL_REF] 
             ? String(row[colIndices.CELL_REF]).trim() 
             : undefined,
@@ -287,6 +308,15 @@ class ExcelParserService {
           groupName: groupName,
           groupNameDe: colIndices.GROUP_NAME_DE !== -1 && row[colIndices.GROUP_NAME_DE] 
             ? String(row[colIndices.GROUP_NAME_DE]).trim() 
+            : undefined,
+          groupNameEn: colIndices.GROUP_NAME_EN !== -1 && row[colIndices.GROUP_NAME_EN] 
+            ? String(row[colIndices.GROUP_NAME_EN]).trim() 
+            : undefined,
+          groupNameFr: colIndices.GROUP_NAME_FR !== -1 && row[colIndices.GROUP_NAME_FR] 
+            ? String(row[colIndices.GROUP_NAME_FR]).trim() 
+            : undefined,
+          groupNameIt: colIndices.GROUP_NAME_IT !== -1 && row[colIndices.GROUP_NAME_IT] 
+            ? String(row[colIndices.GROUP_NAME_IT]).trim() 
             : undefined,
           // FIXED: Read groupKey from Excel first, fallback to auto-generate slug
           groupKey: (colIndices.GROUP_KEY !== -1 && row[colIndices.GROUP_KEY]) 

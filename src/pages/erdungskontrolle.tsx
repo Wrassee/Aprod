@@ -125,7 +125,7 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
                   `}
               >
                 <XCircle className={`h-4 w-4 transition-transform pointer-events-none ${currentAnswer === 'not_ok' ? 'scale-110' : 'group-hover:scale-110'}`} />
-                <span>{language === 'hu' ? 'Nem OK' : 'Nicht OK'}</span>
+                <span>{{hu: 'Nem OK', de: 'Nicht OK', en: 'Not OK', fr: 'Non OK', it: 'Non OK'}[language]}</span>
               </Label>
             </div>
 
@@ -154,9 +154,13 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
             <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-red-100 to-rose-100 border-l-4 border-red-500 rounded-lg shadow-sm">
               <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0" />
               <p className="text-sm text-red-800 font-medium">
-                {language === 'hu'
-                  ? 'Ez a hiba automatikusan hozzáadva a hibalistához'
-                  : 'Dieser Fehler wurde automatisch zur Fehlerliste hinzugefügt'}
+                {{
+                  hu: 'Ez a hiba automatikusan hozzáadva a hibalistához',
+                  de: 'Dieser Fehler wurde automatisch zur Fehlerliste hinzugefügt',
+                  en: 'This error has been automatically added to the error list',
+                  fr: 'Cette erreur a ete automatiquement ajoutee a la liste des erreurs',
+                  it: 'Questo errore e stato aggiunto automaticamente all\'elenco errori'
+                }[language]}
               </p>
             </div>
           </div>
@@ -212,7 +216,7 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
                   : 'bg-white text-gray-800 border-gray-300 hover:bg-red-50'}
               `}
             >
-              {language === 'hu' ? 'Nem OK' : 'Nicht OK'}
+              {{hu: 'Nem OK', de: 'Nicht OK', en: 'Not OK', fr: 'Non OK', it: 'Non OK'}[language]}
             </Label>
           </div>
 
@@ -236,9 +240,13 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
       {currentAnswer === 'not_ok' && (
         <div className="px-4 pb-3">
           <div className="p-3 bg-red-100 border border-red-200 rounded text-sm text-red-800">
-            {language === 'hu'
-              ? '⚠️ Ez a hiba automatikusan hozzáadva a hibalistához'
-              : '⚠️ Dieser Fehler wurde automatisch zur Fehlerliste hinzugefügt'}
+            {{
+              hu: '⚠️ Ez a hiba automatikusan hozzáadva a hibalistához',
+              de: '⚠️ Dieser Fehler wurde automatisch zur Fehlerliste hinzugefügt',
+              en: '⚠️ This error has been automatically added to the error list',
+              fr: '⚠️ Cette erreur a ete automatiquement ajoutee a la liste des erreurs',
+              it: '⚠️ Questo errore e stato aggiunto automaticamente all\'elenco errori'
+            }[language]}
           </div>
         </div>
       )}
@@ -445,7 +453,7 @@ export function Erdungskontrolle({
             <Loader2 className="h-16 w-16 animate-spin text-blue-600" />
           )}
           <p className="text-gray-700 font-medium">
-            {language === 'hu' ? 'Betöltés folyamatban...' : 'Wird geladen...'}
+            {{hu: 'Betöltés folyamatban...', de: 'Wird geladen...', en: 'Loading...', fr: 'Chargement...', it: 'Caricamento...'}[language]}
           </p>
         </div>
       </div>
@@ -457,11 +465,13 @@ export function Erdungskontrolle({
     <div className="min-h-screen">
       {/* ✅ PageHeader KÍVÜL (sticky működhet) */}
       <PageHeader
-        title={
-          language === 'hu'
-            ? 'OTIS APROD - Földelés Ellenőrzés'
-            : 'OTIS APROD - Erdungskontrolle'
-        }
+        title={{
+          hu: 'OTIS APROD - Földelés Ellenőrzés',
+          de: 'OTIS APROD - Erdungskontrolle',
+          en: 'OTIS APROD - Grounding Inspection',
+          fr: 'OTIS APROD - Controle de mise a la terre',
+          it: 'OTIS APROD - Controllo messa a terra'
+        }[language] || 'OTIS APROD - Grounding Inspection'}
         onHome={onHome}
         onAdminAccess={onAdminAccess}
         onStartNew={onStartNew}
@@ -499,21 +509,25 @@ export function Erdungskontrolle({
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <div>
                     <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-                      {language === 'hu' ? 'Földelési Mérések' : 'Erdungskontrolle'}
+                      {{hu: 'Földelési Mérések', de: 'Erdungskontrolle', en: 'Grounding Inspection', fr: 'Controle de mise a la terre', it: 'Controllo messa a terra'}[language]}
                     </h2>
                     <p className="text-gray-600 dark:text-gray-400 flex items-center gap-2">
                       <Sparkles className="h-4 w-4 text-cyan-500" />
-                      {language === 'hu'
-                        ? 'Minden mérési pontnál jelölje be a megfelelő választ'
-                        : 'Wählen Sie bei jedem Messpunkt die entsprechende Antwort'}
+                      {{
+                        hu: 'Minden mérési pontnál jelölje be a megfelelő választ',
+                        de: 'Wählen Sie bei jedem Messpunkt die entsprechende Antwort',
+                        en: 'Select the appropriate answer for each measurement point',
+                        fr: 'Selectionnez la reponse appropriee pour chaque point de mesure',
+                        it: 'Selezionare la risposta appropriata per ogni punto di misura'
+                      }[language]}
                     </p>
                   </div>
                   <div className="flex flex-col items-end gap-2">
                     <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                      {answeredQuestions} / {totalQuestions} {language === 'hu' ? 'kitöltve' : 'ausgefüllt'}
+                      {answeredQuestions} / {totalQuestions} {{hu: 'kitöltve', de: 'ausgefüllt', en: 'completed', fr: 'complete', it: 'completato'}[language]}
                     </div>
                     <div className="text-xs text-gray-500">
-                      {progressPercent}% {language === 'hu' ? 'kész' : 'fertig'}
+                      {progressPercent}% {{hu: 'kész', de: 'fertig', en: 'done', fr: 'termine', it: 'completato'}[language]}
                     </div>
                   </div>
                 </div>
@@ -534,18 +548,22 @@ export function Erdungskontrolle({
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  {language === 'hu' ? 'Földelési Mérések' : 'Erdungskontrolle'}
+                  {{hu: 'Földelési Mérések', de: 'Erdungskontrolle', en: 'Grounding Inspection', fr: 'Controle de mise a la terre', it: 'Controllo messa a terra'}[language]}
                 </h2>
                 <div className="text-sm text-gray-600">
                   {answeredQuestions} / {totalQuestions}{' '}
-                  {language === 'hu' ? 'kitöltve' : 'ausgefüllt'}
+                  {{hu: 'kitöltve', de: 'ausgefüllt', en: 'completed', fr: 'complete', it: 'completato'}[language]}
                 </div>
               </div>
               <Progress value={progressPercent} className="h-2" />
               <p className="text-sm text-gray-600 mt-2">
-                {language === 'hu'
-                  ? 'Minden mérési pontnál jelölje be a megfelelő választ. A "Nem OK" válaszok automatikusan bekerülnek a hibalistába.'
-                  : 'Wählen Sie bei jedem Messpunkt die entsprechende Antwort. "Nicht OK" Antworten werden automatisch zur Fehlerliste hinzugefügt.'}
+                {{
+                  hu: 'Minden mérési pontnál jelölje be a megfelelő választ. A "Nem OK" válaszok automatikusan bekerülnek a hibalistába.',
+                  de: 'Wählen Sie bei jedem Messpunkt die entsprechende Antwort. "Nicht OK" Antworten werden automatisch zur Fehlerliste hinzugefügt.',
+                  en: 'Select the appropriate answer for each measurement point. "Not OK" answers will be automatically added to the error list.',
+                  fr: 'Selectionnez la reponse appropriee pour chaque point de mesure. Les reponses "Non OK" seront ajoutees automatiquement a la liste des erreurs.',
+                  it: 'Selezionare la risposta appropriata per ogni punto di misura. Le risposte "Non OK" verranno aggiunte automaticamente all\'elenco errori.'
+                }[language]}
               </p>
             </div>
           )}
@@ -585,7 +603,7 @@ export function Erdungskontrolle({
                         <div className="flex items-center justify-between mb-3">
                           <Label htmlFor={`switch-${customQuestion.id}`} className="font-bold text-gray-800 flex items-center gap-2">
                             <Plus className="h-5 w-5 text-blue-600" />
-                            {language === 'hu' ? 'Egyéni tétel hozzáadása' : 'Benutzerdefinierter Artikel hinzufügen'}
+                            {{hu: 'Egyéni tétel hozzáadása', de: 'Benutzerdefinierter Artikel hinzufügen', en: 'Add custom item', fr: 'Ajouter un article personnalise', it: 'Aggiungi articolo personalizzato'}[language]}
                           </Label>
                           <Switch
                             id={`switch-${customQuestion.id}`}
@@ -603,7 +621,7 @@ export function Erdungskontrolle({
                           <div className="mt-4 space-y-4">
                             <div className="relative group">
                               <Input
-                                placeholder={language === 'hu' ? 'Mért eszköz leírása...' : 'Beschreibung des gemessenen Geräts...'}
+                                placeholder={{hu: 'Mért eszköz leírása...', de: 'Beschreibung des gemessenen Geräts...', en: 'Description of measured device...', fr: 'Description de l\'appareil mesure...', it: 'Descrizione del dispositivo misurato...'}[language]}
                                 value={customRowTexts[customQuestion.pdfTextFieldName] || ''}
                                 onChange={(e) => {
                                   setCustomRowTexts(prev => ({ ...prev, [customQuestion.pdfTextFieldName!]: e.target.value }));
@@ -615,7 +633,7 @@ export function Erdungskontrolle({
                             <GroundingQuestionItem
                               question={{ 
                                 id: customQuestion.id, 
-                                text: customRowTexts[customQuestion.pdfTextFieldName] || (language === 'hu' ? 'Egyéni tétel' : 'Benutzerdefiniert')
+                                text: customRowTexts[customQuestion.pdfTextFieldName] || {{hu: 'Egyéni tétel', de: 'Benutzerdefiniert', en: 'Custom item', fr: 'Article personnalise', it: 'Articolo personalizzato'}[language]}
                               }}
                               currentAnswer={answers[customQuestion.id]}
                               language={language}
@@ -652,7 +670,7 @@ export function Erdungskontrolle({
                       <div key={customQuestion.id} className="border-t p-4 bg-gray-50">
                         <div className="flex items-center justify-between mb-2">
                           <Label htmlFor={`switch-${customQuestion.id}`} className="font-semibold text-gray-700">
-                            {language === 'hu' ? 'Egyéni tétel hozzáadása' : 'Benutzerdefinierter Artikel hinzufügen'}
+                            {{hu: 'Egyéni tétel hozzáadása', de: 'Benutzerdefinierter Artikel hinzufügen', en: 'Add custom item', fr: 'Ajouter un article personnalise', it: 'Aggiungi articolo personalizzato'}[language]}
                           </Label>
                           <Switch
                             id={`switch-${customQuestion.id}`}
@@ -669,7 +687,7 @@ export function Erdungskontrolle({
                         {activeCustomRows[customQuestion.id] && customQuestion.pdfTextFieldName && (
                           <div className="mt-4 space-y-3">
                             <Input
-                              placeholder={language === 'hu' ? 'Mért eszköz leírása...' : 'Beschreibung des gemessenen Geräts...'}
+                              placeholder={{hu: 'Mért eszköz leírása...', de: 'Beschreibung des gemessenen Geräts...', en: 'Description of measured device...', fr: 'Description de l\'appareil mesure...', it: 'Descrizione del dispositivo misurato...'}[language]}
                               value={customRowTexts[customQuestion.pdfTextFieldName] || ''}
                               onChange={(e) => {
                                 setCustomRowTexts(prev => ({ ...prev, [customQuestion.pdfTextFieldName!]: e.target.value }));
@@ -679,7 +697,7 @@ export function Erdungskontrolle({
                             <GroundingQuestionItem
                               question={{ 
                                 id: customQuestion.id, 
-                                text: customRowTexts[customQuestion.pdfTextFieldName] || (language === 'hu' ? 'Egyéni tétel' : 'Benutzerdefiniert')
+                                text: customRowTexts[customQuestion.pdfTextFieldName] || {{hu: 'Egyéni tétel', de: 'Benutzerdefiniert', en: 'Custom item', fr: 'Article personnalise', it: 'Articolo personalizzato'}[language]}
                               }}
                               currentAnswer={answers[customQuestion.id]}
                               language={language}
@@ -707,7 +725,7 @@ export function Erdungskontrolle({
               >
                 <div className="flex items-center justify-center gap-2">
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="font-semibold">{language === 'hu' ? 'Vissza' : 'Zurück'}</span>
+                  <span className="font-semibold">{{hu: 'Vissza', de: 'Zurück', en: 'Back', fr: 'Retour', it: 'Indietro'}[language]}</span>
                 </div>
               </button>
             ) : (
@@ -718,7 +736,7 @@ export function Erdungskontrolle({
                 className="flex items-center space-x-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4" />
-                <span>{language === 'hu' ? 'Vissza' : 'Zurück'}</span>
+                <span>{{hu: 'Vissza', de: 'Zurück', en: 'Back', fr: 'Retour', it: 'Indietro'}[language]}</span>
               </Button>
             )}
 
@@ -739,17 +757,17 @@ export function Erdungskontrolle({
                     {saveStatus === 'saving' ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin" />
-                        <span>{language === 'hu' ? 'Mentés...' : 'Speichern...'}</span>
+                        <span>{{hu: 'Mentés...', de: 'Speichern...', en: 'Saving...', fr: 'Sauvegarde...', it: 'Salvataggio...'}[language]}</span>
                       </>
                     ) : saveStatus === 'saved' ? (
                       <>
                         <CheckCircle2 className="h-5 w-5" />
-                        <span>{language === 'hu' ? 'Mentve' : 'Gespeichert'}</span>
+                        <span>{{hu: 'Mentve', de: 'Gespeichert', en: 'Saved', fr: 'Sauvegarde', it: 'Salvato'}[language]}</span>
                       </>
                     ) : (
                       <>
                         <Save className="h-5 w-5" />
-                        <span>{language === 'hu' ? 'Mentés' : 'Speichern'}</span>
+                        <span>{{hu: 'Mentés', de: 'Speichern', en: 'Save', fr: 'Sauvegarder', it: 'Salva'}[language]}</span>
                       </>
                     )}
                   </div>
@@ -769,16 +787,10 @@ export function Erdungskontrolle({
                   )}
                   <span>
                     {saveStatus === 'saving'
-                      ? language === 'hu'
-                        ? 'Mentés...'
-                        : 'Speichern...'
+                      ? {{hu: 'Mentés...', de: 'Speichern...', en: 'Saving...', fr: 'Sauvegarde...', it: 'Salvataggio...'}[language]}
                       : saveStatus === 'saved'
-                      ? language === 'hu'
-                        ? 'Mentve'
-                        : 'Gespeichert'
-                      : language === 'hu'
-                      ? 'Mentés'
-                      : 'Speichern'}
+                      ? {{hu: 'Mentve', de: 'Gespeichert', en: 'Saved', fr: 'Sauvegarde', it: 'Salvato'}[language]}
+                      : {{hu: 'Mentés', de: 'Speichern', en: 'Save', fr: 'Sauvegarder', it: 'Salva'}[language]}}
                   </span>
                 </Button>
               )}
@@ -802,9 +814,13 @@ export function Erdungskontrolle({
 
                   <div className="relative z-10 flex items-center gap-2 text-white">
                     <span>
-                      {language === 'hu'
-                        ? 'Tovább a Niedervolt mérésekhez'
-                        : 'Weiter zu Niedervolt Messungen'}
+                      {{
+                        hu: 'Tovább a Niedervolt mérésekhez',
+                        de: 'Weiter zu Niedervolt Messungen',
+                        en: 'Continue to Low Voltage Measurements',
+                        fr: 'Continuer vers les mesures basse tension',
+                        it: 'Continua alle misure bassa tensione'
+                      }[language]}
                     </span>
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </div>
@@ -819,9 +835,13 @@ export function Erdungskontrolle({
                   className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
                 >
                   <span>
-                    {language === 'hu'
-                      ? 'Tovább a Niedervolt mérésekhez'
-                      : 'Weiter zu Niedervolt Messungen'}
+                    {{
+                      hu: 'Tovább a Niedervolt mérésekhez',
+                      de: 'Weiter zu Niedervolt Messungen',
+                      en: 'Continue to Low Voltage Measurements',
+                      fr: 'Continuer vers les mesures basse tension',
+                      it: 'Continua alle misure bassa tensione'
+                    }[language]}
                   </span>
                   <ArrowRight className="h-4 w-4" />
                 </Button>

@@ -12,6 +12,8 @@ export interface MeasurementRow {
   notes: string;
 }
 
+export type GroundingAnswer = 'ok' | 'not_ok' | 'not_applicable';
+
 export interface FormData {
   receptionDate: string;
   answers: Record<string, AnswerValue>;
@@ -20,7 +22,8 @@ export interface FormData {
   signatureName?: string;
   niedervoltMeasurements?: MeasurementRow[];
   niedervoltTableMeasurements?: Record<string, any>;
-  groundingCheckAnswers?: Record<string, boolean>;
+  groundingCheckAnswers?: Record<string, GroundingAnswer>;
+  customGroundingTexts?: Record<string, string>;
 }
 
 export interface QuestionPage {

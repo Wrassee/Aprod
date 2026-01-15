@@ -1,0 +1,96 @@
+{
+  "groups": [
+    {
+      "id": "maschinenraum",
+      "title": "1. Ispezione nel locale macchine",
+      "questions": [
+        { "id": "OK1/1", "text": "Messa a terra di riferimento presente" },
+        { "id": "OK1/2", "text": "Alloggiamento e porte del controllore" },
+        { "id": "OK1/3", "text": "Morsetto di messa a terra dell'alimentazione principale nel controllore" },
+        { "id": "OK1/4", "text": "Alloggiamento/morsetto di messa a terra dei dispositivi elettronici" },
+        { "id": "OK1/5", "text": "Il motore" },
+        { "id": "OK1/6", "text": "L'alloggiamento del freno" },
+        { "id": "OK1/7", "text": "Morsettiera del motore e della bobina del freno" },
+        { "id": "OK1/8", "text": "La puleggia di trazione" },
+        { "id": "OK1/9", "text": "Le funi di sospensione" },
+        { "id": "OK1/10", "text": "L'alloggiamento del resistore" },
+        { "id": "OK1/11", "text": "Le canaline metalliche" },
+        { "id": "OK1/12", "text": "Limitatore di velocita" },
+        { "id": "OKRow13", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row1/13" },
+        { "id": "OK1/14", "text": "Ispezione visiva di fili/cavi" }
+      ]
+    },
+    {
+      "id": "Kabinendach",
+      "title": "2. Ispezione sul tetto cabina",
+      "questions": [
+        { "id": "OK2/1", "text": "Messa a terra di riferimento presente" },
+        { "id": "OK2/2", "text": "Funi di sospensione" },
+        { "id": "OK2/3", "text": "Alloggiamento/morsetto di messa a terra delle connessioni (J-Box), morsettiera" },
+        { "id": "OK2/4", "text": "Generatori di impulsi/interruttori magnetici metallici" },
+        { "id": "OK2/5", "text": "Interruttori di sicurezza sulla cabina" },
+        { "id": "OK2/6", "text": "Contatto botola di uscita" },
+        { "id": "OK2/7", "text": "Alloggiamento PRS" },
+        { "id": "OK2/8", "text": "Nastro PRS metallico" },
+        { "id": "OK2/9", "text": "Scatola comando porta" },
+        { "id": "OK2/10", "text": "Pannelli porta cabina" },
+        { "id": "OK2/11", "text": "Contatto paracadute" },
+        { "id": "OK2/12", "text": "Scatola controllo barriera fotoelettrica" },
+        { "id": "OK2/13", "text": "Scatola ispezione / supporto scatola ispezione" },
+        { "id": "OK2/14", "text": "Le canaline metalliche" },
+        { "id": "OKRow15", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row2/15" },
+        { "id": "OKRow16", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row2/16" },
+        { "id": "OK2/17", "text": "Ispezione visiva di fili/cavi" }
+      ]
+    },
+    {
+      "id": "Schacht",
+      "title": "3. Ispezione nel vano corsa",
+      "questions": [
+        { "id": "OK3/1", "text": "Messa a terra di riferimento presente" },
+        { "id": "OK3/2", "text": "Supporto cavi, telaio porta di piano" },
+        { "id": "OK3/3", "text": "Le canaline metalliche" },
+        { "id": "OK3/4", "text": "Supporto cavi" },
+        { "id": "OK3/5", "text": "Alloggiamento/supporto dei contatti elettrici sulle porte di piano" },
+        { "id": "OK3/6", "text": "Ogni anta dotata di contatto (apertura centrale)" },
+        { "id": "OK3/7", "text": "Carrello porta di piano" },
+        { "id": "OK3/8", "text": "Alloggiamento/morsetto di messa a terra dell'illuminazione vano" },
+        { "id": "OK3/9", "text": "Guide cabina" },
+        { "id": "OKRow10", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row3/10" },
+        { "id": "OKRow11", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row3/11" },
+        { "id": "OK3/12", "text": "Ispezione visiva di fili/cavi" }
+      ]
+    },
+    {
+      "id": "Schachtgrube",
+      "title": "4. Ispezione nella fossa",
+      "questions": [
+        { "id": "OK4/1", "text": "Messa a terra di riferimento presente" },
+        { "id": "OK4/2", "text": "Ammortizzatori dotati di contatto" },
+        { "id": "OK4/3", "text": "La puleggia di tensione" },
+        { "id": "OK4/4", "text": "L'interruttore STOP" },
+        { "id": "OK4/5", "text": "Alloggiamento/morsetto di messa a terra dell'illuminazione vano" },
+        { "id": "OK4/6", "text": "Vari finecorsa del vano" },
+        { "id": "OK4/7", "text": "Le canaline metalliche" },
+        { "id": "OKRow8", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row4/8" },
+        { "id": "OKRow9", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row4/9" },
+        { "id": "OK4/10", "text": "Ispezione visiva di fili/cavi" }
+      ]
+    },
+    {
+      "id": "Kabine",
+      "title": "5. Ispezione nella cabina",
+      "questions": [
+        { "id": "OK5/1", "text": "Messa a terra di riferimento presente" },
+        { "id": "OK5/2", "text": "Il COP, come alloggiamento" },
+        { "id": "OK5/3", "text": "Alloggiamento/morsetto di messa a terra delle connessioni (J-Box), morsettiera" },
+        { "id": "OK5/4", "text": "Il soffitto cabina, a seconda dell'illuminazione" },
+        { "id": "OK5/5", "text": "Il telaio porta cabina" },
+        { "id": "OK5/6", "text": "La soglia porta cabina" },
+        { "id": "OKRow5/7", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row5/7" },
+        { "id": "OKRow5/8", "text": "Articolo personalizzato...", "isCustom": true, "pdfTextFieldName": "Row5/8" },
+        { "id": "OK5/9", "text": "Ispezione visiva di fili/cavi" }
+      ]
+    }
+  ]
+}

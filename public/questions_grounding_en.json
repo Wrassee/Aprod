@@ -1,0 +1,96 @@
+{
+  "groups": [
+    {
+      "id": "maschinenraum",
+      "title": "1. Inspection in Machine Room",
+      "questions": [
+        { "id": "OK1/1", "text": "Reference grounding present" },
+        { "id": "OK1/2", "text": "Controller housing and doors" },
+        { "id": "OK1/3", "text": "Main power grounding terminal in controller" },
+        { "id": "OK1/4", "text": "Housing/grounding terminal of electronic devices" },
+        { "id": "OK1/5", "text": "The motor" },
+        { "id": "OK1/6", "text": "The brake housing" },
+        { "id": "OK1/7", "text": "Terminal board of motor and brake coil" },
+        { "id": "OK1/8", "text": "The traction sheave" },
+        { "id": "OK1/9", "text": "The suspension ropes" },
+        { "id": "OK1/10", "text": "The resistor housing" },
+        { "id": "OK1/11", "text": "The metallic cable channels" },
+        { "id": "OK1/12", "text": "Speed governor" },
+        { "id": "OKRow13", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row1/13" },
+        { "id": "OK1/14", "text": "Visual inspection of wires/cables" }
+      ]
+    },
+    {
+      "id": "Kabinendach",
+      "title": "2. Inspection on Car Top",
+      "questions": [
+        { "id": "OK2/1", "text": "Reference grounding present" },
+        { "id": "OK2/2", "text": "Suspension ropes" },
+        { "id": "OK2/3", "text": "Housing/grounding terminal of connections (J-Box), terminal strip" },
+        { "id": "OK2/4", "text": "Metallic pulse generators/magnetic switches" },
+        { "id": "OK2/5", "text": "Safety limit switches on car" },
+        { "id": "OK2/6", "text": "Exit hatch contact" },
+        { "id": "OK2/7", "text": "PRS housing" },
+        { "id": "OK2/8", "text": "Metallic PRS band" },
+        { "id": "OK2/9", "text": "Door drive box" },
+        { "id": "OK2/10", "text": "Car door panels" },
+        { "id": "OK2/11", "text": "Safety gear contact" },
+        { "id": "OK2/12", "text": "Light curtain control box" },
+        { "id": "OK2/13", "text": "Inspection box / inspection box carrier" },
+        { "id": "OK2/14", "text": "The metallic cable channels" },
+        { "id": "OKRow15", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row2/15" },
+        { "id": "OKRow16", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row2/16" },
+        { "id": "OK2/17", "text": "Visual inspection of wires/cables" }
+      ]
+    },
+    {
+      "id": "Schacht",
+      "title": "3. Inspection in Shaft",
+      "questions": [
+        { "id": "OK3/1", "text": "Reference grounding present" },
+        { "id": "OK3/2", "text": "Cable carrier, shaft door frame" },
+        { "id": "OK3/3", "text": "The metallic cable channels" },
+        { "id": "OK3/4", "text": "Cable support" },
+        { "id": "OK3/5", "text": "Housing/carrier of electrical contacts on shaft doors" },
+        { "id": "OK3/6", "text": "Each door panel equipped with a contact (center opening)" },
+        { "id": "OK3/7", "text": "Shaft door car" },
+        { "id": "OK3/8", "text": "Housing/grounding terminal of shaft lighting" },
+        { "id": "OK3/9", "text": "Car guide rails" },
+        { "id": "OKRow10", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row3/10" },
+        { "id": "OKRow11", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row3/11" },
+        { "id": "OK3/12", "text": "Visual inspection of wires/cables" }
+      ]
+    },
+    {
+      "id": "Schachtgrube",
+      "title": "4. Inspection in Pit",
+      "questions": [
+        { "id": "OK4/1", "text": "Reference grounding present" },
+        { "id": "OK4/2", "text": "Buffers equipped with a contact" },
+        { "id": "OK4/3", "text": "The tension pulley" },
+        { "id": "OK4/4", "text": "The STOP switch" },
+        { "id": "OK4/5", "text": "Housing/grounding terminal of shaft lighting" },
+        { "id": "OK4/6", "text": "Various shaft limit switches" },
+        { "id": "OK4/7", "text": "The metallic cable channels" },
+        { "id": "OKRow8", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row4/8" },
+        { "id": "OKRow9", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row4/9" },
+        { "id": "OK4/10", "text": "Visual inspection of wires/cables" }
+      ]
+    },
+    {
+      "id": "Kabine",
+      "title": "5. Inspection in Car",
+      "questions": [
+        { "id": "OK5/1", "text": "Reference grounding present" },
+        { "id": "OK5/2", "text": "The COP, as housing" },
+        { "id": "OK5/3", "text": "Housing/grounding terminal of connections (J-Box), terminal strip" },
+        { "id": "OK5/4", "text": "The car ceiling, depending on lighting" },
+        { "id": "OK5/5", "text": "The car door frame" },
+        { "id": "OK5/6", "text": "The car door sill" },
+        { "id": "OKRow5/7", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row5/7" },
+        { "id": "OKRow5/8", "text": "Custom item...", "isCustom": true, "pdfTextFieldName": "Row5/8" },
+        { "id": "OK5/9", "text": "Visual inspection of wires/cables" }
+      ]
+    }
+  ]
+}

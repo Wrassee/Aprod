@@ -2,70 +2,168 @@
 
 import { storage } from "../storage.js";
 
-// Bővített hardcoded devices - 20 lift specifikus eszköz
-const FALLBACK_GERMAN_DEVICES = [
-  { id: 'device-1', name: 'Antriebsmotor' },
-  { id: 'device-2', name: 'Türantriebsmotor 1' },
-  { id: 'device-3', name: 'Schachtsteckdose' },
-  { id: 'device-4', name: 'Beleuchtung Kabine' },
-  { id: 'device-5', name: 'Beleuchtung Schacht' },
-  { id: 'device-6', name: 'Steckdose Maschinenraum' },
-  { id: 'device-7', name: 'Weitestentfernter Sicherheitskontakt' },
-  { id: 'device-8', name: 'Türantriebsmotor 2' },
-  { id: 'device-9', name: 'Fotozelle' },
-  { id: 'device-10', name: 'Motorgest. Ventil (hydr.)' },
-  { id: 'device-11', name: 'Ventillator' },
-  { id: 'device-12', name: 'Steckdose' },
-  { id: 'device-13', name: 'Netzanschluss' },
-  // Új eszközök hozzáadása
-  { id: 'device-14', name: 'Steuerung' },
-  { id: 'device-15', name: 'Frequenzumrichter' },
-  { id: 'device-16', name: 'Bündigstellungsmotor' },
-  { id: 'device-17', name: 'Türkontakte' },
-  { id: 'device-18', name: 'Schachtkopfschalter' },
-  { id: 'device-19', name: 'Pufferkontakte' },
-  { id: 'device-20', name: 'Spannungsüberwachung' }
-];
-
-const FALLBACK_HUNGARIAN_DEVICES = [
-  { id: 'device-1', name: 'Motor vagy vezérlés' },
-  { id: 'device-2', name: 'Ajtó motor' },
-  { id: 'device-3', name: 'Konektor az aknában' },
-  { id: 'device-4', name: 'Kabin világítás' },
-  { id: 'device-5', name: 'Akna világítás' },
-  { id: 'device-6', name: 'Konektor a gépházban' },
-  { id: 'device-7', name: 'Legtávolabbi biztonságikör pontja' },
-  { id: 'device-8', name: 'Ajtó motor 2' },
-  { id: 'device-9', name: 'Fénykapu' },
-  { id: 'device-10', name: 'Motorszabályozott szelep (hidraulika)' },
-  { id: 'device-11', name: 'Ventillátor' },
-  { id: 'device-12', name: 'Konektor' },
-  { id: 'device-13', name: 'Hálózati csatlakozás' },
-  // Új eszközök magyar megfelelői
-  { id: 'device-14', name: 'Vezérlés' },
-  { id: 'device-15', name: 'Frekvenciaváltó' },
-  { id: 'device-16', name: 'Szintbeállító motor' },
-  { id: 'device-17', name: 'Ajtó kontaktok' },
-  { id: 'device-18', name: 'Aknafej kapcsoló' },
-  { id: 'device-19', name: 'Puffer kontaktok' },
-  { id: 'device-20', name: 'Feszültség felügyelet' }
-];
+// Bővített hardcoded devices - 20 lift specifikus eszköz (5 nyelvű támogatás)
+const DEVICE_NAMES = {
+  'device-1': {
+    de: 'Antriebsmotor',
+    hu: 'Motor vagy vezérlés',
+    en: 'Drive Motor',
+    fr: 'Moteur d\'entraînement',
+    it: 'Motore di azionamento'
+  },
+  'device-2': {
+    de: 'Türantriebsmotor 1',
+    hu: 'Ajtó motor',
+    en: 'Door Motor 1',
+    fr: 'Moteur de porte 1',
+    it: 'Motore porta 1'
+  },
+  'device-3': {
+    de: 'Schachtsteckdose',
+    hu: 'Konektor az aknában',
+    en: 'Shaft Socket',
+    fr: 'Prise de gaine',
+    it: 'Presa vano corsa'
+  },
+  'device-4': {
+    de: 'Beleuchtung Kabine',
+    hu: 'Kabin világítás',
+    en: 'Cabin Lighting',
+    fr: 'Éclairage cabine',
+    it: 'Illuminazione cabina'
+  },
+  'device-5': {
+    de: 'Beleuchtung Schacht',
+    hu: 'Akna világítás',
+    en: 'Shaft Lighting',
+    fr: 'Éclairage gaine',
+    it: 'Illuminazione vano corsa'
+  },
+  'device-6': {
+    de: 'Steckdose Maschinenraum',
+    hu: 'Konektor a gépházban',
+    en: 'Machine Room Socket',
+    fr: 'Prise salle des machines',
+    it: 'Presa locale macchine'
+  },
+  'device-7': {
+    de: 'Weitestentfernter Sicherheitskontakt',
+    hu: 'Legtávolabbi biztonságikör pontja',
+    en: 'Furthest Safety Contact',
+    fr: 'Contact de sécurité le plus éloigné',
+    it: 'Contatto di sicurezza più lontano'
+  },
+  'device-8': {
+    de: 'Türantriebsmotor 2',
+    hu: 'Ajtó motor 2',
+    en: 'Door Motor 2',
+    fr: 'Moteur de porte 2',
+    it: 'Motore porta 2'
+  },
+  'device-9': {
+    de: 'Fotozelle',
+    hu: 'Fénykapu',
+    en: 'Photo Cell',
+    fr: 'Cellule photo',
+    it: 'Fotocellula'
+  },
+  'device-10': {
+    de: 'Motorgest. Ventil (hydr.)',
+    hu: 'Motorszabályozott szelep (hidraulika)',
+    en: 'Motor Controlled Valve (hydr.)',
+    fr: 'Vanne motorisée (hydr.)',
+    it: 'Valvola motorizzata (idr.)'
+  },
+  'device-11': {
+    de: 'Ventillator',
+    hu: 'Ventillátor',
+    en: 'Ventilator',
+    fr: 'Ventilateur',
+    it: 'Ventilatore'
+  },
+  'device-12': {
+    de: 'Steckdose',
+    hu: 'Konektor',
+    en: 'Socket',
+    fr: 'Prise',
+    it: 'Presa'
+  },
+  'device-13': {
+    de: 'Netzanschluss',
+    hu: 'Hálózati csatlakozás',
+    en: 'Power Connection',
+    fr: 'Connexion réseau',
+    it: 'Connessione di rete'
+  },
+  'device-14': {
+    de: 'Steuerung',
+    hu: 'Vezérlés',
+    en: 'Controller',
+    fr: 'Commande',
+    it: 'Controllo'
+  },
+  'device-15': {
+    de: 'Frequenzumrichter',
+    hu: 'Frekvenciaváltó',
+    en: 'Frequency Inverter',
+    fr: 'Variateur de fréquence',
+    it: 'Inverter di frequenza'
+  },
+  'device-16': {
+    de: 'Bündigstellungsmotor',
+    hu: 'Szintbeállító motor',
+    en: 'Leveling Motor',
+    fr: 'Moteur de nivellement',
+    it: 'Motore di livellamento'
+  },
+  'device-17': {
+    de: 'Türkontakte',
+    hu: 'Ajtó kontaktok',
+    en: 'Door Contacts',
+    fr: 'Contacts de porte',
+    it: 'Contatti porta'
+  },
+  'device-18': {
+    de: 'Schachtkopfschalter',
+    hu: 'Aknafej kapcsoló',
+    en: 'Shaft Head Switch',
+    fr: 'Interrupteur tête de gaine',
+    it: 'Interruttore testa vano'
+  },
+  'device-19': {
+    de: 'Pufferkontakte',
+    hu: 'Puffer kontaktok',
+    en: 'Buffer Contacts',
+    fr: 'Contacts de tampon',
+    it: 'Contatti ammortizzatore'
+  },
+  'device-20': {
+    de: 'Spannungsüberwachung',
+    hu: 'Feszültség felügyelet',
+    en: 'Voltage Monitor',
+    fr: 'Surveillance de tension',
+    it: 'Monitoraggio tensione'
+  }
+};
 
 export interface NiedervoltDevice {
   id: string;
   name: {
     de: string;
     hu: string;
+    en: string;
+    fr: string;
+    it: string;
   };
 }
 
 export class NiedervoltService {
   
   /**
-   * Get niedervolt devices - EGYSZERŰSÍTETT: csak hardcoded lista
+   * Get niedervolt devices - 5 nyelvű támogatással
    */
   async getNiedervoltDevices(): Promise<NiedervoltDevice[]> {
-    console.log('📋 Loading hardcoded niedervolt devices (template search disabled)');
+    console.log('📋 Loading hardcoded niedervolt devices (5 language support)');
     try {
         return this.getHardcodedDevices();
     } catch (error) {
@@ -75,23 +173,18 @@ export class NiedervoltService {
   }
 
   /**
-   * Get hardcoded devices - BŐVÍTETT LISTA
+   * Get hardcoded devices - 5 NYELVŰ LISTA
    */
   private getHardcodedDevices(): NiedervoltDevice[] {
-    console.log(`✅ Using ${FALLBACK_GERMAN_DEVICES.length} hardcoded niedervolt devices`);
+    const deviceIds = Object.keys(DEVICE_NAMES);
+    console.log(`✅ Using ${deviceIds.length} hardcoded niedervolt devices (5 languages)`);
     
-    return FALLBACK_GERMAN_DEVICES.map((germanDevice, index) => ({
-      id: germanDevice.id,
-      name: {
-        de: germanDevice.name,
-        hu: FALLBACK_HUNGARIAN_DEVICES[index]?.name || germanDevice.name
-      }
+    return deviceIds.map(id => ({
+      id,
+      name: DEVICE_NAMES[id as keyof typeof DEVICE_NAMES]
     }));
   }
 
-  // ====================================================================
-  // === MÓDOSÍTÁS KEZDETE ===
-  // ====================================================================
   /**
    * Get dropdown options (these remain hardcoded for consistency)
    */
@@ -102,9 +195,6 @@ export class NiedervoltService {
       fiTest: ['OK', 'NOK']
     };
   }
-  // ====================================================================
-  // === MÓDOSÍTÁS VÉGE ===
-  // ====================================================================
 }
 
 export const niedervoltService = new NiedervoltService();

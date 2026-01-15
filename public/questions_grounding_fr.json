@@ -1,0 +1,96 @@
+{
+  "groups": [
+    {
+      "id": "maschinenraum",
+      "title": "1. Inspection en salle des machines",
+      "questions": [
+        { "id": "OK1/1", "text": "Mise a la terre de reference presente" },
+        { "id": "OK1/2", "text": "Boitier et portes du controleur" },
+        { "id": "OK1/3", "text": "Borne de mise a la terre de l'alimentation principale dans le controleur" },
+        { "id": "OK1/4", "text": "Boitier/borne de mise a la terre des appareils electroniques" },
+        { "id": "OK1/5", "text": "Le moteur" },
+        { "id": "OK1/6", "text": "Le boitier de frein" },
+        { "id": "OK1/7", "text": "Bornier du moteur et de la bobine de frein" },
+        { "id": "OK1/8", "text": "La poulie de traction" },
+        { "id": "OK1/9", "text": "Les cables de suspension" },
+        { "id": "OK1/10", "text": "Le boitier de resistance" },
+        { "id": "OK1/11", "text": "Les goulottes metalliques" },
+        { "id": "OK1/12", "text": "Limiteur de vitesse" },
+        { "id": "OKRow13", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row1/13" },
+        { "id": "OK1/14", "text": "Inspection visuelle des fils/cables" }
+      ]
+    },
+    {
+      "id": "Kabinendach",
+      "title": "2. Inspection sur le toit de cabine",
+      "questions": [
+        { "id": "OK2/1", "text": "Mise a la terre de reference presente" },
+        { "id": "OK2/2", "text": "Cables de suspension" },
+        { "id": "OK2/3", "text": "Boitier/borne de mise a la terre des connexions (J-Box), barrette" },
+        { "id": "OK2/4", "text": "Generateurs d'impulsions/interrupteurs magnetiques metalliques" },
+        { "id": "OK2/5", "text": "Interrupteurs de securite sur la cabine" },
+        { "id": "OK2/6", "text": "Contact de trappe de sortie" },
+        { "id": "OK2/7", "text": "Boitier PRS" },
+        { "id": "OK2/8", "text": "Bande PRS metallique" },
+        { "id": "OK2/9", "text": "Boite d'entrainement de porte" },
+        { "id": "OK2/10", "text": "Panneaux de porte de cabine" },
+        { "id": "OK2/11", "text": "Contact de parachute" },
+        { "id": "OK2/12", "text": "Boite de commande du rideau lumineux" },
+        { "id": "OK2/13", "text": "Boite d'inspection / support de boite d'inspection" },
+        { "id": "OK2/14", "text": "Les goulottes metalliques" },
+        { "id": "OKRow15", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row2/15" },
+        { "id": "OKRow16", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row2/16" },
+        { "id": "OK2/17", "text": "Inspection visuelle des fils/cables" }
+      ]
+    },
+    {
+      "id": "Schacht",
+      "title": "3. Inspection dans la gaine",
+      "questions": [
+        { "id": "OK3/1", "text": "Mise a la terre de reference presente" },
+        { "id": "OK3/2", "text": "Support de cable, cadre de porte paliere" },
+        { "id": "OK3/3", "text": "Les goulottes metalliques" },
+        { "id": "OK3/4", "text": "Support de cable" },
+        { "id": "OK3/5", "text": "Boitier/support des contacts electriques sur les portes palieres" },
+        { "id": "OK3/6", "text": "Chaque vantail equipe d'un contact (ouverture centrale)" },
+        { "id": "OK3/7", "text": "Chariot de porte paliere" },
+        { "id": "OK3/8", "text": "Boitier/borne de mise a la terre de l'eclairage de gaine" },
+        { "id": "OK3/9", "text": "Guides de cabine" },
+        { "id": "OKRow10", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row3/10" },
+        { "id": "OKRow11", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row3/11" },
+        { "id": "OK3/12", "text": "Inspection visuelle des fils/cables" }
+      ]
+    },
+    {
+      "id": "Schachtgrube",
+      "title": "4. Inspection dans la cuvette",
+      "questions": [
+        { "id": "OK4/1", "text": "Mise a la terre de reference presente" },
+        { "id": "OK4/2", "text": "Amortisseurs equipes d'un contact" },
+        { "id": "OK4/3", "text": "La poulie de tension" },
+        { "id": "OK4/4", "text": "L'interrupteur STOP" },
+        { "id": "OK4/5", "text": "Boitier/borne de mise a la terre de l'eclairage de gaine" },
+        { "id": "OK4/6", "text": "Divers interrupteurs de fin de course de gaine" },
+        { "id": "OK4/7", "text": "Les goulottes metalliques" },
+        { "id": "OKRow8", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row4/8" },
+        { "id": "OKRow9", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row4/9" },
+        { "id": "OK4/10", "text": "Inspection visuelle des fils/cables" }
+      ]
+    },
+    {
+      "id": "Kabine",
+      "title": "5. Inspection dans la cabine",
+      "questions": [
+        { "id": "OK5/1", "text": "Mise a la terre de reference presente" },
+        { "id": "OK5/2", "text": "Le COP, en tant que boitier" },
+        { "id": "OK5/3", "text": "Boitier/borne de mise a la terre des connexions (J-Box), barrette" },
+        { "id": "OK5/4", "text": "Le plafond de cabine, selon l'eclairage" },
+        { "id": "OK5/5", "text": "Le cadre de porte de cabine" },
+        { "id": "OK5/6", "text": "Le seuil de porte de cabine" },
+        { "id": "OKRow5/7", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row5/7" },
+        { "id": "OKRow5/8", "text": "Article personnalise...", "isCustom": true, "pdfTextFieldName": "Row5/8" },
+        { "id": "OK5/9", "text": "Inspection visuelle des fils/cables" }
+      ]
+    }
+  ]
+}

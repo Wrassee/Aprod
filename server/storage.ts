@@ -337,8 +337,19 @@ export class DatabaseStorage implements IStorage {
       newConfig.multiCell = config.multi_cell !== undefined ? config.multi_cell : (config.multiCell || false);
       newConfig.titleHu = config.title_hu !== undefined ? config.title_hu : config.titleHu;
       newConfig.titleDe = config.title_de !== undefined ? config.title_de : config.titleDe;
+      newConfig.titleEn = config.title_en !== undefined ? config.title_en : config.titleEn;
+      newConfig.titleFr = config.title_fr !== undefined ? config.title_fr : config.titleFr;
+      newConfig.titleIt = config.title_it !== undefined ? config.title_it : config.titleIt;
+      newConfig.placeholderDe = config.placeholder_de !== undefined ? config.placeholder_de : config.placeholderDe;
+      newConfig.placeholderEn = config.placeholder_en !== undefined ? config.placeholder_en : config.placeholderEn;
+      newConfig.placeholderFr = config.placeholder_fr !== undefined ? config.placeholder_fr : config.placeholderFr;
+      newConfig.placeholderIt = config.placeholder_it !== undefined ? config.placeholder_it : config.placeholderIt;
       newConfig.groupName = config.group_name !== undefined ? config.group_name : config.groupName;
       newConfig.groupNameDe = config.group_name_de !== undefined ? config.group_name_de : config.groupNameDe;
+      newConfig.groupNameEn = config.group_name_en !== undefined ? config.group_name_en : config.groupNameEn;
+      newConfig.groupNameFr = config.group_name_fr !== undefined ? config.group_name_fr : config.groupNameFr;
+      newConfig.groupNameIt = config.group_name_it !== undefined ? config.group_name_it : config.groupNameIt;
+      newConfig.groupKey = config.group_key !== undefined ? config.group_key : config.groupKey;
       newConfig.groupOrder = config.group_order !== undefined ? config.group_order : (config.groupOrder || 0);
       newConfig.conditionalGroupKey = config.conditional_group_key !== undefined ? config.conditional_group_key : config.conditionalGroupKey;
       newConfig.minValue = config.min_value !== undefined ? config.min_value : config.minValue;
@@ -346,6 +357,12 @@ export class DatabaseStorage implements IStorage {
       newConfig.calculationFormula = config.calculation_formula !== undefined ? config.calculation_formula : config.calculationFormula;
       newConfig.calculationInputs = config.calculation_inputs !== undefined ? config.calculation_inputs : config.calculationInputs;
       newConfig.sheetName = config.sheet_name !== undefined ? config.sheet_name : config.sheetName;
+      newConfig.options = config.options !== undefined ? config.options : config.options;
+      newConfig.optionsDe = config.options_de !== undefined ? config.options_de : config.optionsDe;
+      newConfig.optionsEn = config.options_en !== undefined ? config.options_en : config.optionsEn;
+      newConfig.optionsFr = config.options_fr !== undefined ? config.options_fr : config.optionsFr;
+      newConfig.optionsIt = config.options_it !== undefined ? config.options_it : config.optionsIt;
+      newConfig.maxLength = config.max_length !== undefined ? config.max_length : config.maxLength;
 
       return newConfig;
     });

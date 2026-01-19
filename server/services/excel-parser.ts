@@ -36,6 +36,10 @@ export interface ParsedQuestion {
   calculationInputs?: string;
   // === ÚJ MEZŐK HOZZÁADÁSA ===
   options?: string;
+  optionsDe?: string;
+  optionsEn?: string;
+  optionsFr?: string;
+  optionsIt?: string;
   maxLength?: number;
 }
 
@@ -201,7 +205,11 @@ class ExcelParserService {
         TITLE_FR: this.findHeaderIndex(headers, 'title_fr', 'titleFr', 'francia_cím'),
         TITLE_IT: this.findHeaderIndex(headers, 'title_it', 'titleIt', 'olasz_cím'),
         TYPE: this.findHeaderIndex(headers, 'type', 'típus', 'tipus'),
-        OPTIONS: this.findHeaderIndex(headers, 'options', 'choices', 'választások', 'opciók'), // ÚJ
+        OPTIONS: this.findHeaderIndex(headers, 'options', 'choices', 'választások', 'opciók'),
+        OPTIONS_DE: this.findHeaderIndex(headers, 'optionsDE', 'options_de', 'német_opciók'),
+        OPTIONS_EN: this.findHeaderIndex(headers, 'optionsEN', 'options_en', 'angol_opciók'),
+        OPTIONS_FR: this.findHeaderIndex(headers, 'optionsFR', 'options_fr', 'francia_opciók'),
+        OPTIONS_IT: this.findHeaderIndex(headers, 'optionsIT', 'options_it', 'olasz_opciók'),
         MAX_LENGTH: this.findHeaderIndex(headers, 'maxlength', 'max_length', 'maxLength'), // ÚJ
         REQUIRED: this.findHeaderIndex(headers, 'required', 'kötelező', 'kell'),
         PLACEHOLDER: this.findHeaderIndex(headers, 'placeholder', 'description', 'leírás', 'leiras'),
@@ -272,6 +280,18 @@ class ExcelParserService {
           // === ÚJ MEZŐK ===
           options: colIndices.OPTIONS !== -1 && row[colIndices.OPTIONS] 
             ? String(row[colIndices.OPTIONS]).trim() 
+            : undefined,
+          optionsDe: colIndices.OPTIONS_DE !== -1 && row[colIndices.OPTIONS_DE] 
+            ? String(row[colIndices.OPTIONS_DE]).trim() 
+            : undefined,
+          optionsEn: colIndices.OPTIONS_EN !== -1 && row[colIndices.OPTIONS_EN] 
+            ? String(row[colIndices.OPTIONS_EN]).trim() 
+            : undefined,
+          optionsFr: colIndices.OPTIONS_FR !== -1 && row[colIndices.OPTIONS_FR] 
+            ? String(row[colIndices.OPTIONS_FR]).trim() 
+            : undefined,
+          optionsIt: colIndices.OPTIONS_IT !== -1 && row[colIndices.OPTIONS_IT] 
+            ? String(row[colIndices.OPTIONS_IT]).trim() 
             : undefined,
           maxLength: colIndices.MAX_LENGTH !== -1 && row[colIndices.MAX_LENGTH] 
             ? parseInt(String(row[colIndices.MAX_LENGTH])) 

@@ -131,13 +131,33 @@ export async function registerRoutes(app: Express) {
 
       // A válasz formázása a frontend számára
       const formattedQuestions = questionsToFormat.map((config) => {
-        let groupName = language === "de" && config.groupNameDe 
-          ? config.groupNameDe 
-          : config.groupName;
+        // === TELJES 5-NYELVŰ LOKALIZÁCIÓ ===
         
+        // GroupName lokalizáció (fallback: EN → DE → HU → default)
+        let groupName = config.groupName;
+        if (language === "hu" && config.groupName) {
+          groupName = config.groupName;
+        } else if (language === "de" && config.groupNameDe) {
+          groupName = config.groupNameDe;
+        } else if (language === "en") {
+          groupName = config.groupNameEn || config.groupNameDe || config.groupName;
+        } else if (language === "fr") {
+          groupName = config.groupNameFr || config.groupNameEn || config.groupNameDe || config.groupName;
+        } else if (language === "it") {
+          groupName = config.groupNameIt || config.groupNameEn || config.groupNameDe || config.groupName;
+        }
+        
+        // Measurement/calculated speciális csoportnév
         const typeStr = config.type as string;
         if (typeStr === "measurement" || typeStr === "calculated") {
-          groupName = language === "de" ? "Messdaten" : "Mérési adatok";
+          const measurementGroupNames: Record<string, string> = {
+            hu: "Mérési adatok",
+            de: "Messdaten",
+            en: "Measurement Data",
+            fr: "Données de mesure",
+            it: "Dati di misurazione"
+          };
+          groupName = measurementGroupNames[language] || measurementGroupNames["en"];
         }
 
         let correctedType = config.type;
@@ -147,18 +167,32 @@ export async function registerRoutes(app: Express) {
           options = ['true', 'false', 'n.a.'];
         }
 
-        // Nyelvfüggő cím kiválasztása
+        // === NYELVFÜGGŐ CÍM KIVÁLASZTÁSA (FALLBACK: target → EN → DE → HU → default) ===
         let title = config.title;
-        if (language === "hu" && config.titleHu) {
-          title = config.titleHu;
-        } else if (language === "de" && config.titleDe) {
-          title = config.titleDe;
-        } else if (language === "en" && config.titleEn) {
-          title = config.titleEn;
-        } else if (language === "fr" && config.titleFr) {
-          title = config.titleFr;
-        } else if (language === "it" && config.titleIt) {
-          title = config.titleIt;
+        if (language === "hu") {
+          title = config.titleHu || config.title;
+        } else if (language === "de") {
+          title = config.titleDe || config.titleHu || config.title;
+        } else if (language === "en") {
+          title = config.titleEn || config.titleDe || config.titleHu || config.title;
+        } else if (language === "fr") {
+          title = config.titleFr || config.titleEn || config.titleDe || config.titleHu || config.title;
+        } else if (language === "it") {
+          title = config.titleIt || config.titleEn || config.titleDe || config.titleHu || config.title;
+        }
+
+        // === PLACEHOLDER LOKALIZÁCIÓ (FALLBACK: target → EN → DE → HU → default) ===
+        let placeholder = config.placeholder;
+        if (language === "hu") {
+          placeholder = config.placeholder;
+        } else if (language === "de") {
+          placeholder = config.placeholderDe || config.placeholder;
+        } else if (language === "en") {
+          placeholder = config.placeholderEn || config.placeholderDe || config.placeholder;
+        } else if (language === "fr") {
+          placeholder = config.placeholderFr || config.placeholderEn || config.placeholderDe || config.placeholder;
+        } else if (language === "it") {
+          placeholder = config.placeholderIt || config.placeholderEn || config.placeholderDe || config.placeholder;
         }
 
         return {
@@ -169,9 +203,7 @@ export async function registerRoutes(app: Express) {
           type: correctedType,
           options: options,
           required: config.required,
-          placeholder: language === "de" && config.placeholderDe 
-            ? config.placeholderDe 
-            : config.placeholder,
+          placeholder: placeholder,
           unit: config.unit,
           minValue: config.minValue,
           maxValue: config.maxValue,

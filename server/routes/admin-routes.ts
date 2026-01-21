@@ -687,10 +687,10 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
           calculation_formula: q.calculationFormula ?? null,
           calculation_inputs: q.calculationInputs ? [q.calculationInputs] : null,
           options: q.options ?? null,
-          options_de: q.optionsDe ?? null,
-          options_en: q.optionsEn ?? null,
-          options_fr: q.optionsFr ?? null,
-          options_it: q.optionsIt ?? null,
+          // options_de: q.optionsDe ?? null,
+          // options_en: q.optionsEn ?? null,
+          // options_fr: q.optionsFr ?? null,
+          // options_it: q.optionsIt ?? null,
           max_length: q.maxLength ?? null,
         });
       }

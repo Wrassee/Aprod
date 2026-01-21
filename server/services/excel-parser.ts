@@ -5,27 +5,38 @@ import { QuestionType } from '../../shared/schema.js';
 
 export interface ParsedQuestion {
   questionId: string;
-  title: string;
-  titleHu?: string;
-  titleDe?: string;
-  titleEn?: string;
-  titleFr?: string;
-  titleIt?: string;
+  
+  // ===== JAVÍTOTT TÖBBNYELVŰ MODELL =====
+  // title, placeholder, groupName = FALLBACK/TECHNIKAI mezők
+  // titleHu/De/En/Fr/It = EXPLICIT nyelvspecifikus mezők
+  title?: string;              // Fallback - NEM magyar!
+  titleHu?: string;            // Magyar cím
+  titleDe?: string;            // Német cím
+  titleEn?: string;            // Angol cím
+  titleFr?: string;            // Francia cím
+  titleIt?: string;            // Olasz cím
+  
   type: QuestionType;
   required: boolean;
-  placeholder?: string;
+  
+  placeholder?: string;        // Fallback - NEM magyar!
+  placeholderHu?: string;      // Magyar placeholder
   placeholderDe?: string;
   placeholderEn?: string;
   placeholderFr?: string;
   placeholderIt?: string;
+  
   cellReference?: string;
   sheetName?: string;
   multiCell?: boolean;
-  groupName?: string;
+  
+  groupName?: string;          // Fallback - NEM magyar!
+  groupNameHu?: string;        // Magyar csoportnév
   groupNameDe?: string;
   groupNameEn?: string;
   groupNameFr?: string;
   groupNameIt?: string;
+  
   groupKey?: string;
   groupOrder?: number;
   conditionalGroupKey?: string;
@@ -34,12 +45,10 @@ export interface ParsedQuestion {
   maxValue?: number;
   calculationFormula?: string;
   calculationInputs?: string;
-  // === ÚJ MEZŐK HOZZÁADÁSA ===
+  
+  // Opciók (NEM nyelvfüggő - technikai értékek)
   options?: string;
-  optionsDe?: string;
-  optionsEn?: string;
-  optionsFr?: string;
-  optionsIt?: string;
+  
   maxLength?: number;
 }
 
@@ -57,7 +66,6 @@ class ExcelParserService {
   private slugify(text: string): string {
     if (!text) return 'default';
     
-    // Magyar karakterek transliteráció
     const charMap: Record<string, string> = {
       'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ö': 'o', 'ő': 'o', 'ú': 'u', 'ü': 'u', 'ű': 'u',
       'Á': 'a', 'É': 'e', 'Í': 'i', 'Ó': 'o', 'Ö': 'o', 'Ő': 'o', 'Ú': 'u', 'Ü': 'u', 'Ű': 'u',
@@ -71,9 +79,9 @@ class ExcelParserService {
       .join('')
       .toLowerCase()
       .trim()
-      .replace(/[^a-z0-9]+/g, '_')  // Replace special chars with underscore
-      .replace(/^_+|_+$/g, '')      // Remove leading/trailing underscores
-      .replace(/_+/g, '_');         // Replace multiple underscores with single
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .replace(/_+/g, '_');
   }
 
   /** Rugalmas fejléc-kereső: több alias nevet is felismer és a szóközöket is kezeli */
@@ -91,27 +99,18 @@ class ExcelParserService {
     return !!value;
   }
 
-  /** 
-   * JAVÍTOTT típusértelmezés - minden típust külön kezel
-   * Támogatja: text, textarea, select, phone, number, measurement, calculated, stb.
-   */
   private parseQuestionType(raw?: string): QuestionType {
     if (!raw) return 'text';
     const t = raw.toLowerCase().trim();
 
-    // Speciális radio/checkbox típusok
     if (['yes_no_na'].includes(t)) return 'yes_no_na';
     if (['yes_no', 'boolean', 'checkbox', 'igen_nem'].includes(t)) return 'checkbox';
     if (['true_false', 'radio', 'binary'].includes(t)) return 'radio';
     
-    // Speciális számítási típusok
     if (['measurement', 'mérés', 'numeric_with_unit'].includes(t)) return 'measurement';
     if (['calculated', 'computed', 'számított', 'berechnet'].includes(t)) return 'calculated';
     
-    // Alap input típusok
     if (['number', 'numeric', 'integer', 'float', 'decimal'].includes(t)) return 'number';
-    
-    // === ÚJ TÍPUSOK KÜLÖN KEZELÉSE ===
     if (['textarea', 'memo', 'multiline', 'longtext'].includes(t)) return 'textarea';
     if (['select', 'dropdown', 'list', 'választó'].includes(t)) return 'select';
     if (['phone', 'tel', 'telefon', 'telephone'].includes(t)) return 'phone';
@@ -119,14 +118,11 @@ class ExcelParserService {
     if (['date', 'dátum', 'datum'].includes(t)) return 'date';
     if (['time', 'idő', 'zeit'].includes(t)) return 'time';
     if (['multi_select', 'multiselect', 'multiple'].includes(t)) return 'multi_select';
-    
-    // Alapértelmezett
     if (['text', 'string', 'str', 'szöveg'].includes(t)) return 'text';
     
-    return 'text'; // Ha semmi sem illik, akkor sima szöveg
+    return 'text';
   }
 
-  /** A különböző válaszokat Excel-kompatibilis értékre formázza */
   private formatAnswerForExcel(answer: any, type: QuestionType): any {
     switch (type) {
       case 'checkbox':
@@ -150,14 +146,12 @@ class ExcelParserService {
         
       case 'select':
       case 'multi_select':
-        // Ha tömb (multi_select), akkor vesszővel elválasztva
         if (Array.isArray(answer)) {
           return answer.join(', ');
         }
         return answer?.toString() || '';
         
       case 'date':
-        // Dátum formázása ha szükséges
         if (answer instanceof Date) {
           return answer.toLocaleDateString('hu-HU');
         }
@@ -181,7 +175,7 @@ class ExcelParserService {
       const fileBuffer = await readFile(filePath);
       const workbook = XLSX.read(fileBuffer, { 
         type: 'buffer',
-        codepage: 65001 // UTF-8 kódolás ékezetes karakterekhez
+        codepage: 65001
       });
 
       const sheetName = workbook.SheetNames[0];
@@ -195,57 +189,67 @@ class ExcelParserService {
       const headers = data[0].map((h: any) => String(h).trim());
       console.log(`📋 Headers found in Excel: [${headers.join(', ')}]`);
 
-      // === KIBŐVÍTETT OSZLOPINDEX KERESÉS - MINDEN FORMÁTUMMAL (Excel fájl alapján) ===
+      // ===== JAVÍTOTT OSZLOPINDEX KERESÉS - KIS BETŰS KONZISZTENCIA =====
       const colIndices = {
         ID: this.findHeaderIndex(headers, 'id', 'question_id', 'questionId', 'kérdés_id', 'ID'),
-        TITLE: this.findHeaderIndex(headers, 'title', 'name', 'név', 'kérdés', 'Title', 'Title HU'),
-        // titleHu - Excel-ben szóközzel kezdődhet, de a trim() kezeli
-        TITLE_HU: this.findHeaderIndex(headers, 'title_hu', 'titleHu', 'titlehu', 'magyar_cím', 'Title HU', 'Title_HU', 'TitleHU'),
-        TITLE_DE: this.findHeaderIndex(headers, 'title_de', 'titleDe', 'titlede', 'német_cím', 'Title DE', 'Title_DE', 'TitleDE'),
-        TITLE_EN: this.findHeaderIndex(headers, 'title_en', 'titleEn', 'titleen', 'angol_cím', 'Title EN', 'Title_EN', 'TitleEN'),
-        TITLE_FR: this.findHeaderIndex(headers, 'title_fr', 'titleFr', 'titlefr', 'francia_cím', 'Title FR', 'Title_FR', 'TitleFR'),
-        TITLE_IT: this.findHeaderIndex(headers, 'title_it', 'titleIt', 'titleit', 'olasz_cím', 'Title IT', 'Title_IT', 'TitleIT'),
+        
+        // TITLE mezők - kis betűs változatok prioritással
+        TITLE: this.findHeaderIndex(headers, 'title', 'name', 'név', 'kérdés', 'Title'),
+        TITLE_HU: this.findHeaderIndex(headers, 'titlehu', 'title_hu', 'titleHu', 'magyar_cím', 'Title HU', 'TitleHU'),
+        TITLE_DE: this.findHeaderIndex(headers, 'titlede', 'title_de', 'titleDe', 'német_cím', 'Title DE', 'TitleDE'),
+        TITLE_EN: this.findHeaderIndex(headers, 'titleen', 'title_en', 'titleEn', 'angol_cím', 'Title EN', 'TitleEN'),
+        TITLE_FR: this.findHeaderIndex(headers, 'titlefr', 'title_fr', 'titleFr', 'francia_cím', 'Title FR', 'TitleFR'),
+        TITLE_IT: this.findHeaderIndex(headers, 'titleit', 'title_it', 'titleIt', 'olasz_cím', 'Title IT', 'TitleIT'),
+        
         TYPE: this.findHeaderIndex(headers, 'type', 'típus', 'tipus', 'Type'),
-        OPTIONS: this.findHeaderIndex(headers, 'options', 'choices', 'választások', 'opciók', 'Options', 'Options HU'),
-        OPTIONS_DE: this.findHeaderIndex(headers, 'optionsDE', 'optionsde', 'options_de', 'német_opciók', 'Options DE', 'Options_DE', 'OptionsDE'),
-        OPTIONS_EN: this.findHeaderIndex(headers, 'optionsEN', 'optionsen', 'options_en', 'angol_opciók', 'Options EN', 'Options_EN', 'OptionsEN'),
-        OPTIONS_FR: this.findHeaderIndex(headers, 'optionsFR', 'optionsfr', 'options_fr', 'francia_opciók', 'Options FR', 'Options_FR', 'OptionsFR'),
-        OPTIONS_IT: this.findHeaderIndex(headers, 'optionsIT', 'optionsit', 'options_it', 'olasz_opciók', 'Options IT', 'Options_IT', 'OptionsIT'),
+        
+        // ===== OPTIONS (nyelvfüggetlen) =====
+        OPTIONS: this.findHeaderIndex(headers, 'options', 'choices', 'választások', 'opciók', 'Options'),
+        
         MAX_LENGTH: this.findHeaderIndex(headers, 'maxlength', 'max_length', 'maxLength', 'Max Length', 'MaxLength'),
         REQUIRED: this.findHeaderIndex(headers, 'required', 'kötelező', 'kell', 'Required'),
-        // placeholderHU/DE - Excel-ben nagybetűs HU/DE
-        PLACEHOLDER: this.findHeaderIndex(headers, 'placeholder', 'placeholderHU', 'placeholderhu', 'description', 'leírás', 'leiras', 'Placeholder', 'Placeholder HU'),
-        PLACEHOLDER_DE: this.findHeaderIndex(headers, 'placeholderDE', 'placeholderde', 'placeholder_de', 'német_leírás', 'Placeholder DE', 'Placeholder_DE', 'PlaceholderDE'),
-        PLACEHOLDER_EN: this.findHeaderIndex(headers, 'placeholderEN', 'placeholderEn', 'placeholderen', 'placeholder_en', 'angol_leírás', 'Placeholder EN', 'Placeholder_EN', 'PlaceholderEN'),
-        PLACEHOLDER_FR: this.findHeaderIndex(headers, 'placeholderFR', 'placeholderFr', 'placeholderfr', 'placeholder_fr', 'francia_leírás', 'Placeholder FR', 'Placeholder_FR', 'PlaceholderFR'),
-        PLACEHOLDER_IT: this.findHeaderIndex(headers, 'placeholderIT', 'placeholderIt', 'placeholderit', 'placeholder_it', 'olasz_leírás', 'Placeholder IT', 'Placeholder_IT', 'PlaceholderIT'),
+        
+        // PLACEHOLDER mezők
+        PLACEHOLDER: this.findHeaderIndex(headers, 'placeholder', 'description', 'leírás', 'leiras', 'Placeholder'),
+        PLACEHOLDER_HU: this.findHeaderIndex(headers, 'placeholderhu', 'placeholder_hu', 'placeholderHu', 'Placeholder HU', 'PlaceholderHU'),
+        PLACEHOLDER_DE: this.findHeaderIndex(headers, 'placeholderde', 'placeholder_de', 'placeholderDe', 'Placeholder DE', 'PlaceholderDE'),
+        PLACEHOLDER_EN: this.findHeaderIndex(headers, 'placeholderen', 'placeholder_en', 'placeholderEn', 'Placeholder EN', 'PlaceholderEN'),
+        PLACEHOLDER_FR: this.findHeaderIndex(headers, 'placeholderfr', 'placeholder_fr', 'placeholderFr', 'Placeholder FR', 'PlaceholderFR'),
+        PLACEHOLDER_IT: this.findHeaderIndex(headers, 'placeholderit', 'placeholder_it', 'placeholderIt', 'Placeholder IT', 'PlaceholderIT'),
+        
         CELL_REF: this.findHeaderIndex(headers, 'cell_reference', 'cellReference', 'cellreference', 'cella', 'cel', 'Cell Reference', 'CellReference'),
         SHEET_NAME: this.findHeaderIndex(headers, 'sheet_name', 'sheetName', 'sheetname', 'munkalap', 'Sheet Name', 'SheetName'),
         MULTI_CELL: this.findHeaderIndex(headers, 'multi_cell', 'multiCell', 'multicell', 'több_cella', 'Multi Cell', 'MultiCell'),
-        GROUP_NAME: this.findHeaderIndex(headers, 'group_name', 'groupName', 'groupname', 'csoport', 'Group Name', 'Group Name HU', 'GroupName'),
-        GROUP_NAME_DE: this.findHeaderIndex(headers, 'group_name_de', 'groupNameDe', 'groupnamede', 'német_csoport', 'Group Name DE', 'Group_Name_DE', 'GroupNameDE'),
-        GROUP_NAME_EN: this.findHeaderIndex(headers, 'group_name_en', 'groupNameEn', 'groupnameen', 'angol_csoport', 'Group Name EN', 'Group_Name_EN', 'GroupNameEN'),
-        GROUP_NAME_FR: this.findHeaderIndex(headers, 'group_name_fr', 'groupNameFr', 'groupnamefr', 'francia_csoport', 'Group Name FR', 'Group_Name_FR', 'GroupNameFR'),
-        GROUP_NAME_IT: this.findHeaderIndex(headers, 'group_name_it', 'groupNameIt', 'groupnameit', 'olasz_csoport', 'Group Name IT', 'Group_Name_IT', 'GroupNameIT'),
+        
+        // GROUP NAME mezők
+        GROUP_NAME: this.findHeaderIndex(headers, 'group_name', 'groupName', 'groupname', 'csoport', 'Group Name', 'GroupName'),
+        GROUP_NAME_HU: this.findHeaderIndex(headers, 'groupnamehu', 'group_name_hu', 'groupNameHu', 'Group Name HU', 'GroupNameHU'),
+        GROUP_NAME_DE: this.findHeaderIndex(headers, 'groupnamede', 'group_name_de', 'groupNameDe', 'Group Name DE', 'GroupNameDE'),
+        GROUP_NAME_EN: this.findHeaderIndex(headers, 'groupnameen', 'group_name_en', 'groupNameEn', 'Group Name EN', 'GroupNameEN'),
+        GROUP_NAME_FR: this.findHeaderIndex(headers, 'groupnamefr', 'group_name_fr', 'groupNameFr', 'Group Name FR', 'GroupNameFR'),
+        GROUP_NAME_IT: this.findHeaderIndex(headers, 'groupnameit', 'group_name_it', 'groupNameIt', 'Group Name IT', 'GroupNameIT'),
+        
         GROUP_KEY: this.findHeaderIndex(headers, 'groupKey', 'group_key', 'groupkey', 'Group Key', 'GroupKey'),
         GROUP_ORDER: this.findHeaderIndex(headers, 'group_order', 'groupOrder', 'grouporder', 'sorrend', 'Group Order', 'GroupOrder'),
         CONDITIONAL_GROUP_KEY: this.findHeaderIndex(headers, 'conditionalGroupKey', 'conditional_group_key', 'Conditional Group Key', 'ConditionalGroupKey'),
         UNIT: this.findHeaderIndex(headers, 'unit', 'egység', 'mértékegység', 'Unit'),
-        MIN_VALUE: this.findHeaderIndex(headers, 'min_value', 'minValue', 'min_value', 'min', 'Min Value', 'MinValue'),
-        MAX_VALUE: this.findHeaderIndex(headers, 'max_value', 'maxValue', 'max_value', 'max', 'Max Value', 'MaxValue'),
+        MIN_VALUE: this.findHeaderIndex(headers, 'min_value', 'minValue', 'min', 'Min Value', 'MinValue'),
+        MAX_VALUE: this.findHeaderIndex(headers, 'max_value', 'maxValue', 'max', 'Max Value', 'MaxValue'),
         CALC_FORMULA: this.findHeaderIndex(headers, 'calculation_formula', 'calculationFormula', 'képlet', 'Calculation Formula', 'CalculationFormula'),
         CALC_INPUTS: this.findHeaderIndex(headers, 'calculation_inputs', 'calculationInputs', 'bemenetek', 'Calculation Inputs', 'CalculationInputs')
       };
       
-      // Debug információ
       console.log('📊 Column indices found:', {
+        TITLE_HU: colIndices.TITLE_HU,
+        TITLE_DE: colIndices.TITLE_DE,
+        PLACEHOLDER_HU: colIndices.PLACEHOLDER_HU,
+        GROUP_NAME_HU: colIndices.GROUP_NAME_HU,
         TYPE: colIndices.TYPE,
-        OPTIONS: colIndices.OPTIONS,
-        MAX_LENGTH: colIndices.MAX_LENGTH,
         CELL_REF: colIndices.CELL_REF
       });
 
       const questions: ParsedQuestion[] = [];
+      
       for (let i = 1; i < data.length; i++) {
         const row = data[i];
         if (!row || colIndices.ID === -1 || !row[colIndices.ID]) continue;
@@ -254,122 +258,96 @@ class ExcelParserService {
           colIndices.TYPE !== -1 ? String(row[colIndices.TYPE]) : 'text'
         );
 
-        // === TELJES KÉRDÉS OBJEKTUM AZ ÚJ MEZŐKKEL ===
-        const groupName = colIndices.GROUP_NAME !== -1 && row[colIndices.GROUP_NAME] 
-          ? String(row[colIndices.GROUP_NAME]).trim() 
-          : undefined;
+        // ===== JAVÍTOTT KÉRDÉS OBJEKTUM - TISZTA TÖBBNYELVŰ MODELL =====
+        
+        // Helper: Biztonságos string konverzió
+        const safeString = (index: number): string | undefined => {
+          if (index === -1 || !row[index]) return undefined;
+          const trimmed = String(row[index]).trim();
+          return trimmed.length > 0 ? trimmed : undefined;
+        };
         
         const q: ParsedQuestion = {
           questionId: String(row[colIndices.ID]).trim(),
-          title: String(row[colIndices.TITLE] || row[colIndices.TITLE_HU] || row[colIndices.ID]),
-          titleHu: colIndices.TITLE_HU !== -1 && row[colIndices.TITLE_HU] 
-            ? String(row[colIndices.TITLE_HU]).trim() 
-            : undefined,
-          titleDe: colIndices.TITLE_DE !== -1 && row[colIndices.TITLE_DE] 
-            ? String(row[colIndices.TITLE_DE]).trim() 
-            : undefined,
-          titleEn: colIndices.TITLE_EN !== -1 && row[colIndices.TITLE_EN] 
-            ? String(row[colIndices.TITLE_EN]).trim() 
-            : undefined,
-          titleFr: colIndices.TITLE_FR !== -1 && row[colIndices.TITLE_FR] 
-            ? String(row[colIndices.TITLE_FR]).trim() 
-            : undefined,
-          titleIt: colIndices.TITLE_IT !== -1 && row[colIndices.TITLE_IT] 
-            ? String(row[colIndices.TITLE_IT]).trim() 
-            : undefined,
+          
+          // ===== TITLE - FALLBACK ÉS EXPLICIT NYELVEK =====
+          title: safeString(colIndices.TITLE),           // NEM magyar!
+          titleHu: safeString(colIndices.TITLE_HU),      // Magyar
+          titleDe: safeString(colIndices.TITLE_DE),
+          titleEn: safeString(colIndices.TITLE_EN),
+          titleFr: safeString(colIndices.TITLE_FR),
+          titleIt: safeString(colIndices.TITLE_IT),
+          
           type: questionType,
           
-          // === ÚJ MEZŐK ===
-          options: colIndices.OPTIONS !== -1 && row[colIndices.OPTIONS] 
-            ? String(row[colIndices.OPTIONS]).trim() 
-            : undefined,
-          optionsDe: colIndices.OPTIONS_DE !== -1 && row[colIndices.OPTIONS_DE] 
-            ? String(row[colIndices.OPTIONS_DE]).trim() 
-            : undefined,
-          optionsEn: colIndices.OPTIONS_EN !== -1 && row[colIndices.OPTIONS_EN] 
-            ? String(row[colIndices.OPTIONS_EN]).trim() 
-            : undefined,
-          optionsFr: colIndices.OPTIONS_FR !== -1 && row[colIndices.OPTIONS_FR] 
-            ? String(row[colIndices.OPTIONS_FR]).trim() 
-            : undefined,
-          optionsIt: colIndices.OPTIONS_IT !== -1 && row[colIndices.OPTIONS_IT] 
-            ? String(row[colIndices.OPTIONS_IT]).trim() 
-            : undefined,
+          // ===== OPTIONS (nyelvfüggetlen technikai értékek) =====
+          options: safeString(colIndices.OPTIONS),
+          
           maxLength: colIndices.MAX_LENGTH !== -1 && row[colIndices.MAX_LENGTH] 
             ? parseInt(String(row[colIndices.MAX_LENGTH])) 
             : undefined,
           
-          // Többi mező
           required: colIndices.REQUIRED !== -1 
             ? this.parseBoolean(row[colIndices.REQUIRED]) 
             : false,
-          placeholder: colIndices.PLACEHOLDER !== -1 && row[colIndices.PLACEHOLDER] 
-            ? String(row[colIndices.PLACEHOLDER]).trim() 
-            : undefined,
-          placeholderDe: colIndices.PLACEHOLDER_DE !== -1 && row[colIndices.PLACEHOLDER_DE] 
-            ? String(row[colIndices.PLACEHOLDER_DE]).trim() 
-            : undefined,
-          placeholderEn: colIndices.PLACEHOLDER_EN !== -1 && row[colIndices.PLACEHOLDER_EN] 
-            ? String(row[colIndices.PLACEHOLDER_EN]).trim() 
-            : undefined,
-          placeholderFr: colIndices.PLACEHOLDER_FR !== -1 && row[colIndices.PLACEHOLDER_FR] 
-            ? String(row[colIndices.PLACEHOLDER_FR]).trim() 
-            : undefined,
-          placeholderIt: colIndices.PLACEHOLDER_IT !== -1 && row[colIndices.PLACEHOLDER_IT] 
-            ? String(row[colIndices.PLACEHOLDER_IT]).trim() 
-            : undefined,
-          cellReference: colIndices.CELL_REF !== -1 && row[colIndices.CELL_REF] 
-            ? String(row[colIndices.CELL_REF]).trim() 
-            : undefined,
-          sheetName: colIndices.SHEET_NAME !== -1 && row[colIndices.SHEET_NAME] 
-            ? String(row[colIndices.SHEET_NAME]).trim() 
-            : sheetName,
+          
+          // ===== PLACEHOLDER - FALLBACK ÉS EXPLICIT NYELVEK =====
+          placeholder: safeString(colIndices.PLACEHOLDER),        // NEM magyar!
+          placeholderHu: safeString(colIndices.PLACEHOLDER_HU),   // Magyar
+          placeholderDe: safeString(colIndices.PLACEHOLDER_DE),
+          placeholderEn: safeString(colIndices.PLACEHOLDER_EN),
+          placeholderFr: safeString(colIndices.PLACEHOLDER_FR),
+          placeholderIt: safeString(colIndices.PLACEHOLDER_IT),
+          
+          cellReference: safeString(colIndices.CELL_REF),
+          sheetName: safeString(colIndices.SHEET_NAME) || sheetName,
           multiCell: colIndices.MULTI_CELL !== -1 
             ? this.parseBoolean(row[colIndices.MULTI_CELL]) 
             : false,
-          groupName: groupName,
-          groupNameDe: colIndices.GROUP_NAME_DE !== -1 && row[colIndices.GROUP_NAME_DE] 
-            ? String(row[colIndices.GROUP_NAME_DE]).trim() 
-            : undefined,
-          groupNameEn: colIndices.GROUP_NAME_EN !== -1 && row[colIndices.GROUP_NAME_EN] 
-            ? String(row[colIndices.GROUP_NAME_EN]).trim() 
-            : undefined,
-          groupNameFr: colIndices.GROUP_NAME_FR !== -1 && row[colIndices.GROUP_NAME_FR] 
-            ? String(row[colIndices.GROUP_NAME_FR]).trim() 
-            : undefined,
-          groupNameIt: colIndices.GROUP_NAME_IT !== -1 && row[colIndices.GROUP_NAME_IT] 
-            ? String(row[colIndices.GROUP_NAME_IT]).trim() 
-            : undefined,
-          // FIXED: Read groupKey from Excel first, fallback to auto-generate slug
-          groupKey: (colIndices.GROUP_KEY !== -1 && row[colIndices.GROUP_KEY]) 
-            ? String(row[colIndices.GROUP_KEY]).trim() 
-            : (groupName ? this.slugify(groupName) : 'default'),
+          
+          // ===== GROUP NAME - FALLBACK ÉS EXPLICIT NYELVEK =====
+          groupName: safeString(colIndices.GROUP_NAME),           // NEM magyar!
+          groupNameHu: safeString(colIndices.GROUP_NAME_HU),      // Magyar
+          groupNameDe: safeString(colIndices.GROUP_NAME_DE),
+          groupNameEn: safeString(colIndices.GROUP_NAME_EN),
+          groupNameFr: safeString(colIndices.GROUP_NAME_FR),
+          groupNameIt: safeString(colIndices.GROUP_NAME_IT),
+          
+          // ===== GROUP KEY - AUTO-GENERATE HA NINCS =====
+          groupKey: (() => {
+            const explicitKey = safeString(colIndices.GROUP_KEY);
+            if (explicitKey) return explicitKey;
+            
+            // Fallback: első elérhető groupName-ből generál slugot
+            const firstGroupName = 
+              safeString(colIndices.GROUP_NAME_HU) ||
+              safeString(colIndices.GROUP_NAME_EN) ||
+              safeString(colIndices.GROUP_NAME_DE) ||
+              safeString(colIndices.GROUP_NAME);
+            
+            return firstGroupName ? this.slugify(firstGroupName) : 'default';
+          })(),
+          
           groupOrder: colIndices.GROUP_ORDER !== -1 && row[colIndices.GROUP_ORDER] 
             ? parseInt(String(row[colIndices.GROUP_ORDER])) 
             : 0,
-          conditionalGroupKey: colIndices.CONDITIONAL_GROUP_KEY !== -1 && row[colIndices.CONDITIONAL_GROUP_KEY] 
-            ? String(row[colIndices.CONDITIONAL_GROUP_KEY]).trim() 
-            : undefined,
-          unit: colIndices.UNIT !== -1 && row[colIndices.UNIT] 
-            ? String(row[colIndices.UNIT]).trim() 
-            : undefined,
+          
+          conditionalGroupKey: safeString(colIndices.CONDITIONAL_GROUP_KEY),
+          
+          unit: safeString(colIndices.UNIT),
           minValue: colIndices.MIN_VALUE !== -1 && row[colIndices.MIN_VALUE] 
             ? parseFloat(String(row[colIndices.MIN_VALUE])) 
             : undefined,
           maxValue: colIndices.MAX_VALUE !== -1 && row[colIndices.MAX_VALUE] 
             ? parseFloat(String(row[colIndices.MAX_VALUE])) 
             : undefined,
-          calculationFormula: colIndices.CALC_FORMULA !== -1 && row[colIndices.CALC_FORMULA] 
-            ? String(row[colIndices.CALC_FORMULA]).trim() 
-            : undefined,
-          calculationInputs: colIndices.CALC_INPUTS !== -1 && row[colIndices.CALC_INPUTS] 
-            ? String(row[colIndices.CALC_INPUTS]).trim() 
-            : undefined,
+          calculationFormula: safeString(colIndices.CALC_FORMULA),
+          calculationInputs: safeString(colIndices.CALC_INPUTS),
         };
         
-        // Debug információ az options-ről
+        // Debug információ
         if (q.type === 'select' || q.type === 'multi_select') {
-          console.log(`📝 Question ${q.questionId} (${q.type}) has options: ${q.options}`);
+          console.log(`📝 Question ${q.questionId} (${q.type}) has options: ${q.options || 'N/A'}`);
         }
         
         questions.push(q);
@@ -382,6 +360,8 @@ class ExcelParserService {
         total: questions.length,
         withCellRef: questions.filter(q => q.cellReference).length,
         withOptions: questions.filter(q => q.options).length,
+        withTitleHu: questions.filter(q => q.titleHu).length,
+        withGroupNameHu: questions.filter(q => q.groupNameHu).length,
         byType: {} as Record<string, number>
       };
       
@@ -404,7 +384,7 @@ class ExcelParserService {
       const fileBuffer = await readFile(filePath);
       const workbook = XLSX.read(fileBuffer, { 
         type: 'buffer',
-        codepage: 65001 // UTF-8 kódolás beállítása
+        codepage: 65001
       });
       
       const sheetName = workbook.SheetNames[0];
@@ -433,7 +413,7 @@ class ExcelParserService {
       const fileBuffer = await readFile(templatePath);
       const workbook = XLSX.read(fileBuffer, { 
         type: 'buffer',
-        codepage: 65001 // UTF-8, hogy az ékezetes szövegek ne torzuljanak
+        codepage: 65001
       });
 
       questions.forEach(question => {
@@ -448,15 +428,14 @@ class ExcelParserService {
           const worksheet = workbook.Sheets[sheetName];
           const value = this.formatAnswerForExcel(answer, question.type);
           
-          // Cella típus meghatározása
-          let cellType: string = 's'; // alapértelmezett: string
+          let cellType: string = 's';
           if (typeof value === 'number') cellType = 'n';
           if (value instanceof Date) cellType = 'd';
           
           worksheet[cellRef] = { 
             v: value, 
             t: cellType,
-            ...(cellType === 'd' && { z: 'yyyy-mm-dd' }) // dátum formázás
+            ...(cellType === 'd' && { z: 'yyyy-mm-dd' })
           };
 
           console.log(`🖋️ Filled ${sheetName}!${cellRef} for "${question.questionId}" (${question.type}) = ${value}`);
@@ -466,7 +445,7 @@ class ExcelParserService {
       return XLSX.write(workbook, { 
         type: 'buffer', 
         bookType: 'xlsx',
-        cellDates: true // dátumok helyes kezelése
+        cellDates: true
       });
     } catch (error) {
       console.error('❌ Error populating Excel template:', error);

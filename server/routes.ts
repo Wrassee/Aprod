@@ -1,4 +1,4 @@
-// server/routes.ts - VÉGLEGES, MODULÁRIS VERZIÓ (LIFT APIS HOZZÁADVA)
+// server/routes.ts - VÉGLEGES, MODULÁRIS VERZIÓ (LIFT APIS + MULTILINGUAL FIX)
 
 import type { Express } from "express";
 import { storage } from "./storage.js";
@@ -12,12 +12,11 @@ import { adminRoutes } from "./routes/admin-routes.js";
 import { protocolMappingRoutes } from "./routes/protocol-mapping.js";
 import { errorRoutes } from "./routes/error-routes.js";
 
-// ===== ÚJ: LIFT TYPE SELECTION ROUTES =====
+// ===== LIFT TYPE SELECTION ROUTES =====
 import liftTypesRoutes from "./routes/lift-types.js";
 import liftSubtypesRoutes from "./routes/lift-subtypes.js";
 import liftMappingsRoutes from "./routes/lift-mappings.js";
 import liftAvailableRoutes from "./routes/lift-available.js";
-// ==========================================
 
 // Auth middleware
 import { 
@@ -45,33 +44,28 @@ export async function registerRoutes(app: Express) {
   await testConnection();
 
   // --- Moduláris Routerek Regisztrálása ---
-  // A bejövő kérések először ezeken a routereken mennek keresztül.
   app.use("/api/admin", requireAuth, adminRoutes);
   app.use("/api/protocols", protocolMappingRoutes);
   app.use("/api/errors", errorRoutes);
 
-  // ===== ÚJ: LIFT TYPE SELECTION API REGISZTRÁCIÓ =====
-  // Admin routes (védett, requireAuth middleware szükséges)
+  // ===== LIFT TYPE SELECTION API REGISZTRÁCIÓ =====
   app.use("/api/admin", requireAdmin, liftTypesRoutes);
   app.use("/api/admin", requireAdmin, liftSubtypesRoutes);
   app.use("/api/admin", requireAdmin, liftMappingsRoutes);
-  
-  // Public route (nem védett, frontend használja a lift választó képernyőn)
   app.use(liftAvailableRoutes);
-  // ====================================================
 
-  // --- Fő (nem kiszervezett) útvonalak ---
+  // --- Fő útvonalak ---
 
-  // Health check a rendszer állapotának ellenőrzésére
+  // Health check
   app.get('/api/health', (_req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
   });
 
-  // Kérdések lekérése az aktív sablonból (FRISSÍTVE: templateId support)
+  // ===== JAVÍTOTT TÖBBNYELVŰ KÉRDÉSEK LEKÉRÉSE =====
   app.get("/api/questions/:language", async (req, res) => {
     try {
       const { language } = req.params;
-      const { templateId } = req.query; // 🔥 ÚJ: Template ID query parameter
+      const { templateId } = req.query;
       
       const supportedLanguages = ["hu", "de", "en", "fr", "it"];
       if (!supportedLanguages.includes(language)) {
@@ -80,7 +74,7 @@ export async function registerRoutes(app: Express) {
 
       let questionsToFormat: any[] = [];
 
-      // 🔥 ÚJ: Ha templateId meg van adva, azt használjuk (bypass cache)
+      // Template betöltés (templateId vagy aktív sablon)
       if (templateId && typeof templateId === "string") {
         console.log(`📦 Loading questions from template: ${templateId}`);
         
@@ -101,7 +95,7 @@ export async function registerRoutes(app: Express) {
           return res.status(404).json({ message: "Template not found or invalid" });
         }
       } else {
-        // EREDETI LOGIKA: Cache-elt aktív sablon használata
+        // Cache-elt aktív sablon használata
         if (!questionsCache) {
           const activeTemplate = await storage.getActiveTemplate("unified", "multilingual");
           
@@ -129,23 +123,40 @@ export async function registerRoutes(app: Express) {
         questionsToFormat = questionsCache;
       }
 
-      // A válasz formázása a frontend számára
+      // ===== JAVÍTOTT TÖBBNYELVŰ FORMÁZÁS =====
       const formattedQuestions = questionsToFormat.map((config) => {
-        // === TELJES 5-NYELVŰ LOKALIZÁCIÓ ===
         
-        // GroupName lokalizáció (fallback: EN → DE → HU → default)
-        let groupName = config.groupName;
-        if (language === "hu" && config.groupName) {
-          groupName = config.groupName;
-        } else if (language === "de" && config.groupNameDe) {
-          groupName = config.groupNameDe;
-        } else if (language === "en") {
-          groupName = config.groupNameEn || config.groupNameDe || config.groupName;
-        } else if (language === "fr") {
-          groupName = config.groupNameFr || config.groupNameEn || config.groupNameDe || config.groupName;
-        } else if (language === "it") {
-          groupName = config.groupNameIt || config.groupNameEn || config.groupNameDe || config.groupName;
-        }
+        // === HELPER: Nyelvfüggő mező kiválasztása fallback-kel ===
+        const getLocalizedField = (fieldName: string, lang: string): string | undefined => {
+          // Kis betűs verziókat keresünk (titlehu, titlede, placeholderfr, groupNameit stb.)
+          const huField = config[fieldName] || config[`${fieldName}hu`] || config[`${fieldName}Hu`];
+          const deField = config[`${fieldName}de`] || config[`${fieldName}De`];
+          const enField = config[`${fieldName}en`] || config[`${fieldName}En`];
+          const frField = config[`${fieldName}fr`] || config[`${fieldName}Fr`];
+          const itField = config[`${fieldName}it`] || config[`${fieldName}It`];
+          
+          // Fallback lánc: target nyelv → EN → DE → HU → alapmező
+          switch (lang) {
+            case "hu":
+              return huField || enField || deField;
+            case "de":
+              return deField || enField || huField;
+            case "en":
+              return enField || deField || huField;
+            case "fr":
+              return frField || enField || deField || huField;
+            case "it":
+              return itField || enField || deField || huField;
+            default:
+              return huField || enField || deField;
+          }
+        };
+
+        // === TITLE kiválasztás ===
+        const title = getLocalizedField('title', language) || config.title || config.questionId;
+
+        // === GROUP NAME kiválasztás ===
+        let groupName = getLocalizedField('groupName', language);
         
         // Measurement/calculated speciális csoportnév
         const typeStr = config.type as string;
@@ -160,6 +171,10 @@ export async function registerRoutes(app: Express) {
           groupName = measurementGroupNames[language] || measurementGroupNames["en"];
         }
 
+        // === PLACEHOLDER kiválasztás ===
+        const placeholder = getLocalizedField('placeholder', language);
+
+        // === TYPE korrekció ===
         let correctedType = config.type;
         let options: string[] | undefined = config.options;
 
@@ -167,38 +182,15 @@ export async function registerRoutes(app: Express) {
           options = ['true', 'false', 'n.a.'];
         }
 
-        // === NYELVFÜGGŐ CÍM KIVÁLASZTÁSA (FALLBACK: target → EN → DE → HU → default) ===
-        let title = config.title;
-        if (language === "hu") {
-          title = config.titleHu || config.title;
-        } else if (language === "de") {
-          title = config.titleDe || config.titleHu || config.title;
-        } else if (language === "en") {
-          title = config.titleEn || config.titleDe || config.titleHu || config.title;
-        } else if (language === "fr") {
-          title = config.titleFr || config.titleEn || config.titleDe || config.titleHu || config.title;
-        } else if (language === "it") {
-          title = config.titleIt || config.titleEn || config.titleDe || config.titleHu || config.title;
-        }
-
-        // === PLACEHOLDER LOKALIZÁCIÓ (FALLBACK: target → EN → DE → HU → default) ===
-        let placeholder = config.placeholder;
-        if (language === "hu") {
-          placeholder = config.placeholder;
-        } else if (language === "de") {
-          placeholder = config.placeholderDe || config.placeholder;
-        } else if (language === "en") {
-          placeholder = config.placeholderEn || config.placeholderDe || config.placeholder;
-        } else if (language === "fr") {
-          placeholder = config.placeholderFr || config.placeholderEn || config.placeholderDe || config.placeholder;
-        } else if (language === "it") {
-          placeholder = config.placeholderIt || config.placeholderEn || config.placeholderDe || config.placeholder;
+        // === DEBUGGING: Hiányzó magyar fordítások logolása ===
+        if (language === "hu" && !config.titlehu && !config.titleHu && !config.title) {
+          console.warn(`⚠️ Missing HU title for question: ${config.questionId}`);
         }
 
         return {
           id: config.questionId,
           title: title,
-          groupName: groupName,
+          groupName: groupName || "Általános",
           groupKey: config.groupKey,
           type: correctedType,
           options: options,
@@ -236,7 +228,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // Profile endpoints - PROTECTED with auth middleware
+  // Profile endpoints - PROTECTED
   app.get("/api/profiles/:userId", requireAuth, requireOwnerOrAdmin, async (req, res) => {
     try {
       const { userId } = req.params;
@@ -255,7 +247,6 @@ export async function registerRoutes(app: Express) {
 
   app.post("/api/profiles", requireAuth, async (req, res) => {
     try {
-      // Validate request body with Zod
       const validationResult = insertProfileSchema.safeParse(req.body);
       
       if (!validationResult.success) {
@@ -267,42 +258,29 @@ export async function registerRoutes(app: Express) {
       
       const authenticatedUser = (req as any).user;
       
-      // Ensure user can only create their own profile
       if (validationResult.data.user_id !== authenticatedUser.user_id) {
         return res.status(403).json({ 
           message: "Forbidden - You can only create your own profile" 
         });
       }
       
-      // SECURITY FIX: Force role to "user" for self-service creation
-      // Only admins can create profiles with elevated roles (future feature)
-      // const sanitizedData = {
-       // ...validationResult.data,
-        //role: 'user', // Always set to 'user' regardless of client input
-      //};
-      // const profile = await storage.createProfile(sanitizedData);
-      // A validationResult.data tartalmazza a user_id, email, role, name stb. mezőket.
-
-    const profileDataFromClient = validationResult.data;
-
-    // A user_id alapján frissítjük a profilt
-    const updatedProfile = await storage.updateProfile(
+      const profileDataFromClient = validationResult.data;
+      const updatedProfile = await storage.updateProfile(
         profileDataFromClient.user_id, 
         profileDataFromClient
-    );
-    
-    res.status(201).json(updatedProfile); // 201 (Created) helyett 200 (OK) is lehetne, de így is jó
-  } catch (error) {
-    console.error("❌ Error creating/updating profile:", error); // <-- Átírtam a log üzenetet
-    res.status(500).json({ message: "Failed to create or update profile" });
-  }
-});
+      );
+      
+      res.status(201).json(updatedProfile);
+    } catch (error) {
+      console.error("❌ Error creating/updating profile:", error);
+      res.status(500).json({ message: "Failed to create or update profile" });
+    }
+  });
 
   app.patch("/api/profiles/:userId", requireAuth, requireOwnerOrAdmin, async (req, res) => {
     try {
       const { userId } = req.params;
       
-      // Validate request body with Zod (partial update)
       const partialProfileSchema = insertProfileSchema.partial();
       const validationResult = partialProfileSchema.safeParse(req.body);
       
@@ -313,13 +291,10 @@ export async function registerRoutes(app: Express) {
         });
       }
       
-      // SECURITY FIX: Remove protected fields from user updates
-      // Users cannot change their own role or user_id - only system/admin can do that
       const sanitizedData = { ...validationResult.data };
-      delete sanitizedData.role; // Strip role from client updates
-      delete sanitizedData.user_id; // Strip user_id to prevent ownership transfer
+      delete sanitizedData.role;
+      delete sanitizedData.user_id;
       
-      // If no fields left to update after sanitization
       if (Object.keys(sanitizedData).length === 0) {
         return res.status(400).json({ 
           message: "No valid fields to update" 
@@ -339,7 +314,7 @@ export async function registerRoutes(app: Express) {
     }
   });
 
-  // OPCIONÁLIS: Manuális cache törlés endpoint (fejlesztési/debug célokra)
+  // Cache törlés endpoint (fejlesztési/debug célokra)
   app.post("/api/cache/clear", (_req, res) => {
     clearQuestionsCache();
     hybridTemplateLoader.clearCache();

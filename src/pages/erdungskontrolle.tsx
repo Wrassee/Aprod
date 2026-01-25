@@ -85,15 +85,16 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
           ${hasError ? 'bg-amber-50/50' : 'bg-white hover:bg-blue-50/30'}
         `}
       >
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 p-4">
-          <Label className="text-base font-medium text-gray-800 dark:text-gray-200 flex-1 pr-4">
+        {/* MOBILE-FIRST: flex-col on mobile, flex-row on sm+ */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 sm:p-4">
+          <Label className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 flex-1">
             {question.text}
           </Label>
 
           <RadioGroup
             value={currentAnswer || ''}
             onValueChange={(value) => onChange(question.id, value as GroundingAnswer)}
-            className="flex items-center gap-2 flex-shrink-0"
+            className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:flex-shrink-0"
           >
             {/* OK Button */}
             <div className="relative">
@@ -101,13 +102,13 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
               <Label
                 htmlFor={`${question.id}_ok`}
                 className={`
-                  group relative inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md
+                  group relative inline-flex items-center justify-center gap-1 sm:gap-2 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap
                   ${currentAnswer === 'ok'
                     ? 'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-green-500 shadow-lg scale-105'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-green-50 hover:border-green-300'}
                   `}
               >
-                <CheckCircle2 className={`h-4 w-4 transition-transform pointer-events-none ${currentAnswer === 'ok' ? 'scale-110' : 'group-hover:scale-110'}`} />
+                <CheckCircle2 className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform pointer-events-none ${currentAnswer === 'ok' ? 'scale-110' : 'group-hover:scale-110'}`} />
                 <span>OK</span>
               </Label>
             </div>
@@ -118,14 +119,14 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
               <Label
                 htmlFor={`${question.id}_not_ok`}
                 className={`
-                  group relative inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md
+                  group relative inline-flex items-center justify-center gap-1 sm:gap-2 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap
                   ${currentAnswer === 'not_ok'
                     ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-red-500 shadow-lg scale-105'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-red-50 hover:border-red-300'}
                   `}
               >
-                <XCircle className={`h-4 w-4 transition-transform pointer-events-none ${currentAnswer === 'not_ok' ? 'scale-110' : 'group-hover:scale-110'}`} />
-                <span>{{hu: 'Nem OK', de: 'Nicht OK', en: 'Not OK', fr: 'Non OK', it: 'Non OK'}[language]}</span>
+                <XCircle className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform pointer-events-none ${currentAnswer === 'not_ok' ? 'scale-110' : 'group-hover:scale-110'}`} />
+                <span>{{hu: 'Nem', de: 'Nein', en: 'No', fr: 'Non', it: 'No'}[language]}</span>
               </Label>
             </div>
 
@@ -135,13 +136,13 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
               <Label
                 htmlFor={`${question.id}_na`}
                 className={`
-                  group relative inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md
+                  group relative inline-flex items-center justify-center gap-1 sm:gap-2 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap
                   ${currentAnswer === 'not_applicable'
                     ? 'bg-gradient-to-r from-gray-500 to-slate-500 text-white border-gray-500 shadow-lg scale-105'
                     : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 hover:border-gray-300'}
                   `}
               >
-                <MinusCircle className={`h-4 w-4 transition-transform pointer-events-none ${currentAnswer === 'not_applicable' ? 'scale-110' : 'group-hover:scale-110'}`} />
+                <MinusCircle className={`h-3 w-3 sm:h-4 sm:w-4 transition-transform pointer-events-none ${currentAnswer === 'not_applicable' ? 'scale-110' : 'group-hover:scale-110'}`} />
                 <span>N.A.</span>
               </Label>
             </div>
@@ -169,7 +170,7 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
     );
   }
 
-  // CLASSIC VERSION
+  // CLASSIC VERSION - MOBILE-FIRST RESPONSIVE
   return (
     <div
       className={`
@@ -180,22 +181,23 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
         ${hasError ? 'bg-orange-50' : 'bg-white'}
       `}
     >
-      <div className="flex justify-between items-center p-4">
-        <Label className="text-base font-medium text-gray-900 flex-1 pr-4">
+      {/* MOBILE-FIRST: flex-col on mobile, flex-row on sm+ */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 sm:p-4">
+        <Label className="text-sm sm:text-base font-medium text-gray-900 flex-1">
           {question.text}
         </Label>
 
         <RadioGroup
           value={currentAnswer || ''}
           onValueChange={(value) => onChange(question.id, value as GroundingAnswer)}
-          className="flex items-center gap-x-2 sm:gap-x-3"
+          className="flex flex-wrap items-center gap-2 sm:gap-x-3 sm:flex-nowrap"
         >
           <div>
             <RadioGroupItem value="ok" id={`${question.id}_ok`} className="sr-only" />
             <Label
               htmlFor={`${question.id}_ok`}
               className={`
-                inline-flex items-center justify-center rounded-full px-3 py-1 sm:px-4 sm:py-1.5 text-sm font-semibold border cursor-pointer transition-all
+                inline-flex items-center justify-center rounded-full px-3 py-1.5 sm:px-4 sm:py-1.5 text-xs sm:text-sm font-semibold border cursor-pointer transition-all whitespace-nowrap
                 ${currentAnswer === 'ok'
                   ? 'bg-green-600 text-white border-green-600 shadow-md'
                   : 'bg-white text-gray-800 border-gray-300 hover:bg-green-50'}
@@ -210,13 +212,13 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
             <Label
               htmlFor={`${question.id}_not_ok`}
               className={`
-                inline-flex items-center justify-center rounded-full px-3 py-1 sm:px-4 sm:py-1.5 text-sm font-semibold border cursor-pointer transition-all
+                inline-flex items-center justify-center rounded-full px-3 py-1.5 sm:px-4 sm:py-1.5 text-xs sm:text-sm font-semibold border cursor-pointer transition-all whitespace-nowrap
                 ${currentAnswer === 'not_ok'
                   ? 'bg-red-600 text-white border-red-600 shadow-md'
                   : 'bg-white text-gray-800 border-gray-300 hover:bg-red-50'}
               `}
             >
-              {{hu: 'Nem OK', de: 'Nicht OK', en: 'Not OK', fr: 'Non OK', it: 'Non OK'}[language]}
+              {{hu: 'Nem', de: 'Nein', en: 'No', fr: 'Non', it: 'No'}[language]}
             </Label>
           </div>
 
@@ -225,7 +227,7 @@ const GroundingQuestionItem = memo(function GroundingQuestionItem({
             <Label
               htmlFor={`${question.id}_na`}
               className={`
-                inline-flex items-center justify-center rounded-full px-3 py-1 sm:px-4 sm:py-1.5 text-sm font-semibold border cursor-pointer transition-all
+                inline-flex items-center justify-center rounded-full px-3 py-1.5 sm:px-4 sm:py-1.5 text-xs sm:text-sm font-semibold border cursor-pointer transition-all whitespace-nowrap
                 ${currentAnswer === 'not_applicable'
                   ? 'bg-gray-600 text-white border-gray-600 shadow-md'
                   : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'}
@@ -499,7 +501,7 @@ export function Erdungskontrolle({
           </>
         )}
 
-        <main className="relative z-10 max-w-5xl mx-auto px-6 py-8">
+        <main className="relative z-10 max-w-5xl mx-auto px-3 sm:px-6 py-4 sm:py-8 overflow-x-hidden">
           {/* HEADER CARD - Theme Aware */}
           {theme === 'modern' ? (
             // MODERN: Glassmorphism header
@@ -544,10 +546,10 @@ export function Erdungskontrolle({
               </div>
             </div>
           ) : (
-            // CLASSIC: Simple header
-            <div className="mb-8">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold text-gray-900">
+            // CLASSIC: Simple header - MOBILE-FIRST
+            <div className="mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-4">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                   {{hu: 'Földelési Mérések', de: 'Erdungskontrolle', en: 'Grounding Inspection', fr: 'Controle de mise a la terre', it: 'Controllo messa a terra'}[language]}
                 </h2>
                 <div className="text-sm text-gray-600">
@@ -556,7 +558,7 @@ export function Erdungskontrolle({
                 </div>
               </div>
               <Progress value={progressPercent} className="h-2" />
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-xs sm:text-sm text-gray-600 mt-2">
                 {{
                   hu: 'Minden mérési pontnál jelölje be a megfelelő választ. A "Nem OK" válaszok automatikusan bekerülnek a hibalistába.',
                   de: 'Wählen Sie bei jedem Messpunkt die entsprechende Antwort. "Nicht OK" Antworten werden automatisch zur Fehlerliste hinzugefügt.',

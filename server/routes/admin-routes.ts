@@ -657,7 +657,7 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
         await storage.createQuestionConfig({
           template_id: newTemplate.id,
           question_id: q.questionId,
-          title: q.title,
+          title: q.title || q.titleHu || q.titleDe || `Question ${q.questionId}`,
           title_hu: q.titleHu ?? null,
           title_de: q.titleDe ?? null,
           title_en: q.titleEn ?? null,

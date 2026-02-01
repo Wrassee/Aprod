@@ -69,7 +69,25 @@ Excel writing functionality must remain untouched to prevent corruption.
   - **Privilege Escalation Prevention**: Server-side role and user_id field protection with database-backed role verification
   - **Secure API Calls**: All profile operations use Authorization Bearer headers with Zod validation
 
-## Recent Changes (January 13, 2026)
+## Recent Changes (February 1, 2026)
+### Version 0.9.6.0 - Select Extended Question Type & Mobile Improvements
+
+1. **New Question Type: select_extended**
+   - New question type for scenarios where each dropdown option maps to a unique Excel cell
+   - Example: "Lift Purpose" with options like "Passenger", "Freight", "Hospital", etc.
+   - Each option has its own cell reference (e.g., G59, G60, G61, N59, N60, N61)
+   - Selected option writes "X" to its cell, unselected options write "-"
+   - Excel template format: `type: select_extended`, `options: Option1,Option2,Option3`, `optionCells: G59,G60,G61`
+   - Files modified: shared/schema.ts, server/services/excel-parser.ts, server/routes.ts, server/storage.ts, src/components/stable-input.tsx
+
+2. **Grounding Measurements Mobile Responsiveness**
+   - Mobile-first responsive design for Erdungskontrolle page
+   - Questions and radio buttons now stack vertically on mobile (flex-col)
+   - Smaller button padding and font sizes on mobile
+   - flex-wrap for button groups, overflow-x-hidden for main container
+   - Both Modern and Classic themes updated
+
+## Previous Changes (January 13, 2026)
 ### Version 0.9.5.1 - Error List PDF Fix & Mobile Signature Support
 6. **Error List PDF Header Data Fix**
    - Fixed incorrect field mapping in error list PDF generation

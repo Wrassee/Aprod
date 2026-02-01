@@ -75,20 +75,33 @@ class SimpleXmlExcelService {
   private createCellMappings(formData: FormData, questionConfigs: any[], language: string): Array<{cell: string, value: string, label: string}> {
     const mappings: Array<{cell: string, value: string, label: string}> = [];
     
+    console.log(`📊 createCellMappings: ${Object.keys(formData.answers).length} answers, ${questionConfigs.length} configs`);
+    console.log(`📊 Answer keys sample: ${Object.keys(formData.answers).slice(0, 5).join(', ')}`);
+    console.log(`📊 Config IDs sample: ${questionConfigs.slice(0, 3).map(q => `id=${q.id}, qId=${q.questionId}`).join(' | ')}`);
+    
     Object.entries(formData.answers).forEach(([key, answer]) => {
-      const config = questionConfigs.find(q => String(q.id) === key || q.questionId === key);
+      const config = questionConfigs.find(q => String(q.id) === key || q.questionId === key || String(q.question_id) === key);
 
-      if (!config || answer === null || answer === '' || answer === undefined) {
+      if (!config) {
+        console.log(`⚠️ No config found for answer key: ${key}`);
+        return; 
+      }
+      
+      if (answer === null || answer === '' || answer === undefined) {
         return; 
       }
       
       // select_extended nem használ cellReference-t, hanem optionCells-t
-      if (config.type !== 'select_extended' && !config.cellReference) {
+      const cellRef = config.cellReference || config.cell_reference;
+      if (config.type !== 'select_extended' && !cellRef) {
+        console.log(`⚠️ No cellReference for key: ${key}, type: ${config.type}`);
         return;
       }
       
+      console.log(`✅ Processing: key=${key}, type=${config.type}, cellRef=${cellRef}, answer=${answer}`);
+      
       const type = config.type;
-      const cellRef = config.cellReference ? String(config.cellReference) : '';
+      const finalCellRef = cellRef ? String(cellRef) : '';
       
       // ====================== VÉGSŐ, EGYSZERŰSÍTETT LOGIKA ======================
 
@@ -113,8 +126,8 @@ class SimpleXmlExcelService {
       // 1. ESET: Többcellásnak TŰNŐ kérdés.
       // Ha a cellahivatkozás vesszőt tartalmaz, azt MINDIG többcellásként kezeljük,
       // függetlenül a típustól és a multiCell flagtől. Ez a legbiztosabb jel.
-      if (cellRef.includes(',')) {
-        const cellRefs = cellRef.split(',').map((c: string) => c.trim());
+      if (finalCellRef.includes(',')) {
+        const cellRefs = finalCellRef.split(',').map((c: string) => c.trim());
         if (cellRefs.length >= 2) {
           const [yesCells, noCells, naCells] = cellRefs;
           
@@ -133,12 +146,12 @@ class SimpleXmlExcelService {
       // 2. ESET: Egycellás 'true/false' (radio)
       else if (type === 'radio') {
         const cellValue = (answer === 'true' || answer === true) ? 'X' : '-';
-        mappings.push({ cell: cellRef, value: cellValue, label: `Question ${key}` });
+        mappings.push({ cell: finalCellRef, value: cellValue, label: `Question ${key}` });
       } 
       // 3. ESET: Minden más egycellás kérdés (szöveg, szám, egycellás yes_no_na)
       else {
         const formattedValue = this.formatAnswer(answer, language);
-        mappings.push({ cell: cellRef, value: formattedValue, label: `Question ${key}` });
+        mappings.push({ cell: finalCellRef, value: formattedValue, label: `Question ${key}` });
       }
       // ======================================================================
     });

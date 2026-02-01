@@ -78,14 +78,37 @@ class SimpleXmlExcelService {
     Object.entries(formData.answers).forEach(([key, answer]) => {
       const config = questionConfigs.find(q => String(q.id) === key || q.questionId === key);
 
-      if (!config || !config.cellReference || answer === null || answer === '' || answer === undefined) {
+      if (!config || answer === null || answer === '' || answer === undefined) {
         return; 
       }
       
+      // select_extended nem használ cellReference-t, hanem optionCells-t
+      if (config.type !== 'select_extended' && !config.cellReference) {
+        return;
+      }
+      
       const type = config.type;
-      const cellRef = String(config.cellReference);
+      const cellRef = config.cellReference ? String(config.cellReference) : '';
       
       // ====================== VÉGSŐ, EGYSZERŰSÍTETT LOGIKA ======================
+
+      // 0. ESET: select_extended típus - minden opciónak saját cellája van
+      if (type === 'select_extended' && config.optionCells && config.options) {
+        const optionsArr = String(config.options).split(',').map((o: string) => o.trim());
+        const cellsArr = String(config.optionCells).split(',').map((c: string) => c.trim());
+        
+        if (optionsArr.length === cellsArr.length) {
+          cellsArr.forEach((cell, index) => {
+            // Ha ez a kiválasztott opció, "X"-et írunk, különben "-"-t
+            const value = (answer === optionsArr[index]) ? 'X' : '-';
+            mappings.push({ cell, value, label: `select_extended ${key}` });
+            console.log(`🖋️ select_extended ${cell} = "${value}" (option: ${optionsArr[index]}, selected: ${answer})`);
+          });
+        } else {
+          console.warn(`⚠️ select_extended mismatch for "${key}": options(${optionsArr.length}) != cells(${cellsArr.length})`);
+        }
+        return; // Kész, tovább a következőre
+      }
 
       // 1. ESET: Többcellásnak TŰNŐ kérdés.
       // Ha a cellahivatkozás vesszőt tartalmaz, azt MINDIG többcellásként kezeljük,

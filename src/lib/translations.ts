@@ -1009,7 +1009,7 @@ export const translations: Record<string, Translation> = {
     // Answers
     yes: "Ja",
     no: "Nein",
-    notApplicable: "Nicht zutreffend",
+    notApplicable: "N.z.",
     
     // Error List
     errorList: "Fehlerliste",

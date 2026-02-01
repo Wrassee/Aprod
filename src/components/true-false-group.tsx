@@ -75,7 +75,7 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
               
             return (
               <div key={question.id} className="flex items-center p-3 rounded-lg hover:bg-gray-50 min-h-[60px]">
-                <span className="flex-1 text-gray-800 text-sm">
+                <span className="flex-1 text-gray-800 text-sm sm:text-base font-medium">
                   {/* NEW: Use localized title object if available */}
                   {question.title?.[lang] || question.title}
                   {question.required && <span className="text-red-500 ml-1">*</span>}

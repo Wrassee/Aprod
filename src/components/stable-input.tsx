@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 interface StableInputProps {
   questionId: string;
-  type?: 'text' | 'number' | 'email' | 'phone' | 'textarea' | 'select' | 'measurement' | 'multi_select' | 'date' | 'time';
+  type?: 'text' | 'number' | 'email' | 'phone' | 'textarea' | 'select' | 'select_extended' | 'measurement' | 'multi_select' | 'date' | 'time';
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -77,6 +77,7 @@ export function StableInput({
       );
 
     case 'select':
+    case 'select_extended': // Ugyanúgy legördülő lista, de minden opciónak külön cellája van az Excelben
     case 'multi_select':
       const selectOptions = options ? options.split(',') : [];
       return (

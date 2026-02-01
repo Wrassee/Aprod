@@ -125,7 +125,7 @@ const IsolatedQuestionComponent = memo(({
     return (
       <StableInput
         questionId={question.id}
-        type={question.type as 'text' | 'number' | 'measurement' | 'select' | 'multi_select' | 'date' | 'time'}
+        type={question.type as 'text' | 'number' | 'measurement' | 'select' | 'select_extended' | 'multi_select' | 'date' | 'time'}
         value={value?.toString() || ''}
         onChange={onChange}
         placeholder={question.placeholder}

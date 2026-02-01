@@ -194,6 +194,7 @@ export async function registerRoutes(app: Express) {
           groupKey: config.groupKey,
           type: correctedType,
           options: options,
+          optionCells: config.optionCells, // select_extended típushoz
           required: config.required,
           placeholder: placeholder,
           unit: config.unit,

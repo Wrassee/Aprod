@@ -152,6 +152,7 @@ export const QuestionTypeEnum = z.enum([
   "number", 
   "date", 
   "select", 
+  "select_extended", // Új: minden opciónak külön cellája van (X/-) 
   "checkbox", 
   "radio", 
   "measurement", 
@@ -205,10 +206,7 @@ export const questionConfigs = pgTable("question_configs", {
   calculation_formula: text("calculation_formula"),
   calculation_inputs: jsonb("calculation_inputs"),
   options: text("options"),
-  // options_de: text("options_de"),
-  // options_en: text("options_en"),
-  // options_fr: text("options_fr"),
-  // options_it: text("options_it"),
+  option_cells: text("option_cells"), // select_extended típushoz: cella referenciák (G59,G60,G61,N59,N60,N61)
   max_length: integer("max_length"),
   created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
@@ -336,6 +334,7 @@ export type Question = QuestionConfig & {
   groupKey?: string;
   group?: QuestionGroup;
   options?: string[];
+  optionCells?: string | null; // select_extended: cellák az egyes opciókhoz
   questionId?: string;
   titleHu?: string | null;
   titleDe?: string | null;

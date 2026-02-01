@@ -49,6 +49,9 @@ export interface ParsedQuestion {
   // Opciók (NEM nyelvfüggő - technikai értékek)
   options?: string;
   
+  // select_extended típushoz: cellák az egyes opciókhoz (vesszővel elválasztva, sorrendben megegyezik az options-szel)
+  optionCells?: string;
+  
   maxLength?: number;
 }
 
@@ -113,6 +116,7 @@ class ExcelParserService {
     if (['number', 'numeric', 'integer', 'float', 'decimal'].includes(t)) return 'number';
     if (['textarea', 'memo', 'multiline', 'longtext'].includes(t)) return 'textarea';
     if (['select', 'dropdown', 'list', 'választó'].includes(t)) return 'select';
+    if (['select_extended', 'selectextended', 'extended_select', 'multi_cell_select'].includes(t)) return 'select_extended';
     if (['phone', 'tel', 'telefon', 'telephone'].includes(t)) return 'phone';
     if (['email', 'e-mail', 'mail'].includes(t)) return 'email';
     if (['date', 'dátum', 'datum'].includes(t)) return 'date';
@@ -205,6 +209,7 @@ class ExcelParserService {
         
         // ===== OPTIONS (nyelvfüggetlen) =====
         OPTIONS: this.findHeaderIndex(headers, 'options', 'choices', 'választások', 'opciók', 'Options'),
+        OPTION_CELLS: this.findHeaderIndex(headers, 'optioncells', 'option_cells', 'optionCells', 'Option Cells', 'OptionCells', 'cellák', 'cells'),
         
         MAX_LENGTH: this.findHeaderIndex(headers, 'maxlength', 'max_length', 'maxLength', 'Max Length', 'MaxLength'),
         REQUIRED: this.findHeaderIndex(headers, 'required', 'kötelező', 'kell', 'Required'),
@@ -282,6 +287,7 @@ class ExcelParserService {
           
           // ===== OPTIONS (nyelvfüggetlen technikai értékek) =====
           options: safeString(colIndices.OPTIONS),
+          optionCells: safeString(colIndices.OPTION_CELLS), // select_extended típushoz
           
           maxLength: colIndices.MAX_LENGTH !== -1 && row[colIndices.MAX_LENGTH] 
             ? parseInt(String(row[colIndices.MAX_LENGTH])) 
@@ -418,6 +424,38 @@ class ExcelParserService {
 
       questions.forEach(question => {
         const answer = answers[question.questionId];
+        
+        // ===== SELECT_EXTENDED SPECIÁLIS KEZELÉS =====
+        // Minden opciónak saját cellája van, "X" a kiválasztottnak, "-" a többinek
+        if (question.type === 'select_extended' && question.options && question.optionCells) {
+          const optionsArr = question.options.split(',').map(o => o.trim());
+          const cellsArr = question.optionCells.split(',').map(c => c.trim());
+          
+          if (optionsArr.length !== cellsArr.length) {
+            console.warn(`⚠️ select_extended mismatch for "${question.questionId}": options(${optionsArr.length}) != cells(${cellsArr.length})`);
+            return;
+          }
+          
+          const defaultSheetName = question.sheetName || workbook.SheetNames[0];
+          
+          // Minden cellát kitöltünk
+          cellsArr.forEach((cellRef, index) => {
+            const [sheetName, actualCellRef] = cellRef.includes('!')
+              ? cellRef.split('!')
+              : [defaultSheetName, cellRef];
+            
+            if (sheetName && workbook.Sheets[sheetName]) {
+              const worksheet = workbook.Sheets[sheetName];
+              // Ha ez a kiválasztott opció, "X"-et írunk, különben "-"-t
+              const value = (answer === optionsArr[index]) ? 'X' : '-';
+              worksheet[actualCellRef] = { v: value, t: 's' };
+              console.log(`🖋️ select_extended ${sheetName}!${actualCellRef} = "${value}" (option: ${optionsArr[index]})`);
+            }
+          });
+          return; // Megvan, tovább a következő kérdésre
+        }
+        
+        // ===== NORMÁL KÉRDÉSEK (eredeti logika) =====
         if (!question.cellReference || answer === undefined || answer === null) return;
 
         const [sheetName, cellRef] = question.cellReference.includes('!')

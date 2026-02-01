@@ -358,10 +358,7 @@ export class DatabaseStorage implements IStorage {
       newConfig.calculationInputs = config.calculation_inputs !== undefined ? config.calculation_inputs : config.calculationInputs;
       newConfig.sheetName = config.sheet_name !== undefined ? config.sheet_name : config.sheetName;
       newConfig.options = config.options !== undefined ? config.options : config.options;
-      newConfig.optionsDe = config.options_de !== undefined ? config.options_de : config.optionsDe;
-      newConfig.optionsEn = config.options_en !== undefined ? config.options_en : config.optionsEn;
-      newConfig.optionsFr = config.options_fr !== undefined ? config.options_fr : config.optionsFr;
-      newConfig.optionsIt = config.options_it !== undefined ? config.options_it : config.optionsIt;
+      newConfig.optionCells = config.option_cells !== undefined ? config.option_cells : config.optionCells; // select_extended
       newConfig.maxLength = config.max_length !== undefined ? config.max_length : config.maxLength;
 
       return newConfig;

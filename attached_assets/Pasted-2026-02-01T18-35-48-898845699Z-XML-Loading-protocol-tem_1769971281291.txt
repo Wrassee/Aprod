@@ -1,0 +1,100 @@
+2026-02-01T18:35:48.898845699Z XML: Loading protocol template...
+2026-02-01T18:35:48.89885515Z TemplateLoader: Attempting to load active template type="protocol", language="de"
+2026-02-01T18:35:48.89887588Z 🔍 Looking for active template – type=protocol, language=de
+2026-02-01T18:35:48.948504046Z 🔍 No exact match – trying multilingual
+2026-02-01T18:35:48.958433175Z 📋 Result: PR (multilingual)
+2026-02-01T18:35:48.958661561Z TemplateLoader: Downloading from Supabase ("templates/1769028585500-Abnahmeprotokoll Leer DE.xlsx") to temp file ("/app/temp/download-1769970948958-Abnahmeprotokoll Leer DE.xlsx")...
+2026-02-01T18:35:49.385086225Z TemplateLoader: Download complete.
+2026-02-01T18:35:49.385458624Z TemplateLoader: Template file read into buffer, size: 541535 bytes.
+2026-02-01T18:35:49.385719751Z TemplateLoader: Cleaned up temporary file: /app/temp/download-1769970948958-Abnahmeprotokoll Leer DE.xlsx
+2026-02-01T18:35:49.385878985Z 🔍 Looking for active template – type=unified, language=multilingual
+2026-02-01T18:35:49.394511931Z 📋 Result: FRAGE MOD (multilingual)
+2026-02-01T18:35:49.403674711Z XML Excel service error: error: column "option_cells" does not exist
+2026-02-01T18:35:49.403690192Z     at /app/node_modules/pg-pool/index.js:45:11
+2026-02-01T18:35:49.403695562Z     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-01T18:35:49.403699652Z     at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+2026-02-01T18:35:49.403704382Z     at async DatabaseStorage.getQuestionConfigsByTemplate (file:///app/dist/server/storage.js:190:28)
+2026-02-01T18:35:49.403722483Z     at async SimpleXmlExcelService.generateExcelFromTemplate (file:///app/dist/server/services/simple-xml-excel.js:13:35)
+2026-02-01T18:35:49.403727303Z     at async file:///app/dist/server/routes/protocol-mapping.js:93:29 {
+2026-02-01T18:35:49.403731823Z   length: 113,
+2026-02-01T18:35:49.403736463Z   severity: 'ERROR',
+2026-02-01T18:35:49.403740493Z   code: '42703',
+2026-02-01T18:35:49.403744733Z   detail: undefined,
+2026-02-01T18:35:49.403749053Z   hint: undefined,
+2026-02-01T18:35:49.403753493Z   position: '491',
+2026-02-01T18:35:49.403758473Z   internalPosition: undefined,
+2026-02-01T18:35:49.403762733Z   internalQuery: undefined,
+2026-02-01T18:35:49.403766574Z   where: undefined,
+2026-02-01T18:35:49.403770694Z   schema: undefined,
+2026-02-01T18:35:49.403774974Z   table: undefined,
+2026-02-01T18:35:49.403779584Z   column: undefined,
+2026-02-01T18:35:49.403783964Z   dataType: undefined,
+2026-02-01T18:35:49.403788454Z   constraint: undefined,
+2026-02-01T18:35:49.403792894Z   file: 'parse_relation.c',
+2026-02-01T18:35:49.403796924Z   line: '3716',
+2026-02-01T18:35:49.403801094Z   routine: 'errorMissingColumn'
+2026-02-01T18:35:49.403805295Z }
+2026-02-01T18:35:49.403821955Z Error generating Excel download: error: column "option_cells" does not exist
+2026-02-01T18:35:49.403842855Z     at /app/node_modules/pg-pool/index.js:45:11
+2026-02-01T18:35:49.403846286Z     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2026-02-01T18:35:49.403849056Z     at async file:///app/node_modules/drizzle-orm/node-postgres/session.js:83:22
+2026-02-01T18:35:49.403851786Z     at async DatabaseStorage.getQuestionConfigsByTemplate (file:///app/dist/server/storage.js:190:28)
+2026-02-01T18:35:49.403854446Z     at async SimpleXmlExcelService.generateExcelFromTemplate (file:///app/dist/server/services/simple-xml-excel.js:13:35)
+2026-02-01T18:35:49.403856996Z     at async file:///app/dist/server/routes/protocol-mapping.js:93:29 {
+2026-02-01T18:35:49.403859456Z   length: 113,
+2026-02-01T18:35:49.403862006Z   severity: 'ERROR',
+2026-02-01T18:35:49.403864296Z   code: '42703',
+2026-02-01T18:35:49.403866606Z   detail: undefined,
+2026-02-01T18:35:49.403868986Z   hint: undefined,
+2026-02-01T18:35:49.403871576Z   position: '491',
+2026-02-01T18:35:49.403874506Z   internalPosition: undefined,
+2026-02-01T18:35:49.403876876Z   internalQuery: undefined,
+2026-02-01T18:35:49.403879167Z   where: undefined,
+2026-02-01T18:35:49.403881356Z   schema: undefined,
+2026-02-01T18:35:49.403883596Z   table: undefined,
+2026-02-01T18:35:49.403885807Z   column: undefined,
+2026-02-01T18:35:49.403888047Z   dataType: undefined,
+2026-02-01T18:35:49.403890457Z   constraint: undefined,
+2026-02-01T18:35:49.403893057Z   file: 'parse_relation.c',
+2026-02-01T18:35:49.403895437Z   line: '3716',
+2026-02-01T18:35:49.403897787Z   routine: 'errorMissingColumn'
+2026-02-01T18:35:49.403900137Z }
+2026-02-01T18:36:05.505702797Z [API] GET /api/profiles/bec0aba7-dc26-4093-b504-11053a66730e
+2026-02-01T18:36:05.963292984Z 🔄 Syncing profile for bec0aba7-dc26-4093-b504-11053a66730e: { role: 'admin -> admin', email_confirmed: 'undefined -> true' }
+2026-02-01T18:36:10.024715752Z [API] GET /api/questions/de
+2026-02-01T18:36:10.024866426Z 📦 Loading questions from template: 4c1d8c36-4c59-4b55-bcb5-9d7765c04606
+2026-02-01T18:36:10.024890316Z 🔍 Loading template: 4c1d8c36-4c59-4b55-bcb5-9d7765c04606 (type: unified, language: multilingual, strategy: local_first)
+2026-02-01T18:36:10.025080391Z ☁️ Loading template from Supabase...
+2026-02-01T18:36:10.034311683Z 📄 Using existing cached file: /app/temp/template-Abnahme FRAGEN.xlsx
+2026-02-01T18:36:10.034333603Z 🔍 Parsing questions from: /app/temp/template-Abnahme FRAGEN.xlsx
+2026-02-01T18:36:10.147523594Z 📋 Headers found in Excel: [ID, titleHu, titlede, titleen, titlefr, titleit, Type, cellReference, options, optionCells, Unit, calculation_formula, calculation_inputs, min_value, max_value, sheetName, groupOrder, required, placeholderhu, placeholderde, placeholderen, placeholderfr, placeholderit, groupNamehu, groupNamede, groupNameen, groupNamefr, groupNameit, multiCell, title, conditional_group_key, , , , , ]
+2026-02-01T18:36:10.14851719Z 📊 Column indices found: {
+2026-02-01T18:36:10.14853392Z   TITLE_HU: 1,
+2026-02-01T18:36:10.1485386Z   TITLE_DE: 2,
+2026-02-01T18:36:10.14854337Z   PLACEHOLDER_HU: 18,
+2026-02-01T18:36:10.14854757Z   GROUP_NAME_HU: 23,
+2026-02-01T18:36:10.14855175Z   TYPE: 6,
+2026-02-01T18:36:10.14855578Z   CELL_REF: 7
+2026-02-01T18:36:10.148559771Z }
+2026-02-01T18:36:10.148852128Z ✅ Successfully parsed 54 questions.
+2026-02-01T18:36:10.14893731Z 📊 Parse statistics: {
+2026-02-01T18:36:10.14894478Z   total: 54,
+2026-02-01T18:36:10.14894949Z   withCellRef: 49,
+2026-02-01T18:36:10.148953441Z   withOptions: 2,
+2026-02-01T18:36:10.14895737Z   withTitleHu: 51,
+2026-02-01T18:36:10.148961151Z   withGroupNameHu: 47,
+2026-02-01T18:36:10.148979341Z   byType: {
+2026-02-01T18:36:10.148982121Z     text: 10,
+2026-02-01T18:36:10.148984821Z     number: 9,
+2026-02-01T18:36:10.148987361Z     select_extended: 2,
+2026-02-01T18:36:10.148989761Z     radio: 24,
+2026-02-01T18:36:10.148992211Z     yes_no_na: 4,
+2026-02-01T18:36:10.148994742Z     measurement: 3,
+2026-02-01T18:36:10.148997592Z     calculated: 2
+2026-02-01T18:36:10.148999902Z   }
+2026-02-01T18:36:10.149002232Z }
+2026-02-01T18:36:10.149102274Z ✅ Loaded 54 questions from template 4c1d8c36-4c59-4b55-bcb5-9d7765c04606
+2026-02-01T18:37:05.444327619Z [API] GET /api/profiles/bec0aba7-dc26-4093-b504-11053a66730e
+2026-02-01T18:37:05.628230985Z 🔄 Syncing profile for bec0aba7-dc26-4093-b504-11053a66730e: { role: 'admin -> admin', email_confirmed: 'undefined -> true' }
+2026-02-01T18:39:03.42823821Z [API] GET /api/profiles/bec0aba7-dc26-4093-b504-11053a66730e
+2026-02-01T18:39:03.635592245Z 🔄 Syncing profile for bec0aba7-dc26-4093-b504-11053a66730e: { role: 'admin -> admin', email_confirmed: 'undefined -> true' }

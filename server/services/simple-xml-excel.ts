@@ -167,7 +167,174 @@ class SimpleXmlExcelService {
       });
     }
     
+    // ====================== REJTETT KÉRDÉSEK AUTOMATIKUS KITÖLTÉSE ======================
+    // Ha egy kérdésnek van conditionalGroupKey-je és nincs válasza, automatikusan kitöltjük
+    this.fillHiddenQuestions(questionConfigs, formData, mappings, language);
+    
     return mappings;
+  }
+  
+  // Rejtett kérdések automatikus kitöltése (conditional_group_key logika)
+  // LOGIKA: Trigger kérdések válaszai alapján döntjük el mely csoportok rejtettek
+  private fillHiddenQuestions(
+    questionConfigs: any[], 
+    formData: FormData, 
+    mappings: Array<{cell: string, value: string, label: string}>,
+    language: string
+  ): void {
+    // 1. Gyűjtsük össze a rejtett conditionalGroupKey értékeket
+    const hiddenGroupKeys = new Set<string>();
+    
+    const allConditionalKeys = new Set(
+      questionConfigs
+        .map(q => q.conditionalGroupKey || q.conditional_group_key)
+        .filter(Boolean)
+    );
+    
+    if (allConditionalKeys.size === 0) return;
+    
+    // Azonosítsuk a trigger kérdéseket
+    questionConfigs.forEach(config => {
+      const groupKey = config.groupKey || config.group_key;
+      if (!groupKey || !allConditionalKeys.has(groupKey)) return;
+      
+      const qId = config.questionId || config.question_id;
+      const answer = formData.answers[qId];
+      
+      // Normalizált válasz ellenőrzés - "nem" válasz esetén rejtett
+      if (this.isNegativeAnswer(answer)) {
+        hiddenGroupKeys.add(groupKey);
+        console.log(`🔒 Group "${groupKey}" hidden (Q${qId} = ${answer})`);
+      }
+    });
+    
+    if (hiddenGroupKeys.size === 0) {
+      console.log('📋 No hidden conditional groups');
+      return;
+    }
+    
+    // 2. Kitöltjük a rejtett kérdéseket
+    const hiddenQuestions = questionConfigs.filter(q => {
+      const condKey = q.conditionalGroupKey || q.conditional_group_key;
+      return condKey && hiddenGroupKeys.has(condKey);
+    });
+    
+    console.log(`🔍 Auto-filling ${hiddenQuestions.length} hidden questions...`);
+    
+    hiddenQuestions.forEach(config => {
+      const qId = config.questionId || config.question_id;
+      const cellRef = config.cellReference || config.cell_reference;
+      const type = config.type;
+      const defaultValue = this.getDefaultValueForHiddenQuestion(config);
+      
+      console.log(`📝 Hidden Q${qId} (${type}): "${defaultValue}"`);
+      
+      // select_extended: defaultIfHidden lehet opció név vagy "-"
+      if (type === 'select_extended') {
+        this.fillHiddenSelectExtended(config, defaultValue, qId, mappings);
+        return;
+      }
+      
+      if (!cellRef) return;
+      
+      // Többcellás kérdések (yes_no_na: [yesCells, noCells, naCells])
+      if (cellRef.includes(',')) {
+        this.fillHiddenMultiCell(cellRef, type, defaultValue, qId, mappings);
+      }
+      // Egycellás kérdések
+      else {
+        const value = (type === 'radio') ? '-' : defaultValue;
+        mappings.push({ cell: cellRef, value, label: `Hidden Q${qId}` });
+      }
+    });
+  }
+  
+  // Normalizált negatív válasz ellenőrzés
+  private isNegativeAnswer(answer: any): boolean {
+    if (answer === null || answer === undefined) return false;
+    const normalized = String(answer).toLowerCase().trim();
+    return ['no', 'nem', 'nein', 'false', 'n'].includes(normalized) || answer === false;
+  }
+  
+  // select_extended típus kezelése rejtett kérdéseknél
+  private fillHiddenSelectExtended(
+    config: any, 
+    defaultValue: string, 
+    qId: string, 
+    mappings: Array<{cell: string, value: string, label: string}>
+  ): void {
+    const optionCells = config.optionCells || config.option_cells;
+    const options = config.options;
+    
+    if (!optionCells) return;
+    
+    const cellsArr = String(optionCells).split(',').map((c: string) => c.trim());
+    const optionsArr = options ? String(options).split(',').map((o: string) => o.trim()) : [];
+    
+    // Ha defaultValue megegyezik egy opció nevével, arra X, másra -
+    const matchIndex = optionsArr.findIndex(opt => 
+      opt.toLowerCase() === defaultValue.toLowerCase()
+    );
+    
+    cellsArr.forEach((cell, idx) => {
+      if (cell) {
+        const value = (matchIndex === idx) ? 'X' : '-';
+        mappings.push({ cell, value, label: `Hidden Q${qId} select_ext` });
+      }
+    });
+  }
+  
+  // Többcellás kérdések (yes_no_na) kezelése
+  private fillHiddenMultiCell(
+    cellRef: string,
+    type: string,
+    defaultValue: string,
+    qId: string,
+    mappings: Array<{cell: string, value: string, label: string}>
+  ): void {
+    const cellRefs = cellRef.split(',').map((c: string) => c.trim());
+    if (cellRefs.length < 2) return;
+    
+    // Normalizált defaultValue
+    const normalizedDefault = defaultValue.toLowerCase().trim();
+    let targetIndex = 2; // default: N.z. (index 2)
+    
+    if (['yes', 'igen', 'ja', 'true'].includes(normalizedDefault)) {
+      targetIndex = 0;
+    } else if (['no', 'nem', 'nein', 'false'].includes(normalizedDefault)) {
+      targetIndex = 1;
+    } else if (['na', 'n.z.', 'n/a', '-'].includes(normalizedDefault)) {
+      targetIndex = 2;
+    }
+    
+    // Ellenőrizzük, hogy van-e ilyen index
+    if (targetIndex >= cellRefs.length) {
+      targetIndex = cellRefs.length - 1; // Utolsó oszlop
+    }
+    
+    const targetCells = cellRefs[targetIndex];
+    if (targetCells) {
+      targetCells.split(';').forEach((cell: string) => {
+        if (cell.trim()) {
+          mappings.push({ cell: cell.trim(), value: 'X', label: `Hidden Q${qId}` });
+        }
+      });
+    }
+  }
+  
+  // Alapértelmezett érték meghatározása rejtett kérdéshez
+  private getDefaultValueForHiddenQuestion(config: any): string {
+    const explicitDefault = config.defaultIfHidden || config.default_if_hidden;
+    if (explicitDefault) return explicitDefault;
+    
+    const type = config.type;
+    switch (type) {
+      case 'radio':
+      case 'yes_no_na':
+        return 'na';
+      default:
+        return '-';
+    }
   }
 
   private formatAnswer(answer: any, language: string): string {

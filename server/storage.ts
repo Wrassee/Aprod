@@ -359,6 +359,7 @@ export class DatabaseStorage implements IStorage {
       newConfig.sheetName = config.sheet_name !== undefined ? config.sheet_name : config.sheetName;
       newConfig.options = config.options !== undefined ? config.options : config.options;
       newConfig.optionCells = config.option_cells !== undefined ? config.option_cells : config.optionCells; // select_extended
+      newConfig.defaultIfHidden = config.default_if_hidden !== undefined ? config.default_if_hidden : config.defaultIfHidden; // conditional_group_key
       newConfig.maxLength = config.max_length !== undefined ? config.max_length : config.maxLength;
 
       return newConfig;

@@ -29,7 +29,7 @@ Excel writing functionality must remain untouched to prevent corruption.
 
 ### Key Features & Design Patterns
 - **Multi-language Support**: Hungarian and German localization with dynamic switching, using stable `groupKey` slugs for filtering logic and 5-language coverage for core features.
-- **Conditional Question Filtering**: Excel-driven visibility control using stable `groupKey` architecture for language-independent filtering.
+- **Conditional Question Filtering**: Excel-driven visibility control using stable `groupKey` architecture for language-independent filtering. Supports `conditional_group_key` for hiding/showing question blocks based on yes/no answers, with `defaultIfHidden` for automatic Excel cell population when questions are hidden.
 - **Mixed-Type Question Blocks**: Flexible rendering supporting any combination of question types (radio, text, select, measurement, calculated) within a block.
 - **Template Management System**: Admin interface for uploading, activating, and deleting Excel-based question and protocol templates, supporting unified multilingual templates.
 - **Excel Integration**: XML-based manipulation preserving formatting, handling unicode, and supporting complex cell mapping. Calculations handled by Excel's formulas.

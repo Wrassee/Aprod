@@ -52,6 +52,10 @@ export interface ParsedQuestion {
   // select_extended típushoz: cellák az egyes opciókhoz (vesszővel elválasztva, sorrendben megegyezik az options-szel)
   optionCells?: string;
   
+  // Alapértelmezett érték rejtett kérdéseknél (conditional_group_key használatakor)
+  // Ha a trigger kérdésre "nem" a válasz, ez az érték kerül az Excel-be
+  defaultIfHidden?: string;
+  
   maxLength?: number;
 }
 
@@ -237,6 +241,7 @@ class ExcelParserService {
         GROUP_KEY: this.findHeaderIndex(headers, 'groupKey', 'group_key', 'groupkey', 'Group Key', 'GroupKey'),
         GROUP_ORDER: this.findHeaderIndex(headers, 'group_order', 'groupOrder', 'grouporder', 'sorrend', 'Group Order', 'GroupOrder'),
         CONDITIONAL_GROUP_KEY: this.findHeaderIndex(headers, 'conditionalGroupKey', 'conditional_group_key', 'Conditional Group Key', 'ConditionalGroupKey'),
+        DEFAULT_IF_HIDDEN: this.findHeaderIndex(headers, 'defaultIfHidden', 'default_if_hidden', 'Default If Hidden', 'DefaultIfHidden'),
         UNIT: this.findHeaderIndex(headers, 'unit', 'egység', 'mértékegység', 'Unit'),
         MIN_VALUE: this.findHeaderIndex(headers, 'min_value', 'minValue', 'min', 'Min Value', 'MinValue'),
         MAX_VALUE: this.findHeaderIndex(headers, 'max_value', 'maxValue', 'max', 'Max Value', 'MaxValue'),
@@ -339,6 +344,7 @@ class ExcelParserService {
             : 0,
           
           conditionalGroupKey: safeString(colIndices.CONDITIONAL_GROUP_KEY),
+          defaultIfHidden: safeString(colIndices.DEFAULT_IF_HIDDEN),
           
           unit: safeString(colIndices.UNIT),
           minValue: colIndices.MIN_VALUE !== -1 && row[colIndices.MIN_VALUE] 

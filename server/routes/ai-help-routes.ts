@@ -7,16 +7,12 @@ const router = Router();
 let geminiClient: GoogleGenAI | null = null;
 
 function getGeminiClient(): GoogleGenAI | null {
-  if (!process.env.AI_INTEGRATIONS_GEMINI_API_KEY || !process.env.AI_INTEGRATIONS_GEMINI_BASE_URL) {
+  if (!process.env.GEMINI_API_KEY) {
     return null;
   }
   if (!geminiClient) {
     geminiClient = new GoogleGenAI({
-      apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
-      httpOptions: {
-        apiVersion: "",
-        baseUrl: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
-      },
+      apiKey: process.env.GEMINI_API_KEY,
     });
   }
   return geminiClient;

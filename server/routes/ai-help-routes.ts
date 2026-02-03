@@ -1,18 +1,25 @@
 import { Router } from 'express';
-import OpenAI from 'openai';
+import { GoogleGenAI } from '@google/genai';
 import { systemPromptForAI } from '../../src/lib/help-content';
 
 const router = Router();
 
-// the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
-// Lazy initialization to avoid crash when API key is missing
-let openai: OpenAI | null = null;
-function getOpenAIClient(): OpenAI | null {
-  if (!process.env.OPENAI_API_KEY) return null;
-  if (!openai) {
-    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+let geminiClient: GoogleGenAI | null = null;
+
+function getGeminiClient(): GoogleGenAI | null {
+  if (!process.env.AI_INTEGRATIONS_GEMINI_API_KEY || !process.env.AI_INTEGRATIONS_GEMINI_BASE_URL) {
+    return null;
   }
-  return openai;
+  if (!geminiClient) {
+    geminiClient = new GoogleGenAI({
+      apiKey: process.env.AI_INTEGRATIONS_GEMINI_API_KEY,
+      httpOptions: {
+        apiVersion: "",
+        baseUrl: process.env.AI_INTEGRATIONS_GEMINI_BASE_URL,
+      },
+    });
+  }
+  return geminiClient;
 }
 
 router.post('/ask', async (req, res) => {
@@ -23,7 +30,7 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'Question is required' });
     }
 
-    const client = getOpenAIClient();
+    const client = getGeminiClient();
     if (!client) {
       return res.status(503).json({ 
         error: 'AI service not configured',
@@ -40,19 +47,16 @@ Jelenlegi kontextus:
 - Hibák száma: ${context.errorCount || 0}
 ` : '';
 
-    const response = await client.chat.completions.create({
-      model: "gpt-5",
-      messages: [
-        { 
-          role: "system", 
-          content: `${systemPromptForAI}\n\n${languageInstruction}\n${contextInfo}` 
-        },
-        { role: "user", content: question }
+    const systemMessage = `${systemPromptForAI}\n\n${languageInstruction}\n${contextInfo}`;
+
+    const response = await client.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        { role: "user", parts: [{ text: `${systemMessage}\n\nKérdés: ${question}` }] }
       ],
-      max_completion_tokens: 500
     });
 
-    const answer = response.choices[0]?.message?.content || getFallbackMessage(language);
+    const answer = response.text || getFallbackMessage(language);
 
     res.json({ answer });
   } catch (error: any) {

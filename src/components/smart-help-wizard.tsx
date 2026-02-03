@@ -10,7 +10,7 @@ import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
 import { 
   HelpCircle, Lightbulb, AlertTriangle, CheckCircle, Brain, Zap, Sparkles,
-  BookOpen, MessageCircle, Send, ChevronRight, Loader2, ArrowLeft
+  BookOpen, MessageCircle, Send, ChevronRight, Loader2, ArrowLeft, Download, FileText, ExternalLink
 } from 'lucide-react';
 import { helpTranslations, faqContent, type FAQItem } from '@/lib/help-content';
 import { apiRequest } from '@/lib/queryClient';
@@ -42,7 +42,7 @@ export function SmartHelpWizard({ currentPage, formData, currentQuestionId, erro
   const [suggestions, setSuggestions] = useState<HelpSuggestion[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [aiThinking, setAiThinking] = useState(false);
-  const [activeTab, setActiveTab] = useState<'suggestions' | 'faq' | 'chat'>('suggestions');
+  const [activeTab, setActiveTab] = useState<'suggestions' | 'faq' | 'chat' | 'manual'>('suggestions');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
@@ -380,6 +380,137 @@ export function SmartHelpWizard({ currentPage, formData, currentQuestionId, erro
     </ScrollArea>
   );
 
+  const renderManualContent = () => {
+    const manualLang = ['hu', 'de', 'en'].includes(language) ? language : 'hu';
+    
+    const manualTexts = {
+      hu: {
+        title: 'Teljes Használati Útmutató',
+        description: 'Töltse le vagy tekintse meg a részletes használati útmutatót, amely tartalmazza az összes funkció leírását, lépésről lépésre útmutatókat és hibaelhárítási tippeket.',
+        viewOnline: 'Megtekintés böngészőben',
+        download: 'Letöltés HTML-ként',
+        contents: 'Az útmutató tartalma:',
+        sections: [
+          'Bevezetés és első lépések',
+          'Új protokoll létrehozása',
+          'Kérdések megválaszolása',
+          'Feltételes kérdések kezelése',
+          'Niedervolt rendszer használata',
+          'Hibák dokumentálása képekkel',
+          'Digitális aláírás',
+          'Excel és PDF generálás',
+          'Korábbi protokollok kezelése',
+          'Admin funkciók',
+          'Hibaelhárítás',
+          'Billentyűparancsok',
+          'Adatvédelem és biztonság'
+        ]
+      },
+      de: {
+        title: 'Vollständiges Benutzerhandbuch',
+        description: 'Laden Sie das detaillierte Benutzerhandbuch herunter oder zeigen Sie es an, das Beschreibungen aller Funktionen, Schritt-für-Schritt-Anleitungen und Tipps zur Fehlerbehebung enthält.',
+        viewOnline: 'Im Browser anzeigen',
+        download: 'Als HTML herunterladen',
+        contents: 'Inhalt des Handbuchs:',
+        sections: [
+          'Einführung und erste Schritte',
+          'Neues Protokoll erstellen',
+          'Fragen beantworten',
+          'Bedingte Fragen verwalten',
+          'Niedervolt-System verwenden',
+          'Fehler mit Bildern dokumentieren',
+          'Digitale Unterschrift',
+          'Excel und PDF generieren',
+          'Frühere Protokolle verwalten',
+          'Admin-Funktionen',
+          'Fehlerbehebung',
+          'Tastaturkürzel',
+          'Datenschutz und Sicherheit'
+        ]
+      },
+      en: {
+        title: 'Complete User Manual',
+        description: 'Download or view the detailed user manual containing descriptions of all features, step-by-step guides, and troubleshooting tips.',
+        viewOnline: 'View in Browser',
+        download: 'Download as HTML',
+        contents: 'Manual contents:',
+        sections: [
+          'Introduction and Getting Started',
+          'Creating a New Protocol',
+          'Answering Questions',
+          'Managing Conditional Questions',
+          'Using the Niedervolt System',
+          'Documenting Errors with Images',
+          'Digital Signature',
+          'Generating Excel and PDF',
+          'Managing Previous Protocols',
+          'Admin Functions',
+          'Troubleshooting',
+          'Keyboard Shortcuts',
+          'Privacy and Security'
+        ]
+      }
+    };
+    
+    const mt = manualTexts[manualLang as keyof typeof manualTexts] || manualTexts.hu;
+    
+    return (
+      <div className="space-y-4">
+        <Card className="border-blue-200 bg-blue-50">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center text-lg text-blue-800">
+              <FileText className="h-5 w-5 mr-2" />
+              {mt.title}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-gray-700 mb-4">{mt.description}</p>
+            
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => window.open(`/api/manual/view?lang=${manualLang}`, '_blank')}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                {mt.viewOnline}
+              </Button>
+              <Button 
+                className="flex-1 bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  const link = document.createElement('a');
+                  link.href = `/api/manual/download?lang=${manualLang}`;
+                  link.click();
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                {mt.download}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-700">
+              {mt.contents}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-1">
+              {mt.sections.map((section, idx) => (
+                <li key={idx} className="text-sm text-gray-600 flex items-center gap-2">
+                  <CheckCircle className="h-3 w-3 text-green-500" />
+                  {section}
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -420,22 +551,30 @@ export function SmartHelpWizard({ currentPage, formData, currentQuestionId, erro
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="mt-4">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="suggestions" className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              {language === 'hu' ? 'Javaslatok' : 
-               language === 'de' ? 'Vorschläge' :
-               language === 'fr' ? 'Suggestions' :
-               language === 'it' ? 'Suggerimenti' :
-               'Suggestions'}
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="suggestions" className="flex items-center gap-1 text-xs">
+              <Sparkles className="h-3 w-3" />
+              {language === 'hu' ? 'Tippek' : 
+               language === 'de' ? 'Tipps' :
+               language === 'fr' ? 'Conseils' :
+               language === 'it' ? 'Consigli' :
+               'Tips'}
             </TabsTrigger>
-            <TabsTrigger value="faq" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              {t.faqTitle}
+            <TabsTrigger value="faq" className="flex items-center gap-1 text-xs">
+              <BookOpen className="h-3 w-3" />
+              {language === 'hu' ? 'GYIK' : 'FAQ'}
             </TabsTrigger>
-            <TabsTrigger value="chat" className="flex items-center gap-2">
-              <MessageCircle className="h-4 w-4" />
-              {t.askAI}
+            <TabsTrigger value="chat" className="flex items-center gap-1 text-xs">
+              <MessageCircle className="h-3 w-3" />
+              {language === 'hu' ? 'AI Chat' : 'AI Chat'}
+            </TabsTrigger>
+            <TabsTrigger value="manual" className="flex items-center gap-1 text-xs">
+              <FileText className="h-3 w-3" />
+              {language === 'hu' ? 'Útmutató' : 
+               language === 'de' ? 'Handbuch' :
+               language === 'fr' ? 'Manuel' :
+               language === 'it' ? 'Manuale' :
+               'Manual'}
             </TabsTrigger>
           </TabsList>
 
@@ -449,6 +588,10 @@ export function SmartHelpWizard({ currentPage, formData, currentQuestionId, erro
 
           <TabsContent value="chat" className="mt-4">
             {renderChatContent()}
+          </TabsContent>
+
+          <TabsContent value="manual" className="mt-4">
+            {renderManualContent()}
           </TabsContent>
         </Tabs>
 

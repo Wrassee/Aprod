@@ -1,21 +1,22 @@
 import { Router } from 'express';
-import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import { systemPromptForAI } from '../../src/lib/help-content';
 
 const router = Router();
 
-let geminiClient: GoogleGenAI | null = null;
+let groqClient: OpenAI | null = null;
 
-function getGeminiClient(): GoogleGenAI | null {
-  if (!process.env.GEMINI_API_KEY) {
+function getGroqClient(): OpenAI | null {
+  if (!process.env.GROQ_API_KEY) {
     return null;
   }
-  if (!geminiClient) {
-    geminiClient = new GoogleGenAI({
-      apiKey: process.env.GEMINI_API_KEY,
+  if (!groqClient) {
+    groqClient = new OpenAI({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: 'https://api.groq.com/openai/v1',
     });
   }
-  return geminiClient;
+  return groqClient;
 }
 
 router.post('/ask', async (req, res) => {
@@ -26,7 +27,7 @@ router.post('/ask', async (req, res) => {
       return res.status(400).json({ error: 'Question is required' });
     }
 
-    const client = getGeminiClient();
+    const client = getGroqClient();
     if (!client) {
       return res.status(503).json({ 
         error: 'AI service not configured',
@@ -45,14 +46,16 @@ Jelenlegi kontextus:
 
     const systemMessage = `${systemPromptForAI}\n\n${languageInstruction}\n${contextInfo}`;
 
-    const response = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: [
-        { role: "user", parts: [{ text: `${systemMessage}\n\nKérdés: ${question}` }] }
+    const response = await client.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        { role: "system", content: systemMessage },
+        { role: "user", content: question }
       ],
+      max_tokens: 500
     });
 
-    const answer = response.text || getFallbackMessage(language);
+    const answer = response.choices[0]?.message?.content || getFallbackMessage(language);
 
     res.json({ answer });
   } catch (error: any) {

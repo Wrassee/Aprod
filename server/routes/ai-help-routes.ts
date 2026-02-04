@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import OpenAI from 'openai';
-import { systemPromptForAI } from '../../src/lib/help-content';
+import { systemPromptForAI } from '../../src/lib/help-content.js';
 
 const router = Router();
 

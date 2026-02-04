@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { generateManualHTML } from '../../src/lib/user-manual-content';
+import { generateManualHTML } from '../../src/lib/user-manual-content.js';
 
 const router = Router();
 

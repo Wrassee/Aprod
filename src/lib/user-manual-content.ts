@@ -2,7 +2,7 @@ export const userManualContent = {
   hu: {
     title: "OTIS APROD - Teljes Használati Útmutató",
     subtitle: "Lift Átvételi Protokoll Digitalizáló Alkalmazás",
-    version: "v2.0 - 2024",
+    version: "v0.9.6 - 2024",
     sections: [
       {
         title: "1. Bevezetés",
@@ -272,7 +272,7 @@ Ha "Nem"-et válaszol:
   de: {
     title: "OTIS APROD - Vollständiges Benutzerhandbuch",
     subtitle: "Anwendung zur Digitalisierung von Aufzugsabnahmeprotokollen",
-    version: "v2.0 - 2024",
+    version: "v0.9.6 - 2024",
     sections: [
       {
         title: "1. Einführung",
@@ -358,7 +358,7 @@ Ha "Nem"-et válaszol:
   en: {
     title: "OTIS APROD - Complete User Manual",
     subtitle: "Elevator Acceptance Protocol Digitization Application",
-    version: "v2.0 - 2024",
+    version: "v0.9.6 - 2024",
     sections: [
       {
         title: "1. Introduction",

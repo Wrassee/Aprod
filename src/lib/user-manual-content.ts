@@ -2,7 +2,7 @@ export const userManualContent = {
   hu: {
     title: "OTIS APROD - Teljes Használati Útmutató",
     subtitle: "Lift Átvételi Protokoll Digitalizáló Alkalmazás",
-    version: "v0.9.6 - 2024",
+    version: "v0.9.6 - 2026",
     sections: [
       {
         title: "1. Bevezetés",
@@ -267,12 +267,12 @@ Ha "Nem"-et válaszol:
 • Adattörlési kérelem: support@otis.com`
       }
     ],
-    footer: "© 2024 OTIS Elevator Company - APROD Alkalmazás"
+    footer: "© 2026 OTIS Elevator Company - APROD Alkalmazás"
   },
   de: {
     title: "OTIS APROD - Vollständiges Benutzerhandbuch",
     subtitle: "Anwendung zur Digitalisierung von Aufzugsabnahmeprotokollen",
-    version: "v0.9.6 - 2024",
+    version: "v0.9.6 - 2026",
     sections: [
       {
         title: "1. Einführung",
@@ -353,12 +353,12 @@ Ha "Nem"-et válaszol:
 • Grünes Häkchen = ausgefüllter Abschnitt`
       }
     ],
-    footer: "© 2024 OTIS Elevator Company - APROD Anwendung"
+    footer: "© 2026 OTIS Elevator Company - APROD Anwendung"
   },
   en: {
     title: "OTIS APROD - Complete User Manual",
     subtitle: "Elevator Acceptance Protocol Digitization Application",
-    version: "v0.9.6 - 2024",
+    version: "v0.9.6 - 2026",
     sections: [
       {
         title: "1. Introduction",
@@ -439,7 +439,7 @@ Ha "Nem"-et válaszol:
 • Green checkmark = completed section`
       }
     ],
-    footer: "© 2024 OTIS Elevator Company - APROD Application"
+    footer: "© 2026 OTIS Elevator Company - APROD Application"
   }
 };
 

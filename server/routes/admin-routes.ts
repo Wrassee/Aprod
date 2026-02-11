@@ -116,7 +116,6 @@ router.get('/stats', requireAdmin, async (_req, res) => {
   }
 });
 
-// MÓDOSÍTVA: requireAdmin eltávolítva, hogy a USER is lássa a naplót
 router.get('/audit-logs', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
@@ -127,6 +126,33 @@ router.get('/audit-logs', async (req, res) => {
   } catch (error) {
     console.error('❌ Failed to fetch audit logs:', error);
     res.status(500).json({ message: 'Hiba történt a naplók lekérdezése során.' });
+  }
+});
+
+router.get('/audit-logs/health', async (_req, res) => {
+  try {
+    const result = await (db as any).execute(
+      sql`SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'audit_logs') as table_exists`
+    );
+    const rows = Array.isArray(result) ? result : (result?.rows || []);
+    const tableExists = rows[0]?.table_exists ?? false;
+
+    let rowCount = 0;
+    if (tableExists) {
+      const countResult = await (db as any).execute(sql`SELECT COUNT(*) as count FROM audit_logs`);
+      const countRows = Array.isArray(countResult) ? countResult : (countResult?.rows || []);
+      rowCount = parseInt(countRows[0]?.count || '0', 10);
+    }
+
+    res.json({
+      audit_logs_table_exists: tableExists,
+      audit_logs_count: rowCount,
+      environment: process.env.NODE_ENV || 'development',
+      database_url_set: !!process.env.DATABASE_URL,
+    });
+  } catch (error: any) {
+    console.error('❌ Audit health check failed:', error?.message);
+    res.status(500).json({ error: error?.message || 'Health check failed' });
   }
 });
 

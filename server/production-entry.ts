@@ -1,14 +1,12 @@
-// Production-only server entry point - completely avoids all Vite imports
+// Production-only server entry point - uses shared registerRoutes for full feature parity
 import express, { type Request, Response, NextFunction } from "express";
-import { createServer, type Server } from "http";
+import { createServer } from "http";
 import fs from "fs";
 import path from "path";
-import { storage } from "./storage.js";
-import { testConnection } from "./db.js";
+import { registerRoutes } from "./routes.js";
 
 const app = express();
 
-// Export for serverless deployment
 export default app;
 
 function log(message: string, source = "express") {
@@ -36,13 +34,12 @@ function serveStatic(app: express.Express) {
   });
 }
 
-// 🔧 Increased limit for high-DPI mobile signatures (Samsung Fold5, etc.)
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 app.use((req, res, next) => {
   const start = Date.now();
-  const path = req.path;
+  const reqPath = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
   const originalResJson = res.json;
@@ -53,8 +50,8 @@ app.use((req, res, next) => {
 
   res.on("finish", () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
+    if (reqPath.startsWith("/api")) {
+      let logLine = `${req.method} ${reqPath} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
@@ -68,57 +65,12 @@ app.use((req, res, next) => {
   next();
 });
 
-async function registerRoutes(app: express.Express): Promise<Server> {
-  // Test database connection first
-  console.log('Testing database connection...');
-  const dbConnected = await testConnection();
-  if (!dbConnected) {
-    throw new Error('Database connection failed');
-  }
-  
-  // Essential API routes for production
-  app.get('/api/health', (req, res) => {
-    res.json({ 
-      status: 'ok', 
-      environment: 'production', 
-      timestamp: new Date().toISOString(),
-      server: 'production-entry'
-    });
-  });
-  
-  app.get('/api/questions/:lang', async (req, res) => {
-    try {
-      const lang = req.params.lang || 'hu';
-      // Use available storage methods
-      const protocols = await storage.getAllProtocols();
-      // Extract questions from protocols or return empty array
-      const questions = protocols.length > 0 ? [] : [];
-      res.json(questions);
-    } catch (error) {
-      console.error('Error fetching questions:', error);
-      res.status(500).json({ error: 'Failed to fetch questions' });
-    }
-  });
-  
-  app.get('/api/admin/templates', async (req, res) => {
-    try {
-      // Use available storage methods
-      const templates = await storage.getAllTemplates();
-      res.json(templates);
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      res.status(500).json({ error: 'Failed to fetch templates' });
-    }
-  });
-  
-  return createServer(app);
-}
-
 (async () => {
   try {
     console.log('Starting production server...');
-    const server = await registerRoutes(app);
-    console.log('Routes registered successfully');
+    
+    await registerRoutes(app);
+    console.log('All routes registered successfully (full feature parity with development)');
 
     app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
       const status = err.status || err.statusCode || 500;
@@ -130,16 +82,16 @@ async function registerRoutes(app: express.Express): Promise<Server> {
     console.log('Serving static files in production mode...');
     serveStatic(app);
 
-    // For serverless deployment, don't start the server
     if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
       console.log('Running in serverless environment');
       return;
     }
 
     const PORT = Number(process.env.PORT) || 5000;
-server.listen(PORT, "0.0.0.0", () => {
-  log(`serving on port ${PORT}`);
-});
+    const server = createServer(app);
+    server.listen(PORT, "0.0.0.0", () => {
+      log(`serving on port ${PORT}`);
+    });
   } catch (error) {
     console.error('Failed to start production server:', error);
     process.exit(1);

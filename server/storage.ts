@@ -592,44 +592,68 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log(`📝 Creating audit log: ${log.action} by ${log.user_email || log.user_id}`);
       
+      if (!audit_logs) {
+        console.error('❌ audit_logs table not available in schema');
+        return;
+      }
+      
       await (db as any).insert(audit_logs).values(log);
       
       console.log(`✅ Audit log created for action: ${log.action}`);
-    } catch (error) {
-      console.error('❌ Error creating audit log:', error);
-      // NEM dobunk hibát tovább, mert a naplózás hibája nem akaszthatja meg a fő műveletet
+    } catch (error: any) {
+      console.error('❌ Error creating audit log:', error?.message || error);
+      console.error('❌ Audit log data:', JSON.stringify({ action: log.action, user_id: log.user_id }));
     }
   }
 
-  /**
-   * Audit log bejegyzések lekérdezése felhasználói adatokkal együtt.
-   * Használja a Drizzle ORM relációs lekérdezését a user adatok automatikus JOIN-jához.
-   * @param limit - A lekérdezendő bejegyzések száma (alapértelmezett: 50)
-   * @returns Promise<AuditLog[]>
-   */
   async getAuditLogs(limit: number = 50): Promise<any[]> {
     try {
-      console.log(`📜 Fetching last ${limit} audit logs with user data...`);
+      console.log(`📜 Fetching last ${limit} audit logs...`);
       
-      const logs = await (db as any).query.audit_logs.findMany({
-        orderBy: [desc(audit_logs.created_at)],
-        limit: limit,
-        // A 'with' kulcsszó segítségével a Drizzle automatikusan JOIN-olja
-        // a felhasználói adatokat a 'schema.ts'-ben definiált 'auditLogsRelations' alapján.
-        with: {
-          user: {
-            columns: {
-              email: true,
-              name: true,
+      if (!audit_logs) {
+        console.error('❌ audit_logs table not available in schema');
+        return [];
+      }
+
+      try {
+        const logs = await (db as any).query.audit_logs.findMany({
+          orderBy: [desc(audit_logs.created_at)],
+          limit: limit,
+          with: {
+            user: {
+              columns: {
+                email: true,
+                name: true,
+              },
             },
           },
-        },
-      });
-      
-      console.log(`✅ Retrieved ${logs.length} audit log entries with user data`);
-      return logs;
-    } catch (error) {
-      console.error('❌ Error fetching audit logs:', error);
+        });
+        
+        console.log(`✅ Retrieved ${logs.length} audit log entries with user data (relational query)`);
+        return logs;
+      } catch (relationalError: any) {
+        console.warn('⚠️ Relational query failed, falling back to raw SQL:', relationalError?.message);
+        
+        const result = await (db as any).execute(
+          sql`SELECT al.*, p.email as user_email_joined, p.name as user_name_joined 
+              FROM audit_logs al 
+              LEFT JOIN profiles p ON al.user_id = p.user_id 
+              ORDER BY al.created_at DESC 
+              LIMIT ${limit}`
+        );
+        
+        const rows = Array.isArray(result) ? result : (result?.rows || []);
+        
+        const mapped = rows.map((row: any) => ({
+          ...row,
+          user: row.user_email_joined ? { email: row.user_email_joined, name: row.user_name_joined } : null,
+        }));
+        
+        console.log(`✅ Retrieved ${mapped.length} audit log entries (fallback SQL query)`);
+        return mapped;
+      }
+    } catch (error: any) {
+      console.error('❌ Error fetching audit logs:', error?.message || error);
       return [];
     }
   }

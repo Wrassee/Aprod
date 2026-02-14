@@ -1,4 +1,4 @@
-// server/middleware/auth.ts - JAVÍTOTT ÉS ROBUSTUS VERZIÓ (Email confirmation support)
+// server/middleware/auth.ts - JAVÍTOTT ÉS ROBUSZTUS VERZIÓ (Email confirmation support + ID FIX)
 import { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { storage } from '../storage.js';
@@ -34,7 +34,7 @@ const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
   try {
     const authHeader = req.headers.authorization;
-    
+
     // 1. Token kinyerése (Robusztus módon)
     if (!authHeader) {
       console.warn(`[Auth] Missing Authorization header on ${req.path}`);
@@ -52,23 +52,27 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
 
     // 2. Token ellenőrzése a Supabase-nél
     const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-    
+
     if (error || !user) {
       console.error(`[Auth] Invalid token on ${req.path}:`, error?.message);
       return res.status(401).json({ message: 'Invalid or expired session' });
     }
+
+    console.log(`✅ [Auth] User authenticated: ${user.id} (${user.email})`);
 
     // === AUTOMATIKUS SZINKRONIZÁCIÓ KEZDETE ===
     // 3. Supabase role és email confirmation státusz lekérése
     const supabaseRole = user.app_metadata?.role || 'user';
     const emailConfirmed = user.email_confirmed_at !== null;
 
+    console.log(`🔍 [Auth] Supabase metadata - Role: ${supabaseRole}, Email confirmed: ${emailConfirmed}`);
+
     // 4. Helyi profil lekérése
     let localProfile = await storage.getProfileByUserId(user.id);
 
     // 5. Ha nincs helyi profil, létrehozzuk a helyes adatokkal
     if (!localProfile) {
-      console.log(`🔄 Creating missing local profile for ${user.id} with role: ${supabaseRole}, email_confirmed: ${emailConfirmed}`);
+      console.log(`🔄 [Auth] Creating missing local profile for ${user.id} with role: ${supabaseRole}, email_confirmed: ${emailConfirmed}`);
       localProfile = await storage.createProfile({
         user_id: user.id,
         email: user.email!,
@@ -84,16 +88,16 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
         localProfile.email_confirmed !== emailConfirmed;
 
       if (needsUpdate) {
-        console.log(`🔄 Syncing profile for ${user.id}:`, {
+        console.log(`🔄 [Auth] Syncing profile for ${user.id}:`, {
           role: `${localProfile.role} -> ${supabaseRole}`,
           email_confirmed: `${localProfile.email_confirmed} -> ${emailConfirmed}`
         });
-        
+
         const updatedProfile = await storage.updateProfile(user.id, { 
           role: supabaseRole,
           email_confirmed: emailConfirmed
         });
-        
+
         if (updatedProfile) {
           localProfile = updatedProfile;
         }
@@ -101,12 +105,29 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
     // === AUTOMATIKUS SZINKRONIZÁCIÓ VÉGE ===
 
-    // 7. Attach validated (and synced) user profile to request object
-    (req as any).user = localProfile || user;
+    // 🔥 KRITIKUS JAVÍTÁS: req.user.id MINDIG AZ AUTH USER ID LEGYEN!
+    // A localProfile.id a Profile tábla ID-ja (más UUID)
+    // De nekünk mindenhol az Auth User ID kell (user.id)
+    (req as any).user = {
+      ...user,                    // Supabase Auth User adatai (id, email, stb.)
+      ...localProfile,            // Profil adatok (role, name, email_confirmed, stb.)
+      id: user.id,                // 🔥 KÉNYSZERÍTJÜK: az id MINDIG az AUTH USER ID
+      user_id: user.id,           // 🔥 Biztonsági másolat: user_id is az AUTH USER ID
+      profile_id: localProfile?.id // Ha kell a Profile tábla ID-ja, itt van
+    };
+
+    console.log(`✅ [Auth] User object attached to request:`, {
+      id: (req as any).user.id,
+      user_id: (req as any).user.user_id,
+      profile_id: (req as any).user.profile_id,
+      email: (req as any).user.email,
+      role: (req as any).user.role
+    });
+
     next();
 
   } catch (error) {
-    console.error('❌ Auth middleware fatal error:', error);
+    console.error('❌ [Auth] Middleware fatal error:', error);
     return res.status(500).json({ message: 'Internal Authentication Error' });
   }
 }
@@ -140,29 +161,32 @@ export async function requireOwnerOrAdmin(req: Request, res: Response, next: Nex
   try {
     const requestedUserId = req.params.userId;
     const authenticatedUser = (req as any).user;
-    
+
     if (!authenticatedUser) {
       return res.status(401).json({ 
         message: 'Unauthorized - User not authenticated' 
       });
     }
 
+    // 🔥 JAVÍTÁS: Mindig a user_id-t használjuk (ami most már az Auth User ID)
     const currentUserId = authenticatedUser.user_id || authenticatedUser.id;
 
     if (currentUserId === requestedUserId) {
+      console.log(`✅ [Auth] Owner access granted for user: ${currentUserId}`);
       return next();
     }
 
     if (authenticatedUser.role === 'admin') {
-      console.log('✅ Admin access granted for user:', currentUserId);
+      console.log(`✅ [Auth] Admin access granted for user: ${currentUserId}`);
       return next();
     }
 
+    console.warn(`⚠️ [Auth] Access denied for user ${currentUserId} to resource ${requestedUserId}`);
     return res.status(403).json({ 
       message: 'Forbidden - You can only access your own profile' 
     });
   } catch (error) {
-    console.error('❌ Owner/Admin check error:', error);
+    console.error('❌ [Auth] Owner/Admin check error:', error);
     return res.status(500).json({ 
       message: 'Authorization error' 
     });
@@ -177,15 +201,15 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
   const authenticatedUser = (req as any).user;
 
   if (!authenticatedUser) {
-    console.warn('⚠️ requireAdmin: No authenticated user found');
+    console.warn('⚠️ [Auth] requireAdmin: No authenticated user found');
     return res.status(401).json({ message: 'Authentication required' });
   }
 
   if (authenticatedUser.role === 'admin') {
-    console.log(`✅ Admin access granted for user: ${authenticatedUser.user_id || authenticatedUser.id}`);
+    console.log(`✅ [Auth] Admin access granted for user: ${authenticatedUser.user_id || authenticatedUser.id}`);
     next();
   } else {
-    console.warn(`⚠️ requireAdmin: User ${authenticatedUser.user_id || authenticatedUser.id} has role '${authenticatedUser.role}', admin required`);
+    console.warn(`⚠️ [Auth] requireAdmin: User ${authenticatedUser.user_id || authenticatedUser.id} has role '${authenticatedUser.role}', admin required`);
     res.status(403).json({ message: 'Forbidden: Admin access required.' });
   }
 }

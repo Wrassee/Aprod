@@ -678,6 +678,7 @@ async getAuditLogs(limit: number = 50): Promise<any[]> {
     return [];
   }
 }
+}
 
 // ------------------------------------------------------------
 // 4️⃣ Exported singleton for convenient imports elsewhere

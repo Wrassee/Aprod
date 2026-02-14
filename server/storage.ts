@@ -612,72 +612,78 @@ async createAuditLog(log: InsertAuditLog): Promise<void> {
  * @param limit - Hány bejegyzést kérünk le (alapértelmezett: 50)
  * @returns Promise<any[]>
  */
-async getAuditLogs(limit: number = 50): Promise<any[]> {
-  try {
-    console.log(`📜 Fetching last ${limit} audit logs with UUID fix...`);
+  async getAuditLogs(limit: number = 50): Promise<any[]> {
+    try {
+      console.log(`📜 Fetching last ${limit} audit logs with column fix...`);
 
-    if (!audit_logs) {
-      console.error('❌ audit_logs table not available in schema');
+      if (!audit_logs) {
+        console.error('❌ audit_logs table not available in schema');
+        return [];
+      }
+
+      // ✅ KIVETTÜK a p.full_name-t, mert nem létezik ez az oszlop
+      // ✅ UUID casting (::text) a JOIN-ban
+      const result = await (db as any).execute(
+        sql`SELECT 
+              al.id, 
+              al.user_id::text as user_id,
+              al.user_email,
+              al.action, 
+              al.resource_type,
+              al.resource_id,
+              al.details, 
+              al.status, 
+              al.error_message, 
+              al.ip_address, 
+              al.user_agent, 
+              al.created_at,
+              p.email as user_email_joined
+            FROM audit_logs al 
+            LEFT JOIN profiles p ON al.user_id::text = p.user_id::text 
+            ORDER BY al.created_at DESC 
+            LIMIT ${limit}`
+      );
+
+      // Drizzle eredmény kezelése
+      const rows = Array.isArray(result) ? result : (result?.rows || []);
+
+      // Összefésüljük az adatokat
+      const mapped = rows.map((row: any) => {
+        // Ha nincs név oszlop, generálunk egyet az emailből (pl. "istvan.faddi")
+        const fallbackName = row.user_email_joined 
+          ? row.user_email_joined.split('@')[0] 
+          : (row.user_email ? row.user_email.split('@')[0] : 'Rendszer');
+
+        return {
+          id: row.id,
+          user_id: row.user_id,
+          user_email: row.user_email || row.user_email_joined,
+          action: row.action,
+          resource_type: row.resource_type,
+          resource_id: row.resource_id,
+          details: row.details,
+          status: row.status,
+          error_message: row.error_message,
+          ip_address: row.ip_address,
+          user_agent: row.user_agent,
+          created_at: row.created_at,
+          // User objektum a frontend számára
+          user: row.user_email_joined ? { 
+            email: row.user_email_joined, 
+            name: fallbackName  // Email előtti rész névként
+          } : null,
+        };
+      });
+
+      console.log(`✅ Retrieved ${mapped.length} audit log entries (Safe mode)`);
+      return mapped;
+
+    } catch (error: any) {
+      console.error('❌ Error fetching audit logs:', error?.message || error);
+      console.error('❌ Full error:', error);
       return [];
     }
-
-    // ✅ KÖZVETLEN ÉS BIZTONSÁGOS SQL LEKÉRDEZÉS UUID CASTING-GEL
-    // A user_id::text kényszeríti a típusegyeztetést mindkét oldalon
-    const result = await (db as any).execute(
-      sql`SELECT 
-            al.id, 
-            al.user_id::text as user_id,
-            al.user_email,
-            al.action, 
-            al.resource_type,
-            al.resource_id,
-            al.details, 
-            al.status, 
-            al.error_message, 
-            al.ip_address, 
-            al.user_agent, 
-            al.created_at,
-            p.email as user_email_joined, 
-            p.full_name as user_name_joined 
-          FROM audit_logs al 
-          LEFT JOIN profiles p ON al.user_id::text = p.user_id::text 
-          ORDER BY al.created_at DESC 
-          LIMIT ${limit}`
-    );
-
-    // Drizzle eredmény kezelése (környezettől függ, hogy result vagy result.rows)
-    const rows = Array.isArray(result) ? result : (result?.rows || []);
-
-    // Összefésüljük a csatolt user adatokat a frontend által várt formátumra
-    const mapped = rows.map((row: any) => ({
-      id: row.id,
-      user_id: row.user_id,
-      user_email: row.user_email || row.user_email_joined,
-      action: row.action,
-      resource_type: row.resource_type,
-      resource_id: row.resource_id,
-      details: row.details,
-      status: row.status,
-      error_message: row.error_message,
-      ip_address: row.ip_address,
-      user_agent: row.user_agent,
-      created_at: row.created_at,
-      // User objektum a frontend számára
-      user: row.user_email_joined ? { 
-        email: row.user_email_joined, 
-        name: row.user_name_joined 
-      } : null,
-    }));
-
-    console.log(`✅ Retrieved ${mapped.length} audit log entries with UUID casting`);
-    return mapped;
-
-  } catch (error: any) {
-    console.error('❌ Error fetching audit logs:', error?.message || error);
-    console.error('❌ Full error:', error);
-    return [];
   }
-}
 }
 
 // ------------------------------------------------------------

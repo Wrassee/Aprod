@@ -580,82 +580,102 @@ export class DatabaseStorage implements IStorage {
       return [];
     }
   }
+  
+/* ---------- Audit Logs (JAVÍTOTT VERZIÓ) ---------- */
 
-  /* ---------- Audit Logs (ÚJ SZEKCIÓ) ---------- */
+/**
+ * Új audit log bejegyzés létrehozása.
+ * @param log - Az audit log adatai
+ * @returns Promise<void>
+ */
+async createAuditLog(log: InsertAuditLog): Promise<void> {
+  try {
+    console.log(`📝 Creating audit log: ${log.action} by ${log.user_email || log.user_id}`);
 
-  /**
-   * Új audit log bejegyzés létrehozása.
-   * @param log - Az audit log adatai
-   * @returns Promise<void>
-   */
-  async createAuditLog(log: InsertAuditLog): Promise<void> {
-    try {
-      console.log(`📝 Creating audit log: ${log.action} by ${log.user_email || log.user_id}`);
-      
-      if (!audit_logs) {
-        console.error('❌ audit_logs table not available in schema');
-        return;
-      }
-      
-      await (db as any).insert(audit_logs).values(log);
-      
-      console.log(`✅ Audit log created for action: ${log.action}`);
-    } catch (error: any) {
-      console.error('❌ Error creating audit log:', error?.message || error);
-      console.error('❌ Audit log data:', JSON.stringify({ action: log.action, user_id: log.user_id }));
+    if (!audit_logs) {
+      console.error('❌ audit_logs table not available in schema');
+      return;
     }
+
+    await (db as any).insert(audit_logs).values(log);
+
+    console.log(`✅ Audit log created for action: ${log.action}`);
+  } catch (error: any) {
+    console.error('❌ Error creating audit log:', error?.message || error);
+    console.error('❌ Audit log data:', JSON.stringify({ action: log.action, user_id: log.user_id }));
   }
+}
 
-  async getAuditLogs(limit: number = 50): Promise<any[]> {
-    try {
-      console.log(`📜 Fetching last ${limit} audit logs...`);
-      
-      if (!audit_logs) {
-        console.error('❌ audit_logs table not available in schema');
-        return [];
-      }
+/**
+ * 🔥 JAVÍTOTT VERZIÓ - UUID CASTING-GEL
+ * Lekérdezi az audit logokat user adatokkal együtt.
+ * @param limit - Hány bejegyzést kérünk le (alapértelmezett: 50)
+ * @returns Promise<any[]>
+ */
+async getAuditLogs(limit: number = 50): Promise<any[]> {
+  try {
+    console.log(`📜 Fetching last ${limit} audit logs with UUID fix...`);
 
-      try {
-        const logs = await (db as any).query.audit_logs.findMany({
-          orderBy: [desc(audit_logs.created_at)],
-          limit: limit,
-          with: {
-            user: {
-              columns: {
-                email: true,
-                name: true,
-              },
-            },
-          },
-        });
-        
-        console.log(`✅ Retrieved ${logs.length} audit log entries with user data (relational query)`);
-        return logs;
-      } catch (relationalError: any) {
-        console.warn('⚠️ Relational query failed, falling back to raw SQL:', relationalError?.message);
-        
-        const result = await (db as any).execute(
-          sql`SELECT al.*, p.email as user_email_joined, p.name as user_name_joined 
-              FROM audit_logs al 
-              LEFT JOIN profiles p ON al.user_id = p.user_id 
-              ORDER BY al.created_at DESC 
-              LIMIT ${limit}`
-        );
-        
-        const rows = Array.isArray(result) ? result : (result?.rows || []);
-        
-        const mapped = rows.map((row: any) => ({
-          ...row,
-          user: row.user_email_joined ? { email: row.user_email_joined, name: row.user_name_joined } : null,
-        }));
-        
-        console.log(`✅ Retrieved ${mapped.length} audit log entries (fallback SQL query)`);
-        return mapped;
-      }
-    } catch (error: any) {
-      console.error('❌ Error fetching audit logs:', error?.message || error);
+    if (!audit_logs) {
+      console.error('❌ audit_logs table not available in schema');
       return [];
     }
+
+    // ✅ KÖZVETLEN ÉS BIZTONSÁGOS SQL LEKÉRDEZÉS UUID CASTING-GEL
+    // A user_id::text kényszeríti a típusegyeztetést mindkét oldalon
+    const result = await (db as any).execute(
+      sql`SELECT 
+            al.id, 
+            al.user_id::text as user_id,
+            al.user_email,
+            al.action, 
+            al.resource_type,
+            al.resource_id,
+            al.details, 
+            al.status, 
+            al.error_message, 
+            al.ip_address, 
+            al.user_agent, 
+            al.created_at,
+            p.email as user_email_joined, 
+            p.full_name as user_name_joined 
+          FROM audit_logs al 
+          LEFT JOIN profiles p ON al.user_id::text = p.user_id::text 
+          ORDER BY al.created_at DESC 
+          LIMIT ${limit}`
+    );
+
+    // Drizzle eredmény kezelése (környezettől függ, hogy result vagy result.rows)
+    const rows = Array.isArray(result) ? result : (result?.rows || []);
+
+    // Összefésüljük a csatolt user adatokat a frontend által várt formátumra
+    const mapped = rows.map((row: any) => ({
+      id: row.id,
+      user_id: row.user_id,
+      user_email: row.user_email || row.user_email_joined,
+      action: row.action,
+      resource_type: row.resource_type,
+      resource_id: row.resource_id,
+      details: row.details,
+      status: row.status,
+      error_message: row.error_message,
+      ip_address: row.ip_address,
+      user_agent: row.user_agent,
+      created_at: row.created_at,
+      // User objektum a frontend számára
+      user: row.user_email_joined ? { 
+        email: row.user_email_joined, 
+        name: row.user_name_joined 
+      } : null,
+    }));
+
+    console.log(`✅ Retrieved ${mapped.length} audit log entries with UUID casting`);
+    return mapped;
+
+  } catch (error: any) {
+    console.error('❌ Error fetching audit logs:', error?.message || error);
+    console.error('❌ Full error:', error);
+    return [];
   }
 }
 

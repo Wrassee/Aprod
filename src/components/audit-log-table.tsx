@@ -1,4 +1,4 @@
-// src/components/audit-log-table.tsx - JAVÍTOTT (API URL Fix)
+// src/components/audit-log-table.tsx - ROBUSZTUS VERZIÓ
 import React, { useState, useEffect } from 'react';
 import { useLanguageContext } from "@/components/language-context";
 import { useToast } from '@/hooks/use-toast';
@@ -22,14 +22,26 @@ import {
   XCircle,
   RefreshCw,
   Sparkles,
-  Clock
+  Clock,
+  AlertTriangle
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
-// 🔥 FONTOS: IDE ÍRD BE A BACKEND SZERVERED CÍMÉT!
-// Ha Render-en van: "https://te-projekt-neved.onrender.com"
-// Ha lokálisan teszteled WiFi-n: "http://192.168.0.XX:5000"
-const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+// 🔥 ROBUSZTUS URL KEZELÉS
+const getApiBaseUrl = (): string => {
+  let url = import.meta.env.VITE_API_URL || "";
+
+  // Ha üres, próbáljuk meg a window.location-ből kinyerni
+  if (!url && typeof window !== 'undefined') {
+    const { protocol, hostname, port } = window.location;
+    url = `${protocol}//${hostname}${port ? ':' + port : ''}`;
+    console.warn('⚠️ VITE_API_URL nincs beállítva, használom:', url);
+  }
+
+  return url.replace(/\/$/, "");
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 interface AuditLogEntry {
   id: string;
@@ -49,18 +61,20 @@ interface AuditLogEntry {
     name: string | null;
   };
 }
-
 export function AuditLogTable() {
   const { t, language } = useLanguageContext();
   const { toast } = useToast();
   const { supabase, initialized } = useAuth();
   const { theme } = useTheme();
-  
+
   const [logs, setLogs] = useState<AuditLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [limit, setLimit] = useState(50);
+  const [error, setError] = useState<string | null>(null);
+  const [limit] = useState(50);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
+    console.log('🔍 AuditLogTable mounted, initialized:', initialized);
     if (!initialized) return;
 
     if (supabase) {
@@ -68,48 +82,145 @@ export function AuditLogTable() {
     }
   }, [supabase, limit, initialized]);
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (isRetry = false) => {
     setLoading(true);
+    setError(null);
+
     try {
-      console.log('📜 Fetching audit logs...');
-      
-      if (!supabase) throw new Error("Supabase client not available");
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('Authentication required');
+      console.log('📜 ========================================');
+      console.log('📜 Audit Log lekérése indult...');
+      console.log('📜 API_BASE_URL:', API_BASE_URL);
+      console.log('📜 Retry attempt:', retryCount);
+      console.log('📜 ========================================');
+
+      // 1️⃣ SUPABASE ELLENŐRZÉS
+      if (!supabase) {
+        throw new Error("❌ Supabase kliens nem érhető el");
       }
 
-      // 🔥 JAVÍTÁS ITT: API_BASE_URL hozzáadása
-      const url = `${API_BASE_URL}/api/admin/audit-logs?limit=${limit}`;
-      console.log('📤 Fetching from URL:', url);
+      // 2️⃣ SESSION LEKÉRÉS
+      console.log('🔐 Session lekérése...');
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-      const response = await fetch(url, {
+      if (sessionError) {
+        console.error('❌ Session error:', sessionError);
+        throw new Error(`Session hiba: ${sessionError.message}`);
+      }
+
+      if (!session) {
+        console.error('❌ Nincs aktív session');
+
+        // Próbáljuk meg újra betölteni a sessiont
+        if (!isRetry && retryCount < 2) {
+          console.log('🔄 Újrapróbálkozás session refresh-sel...');
+          setRetryCount(prev => prev + 1);
+          await supabase.auth.refreshSession();
+          await fetchLogs(true);
+          return;
+        }
+
+        throw new Error('Nincs aktív munkamenet. Kérlek jelentkezz be újra.');
+      }
+
+      console.log('✅ Session OK, user:', session.user?.email);
+      console.log('🔑 Access token hossza:', session.access_token?.length || 0);
+
+      // 3️⃣ URL ÖSSZEÁLLÍTÁS
+      const endpoint = `/api/admin/audit-logs?limit=${limit}`;
+      const fullUrl = API_BASE_URL ? `${API_BASE_URL}${endpoint}` : endpoint;
+
+      console.log('📤 Teljes URL:', fullUrl);
+      console.log('📤 Headers:', {
+        'Authorization': `Bearer ${session.access_token.substring(0, 20)}...`,
+        'Content-Type': 'application/json'
+      });
+
+      // 4️⃣ API HÍVÁS
+      console.log('🌐 Fetch indítása...');
+      const response = await fetch(fullUrl, {
+        method: 'GET',
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
       });
 
-      // 🔥 JAVÍTÁS: Ellenőrizzük, hogy véletlenül HTML-t kaptunk-e vissza JSON helyett
+      console.log('📥 Response status:', response.status, response.statusText);
+      console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
+
+      // 5️⃣ CONTENT TYPE ELLENŐRZÉS
       const contentType = response.headers.get("content-type");
-      if (contentType && contentType.indexOf("application/json") === -1) {
+      console.log('📄 Content-Type:', contentType);
+
+      if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text();
-        console.error("❌ Nem JSON válasz érkezett:", text.substring(0, 200));
-        throw new Error("A szerver nem JSON választ küldött (Valószínűleg rossz az URL)");
+        console.error("❌ NEM JSON VÁLASZ:");
+        console.error("Preview:", text.substring(0, 500));
+
+        if (text.includes('<!DOCTYPE html>') || text.includes('<html')) {
+          throw new Error(
+            `A szerver HTML-t küldött JSON helyett. ` +
+            `Ellenőrizd, hogy a backend fut-e a következő címen: ${API_BASE_URL}`
+          );
+        }
+
+        throw new Error(
+          `A szerver nem JSON választ küldött (Content-Type: ${contentType}). ` +
+          `Válasz: ${text.substring(0, 200)}`
+        );
       }
 
+      // 6️⃣ STATUS ELLENŐRZÉS
       if (!response.ok) {
-        throw new Error('Failed to fetch audit logs');
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+
+        try {
+          const errorData = await response.json();
+          console.error('❌ Szerver hiba részletei:', errorData);
+          errorMessage = errorData.message || errorData.error || errorMessage;
+        } catch (e) {
+          console.error('❌ Nem sikerült a hiba JSON parse-olása');
+          const text = await response.text();
+          console.error('Raw error:', text);
+          errorMessage = text || errorMessage;
+        }
+
+        // Session lejárt esetén próbáljuk újra
+        if (response.status === 401 && !isRetry && retryCount < 2) {
+          console.log('🔄 401 - Session refresh és újrapróbálás...');
+          setRetryCount(prev => prev + 1);
+          await supabase.auth.refreshSession();
+          await fetchLogs(true);
+          return;
+        }
+
+        throw new Error(errorMessage);
       }
-      
+
+      // 7️⃣ SIKERES VÁLASZ FELDOLGOZÁSA
       const data = await response.json();
-      console.log(`✅ Loaded ${data.length} audit log entries`);
+      console.log('✅ ========================================');
+      console.log('✅ SIKERES LEKÉRÉS');
+      console.log('✅ Betöltött logok száma:', data.length);
+      console.log('✅ Első log:', data[0]);
+      console.log('✅ ========================================');
+
       setLogs(data);
+      setRetryCount(0);
+
     } catch (error: any) {
-      console.error('❌ Error fetching audit logs:', error);
+      console.error('❌ ========================================');
+      console.error('❌ HIBA AZ AUDIT LOGOK LEKÉRÉSEKOR');
+      console.error('❌ Error name:', error.name);
+      console.error('❌ Error message:', error.message);
+      console.error('❌ Error stack:', error.stack);
+      console.error('❌ ========================================');
+
+      setError(error.message);
+
       toast({
-        title: t("error"),
+        title: "❌ " + t("error"),
         description: error.message,
         variant: 'destructive',
       });
@@ -118,6 +229,7 @@ export function AuditLogTable() {
     }
   };
 
+  // Helper funkciók
   const getActionIcon = (action: string) => {
     if (action.includes('delete')) return <Trash2 className="h-4 w-4" />;
     if (action.includes('upload')) return <Upload className="h-4 w-4" />;
@@ -134,7 +246,6 @@ export function AuditLogTable() {
     return 'text-gray-600';
   };
 
-  // Helper a specifikus log üzenetek fordítására
   const getActionLabel = (action: string) => {
     const translations: Record<string, { hu: string; de: string }> = {
       'user.create': { hu: 'Felhasználó létrehozva', de: 'Benutzer erstellt' },
@@ -159,7 +270,6 @@ export function AuditLogTable() {
     }
     return action;
   };
-
   // ========================================
   // MODERN THEME - Loading
   // ========================================
@@ -167,7 +277,7 @@ export function AuditLogTable() {
     return (
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-500 to-pink-400 p-1 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-400 via-purple-500 to-pink-500 opacity-30 animate-pulse" />
-        
+
         <Card className="relative bg-white dark:bg-gray-900 border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
@@ -188,6 +298,11 @@ export function AuditLogTable() {
               <p className="mt-4 text-gray-600">
                 {t("loading")}...
               </p>
+              {retryCount > 0 && (
+                <p className="mt-2 text-sm text-gray-500">
+                  Újrapróbálás... ({retryCount}/2)
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -208,9 +323,93 @@ export function AuditLogTable() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex justify-center items-center py-12">
+          <div className="flex flex-col justify-center items-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+            <p className="mt-4 text-sm text-gray-600">{t("loading")}...</p>
+            {retryCount > 0 && (
+              <p className="mt-2 text-xs text-gray-500">
+                Újrapróbálás... ({retryCount}/2)
+              </p>
+            )}
           </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // ========================================
+  // ERROR STATE
+  // ========================================
+  if (error && logs.length === 0) {
+    const ErrorContent = () => (
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="relative mb-6">
+          <div className="absolute inset-0 bg-red-400 rounded-full blur-2xl opacity-20 animate-pulse" />
+          <AlertTriangle className="relative h-16 w-16 text-red-500" />
+        </div>
+        <p className="text-lg font-semibold text-red-600 mb-2">
+          {t("error")}
+        </p>
+        <p className="text-sm text-gray-600 text-center max-w-md mb-6">
+          {error}
+        </p>
+        <Button
+          onClick={() => fetchLogs()}
+          variant="outline"
+          className="gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Újrapróbálás
+        </Button>
+
+        {/* Debug info */}
+        <details className="mt-6 text-xs text-gray-500 max-w-2xl">
+          <summary className="cursor-pointer hover:text-gray-700">
+            🔍 Debug információk
+          </summary>
+          <div className="mt-2 p-4 bg-gray-50 rounded-lg font-mono space-y-1">
+            <div>API URL: {API_BASE_URL || '(nincs beállítva)'}</div>
+            <div>Endpoint: /api/admin/audit-logs</div>
+            <div>Retry count: {retryCount}</div>
+            <div>Initialized: {initialized ? 'Igen' : 'Nem'}</div>
+            <div>Has Supabase: {supabase ? 'Igen' : 'Nem'}</div>
+          </div>
+        </details>
+      </div>
+    );
+
+    if (theme === 'modern') {
+      return (
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-red-600 via-orange-500 to-pink-400 p-1 shadow-xl">
+          <Card className="relative bg-white dark:bg-gray-900 border-0 rounded-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-orange-400 flex items-center justify-center shadow-lg">
+                  <Shield className="h-5 w-5 text-white" />
+                </div>
+                <span className="bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">
+                  {t("Admin.AuditLog.title")}
+                </span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ErrorContent />
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Shield className="h-5 w-5 mr-2" />
+            {t("Admin.AuditLog.title")}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ErrorContent />
         </CardContent>
       </Card>
     );
@@ -223,7 +422,7 @@ export function AuditLogTable() {
     return (
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-500 to-pink-400 p-1 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-400 via-purple-500 to-pink-500 opacity-30 animate-pulse" />
-        
+
         <Card className="relative bg-white dark:bg-gray-900 border-0 rounded-2xl">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
@@ -242,8 +441,16 @@ export function AuditLogTable() {
                 <AlertCircle className="relative h-16 w-16 text-gray-400" />
               </div>
               <p className="text-lg font-medium text-gray-600">
-                {t("Admin.AuditLog.noLogs")}
+                {t("Admin.AuditLog.noLogs") || "Nincsenek naplóbejegyzések"}
               </p>
+              <Button
+                onClick={() => fetchLogs()}
+                variant="outline"
+                className="mt-4 gap-2"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Frissítés
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -266,13 +473,21 @@ export function AuditLogTable() {
         <CardContent>
           <div className="flex flex-col items-center justify-center py-12 text-gray-500">
             <AlertCircle className="h-12 w-12 mb-4 text-gray-300" />
-            <p>{t("Admin.AuditLog.noLogs")}</p>
+            <p>{t("Admin.AuditLog.noLogs") || "Nincsenek naplóbejegyzések"}</p>
+            <Button
+              onClick={() => fetchLogs()}
+              variant="outline"
+              size="sm"
+              className="mt-4 gap-2"
+            >
+              <RefreshCw className="h-4 w-4" />
+              Frissítés
+            </Button>
           </div>
         </CardContent>
       </Card>
     );
   }
-
   // ========================================
   // MODERN THEME - Normal View
   // ========================================
@@ -280,7 +495,7 @@ export function AuditLogTable() {
     return (
       <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-600 via-fuchsia-500 to-pink-400 p-1 shadow-xl">
         <div className="absolute inset-0 bg-gradient-to-r from-fuchsia-400 via-purple-500 to-pink-500 opacity-30 animate-pulse" />
-        
+
         <Card className="relative bg-white dark:bg-gray-900 border-0 rounded-2xl">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -298,26 +513,26 @@ export function AuditLogTable() {
                   {t("Admin.AuditLog.description")}
                   {' • '}
                   <Badge className="bg-gradient-to-r from-purple-500 to-fuchsia-500 text-white border-0 px-3 py-1">
-                    {logs.length} {t("Admin.AuditLog.entries")}
+                    {logs.length} {t("Admin.AuditLog.entries") || "bejegyzés"}
                   </Badge>
                 </CardDescription>
               </div>
-              
+
               <button
-                onClick={fetchLogs}
+                onClick={() => fetchLogs()}
                 disabled={loading}
                 className="group relative overflow-hidden px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-purple-600 hover:to-fuchsia-600 text-white shadow-lg hover:shadow-xl transition-all disabled:opacity-50"
               >
                 <div className="flex items-center gap-2">
                   <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : 'group-hover:rotate-180'} transition-transform duration-500`} />
-                  <span className="font-semibold">{t("Admin.AuditLog.refresh")}</span>
+                  <span className="font-semibold">{t("Admin.AuditLog.refresh") || "Frissítés"}</span>
                 </div>
-                
+
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700" />
               </button>
             </div>
           </CardHeader>
-          
+
           <CardContent>
             <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden">
               <ScrollArea className="h-[600px]">
@@ -325,30 +540,30 @@ export function AuditLogTable() {
                   <TableHeader>
                     <TableRow className="bg-gradient-to-r from-purple-50 via-fuchsia-50 to-pink-50 dark:from-purple-950/20 dark:via-fuchsia-950/20 dark:to-pink-950/20">
                       <TableHead className="w-[50px] font-bold text-gray-700">
-                        {t("Admin.AuditLog.table.status")}
+                        {t("Admin.AuditLog.table.status") || "Státusz"}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4 text-purple-600" />
-                          {t("Admin.AuditLog.table.action")}
+                          {t("Admin.AuditLog.table.action") || "Művelet"}
                         </div>
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <User className="h-4 w-4 text-purple-600" />
-                          {t("Admin.AuditLog.table.user")}
+                          {t("Admin.AuditLog.table.user") || "Felhasználó"}
                         </div>
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
-                        {t("Admin.AuditLog.table.resource")}
+                        {t("Admin.AuditLog.table.resource") || "Erőforrás"}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
-                        {t("Admin.AuditLog.table.details")}
+                        {t("Admin.AuditLog.table.details") || "Részletek"}
                       </TableHead>
                       <TableHead className="font-bold text-gray-700">
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-purple-600" />
-                          {t("Admin.AuditLog.table.time")}
+                          {t("Admin.AuditLog.table.time") || "Időpont"}
                         </div>
                       </TableHead>
                     </TableRow>
@@ -374,7 +589,7 @@ export function AuditLogTable() {
                             )}
                           </div>
                         </TableCell>
-                        
+
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <div className={`w-8 h-8 rounded-lg ${
@@ -392,18 +607,18 @@ export function AuditLogTable() {
                             </span>
                           </div>
                         </TableCell>
-                        
+
                         <TableCell>
                           <div className="flex flex-col">
                             <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                               {log.user?.name || log.user_email || 'Ismeretlen'}
                             </span>
-                            {log.user?.email && (
+                            {log.user?.email && log.user.email !== log.user.name && (
                               <span className="text-xs text-gray-500">{log.user.email}</span>
                             )}
                           </div>
                         </TableCell>
-                        
+
                         <TableCell>
                           {log.resource_type && (
                             <div className="flex flex-col gap-1">
@@ -418,7 +633,7 @@ export function AuditLogTable() {
                             </div>
                           )}
                         </TableCell>
-                        
+
                         <TableCell>
                           <div className="text-xs text-gray-600 dark:text-gray-400 max-w-[200px] space-y-1">
                             {log.details?.template_name && (
@@ -446,7 +661,7 @@ export function AuditLogTable() {
                             )}
                           </div>
                         </TableCell>
-                        
+
                         <TableCell className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">
                           {(() => {
                             try {
@@ -471,151 +686,150 @@ export function AuditLogTable() {
       </div>
     );
   }
-
   // ========================================
-  // CLASSIC THEME - Normal View
-  // ========================================
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center">
-              <Shield className="h-5 w-5 mr-2" />
-              {t("Admin.AuditLog.title")}
-            </CardTitle>
-            <CardDescription className="mt-2">
-              {t("Admin.AuditLog.description")}
-              {' • '}
-              <span className="font-semibold">{logs.length}</span>
-              {' '}
-              {t("Admin.AuditLog.entries")}
-            </CardDescription>
+    // CLASSIC THEME - Normal View
+    // ========================================
+    return (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center">
+                <Shield className="h-5 w-5 mr-2" />
+                {t("Admin.AuditLog.title")}
+              </CardTitle>
+              <CardDescription className="mt-2">
+                {t("Admin.AuditLog.description")}
+                {' • '}
+                <span className="font-semibold">{logs.length}</span>
+                {' '}
+                {t("Admin.AuditLog.entries") || "bejegyzés"}
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchLogs()}
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+                {t("Admin.AuditLog.refresh") || "Frissítés"}
+              </Button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={fetchLogs}
-              disabled={loading}
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-              {t("Admin.AuditLog.refresh")}
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="rounded-md border">
-          <ScrollArea className="h-[600px]">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[50px]">
-                    {t("Admin.AuditLog.table.status")}
-                  </TableHead>
-                  <TableHead>
-                    {t("Admin.AuditLog.table.action")}
-                  </TableHead>
-                  <TableHead>
-                    {t("Admin.AuditLog.table.user")}
-                  </TableHead>
-                  <TableHead>
-                    {t("Admin.AuditLog.table.resource")}
-                  </TableHead>
-                  <TableHead>
-                    {t("Admin.AuditLog.table.details")}
-                  </TableHead>
-                  <TableHead>
-                    {t("Admin.AuditLog.table.time")}
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {logs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell>
-                      {log.status === 'success' ? (
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                      ) : (
-                        <XCircle className="h-4 w-4 text-red-600" />
-                      )}
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <span className={getActionColor(log.action)}>
-                          {getActionIcon(log.action)}
-                        </span>
-                        <span className="font-medium text-sm">
-                          {getActionLabel(log.action)}
-                        </span>
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {log.user?.name || log.user_email || 'Ismeretlen'}
-                        </span>
-                        {log.user?.email && (
-                          <span className="text-xs text-gray-500">{log.user.email}</span>
+        </CardHeader>
+        <CardContent>
+          <div className="rounded-md border">
+            <ScrollArea className="h-[600px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[50px]">
+                      {t("Admin.AuditLog.table.status") || "Státusz"}
+                    </TableHead>
+                    <TableHead>
+                      {t("Admin.AuditLog.table.action") || "Művelet"}
+                    </TableHead>
+                    <TableHead>
+                      {t("Admin.AuditLog.table.user") || "Felhasználó"}
+                    </TableHead>
+                    <TableHead>
+                      {t("Admin.AuditLog.table.resource") || "Erőforrás"}
+                    </TableHead>
+                    <TableHead>
+                      {t("Admin.AuditLog.table.details") || "Részletek"}
+                    </TableHead>
+                    <TableHead>
+                      {t("Admin.AuditLog.table.time") || "Időpont"}
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {logs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell>
+                        {log.status === 'success' ? (
+                          <CheckCircle className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-600" />
                         )}
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell>
-                      {log.resource_type && (
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className={getActionColor(log.action)}>
+                            {getActionIcon(log.action)}
+                          </span>
+                          <span className="font-medium text-sm">
+                            {getActionLabel(log.action)}
+                          </span>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
                         <div className="flex flex-col">
-                          <Badge variant="outline" className="w-fit">
-                            {log.resource_type}
-                          </Badge>
-                          {log.resource_id && (
-                            <span className="text-xs text-gray-500 mt-1 font-mono">
-                              {log.resource_id.substring(0, 8)}...
-                            </span>
+                          <span className="text-sm font-medium">
+                            {log.user?.name || log.user_email || 'Ismeretlen'}
+                          </span>
+                          {log.user?.email && log.user.email !== log.user.name && (
+                            <span className="text-xs text-gray-500">{log.user.email}</span>
                           )}
                         </div>
-                      )}
-                    </TableCell>
-                    
-                    <TableCell>
-                      <div className="text-xs text-gray-600 max-w-[200px]">
-                        {log.details?.template_name && (
-                          <div>📄 {log.details.template_name}</div>
+                      </TableCell>
+
+                      <TableCell>
+                        {log.resource_type && (
+                          <div className="flex flex-col">
+                            <Badge variant="outline" className="w-fit">
+                              {log.resource_type}
+                            </Badge>
+                            {log.resource_id && (
+                              <span className="text-xs text-gray-500 mt-1 font-mono">
+                                {log.resource_id.substring(0, 8)}...
+                              </span>
+                            )}
+                          </div>
                         )}
-                        {log.details?.file_name && (
-                          <div className="text-gray-500">📎 {log.details.file_name}</div>
-                        )}
-                        {log.error_message && (
-                          <div className="text-red-600">⚠️ {log.error_message}</div>
-                        )}
-                        {log.ip_address && (
-                          <div className="text-gray-400 mt-1">🌐 {log.ip_address}</div>
-                        )}
-                      </div>
-                    </TableCell>
-                    
-                    <TableCell className="text-sm text-gray-600">
-                      {(() => {
-                        try {
-                          const date = new Date(log.created_at);
-                          if (isNaN(date.getTime())) {
+                      </TableCell>
+
+                      <TableCell>
+                        <div className="text-xs text-gray-600 max-w-[200px]">
+                          {log.details?.template_name && (
+                            <div>📄 {log.details.template_name}</div>
+                          )}
+                          {log.details?.file_name && (
+                            <div className="text-gray-500">📎 {log.details.file_name}</div>
+                          )}
+                          {log.error_message && (
+                            <div className="text-red-600">⚠️ {log.error_message}</div>
+                          )}
+                          {log.ip_address && (
+                            <div className="text-gray-400 mt-1">🌐 {log.ip_address}</div>
+                          )}
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="text-sm text-gray-600">
+                        {(() => {
+                          try {
+                            const date = new Date(log.created_at);
+                            if (isNaN(date.getTime())) {
+                              return '-';
+                            }
+                            return formatDate(date, language);
+                          } catch {
                             return '-';
                           }
-                          return formatDate(date, language);
-                        } catch {
-                          return '-';
-                        }
-                      })()}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </ScrollArea>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+                        })()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ScrollArea>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }

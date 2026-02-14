@@ -24,9 +24,9 @@ import {
   audit_logs,
 } from "./db.js";
 
-import { db } from "./db.js";              // Drizzle connection
+import { db } from "./db.js"; // Drizzle connection
 import { eq, and, desc, sql } from "drizzle-orm"; // Drizzle helpers + sql for aggregations
-import { supabaseAdmin } from './supabaseAdmin.js';
+import { supabaseAdmin } from "./supabaseAdmin.js";
 
 // ------------------------------------------------------------
 // 2️⃣ IStorage interface – FRISSÍTVE
@@ -35,14 +35,17 @@ export interface IStorage {
   /* ---------- Protocols ---------- */
   getProtocol(id: string): Promise<Protocol | undefined>;
   // ✅ JAVÍTÁS: Új, lapozható getProtocols függvény
-  getProtocols(options: { 
-    userId: string; 
-    page: number; 
-    limit: number; 
-    offset: number; 
-  }): Promise<{ items: Protocol[]; total: number; }>;
+  getProtocols(options: {
+    userId: string;
+    page: number;
+    limit: number;
+    offset: number;
+  }): Promise<{ items: Protocol[]; total: number }>;
   createProtocol(protocol: InsertProtocol): Promise<Protocol>;
-  updateProtocol(id: string, updates: Partial<Protocol>): Promise<Protocol | undefined>;
+  updateProtocol(
+    id: string,
+    updates: Partial<Protocol>,
+  ): Promise<Protocol | undefined>;
   getAllProtocols(): Promise<Protocol[]>;
   // ✅ JAVÍTÁS: userId opcionális lett (admin override támogatás)
   deleteProtocol(id: string, userId?: string): Promise<boolean>;
@@ -50,16 +53,25 @@ export interface IStorage {
   /* ---------- Templates ---------- */
   getTemplate(id: string): Promise<Template | undefined>;
   createTemplate(template: InsertTemplate): Promise<Template>;
-  updateTemplate(id: string, updates: Partial<Template>): Promise<Template | undefined>;
+  updateTemplate(
+    id: string,
+    updates: Partial<Template>,
+  ): Promise<Template | undefined>;
   getAllTemplates(): Promise<Template[]>;
-  getActiveTemplate(type: string, language: string): Promise<Template | undefined>;
+  getActiveTemplate(
+    type: string,
+    language: string,
+  ): Promise<Template | undefined>;
   setActiveTemplate(id: string): Promise<void>;
   deleteTemplate(id: string): Promise<boolean>;
 
   /* ---------- Question Configurations ---------- */
   getQuestionConfig(id: string): Promise<QuestionConfig | undefined>;
   createQuestionConfig(config: InsertQuestionConfig): Promise<QuestionConfig>;
-  updateQuestionConfig(id: string, updates: Partial<QuestionConfig>): Promise<QuestionConfig | undefined>;
+  updateQuestionConfig(
+    id: string,
+    updates: Partial<QuestionConfig>,
+  ): Promise<QuestionConfig | undefined>;
   deleteQuestionConfig(id: string): Promise<boolean>;
   getQuestionConfigsByTemplate(templateId: string): Promise<QuestionConfig[]>;
   deleteQuestionConfigsByTemplate(templateId: string): Promise<boolean>;
@@ -75,7 +87,10 @@ export interface IStorage {
   getAllProfiles(): Promise<Profile[]>;
   // --- ÚJ FÜGGVÉNY VÉGE ---
   createProfile(profile: InsertProfile): Promise<Profile>;
-  updateProfile(userId: string, updates: Partial<Profile>): Promise<Profile | undefined>;
+  updateProfile(
+    userId: string,
+    updates: Partial<Profile>,
+  ): Promise<Profile | undefined>;
   deleteProfile(userId: string): Promise<boolean>;
 
   /* ---------- Statistics (ÚJ SZEKCIÓ) ---------- */
@@ -96,7 +111,10 @@ export interface IStorage {
 export class DatabaseStorage implements IStorage {
   /* ---------- Protocols ---------- */
   async getProtocol(id: string) {
-    const [protocol] = await (db as any).select().from(protocols).where(eq(protocols.id, id));
+    const [protocol] = await (db as any)
+      .select()
+      .from(protocols)
+      .where(eq(protocols.id, id));
     return protocol ?? undefined;
   }
 
@@ -109,16 +127,17 @@ export class DatabaseStorage implements IStorage {
    * @param options - userId, page, limit, offset
    * @returns Promise<{ items: Protocol[], total: number }>
    */
-  async getProtocols(options: { 
-    userId: string; 
-    page: number; 
-    limit: number; 
-    offset: number; 
-  }): Promise<{ items: Protocol[]; total: number; }> {
-    
+  async getProtocols(options: {
+    userId: string;
+    page: number;
+    limit: number;
+    offset: number;
+  }): Promise<{ items: Protocol[]; total: number }> {
     try {
-      console.log(`🗄️ Storage: Fetching protocols for user ${options.userId} (Limit: ${options.limit}, Offset: ${options.offset})`);
-      
+      console.log(
+        `🗄️ Storage: Fetching protocols for user ${options.userId} (Limit: ${options.limit}, Offset: ${options.offset})`,
+      );
+
       const whereClause = eq(protocols.user_id, options.userId);
 
       // 1. Lekérjük az adott oldal elemeit
@@ -135,20 +154,22 @@ export class DatabaseStorage implements IStorage {
         .select({ count: sql<number>`count(*)` })
         .from(protocols)
         .where(whereClause);
-      
+
       const total = Number(totalResult?.count || 0);
 
       console.log(`✅ Storage: Found ${items.length} items (Total: ${total})`);
       return { items, total };
-
     } catch (error) {
-      console.error('❌ Error in storage.getProtocols:', error);
+      console.error("❌ Error in storage.getProtocols:", error);
       return { items: [], total: 0 };
     }
   }
 
   async createProtocol(protocol: InsertProtocol) {
-    const [created] = await (db as any).insert(protocols).values(protocol).returning();
+    const [created] = await (db as any)
+      .insert(protocols)
+      .values(protocol)
+      .returning();
     return created;
   }
 
@@ -162,7 +183,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllProtocols() {
-    return await (db as any).select().from(protocols).orderBy(desc(protocols.created_at));
+    return await (db as any)
+      .select()
+      .from(protocols)
+      .orderBy(desc(protocols.created_at));
   }
 
   // ✅ =========================================================
@@ -170,7 +194,7 @@ export class DatabaseStorage implements IStorage {
   // === userId opcionális - admin override támogatással
   // =========================================================
   /**
-   * Egy protokollt töröl. 
+   * Egy protokollt töröl.
    * Ha a userId meg van adva, csak akkor töröl, ha ő a tulajdonos (biztonságos user törlés).
    * Ha nincs megadva (admin eset), akkor bármelyiket törli ID alapján.
    * @param id - A törlendő protokoll azonosítója
@@ -179,8 +203,10 @@ export class DatabaseStorage implements IStorage {
    */
   async deleteProtocol(id: string, userId?: string): Promise<boolean> {
     try {
-      console.log(`🗑️ Attempting to delete protocol: ${id}${userId ? ` by user: ${userId}` : ' (admin override)'}`);
-      
+      console.log(
+        `🗑️ Attempting to delete protocol: ${id}${userId ? ` by user: ${userId}` : " (admin override)"}`,
+      );
+
       // Ha van userId, szigorúbb szűrés (biztonsági ellenőrzés)
       // Ha nincs, csak ID alapján törlünk (admin funkció)
       const whereClause = userId
@@ -191,12 +217,16 @@ export class DatabaseStorage implements IStorage {
         .delete(protocols)
         .where(whereClause)
         .returning();
-      
+
       const success = result.length > 0;
       if (success) {
-        console.log(`✅ Protocol ${id} deleted successfully${userId ? ` by user ${userId}` : ' (admin)'}`);
+        console.log(
+          `✅ Protocol ${id} deleted successfully${userId ? ` by user ${userId}` : " (admin)"}`,
+        );
       } else {
-        console.warn(`⚠️ Protocol not found or access denied for deletion (ID: ${id}, User: ${userId || 'admin'})`);
+        console.warn(
+          `⚠️ Protocol not found or access denied for deletion (ID: ${id}, User: ${userId || "admin"})`,
+        );
       }
       return success;
     } catch (error) {
@@ -207,12 +237,18 @@ export class DatabaseStorage implements IStorage {
 
   /* ---------- Templates ---------- */
   async getTemplate(id: string) {
-    const [tpl] = await (db as any).select().from(templates).where(eq(templates.id, id));
+    const [tpl] = await (db as any)
+      .select()
+      .from(templates)
+      .where(eq(templates.id, id));
     return tpl ?? undefined;
   }
 
   async createTemplate(template: InsertTemplate) {
-    const [created] = await (db as any).insert(templates).values(template).returning();
+    const [created] = await (db as any)
+      .insert(templates)
+      .values(template)
+      .returning();
     return created;
   }
 
@@ -226,27 +262,44 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAllTemplates() {
-    return await (db as any).select().from(templates).orderBy(desc(templates.uploaded_at));
+    return await (db as any)
+      .select()
+      .from(templates)
+      .orderBy(desc(templates.uploaded_at));
   }
 
   async getActiveTemplate(type: string, language: string) {
-    console.log(`🔍 Looking for active template – type=${type}, language=${language}`);
-    
+    console.log(
+      `🔍 Looking for active template – type=${type}, language=${language}`,
+    );
+
     const isActiveCondition = eq(templates.is_active, true);
-  
+
     let [tpl] = await (db as any)
       .select()
       .from(templates)
-      .where(and(eq(templates.type, type), eq(templates.language, language), isActiveCondition));
-  
+      .where(
+        and(
+          eq(templates.type, type),
+          eq(templates.language, language),
+          isActiveCondition,
+        ),
+      );
+
     if (!tpl) {
       console.log(`🔍 No exact match – trying multilingual`);
       [tpl] = await (db as any)
         .select()
         .from(templates)
-        .where(and(eq(templates.type, type), eq(templates.language, "multilingual"), isActiveCondition));
+        .where(
+          and(
+            eq(templates.type, type),
+            eq(templates.language, "multilingual"),
+            isActiveCondition,
+          ),
+        );
     }
-  
+
     console.log(`📋 Result: ${tpl ? `${tpl.name} (${tpl.language})` : "none"}`);
     return tpl ?? undefined;
   }
@@ -255,34 +308,50 @@ export class DatabaseStorage implements IStorage {
     const target = await this.getTemplate(id);
     if (!target) throw new Error("Template not found");
 
-    console.log(`Deactivating other templates of type=${target.type}, language=${target.language}`);
+    console.log(
+      `Deactivating other templates of type=${target.type}, language=${target.language}`,
+    );
     await (db as any)
-        .update(templates)
-        .set({ is_active: false })
-        .where(and(eq(templates.type, target.type), eq(templates.language, target.language)));
+      .update(templates)
+      .set({ is_active: false })
+      .where(
+        and(
+          eq(templates.type, target.type),
+          eq(templates.language, target.language),
+        ),
+      );
 
     console.log(`Activating template id=${id}`);
     await (db as any)
-        .update(templates)
-        .set({ is_active: true })
-        .where(eq(templates.id, id));
+      .update(templates)
+      .set({ is_active: true })
+      .where(eq(templates.id, id));
 
     console.log(`✅ Activated template ${target.name}`);
   }
 
   async deleteTemplate(id: string) {
-    const result = await (db as any).delete(templates).where(eq(templates.id, id)).returning();
+    const result = await (db as any)
+      .delete(templates)
+      .where(eq(templates.id, id))
+      .returning();
     return result.length > 0;
   }
 
   /* ---------- Question Configurations ---------- */
   async getQuestionConfig(id: string) {
-    const [cfg] = await (db as any).select().from(questionConfigs).where(eq(questionConfigs.id, id));
+    const [cfg] = await (db as any)
+      .select()
+      .from(questionConfigs)
+      .where(eq(questionConfigs.id, id));
     return cfg ?? undefined;
   }
 
   async createQuestionConfig(config: InsertQuestionConfig) {
-    const [created] = await (db as any).insert(questionConfigs).values(config).returning();
+    const [created] = await (db as any)
+      .insert(questionConfigs)
+      .values(config)
+      .returning();
     return created;
   }
 
@@ -296,84 +365,154 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteQuestionConfig(id: string) {
-    const result = await (db as any).delete(questionConfigs).where(eq(questionConfigs.id, id)).returning();
+    const result = await (db as any)
+      .delete(questionConfigs)
+      .where(eq(questionConfigs.id, id))
+      .returning();
     return result.length > 0;
   }
 
   async getQuestionConfigsByTemplate(templateId: string) {
     const rawConfigs = await (db as any)
-        .select()
-        .from(questionConfigs)
-        .where(eq(questionConfigs.template_id, templateId))
-        .orderBy(questionConfigs.created_at);
+      .select()
+      .from(questionConfigs)
+      .where(eq(questionConfigs.template_id, templateId))
+      .orderBy(questionConfigs.created_at);
 
     // DEBUG LOG: Nyers adatbázis eredmény
     if (rawConfigs && rawConfigs.length > 0) {
-      console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
-      console.log('NYERS ADATBÁZIS EREDMÉNY (a konverzió előtt):');
+      console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+      console.log("NYERS ADATBÁZIS EREDMÉNY (a konverzió előtt):");
       console.log(JSON.stringify(rawConfigs[0], null, 2));
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     }
 
     // *** JAVÍTOTT, VÉGLEGES CAMELCASE KONVERZIÓ ***
     const configs = rawConfigs.map((config: any) => {
       const newConfig = { ...config };
-      
+
       // 1. ÁLTALÁNOS: Automatikus snake_case -> camelCase konverzió minden mezőre
       for (const key in newConfig) {
-        if (key.includes('_')) {
-          const camelCaseKey = key.replace(/_([a-z])/g, (g: string) => g[1].toUpperCase());
+        if (key.includes("_")) {
+          const camelCaseKey = key.replace(/_([a-z])/g, (g: string) =>
+            g[1].toUpperCase(),
+          );
           // Csak akkor hozzuk létre, ha még nem létezik
           if (!(camelCaseKey in newConfig)) {
             newConfig[camelCaseKey] = newConfig[key];
           }
         }
       }
-      
+
       // 2. MANUÁLIS "BOLONDBIZTOS" FELÜLÍRÁS a kritikus mezőkre
       // A !== undefined ellenőrzés biztosítja, hogy a null értékek is átmásolódjanak
-      newConfig.questionId = config.question_id !== undefined ? config.question_id : config.questionId;
-      newConfig.cellReference = config.cell_reference !== undefined ? config.cell_reference : config.cellReference;
-      newConfig.multiCell = config.multi_cell !== undefined ? config.multi_cell : (config.multiCell || false);
-      newConfig.titleHu = config.title_hu !== undefined ? config.title_hu : config.titleHu;
-      newConfig.titleDe = config.title_de !== undefined ? config.title_de : config.titleDe;
-      newConfig.titleEn = config.title_en !== undefined ? config.title_en : config.titleEn;
-      newConfig.titleFr = config.title_fr !== undefined ? config.title_fr : config.titleFr;
-      newConfig.titleIt = config.title_it !== undefined ? config.title_it : config.titleIt;
-      newConfig.placeholderDe = config.placeholder_de !== undefined ? config.placeholder_de : config.placeholderDe;
-      newConfig.placeholderEn = config.placeholder_en !== undefined ? config.placeholder_en : config.placeholderEn;
-      newConfig.placeholderFr = config.placeholder_fr !== undefined ? config.placeholder_fr : config.placeholderFr;
-      newConfig.placeholderIt = config.placeholder_it !== undefined ? config.placeholder_it : config.placeholderIt;
-      newConfig.groupName = config.group_name !== undefined ? config.group_name : config.groupName;
-      newConfig.groupNameDe = config.group_name_de !== undefined ? config.group_name_de : config.groupNameDe;
-      newConfig.groupNameEn = config.group_name_en !== undefined ? config.group_name_en : config.groupNameEn;
-      newConfig.groupNameFr = config.group_name_fr !== undefined ? config.group_name_fr : config.groupNameFr;
-      newConfig.groupNameIt = config.group_name_it !== undefined ? config.group_name_it : config.groupNameIt;
-      newConfig.groupKey = config.group_key !== undefined ? config.group_key : config.groupKey;
-      newConfig.groupOrder = config.group_order !== undefined ? config.group_order : (config.groupOrder || 0);
-      newConfig.conditionalGroupKey = config.conditional_group_key !== undefined ? config.conditional_group_key : config.conditionalGroupKey;
-      newConfig.minValue = config.min_value !== undefined ? config.min_value : config.minValue;
-      newConfig.maxValue = config.max_value !== undefined ? config.max_value : config.maxValue;
-      newConfig.calculationFormula = config.calculation_formula !== undefined ? config.calculation_formula : config.calculationFormula;
-      newConfig.calculationInputs = config.calculation_inputs !== undefined ? config.calculation_inputs : config.calculationInputs;
-      newConfig.sheetName = config.sheet_name !== undefined ? config.sheet_name : config.sheetName;
-      newConfig.options = config.options !== undefined ? config.options : config.options;
-      newConfig.optionCells = config.option_cells !== undefined ? config.option_cells : config.optionCells; // select_extended
-      newConfig.defaultIfHidden = config.default_if_hidden !== undefined ? config.default_if_hidden : config.defaultIfHidden; // conditional_group_key
-      newConfig.maxLength = config.max_length !== undefined ? config.max_length : config.maxLength;
+      newConfig.questionId =
+        config.question_id !== undefined
+          ? config.question_id
+          : config.questionId;
+      newConfig.cellReference =
+        config.cell_reference !== undefined
+          ? config.cell_reference
+          : config.cellReference;
+      newConfig.multiCell =
+        config.multi_cell !== undefined
+          ? config.multi_cell
+          : config.multiCell || false;
+      newConfig.titleHu =
+        config.title_hu !== undefined ? config.title_hu : config.titleHu;
+      newConfig.titleDe =
+        config.title_de !== undefined ? config.title_de : config.titleDe;
+      newConfig.titleEn =
+        config.title_en !== undefined ? config.title_en : config.titleEn;
+      newConfig.titleFr =
+        config.title_fr !== undefined ? config.title_fr : config.titleFr;
+      newConfig.titleIt =
+        config.title_it !== undefined ? config.title_it : config.titleIt;
+      newConfig.placeholderDe =
+        config.placeholder_de !== undefined
+          ? config.placeholder_de
+          : config.placeholderDe;
+      newConfig.placeholderEn =
+        config.placeholder_en !== undefined
+          ? config.placeholder_en
+          : config.placeholderEn;
+      newConfig.placeholderFr =
+        config.placeholder_fr !== undefined
+          ? config.placeholder_fr
+          : config.placeholderFr;
+      newConfig.placeholderIt =
+        config.placeholder_it !== undefined
+          ? config.placeholder_it
+          : config.placeholderIt;
+      newConfig.groupName =
+        config.group_name !== undefined ? config.group_name : config.groupName;
+      newConfig.groupNameDe =
+        config.group_name_de !== undefined
+          ? config.group_name_de
+          : config.groupNameDe;
+      newConfig.groupNameEn =
+        config.group_name_en !== undefined
+          ? config.group_name_en
+          : config.groupNameEn;
+      newConfig.groupNameFr =
+        config.group_name_fr !== undefined
+          ? config.group_name_fr
+          : config.groupNameFr;
+      newConfig.groupNameIt =
+        config.group_name_it !== undefined
+          ? config.group_name_it
+          : config.groupNameIt;
+      newConfig.groupKey =
+        config.group_key !== undefined ? config.group_key : config.groupKey;
+      newConfig.groupOrder =
+        config.group_order !== undefined
+          ? config.group_order
+          : config.groupOrder || 0;
+      newConfig.conditionalGroupKey =
+        config.conditional_group_key !== undefined
+          ? config.conditional_group_key
+          : config.conditionalGroupKey;
+      newConfig.minValue =
+        config.min_value !== undefined ? config.min_value : config.minValue;
+      newConfig.maxValue =
+        config.max_value !== undefined ? config.max_value : config.maxValue;
+      newConfig.calculationFormula =
+        config.calculation_formula !== undefined
+          ? config.calculation_formula
+          : config.calculationFormula;
+      newConfig.calculationInputs =
+        config.calculation_inputs !== undefined
+          ? config.calculation_inputs
+          : config.calculationInputs;
+      newConfig.sheetName =
+        config.sheet_name !== undefined ? config.sheet_name : config.sheetName;
+      newConfig.options =
+        config.options !== undefined ? config.options : config.options;
+      newConfig.optionCells =
+        config.option_cells !== undefined
+          ? config.option_cells
+          : config.optionCells; // select_extended
+      newConfig.defaultIfHidden =
+        config.default_if_hidden !== undefined
+          ? config.default_if_hidden
+          : config.defaultIfHidden; // conditional_group_key
+      newConfig.maxLength =
+        config.max_length !== undefined ? config.max_length : config.maxLength;
 
       return newConfig;
     });
 
     // DEBUG LOG: Konvertált eredmény
     if (configs && configs.length > 0) {
-      console.log('<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<');
-      console.log('EREDMÉNY a camelCase konverzió UTÁN:');
+      console.log("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+      console.log("EREDMÉNY a camelCase konverzió UTÁN:");
       console.log(JSON.stringify(configs[0], null, 2));
-      console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
     }
 
-    console.log(`✅ ${configs.length} question configs converted to camelCase.`);
+    console.log(
+      `✅ ${configs.length} question configs converted to camelCase.`,
+    );
     return configs;
   }
 
@@ -400,10 +539,13 @@ export class DatabaseStorage implements IStorage {
   // TISZTÍTÁS: A duplikált getProfile() függvény eltávolítva, csak a getProfileByUserId maradt
 
   async getProfileByUserId(userId: string) {
-    const [profile] = await (db as any).select().from(profiles).where(eq(profiles.user_id, userId));
+    const [profile] = await (db as any)
+      .select()
+      .from(profiles)
+      .where(eq(profiles.user_id, userId));
     return profile ?? undefined;
   }
-  
+
   // --- ÚJ FÜGGVÉNY IMPLEMENTÁCIÓJA ---
   /**
    * Lekérdezi az összes felhasználói profilt az adatbázisból.
@@ -411,38 +553,44 @@ export class DatabaseStorage implements IStorage {
    * @returns Promise<Profile[]>
    */
   async getAllProfiles() {
-  try {
-    console.log('📋 Fetching all users from Supabase Auth...');
-    
-    const { data: authData, error } = await supabaseAdmin.auth.admin.listUsers();
-    
-    if (error) {
-      console.error('❌ Error fetching users from Supabase Auth:', error);
-      throw error;
+    try {
+      console.log("📋 Fetching all users from Supabase Auth...");
+
+      const { data: authData, error } =
+        await supabaseAdmin.auth.admin.listUsers();
+
+      if (error) {
+        console.error("❌ Error fetching users from Supabase Auth:", error);
+        throw error;
+      }
+
+      // Átalakítjuk a "profile" formátumra a kompatibilitás érdekében
+      const profiles = authData.users.map((user) => ({
+        user_id: user.id,
+        full_name:
+          user.user_metadata?.full_name || user.email?.split("@")[0] || null,
+        email: user.email || null,
+        role: user.user_metadata?.role || user.app_metadata?.role || "user",
+        created_at: user.created_at,
+        updated_at: user.updated_at || user.created_at,
+      }));
+
+      console.log(
+        `✅ Retrieved ${profiles.length} user profiles from Supabase Auth`,
+      );
+      return profiles;
+    } catch (error) {
+      console.error("❌ Error fetching profiles from Auth:", error);
+      return [];
     }
-    
-    // Átalakítjuk a "profile" formátumra a kompatibilitás érdekében
-    const profiles = authData.users.map((user) => ({
-      user_id: user.id,
-      full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || null,
-      email: user.email || null,
-      role: user.user_metadata?.role || user.app_metadata?.role || 'user',
-      created_at: user.created_at,
-      updated_at: user.updated_at || user.created_at,
-    }));
-    
-    console.log(`✅ Retrieved ${profiles.length} user profiles from Supabase Auth`);
-    return profiles;
-    
-  } catch (error) {
-    console.error('❌ Error fetching profiles from Auth:', error);
-    return [];
   }
-}
   // --- ÚJ FÜGGVÉNY VÉGE ---
 
   async createProfile(profile: InsertProfile) {
-    const [created] = await (db as any).insert(profiles).values(profile).returning();
+    const [created] = await (db as any)
+      .insert(profiles)
+      .values(profile)
+      .returning();
     return created;
   }
 
@@ -461,7 +609,7 @@ export class DatabaseStorage implements IStorage {
       .delete(profiles)
       .where(eq(profiles.user_id, userId))
       .returning();
-    
+
     const success = result.length > 0;
     if (success) {
       console.log(`✅ Profile deleted successfully for user: ${userId}`);
@@ -472,31 +620,30 @@ export class DatabaseStorage implements IStorage {
   }
 
   /* ---------- Statistics (ÚJ SZEKCIÓ) ---------- */
-  
+
   /**
    * Visszaadja a regisztrált felhasználók teljes számát.
    * @returns Promise<number>
    */
   async getUsersCount(): Promise<number> {
-  try {
-    console.log('📊 Counting users from Supabase Auth...');
-    
-    const { data, error } = await supabaseAdmin.auth.admin.listUsers();
-    
-    if (error) {
-      console.error('❌ Error counting users:', error);
+    try {
+      console.log("📊 Counting users from Supabase Auth...");
+
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+
+      if (error) {
+        console.error("❌ Error counting users:", error);
+        return 0;
+      }
+
+      const count = data.users.length;
+      console.log(`✅ Total users: ${count}`);
+      return count;
+    } catch (error) {
+      console.error("❌ Error counting users:", error);
       return 0;
     }
-    
-    const count = data.users.length;
-    console.log(`✅ Total users: ${count}`);
-    return count;
-    
-  } catch (error) {
-    console.error('❌ Error counting users:', error);
-    return 0;
   }
-}
 
   /**
    * Visszaadja a létrehozott protokollok teljes számát.
@@ -504,16 +651,16 @@ export class DatabaseStorage implements IStorage {
    */
   async getProtocolsCount(): Promise<number> {
     try {
-      console.log('📊 Counting total protocols...');
+      console.log("📊 Counting total protocols...");
       const [result] = await (db as any)
         .select({ count: sql<number>`count(*)` })
         .from(protocols);
-      
+
       const count = Number(result?.count || 0);
       console.log(`✅ Total protocols: ${count}`);
       return count;
     } catch (error) {
-      console.error('❌ Error counting protocols:', error);
+      console.error("❌ Error counting protocols:", error);
       return 0;
     }
   }
@@ -524,16 +671,16 @@ export class DatabaseStorage implements IStorage {
    */
   async getTemplatesCount(): Promise<number> {
     try {
-      console.log('📊 Counting total templates...');
+      console.log("📊 Counting total templates...");
       const [result] = await (db as any)
         .select({ count: sql<number>`count(*)` })
         .from(templates);
-      
+
       const count = Number(result?.count || 0);
       console.log(`✅ Total templates: ${count}`);
       return count;
     } catch (error) {
-      console.error('❌ Error counting templates:', error);
+      console.error("❌ Error counting templates:", error);
       return 0;
     }
   }
@@ -544,17 +691,17 @@ export class DatabaseStorage implements IStorage {
    */
   async getActiveTemplatesCount(): Promise<number> {
     try {
-      console.log('📊 Counting active templates...');
+      console.log("📊 Counting active templates...");
       const [result] = await (db as any)
         .select({ count: sql<number>`count(*)` })
         .from(templates)
         .where(eq(templates.is_active, true)); // Csak az aktívakat számoljuk
-      
+
       const count = Number(result?.count || 0);
       console.log(`✅ Active templates: ${count}`);
       return count;
     } catch (error) {
-      console.error('❌ Error counting active templates:', error);
+      console.error("❌ Error counting active templates:", error);
       return 0;
     }
   }
@@ -572,52 +719,57 @@ export class DatabaseStorage implements IStorage {
         .from(protocols)
         .orderBy(desc(protocols.created_at))
         .limit(limit);
-      
+
       console.log(`✅ Retrieved ${recentProtocols.length} recent protocols`);
       return recentProtocols;
     } catch (error) {
-      console.error('❌ Error fetching recent protocols:', error);
+      console.error("❌ Error fetching recent protocols:", error);
       return [];
     }
   }
-  
-/* ---------- Audit Logs (JAVÍTOTT VERZIÓ) ---------- */
 
-/**
- * Új audit log bejegyzés létrehozása.
- * @param log - Az audit log adatai
- * @returns Promise<void>
- */
-async createAuditLog(log: InsertAuditLog): Promise<void> {
-  try {
-    console.log(`📝 Creating audit log: ${log.action} by ${log.user_email || log.user_id}`);
+  /* ---------- Audit Logs (JAVÍTOTT VERZIÓ) ---------- */
 
-    if (!audit_logs) {
-      console.error('❌ audit_logs table not available in schema');
-      return;
+  /**
+   * Új audit log bejegyzés létrehozása.
+   * @param log - Az audit log adatai
+   * @returns Promise<void>
+   */
+  async createAuditLog(log: InsertAuditLog): Promise<void> {
+    try {
+      console.log(
+        `📝 Creating audit log: ${log.action} by ${log.user_email || log.user_id}`,
+      );
+
+      if (!audit_logs) {
+        console.error("❌ audit_logs table not available in schema");
+        return;
+      }
+
+      await (db as any).insert(audit_logs).values(log);
+
+      console.log(`✅ Audit log created for action: ${log.action}`);
+    } catch (error: any) {
+      console.error("❌ Error creating audit log:", error?.message || error);
+      console.error(
+        "❌ Audit log data:",
+        JSON.stringify({ action: log.action, user_id: log.user_id }),
+      );
     }
-
-    await (db as any).insert(audit_logs).values(log);
-
-    console.log(`✅ Audit log created for action: ${log.action}`);
-  } catch (error: any) {
-    console.error('❌ Error creating audit log:', error?.message || error);
-    console.error('❌ Audit log data:', JSON.stringify({ action: log.action, user_id: log.user_id }));
   }
-}
 
-/**
- * 🔥 JAVÍTOTT VERZIÓ - UUID CASTING-GEL
- * Lekérdezi az audit logokat user adatokkal együtt.
- * @param limit - Hány bejegyzést kérünk le (alapértelmezett: 50)
- * @returns Promise<any[]>
- */
+  /**
+   * 🔥 JAVÍTOTT VERZIÓ - UUID CASTING-GEL
+   * Lekérdezi az audit logokat user adatokkal együtt.
+   * @param limit - Hány bejegyzést kérünk le (alapértelmezett: 50)
+   * @returns Promise<any[]>
+   */
   async getAuditLogs(limit: number = 50): Promise<any[]> {
     try {
       console.log(`📜 Fetching last ${limit} audit logs with column fix...`);
 
       if (!audit_logs) {
-        console.error('❌ audit_logs table not available in schema');
+        console.error("❌ audit_logs table not available in schema");
         return [];
       }
 
@@ -641,18 +793,20 @@ async createAuditLog(log: InsertAuditLog): Promise<void> {
             FROM audit_logs al 
             LEFT JOIN profiles p ON al.user_id::text = p.user_id::text 
             ORDER BY al.created_at DESC 
-            LIMIT ${limit}`
+            LIMIT ${limit}`,
       );
 
       // Drizzle eredmény kezelése
-      const rows = Array.isArray(result) ? result : (result?.rows || []);
+      const rows = Array.isArray(result) ? result : result?.rows || [];
 
       // Összefésüljük az adatokat
       const mapped = rows.map((row: any) => {
         // Ha nincs név oszlop, generálunk egyet az emailből (pl. "istvan.faddi")
-        const fallbackName = row.user_email_joined 
-          ? row.user_email_joined.split('@')[0] 
-          : (row.user_email ? row.user_email.split('@')[0] : 'Rendszer');
+        const fallbackName = row.user_email_joined
+          ? row.user_email_joined.split("@")[0]
+          : row.user_email
+            ? row.user_email.split("@")[0]
+            : "Rendszer";
 
         return {
           id: row.id,
@@ -668,19 +822,22 @@ async createAuditLog(log: InsertAuditLog): Promise<void> {
           user_agent: row.user_agent,
           created_at: row.created_at,
           // User objektum a frontend számára
-          user: row.user_email_joined ? { 
-            email: row.user_email_joined, 
-            name: fallbackName  // Email előtti rész névként
-          } : null,
+          user: row.user_email_joined
+            ? {
+                email: row.user_email_joined,
+                name: fallbackName, // Email előtti rész névként
+              }
+            : null,
         };
       });
 
-      console.log(`✅ Retrieved ${mapped.length} audit log entries (Safe mode)`);
+      console.log(
+        `✅ Retrieved ${mapped.length} audit log entries (Safe mode)`,
+      );
       return mapped;
-
     } catch (error: any) {
-      console.error('❌ Error fetching audit logs:', error?.message || error);
-      console.error('❌ Full error:', error);
+      console.error("❌ Error fetching audit logs:", error?.message || error);
+      console.error("❌ Full error:", error);
       return [];
     }
   }

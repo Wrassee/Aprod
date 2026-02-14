@@ -116,22 +116,21 @@ router.get('/stats', requireAdmin, async (_req, res) => {
   }
 });
 
-// 🔥 JAVÍTOTT AUDIT LOGS VÉGPONT - UUID CASTING-GEL
+// 🔥 JAVÍTOTT AUDIT LOGS VÉGPONT - UUID CASTING + HELYES OSZLOPNEVEK
 router.get('/audit-logs', async (req, res) => {
   try {
     const limit = parseInt(req.query.limit as string) || 50;
-    console.log(`📜 Fetching last ${limit} audit logs with explicit UUID casting...`);
+    console.log(`📜 Fetching last ${limit} audit logs with correct column names...`);
 
-    // ✅ KÖZVETLEN SQL LEKÉRDEZÉS UUID CASTOLÁSSAL (::text)
-    // Ez megoldja a "operator does not exist: text = uuid" hibát
+    // ✅ JAVÍTÁS: p.full_name -> p.name (a profiles táblában name van, nem full_name!)
     const result = await (db as any).execute(sql`
       SELECT 
         al.id, 
         al.user_id::text as user_id,
         al.user_email,
         al.action, 
-        al.resource_type as entity_type,
-        al.resource_id as entity_id,
+        al.resource_type,
+        al.resource_id,
         al.details, 
         al.status, 
         al.error_message, 
@@ -139,14 +138,13 @@ router.get('/audit-logs', async (req, res) => {
         al.user_agent, 
         al.created_at,
         p.email as user_email_joined, 
-        p.full_name as user_name_joined 
+        p.name as user_name_joined
       FROM audit_logs al 
       LEFT JOIN profiles p ON al.user_id::text = p.user_id::text 
       ORDER BY al.created_at DESC 
       LIMIT ${limit}
     `);
 
-    // Drizzle eredménykezelés (lehet result vagy result.rows)
     const rows = Array.isArray(result) ? result : (result?.rows || []);
 
     // Összefésüljük a user adatokat
@@ -154,15 +152,19 @@ router.get('/audit-logs', async (req, res) => {
       ...row,
       user: row.user_email_joined ? { 
         email: row.user_email_joined, 
-        name: row.user_name_joined 
-      } : null,
+        name: row.user_name_joined || row.user_email_joined.split('@')[0]
+      } : (row.user_email ? { 
+        email: row.user_email, 
+        name: row.user_email.split('@')[0] 
+      } : null),
     }));
 
-    console.log(`✅ Retrieved ${logs.length} audit log entries using UUID casting fix`);
+    console.log(`✅ Retrieved ${logs.length} audit log entries with correct columns`);
     res.json(logs);
 
   } catch (error: any) {
     console.error('❌ Failed to fetch audit logs:', error);
+    console.error('❌ Error stack:', error.stack);
     res.status(500).json({ 
       message: 'Hiba történt a naplók lekérdezése során.',
       error: error.message 
@@ -217,7 +219,7 @@ router.get('/users', requireAdmin, async (_req, res) => {
     // ✅ Átalakítjuk a frontend által elvárt formátumra
     const users = authData.users.map((user) => ({
       user_id: user.id,
-      full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown',
+      name: user.user_metadata?.name || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Unknown',
       email: user.email || null,
       role: user.user_metadata?.role || user.app_metadata?.role || 'user',
       created_at: user.created_at,

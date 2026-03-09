@@ -39,6 +39,7 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **Excel Integration**: XML-based manipulation preserving formatting, handling unicode, and supporting complex cell mapping. Calculations handled by Excel's formulas.
 - **Dual PDF Generation System**: LibreOffice for protocol PDFs (Excel-to-PDF conversion) and jsPDF for error list PDFs (with embedded Roboto fonts for Unicode support).
 - **Data Persistence**: Form data saved to localStorage and PostgreSQL.
+- **Backup & Restore System**: Full database backup/restore via admin panel. Creates downloadable JSON containing all tables (protocols, templates, lift types, profiles, audit logs). Restore with confirmation dialog showing record counts and warnings. Admin-only access.
 - **Error Documentation**: Allows adding, editing, and deleting protocol errors with image attachments.
 - **Digital Signature**: Canvas-based signature capture with printed name functionality.
 - **Measurement & Calculation**: Supports 'measurement' and 'calculated' question types with a dedicated engine and automatic error detection.

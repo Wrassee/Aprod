@@ -476,6 +476,15 @@ export interface Translation {
       createBackup: string;
       restoreBackup: string;
       comingSoon: string;
+      backupSuccess: string;
+      restoreSuccess: string;
+      invalidBackupFile: string;
+      backupInfo: string;
+      backupInfoDesc: string;
+      restoreWarning: string;
+      restoreWarningDesc: string;
+      confirmRestore: string;
+      backupDate: string;
     };
     comingSoon: {
       dashboard: string;
@@ -966,6 +975,15 @@ export const translations: Record<string, Translation> = {
         createBackup: "Mentés készítése",
         restoreBackup: "Mentés visszaállítása",
         comingSoon: "Hamarosan elérhető funkció",
+        backupSuccess: "Biztonsági mentés sikeresen létrehozva és letöltve!",
+        restoreSuccess: "Az adatbázis sikeresen visszaállítva a mentésből!",
+        invalidBackupFile: "Érvénytelen mentési fájl formátum. Kérjük, válasszon egy érvényes .json mentési fájlt.",
+        backupInfo: "Fontos tudnivaló",
+        backupInfoDesc: "A mentés tartalmazza a protokollokat, sablonokat, lift típusokat, felhasználói profilokat és audit naplókat. A sablon fájlok (Excel) nem kerülnek mentésre, csak a metaadataik.",
+        restoreWarning: "Figyelmeztetés! Ez a művelet visszavonhatatlan!",
+        restoreWarningDesc: "A visszaállítás felülírja az aktuális adatbázis tartalmát. Kérjük, először készítsen mentést a jelenlegi állapotról!",
+        confirmRestore: "Visszaállítás megerősítése",
+        backupDate: "Mentés dátuma",
       },
       comingSoon: {
         dashboard: "Dashboard hamarosan",
@@ -1459,6 +1477,15 @@ export const translations: Record<string, Translation> = {
         createBackup: "Sicherung erstellen",
         restoreBackup: "Sicherung wiederherstellen",
         comingSoon: "Funktion bald verfügbar",
+        backupSuccess: "Sicherung erfolgreich erstellt und heruntergeladen!",
+        restoreSuccess: "Die Datenbank wurde erfolgreich aus der Sicherung wiederhergestellt!",
+        invalidBackupFile: "Ungültiges Sicherungsdateiformat. Bitte wählen Sie eine gültige .json Sicherungsdatei.",
+        backupInfo: "Wichtiger Hinweis",
+        backupInfoDesc: "Die Sicherung enthält Protokolle, Vorlagen, Lifttypen, Benutzerprofile und Audit-Protokolle. Excel-Vorlagendateien werden nicht gesichert, nur deren Metadaten.",
+        restoreWarning: "Warnung! Dieser Vorgang ist unwiderruflich!",
+        restoreWarningDesc: "Die Wiederherstellung überschreibt den aktuellen Datenbankinhalt. Bitte erstellen Sie zuerst eine Sicherung des aktuellen Zustands!",
+        confirmRestore: "Wiederherstellung bestätigen",
+        backupDate: "Sicherungsdatum",
       },
       comingSoon: {
         dashboard: "Dashboard kommt bald",
@@ -1937,6 +1964,15 @@ export const translations: Record<string, Translation> = {
         createBackup: "Create Backup",
         restoreBackup: "Restore Backup",
         comingSoon: "Feature coming soon",
+        backupSuccess: "Backup successfully created and downloaded!",
+        restoreSuccess: "Database successfully restored from backup!",
+        invalidBackupFile: "Invalid backup file format. Please select a valid .json backup file.",
+        backupInfo: "Important Information",
+        backupInfoDesc: "The backup includes protocols, templates, lift types, user profiles, and audit logs. Excel template files are not backed up, only their metadata.",
+        restoreWarning: "Warning! This action is irreversible!",
+        restoreWarningDesc: "Restoring will overwrite the current database contents. Please create a backup of the current state first!",
+        confirmRestore: "Confirm Restore",
+        backupDate: "Backup date",
       },
       comingSoon: {
         dashboard: "Dashboard coming soon",
@@ -2415,6 +2451,15 @@ export const translations: Record<string, Translation> = {
         createBackup: "Créer une Sauvegarde",
         restoreBackup: "Restaurer la Sauvegarde",
         comingSoon: "Fonctionnalité bientôt disponible",
+        backupSuccess: "Sauvegarde créée et téléchargée avec succès !",
+        restoreSuccess: "La base de données a été restaurée avec succès depuis la sauvegarde !",
+        invalidBackupFile: "Format de fichier de sauvegarde invalide. Veuillez sélectionner un fichier .json valide.",
+        backupInfo: "Information importante",
+        backupInfoDesc: "La sauvegarde comprend les protocoles, modèles, types d'ascenseurs, profils utilisateurs et journaux d'audit. Les fichiers Excel ne sont pas sauvegardés, uniquement leurs métadonnées.",
+        restoreWarning: "Attention ! Cette action est irréversible !",
+        restoreWarningDesc: "La restauration écrasera le contenu actuel de la base de données. Veuillez d'abord créer une sauvegarde de l'état actuel !",
+        confirmRestore: "Confirmer la restauration",
+        backupDate: "Date de sauvegarde",
       },
       comingSoon: {
         dashboard: "Tableau de Bord bientôt disponible",
@@ -2892,6 +2937,15 @@ export const translations: Record<string, Translation> = {
         createBackup: "Crea Backup",
         restoreBackup: "Ripristina Backup",
         comingSoon: "Funzione in arrivo",
+        backupSuccess: "Backup creato e scaricato con successo!",
+        restoreSuccess: "Il database è stato ripristinato con successo dal backup!",
+        invalidBackupFile: "Formato file di backup non valido. Selezionare un file .json di backup valido.",
+        backupInfo: "Informazione importante",
+        backupInfoDesc: "Il backup include protocolli, modelli, tipi di ascensore, profili utente e registri di audit. I file Excel dei modelli non vengono salvati, solo i loro metadati.",
+        restoreWarning: "Attenzione! Questa azione è irreversibile!",
+        restoreWarningDesc: "Il ripristino sovrascriverà il contenuto attuale del database. Si prega di creare prima un backup dello stato attuale!",
+        confirmRestore: "Conferma ripristino",
+        backupDate: "Data del backup",
       },
       comingSoon: {
         dashboard: "Dashboard in arrivo",

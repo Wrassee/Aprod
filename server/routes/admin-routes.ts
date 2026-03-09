@@ -928,4 +928,184 @@ router.delete("/templates/:id", async (req, res) => {
   }
 });
 
+const queryRows = async (query: any) => {
+  const result = await (db as any).execute(query);
+  return Array.isArray(result) ? result : (result?.rows || []);
+};
+
+router.get('/backup/create', requireAdmin, async (req, res) => {
+  try {
+    console.log('📦 Creating database backup...');
+
+    const protocolsRows = await queryRows(sql`SELECT * FROM protocols ORDER BY created_at DESC`);
+    const templatesRows = await queryRows(sql`SELECT id, name, type, file_name, file_path, language, uploaded_at, is_active FROM templates ORDER BY uploaded_at DESC`);
+    const questionConfigsRows = await queryRows(sql`SELECT * FROM question_configs ORDER BY group_order`);
+    const liftTypesRows = await queryRows(sql`SELECT * FROM lift_types ORDER BY sort_order`);
+    const liftSubtypesRows = await queryRows(sql`SELECT * FROM lift_subtypes ORDER BY sort_order`);
+    const liftMappingsRows = await queryRows(sql`SELECT * FROM lift_template_mappings`);
+    const profilesRows = await queryRows(sql`SELECT * FROM profiles`);
+
+    let auditLogsRows: any[] = [];
+    try {
+      auditLogsRows = await queryRows(sql`SELECT * FROM audit_logs ORDER BY created_at DESC LIMIT 500`);
+    } catch (e) {
+      console.warn('⚠️ audit_logs table not available for backup');
+    }
+
+    const backup = {
+      version: '0.9.6',
+      created_at: new Date().toISOString(),
+      tables: {
+        protocols: protocolsRows,
+        templates: templatesRows,
+        question_configs: questionConfigsRows,
+        lift_types: liftTypesRows,
+        lift_subtypes: liftSubtypesRows,
+        lift_template_mappings: liftMappingsRows,
+        profiles: profilesRows,
+        audit_logs: auditLogsRows,
+      },
+      counts: {
+        protocols: protocolsRows.length,
+        templates: templatesRows.length,
+        question_configs: questionConfigsRows.length,
+        lift_types: liftTypesRows.length,
+        lift_subtypes: liftSubtypesRows.length,
+        lift_template_mappings: liftMappingsRows.length,
+        profiles: profilesRows.length,
+        audit_logs: auditLogsRows.length,
+      },
+    };
+
+    try {
+      await createManualAuditLog(req, 'settings.update', 'backup', 'all', { action: 'backup_created', counts: backup.counts }, 'success', 'Database backup created');
+    } catch (e) { /* audit log failure should not block backup */ }
+
+    const fileName = `otis-aprod-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    console.log(`✅ Backup created: ${Object.values(backup.counts).reduce((a: number, b: number) => a + b, 0)} total records`);
+    res.json(backup);
+  } catch (error: any) {
+    console.error('❌ Backup creation failed:', error?.message);
+    res.status(500).json({ message: error?.message || 'Backup creation failed' });
+  }
+});
+
+router.post('/backup/restore', requireAdmin, async (req, res) => {
+  try {
+    const backup = req.body;
+
+    if (!backup || !backup.tables || !backup.version) {
+      return res.status(400).json({ message: 'Invalid backup file format' });
+    }
+
+    console.log(`📦 Restoring backup from ${backup.created_at}, version ${backup.version}...`);
+
+    const restored: Record<string, number> = {};
+
+    await (db as any).execute(sql`BEGIN`);
+
+    try {
+      await (db as any).execute(sql`DELETE FROM lift_template_mappings`);
+      await (db as any).execute(sql`DELETE FROM lift_subtypes`);
+      await (db as any).execute(sql`DELETE FROM lift_types`);
+      await (db as any).execute(sql`DELETE FROM question_configs`);
+      await (db as any).execute(sql`DELETE FROM protocols`);
+
+      if (backup.tables.protocols) {
+        for (const row of backup.tables.protocols) {
+          await (db as any).execute(sql`
+            INSERT INTO protocols (id, reception_date, language, answers, errors, signature, signature_name, completed, created_at)
+            VALUES (${row.id}, ${row.reception_date}, ${row.language}, ${JSON.stringify(row.answers)}::jsonb, ${JSON.stringify(row.errors)}::jsonb, ${row.signature}, ${row.signature_name}, ${row.completed}, ${row.created_at ? new Date(row.created_at) : new Date()})
+            ON CONFLICT (id) DO NOTHING
+          `);
+        }
+        restored.protocols = backup.tables.protocols.length;
+      }
+
+      if (backup.tables.templates) {
+        for (const row of backup.tables.templates) {
+          await (db as any).execute(sql`
+            INSERT INTO templates (id, name, type, file_name, file_path, language, uploaded_at, is_active)
+            VALUES (${row.id}, ${row.name}, ${row.type}, ${row.file_name}, ${row.file_path}, ${row.language || 'multilingual'}, ${row.uploaded_at ? new Date(row.uploaded_at) : new Date()}, ${row.is_active ?? false})
+            ON CONFLICT (id) DO UPDATE SET name = ${row.name}, type = ${row.type}, file_name = ${row.file_name}, file_path = ${row.file_path}, language = ${row.language || 'multilingual'}, is_active = ${row.is_active ?? false}
+          `);
+        }
+        restored.templates = backup.tables.templates.length;
+      }
+
+      if (backup.tables.question_configs) {
+        for (const row of backup.tables.question_configs) {
+          await (db as any).execute(sql`
+            INSERT INTO question_configs (id, template_id, question_id, title, title_hu, title_de, title_en, title_fr, title_it, type, required, placeholder, placeholder_de, placeholder_en, placeholder_fr, placeholder_it, cell_reference, sheet_name, multi_cell, group_name, group_name_de, group_name_en, group_name_fr, group_name_it, group_key, group_order, conditional_group_key, unit, min_value, max_value, calculation_formula, calculation_inputs, options, option_cells, default_if_hidden, max_length, created_at)
+            VALUES (${row.id}, ${row.template_id}, ${row.question_id}, ${row.title}, ${row.title_hu}, ${row.title_de}, ${row.title_en}, ${row.title_fr}, ${row.title_it}, ${row.type}, ${row.required ?? true}, ${row.placeholder}, ${row.placeholder_de}, ${row.placeholder_en}, ${row.placeholder_fr}, ${row.placeholder_it}, ${row.cell_reference}, ${row.sheet_name || 'Sheet1'}, ${row.multi_cell ?? false}, ${row.group_name}, ${row.group_name_de}, ${row.group_name_en}, ${row.group_name_fr}, ${row.group_name_it}, ${row.group_key}, ${row.group_order || 0}, ${row.conditional_group_key}, ${row.unit}, ${row.min_value}, ${row.max_value}, ${row.calculation_formula}, ${row.calculation_inputs ? JSON.stringify(row.calculation_inputs) : null}::jsonb, ${row.options}, ${row.option_cells}, ${row.default_if_hidden}, ${row.max_length}, ${row.created_at ? new Date(row.created_at) : new Date()})
+            ON CONFLICT (id) DO NOTHING
+          `);
+        }
+        restored.question_configs = backup.tables.question_configs.length;
+      }
+
+      if (backup.tables.lift_types) {
+        for (const row of backup.tables.lift_types) {
+          await (db as any).execute(sql`
+            INSERT INTO lift_types (id, code, name_hu, name_de, description_hu, description_de, sort_order, is_active, created_at, updated_at)
+            VALUES (${row.id}, ${row.code}, ${row.name_hu}, ${row.name_de}, ${row.description_hu}, ${row.description_de}, ${row.sort_order || 0}, ${row.is_active ?? true}, ${row.created_at ? new Date(row.created_at) : new Date()}, ${row.updated_at ? new Date(row.updated_at) : new Date()})
+            ON CONFLICT (id) DO NOTHING
+          `);
+        }
+        restored.lift_types = backup.tables.lift_types.length;
+      }
+
+      if (backup.tables.lift_subtypes) {
+        for (const row of backup.tables.lift_subtypes) {
+          await (db as any).execute(sql`
+            INSERT INTO lift_subtypes (id, lift_type_id, code, name_hu, name_de, description_hu, description_de, sort_order, is_active, created_at, updated_at)
+            VALUES (${row.id}, ${row.lift_type_id}, ${row.code}, ${row.name_hu}, ${row.name_de}, ${row.description_hu}, ${row.description_de}, ${row.sort_order || 0}, ${row.is_active ?? true}, ${row.created_at ? new Date(row.created_at) : new Date()}, ${row.updated_at ? new Date(row.updated_at) : new Date()})
+            ON CONFLICT (id) DO NOTHING
+          `);
+        }
+        restored.lift_subtypes = backup.tables.lift_subtypes.length;
+      }
+
+      if (backup.tables.lift_template_mappings) {
+        for (const row of backup.tables.lift_template_mappings) {
+          await (db as any).execute(sql`
+            INSERT INTO lift_template_mappings (id, lift_subtype_id, question_template_id, protocol_template_id, is_active, created_at, updated_at, created_by, notes)
+            VALUES (${row.id}, ${row.lift_subtype_id}, ${row.question_template_id}, ${row.protocol_template_id}, ${row.is_active ?? true}, ${row.created_at ? new Date(row.created_at) : new Date()}, ${row.updated_at ? new Date(row.updated_at) : new Date()}, ${row.created_by}, ${row.notes})
+            ON CONFLICT (id) DO NOTHING
+          `);
+        }
+        restored.lift_template_mappings = backup.tables.lift_template_mappings.length;
+      }
+
+      if (backup.tables.profiles) {
+        for (const row of backup.tables.profiles) {
+          await (db as any).execute(sql`
+            INSERT INTO profiles (user_id, email, name, role, address, is_active, created_at, updated_at)
+            VALUES (${row.user_id}, ${row.email}, ${row.name}, ${row.role || 'user'}, ${row.address}, ${row.is_active ?? true}, ${row.created_at ? new Date(row.created_at) : new Date()}, ${row.updated_at ? new Date(row.updated_at) : new Date()})
+            ON CONFLICT (user_id) DO UPDATE SET name = ${row.name}, role = ${row.role || 'user'}, address = ${row.address}, is_active = ${row.is_active ?? true}
+          `);
+        }
+        restored.profiles = backup.tables.profiles.length;
+      }
+
+      await (db as any).execute(sql`COMMIT`);
+    } catch (txError: any) {
+      await (db as any).execute(sql`ROLLBACK`);
+      throw new Error(`Restore failed, all changes rolled back: ${txError.message}`);
+    }
+
+    try {
+      await createManualAuditLog(req, 'settings.update', 'backup', 'all', { action: 'backup_restored', restored }, 'success', 'Database restored from backup');
+    } catch (e) { /* audit log failure should not block restore response */ }
+
+    console.log(`✅ Backup restored:`, restored);
+    res.json({ message: 'Backup restored successfully', restored });
+  } catch (error: any) {
+    console.error('❌ Backup restore failed:', error?.message);
+    res.status(500).json({ message: error?.message || 'Backup restore failed' });
+  }
+});
+
 export const adminRoutes = router;

@@ -49,6 +49,12 @@ export function SystemSettings() {
   const [info, setInfo] = useState<SystemInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [backupLoading, setBackupLoading] = useState(false);
+  const [restoreLoading, setRestoreLoading] = useState(false);
+  const [showRestoreConfirm, setShowRestoreConfirm] = useState(false);
+  const [restoreFile, setRestoreFile] = useState<File | null>(null);
+  const [restorePreview, setRestorePreview] = useState<any>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     console.log('ℹ️ SystemSettings useEffect triggered');
@@ -108,6 +114,121 @@ export function SystemSettings() {
       title: t("success"),
       description: t("Admin.Settings.refreshed"),
     });
+  };
+
+  const handleCreateBackup = async () => {
+    setBackupLoading(true);
+    try {
+      if (!supabase) throw new Error("Not authenticated");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Authentication required');
+
+      const response = await fetch(getApiUrl('/api/admin/backup/create'), {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Backup failed');
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `otis-aprod-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: t("success"),
+        description: t("Admin.Settings.backupSuccess"),
+      });
+    } catch (error: any) {
+      console.error('Backup failed:', error);
+      toast({
+        title: t("error"),
+        description: error.message || 'Backup failed',
+        variant: 'destructive',
+      });
+    } finally {
+      setBackupLoading(false);
+    }
+  };
+
+  const handleRestoreFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if (!data.tables || !data.version) {
+        throw new Error('Invalid backup file');
+      }
+
+      setRestoreFile(file);
+      setRestorePreview(data);
+      setShowRestoreConfirm(true);
+    } catch (error: any) {
+      toast({
+        title: t("error"),
+        description: t("Admin.Settings.invalidBackupFile"),
+        variant: 'destructive',
+      });
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRestore = async () => {
+    if (!restorePreview) return;
+    setRestoreLoading(true);
+    try {
+      if (!supabase) throw new Error("Not authenticated");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Authentication required');
+
+      const response = await fetch(getApiUrl('/api/admin/backup/restore'), {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(restorePreview),
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Restore failed');
+      }
+
+      const result = await response.json();
+      setShowRestoreConfirm(false);
+      setRestoreFile(null);
+      setRestorePreview(null);
+
+      toast({
+        title: t("success"),
+        description: t("Admin.Settings.restoreSuccess"),
+      });
+    } catch (error: any) {
+      console.error('Restore failed:', error);
+      toast({
+        title: t("error"),
+        description: error.message || 'Restore failed',
+        variant: 'destructive',
+      });
+    } finally {
+      setRestoreLoading(false);
+    }
   };
 
   const handleThemeChange = (newTheme: 'modern' | 'classic') => {
@@ -459,24 +580,33 @@ export function SystemSettings() {
             <CardContent>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                 <button
-                  disabled
-                  className="relative overflow-hidden px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg opacity-50 cursor-not-allowed"
+                  onClick={handleCreateBackup}
+                  disabled={backupLoading}
+                  className="relative overflow-hidden px-6 py-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="flex items-center gap-2">
-                    <Download className="h-5 w-5" />
+                    {backupLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Download className="h-5 w-5" />}
                     <span className="font-semibold">{t("Admin.Settings.createBackup")}</span>
                   </div>
                 </button>
                 
                 <button
-                  disabled
-                  className="relative overflow-hidden px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white shadow-lg opacity-50 cursor-not-allowed"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={restoreLoading}
+                  className="relative overflow-hidden px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white shadow-lg transition-all duration-300 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <div className="flex items-center gap-2">
-                    <Upload className="h-5 w-5" />
+                    {restoreLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Upload className="h-5 w-5" />}
                     <span className="font-semibold">{t("Admin.Settings.restoreBackup")}</span>
                   </div>
                 </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleRestoreFileSelect}
+                  className="hidden"
+                />
               </div>
               
               <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800">
@@ -484,14 +614,62 @@ export function SystemSettings() {
                   <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-semibold text-amber-900 dark:text-amber-100 text-sm">
-                      {t("Admin.Settings.comingSoon")}
+                      {t("Admin.Settings.backupInfo")}
                     </p>
                     <p className="text-xs text-amber-700 dark:text-amber-300 mt-1">
-                      {t("backup_under_development")}
+                      {t("Admin.Settings.backupInfoDesc")}
                     </p>
                   </div>
                 </div>
               </div>
+
+              {showRestoreConfirm && restorePreview && (
+                <div className="mt-6 p-5 rounded-xl bg-red-50 dark:bg-red-950/20 border-2 border-red-300 dark:border-red-800">
+                  <div className="flex items-start gap-3 mb-4">
+                    <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-red-900 dark:text-red-100">
+                        {t("Admin.Settings.restoreWarning")}
+                      </p>
+                      <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+                        {t("Admin.Settings.restoreWarningDesc")}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    {Object.entries(restorePreview.counts || {}).map(([key, count]) => (
+                      <div key={key} className="bg-white dark:bg-gray-800 rounded-lg p-3 text-center border">
+                        <p className="text-lg font-bold text-gray-900 dark:text-gray-100">{count as number}</p>
+                        <p className="text-xs text-gray-500">{key.replace(/_/g, ' ')}</p>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <p className="text-xs text-gray-500 mb-4">
+                    {t("Admin.Settings.backupDate")}: {restorePreview.created_at ? new Date(restorePreview.created_at).toLocaleString() : '—'} | v{restorePreview.version}
+                  </p>
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleRestore}
+                      disabled={restoreLoading}
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white font-semibold shadow-lg transition-all disabled:opacity-50"
+                    >
+                      <div className="flex items-center gap-2">
+                        {restoreLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                        {t("Admin.Settings.confirmRestore")}
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => { setShowRestoreConfirm(false); setRestorePreview(null); setRestoreFile(null); }}
+                      className="px-5 py-2.5 rounded-xl bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold transition-all"
+                    >
+                      {t("cancel")}
+                    </button>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -759,15 +937,22 @@ export function SystemSettings() {
         </CardHeader>
         <CardContent>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <Button disabled variant="outline" className="opacity-50">
-              <Download className="h-4 w-4 mr-2" />
+            <Button onClick={handleCreateBackup} disabled={backupLoading} variant="outline">
+              {backupLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
               {t("Admin.Settings.createBackup")}
             </Button>
             
-            <Button disabled variant="outline" className="opacity-50">
-              <Upload className="h-4 w-4 mr-2" />
+            <Button onClick={() => fileInputRef.current?.click()} disabled={restoreLoading} variant="outline">
+              {restoreLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
               {t("Admin.Settings.restoreBackup")}
             </Button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleRestoreFileSelect}
+              className="hidden"
+            />
           </div>
           
           <div className="mt-4 p-4 rounded-lg bg-amber-50 border border-amber-200">
@@ -775,14 +960,53 @@ export function SystemSettings() {
               <AlertCircle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-amber-900 text-sm">
-                  {t("Admin.Settings.comingSoon")}
+                  {t("Admin.Settings.backupInfo")}
                 </p>
                 <p className="text-xs text-amber-700 mt-1">
-                  {t("backup_under_development")}
+                  {t("Admin.Settings.backupInfoDesc")}
                 </p>
               </div>
             </div>
           </div>
+
+          {showRestoreConfirm && restorePreview && (
+            <div className="mt-4 p-4 rounded-lg bg-red-50 border-2 border-red-300">
+              <div className="flex items-start gap-3 mb-3">
+                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-red-900">
+                    {t("Admin.Settings.restoreWarning")}
+                  </p>
+                  <p className="text-sm text-red-700 mt-1">
+                    {t("Admin.Settings.restoreWarningDesc")}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+                {Object.entries(restorePreview.counts || {}).map(([key, count]) => (
+                  <div key={key} className="bg-white rounded-lg p-2 text-center border">
+                    <p className="text-lg font-bold text-gray-900">{count as number}</p>
+                    <p className="text-xs text-gray-500">{key.replace(/_/g, ' ')}</p>
+                  </div>
+                ))}
+              </div>
+              
+              <p className="text-xs text-gray-500 mb-3">
+                {t("Admin.Settings.backupDate")}: {restorePreview.created_at ? new Date(restorePreview.created_at).toLocaleString() : '—'} | v{restorePreview.version}
+              </p>
+
+              <div className="flex gap-3">
+                <Button onClick={handleRestore} disabled={restoreLoading} variant="destructive" size="sm">
+                  {restoreLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
+                  {t("Admin.Settings.confirmRestore")}
+                </Button>
+                <Button onClick={() => { setShowRestoreConfirm(false); setRestorePreview(null); setRestoreFile(null); }} variant="outline" size="sm">
+                  {t("cancel")}
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

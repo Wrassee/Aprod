@@ -247,26 +247,27 @@ export function AuditLogTable() {
   };
 
   const getActionLabel = (action: string) => {
-    const translations: Record<string, { hu: string; de: string }> = {
-      'user.create': { hu: 'Felhasználó létrehozva', de: 'Benutzer erstellt' },
-      'user.update': { hu: 'Felhasználó frissítve', de: 'Benutzer aktualisiert' },
-      'user.delete': { hu: 'Felhasználó törölve', de: 'Benutzer gelöscht' },
-      'user.role_change': { hu: 'Jogosultság módosítva', de: 'Rolle geändert' },
-      'template.upload': { hu: 'Sablon feltöltve', de: 'Vorlage hochgeladen' },
-      'template.activate': { hu: 'Sablon aktiválva', de: 'Vorlage aktiviert' },
-      'template.deactivate': { hu: 'Sablon deaktiválva', de: 'Vorlage deaktiviert' },
-      'template.delete': { hu: 'Sablon törölve', de: 'Vorlage gelöscht' },
-      'template.download': { hu: 'Sablon letöltve', de: 'Vorlage heruntergeladen' },
-      'protocol.create': { hu: 'Protokoll létrehozva', de: 'Protokoll erstellt' },
-      'protocol.update': { hu: 'Protokoll frissítve', de: 'Protokoll aktualisiert' },
-      'protocol.delete': { hu: 'Protokoll törölve', de: 'Protokoll gelöscht' },
-      'admin.login': { hu: 'Admin bejelentkezés', de: 'Admin-Anmeldung' },
-      'settings.update': { hu: 'Beállítások frissítve', de: 'Einstellungen aktualisiert' },
+    const translations: Record<string, Record<string, string>> = {
+      'user.create': { hu: 'Felhasználó létrehozva', de: 'Benutzer erstellt', en: 'User created', fr: 'Utilisateur créé', it: 'Utente creato' },
+      'user.update': { hu: 'Felhasználó frissítve', de: 'Benutzer aktualisiert', en: 'User updated', fr: 'Utilisateur mis à jour', it: 'Utente aggiornato' },
+      'user.delete': { hu: 'Felhasználó törölve', de: 'Benutzer gelöscht', en: 'User deleted', fr: 'Utilisateur supprimé', it: 'Utente eliminato' },
+      'user.role_change': { hu: 'Jogosultság módosítva', de: 'Rolle geändert', en: 'Role changed', fr: 'Rôle modifié', it: 'Ruolo modificato' },
+      'template.upload': { hu: 'Sablon feltöltve', de: 'Vorlage hochgeladen', en: 'Template uploaded', fr: 'Modèle téléchargé', it: 'Modello caricato' },
+      'template.activate': { hu: 'Sablon aktiválva', de: 'Vorlage aktiviert', en: 'Template activated', fr: 'Modèle activé', it: 'Modello attivato' },
+      'template.deactivate': { hu: 'Sablon deaktiválva', de: 'Vorlage deaktiviert', en: 'Template deactivated', fr: 'Modèle désactivé', it: 'Modello disattivato' },
+      'template.delete': { hu: 'Sablon törölve', de: 'Vorlage gelöscht', en: 'Template deleted', fr: 'Modèle supprimé', it: 'Modello eliminato' },
+      'template.download': { hu: 'Sablon letöltve', de: 'Vorlage heruntergeladen', en: 'Template downloaded', fr: 'Modèle téléchargé', it: 'Modello scaricato' },
+      'protocol.create': { hu: 'Protokoll létrehozva', de: 'Protokoll erstellt', en: 'Protocol created', fr: 'Protocole créé', it: 'Protocollo creato' },
+      'protocol.update': { hu: 'Protokoll frissítve', de: 'Protokoll aktualisiert', en: 'Protocol updated', fr: 'Protocole mis à jour', it: 'Protocollo aggiornato' },
+      'protocol.delete': { hu: 'Protokoll törölve', de: 'Protokoll gelöscht', en: 'Protocol deleted', fr: 'Protocole supprimé', it: 'Protocollo eliminato' },
+      'admin.login': { hu: 'Admin bejelentkezés', de: 'Admin-Anmeldung', en: 'Admin login', fr: 'Connexion admin', it: 'Accesso admin' },
+      'settings.update': { hu: 'Beállítások frissítve', de: 'Einstellungen aktualisiert', en: 'Settings updated', fr: 'Paramètres mis à jour', it: 'Impostazioni aggiornate' },
+      'template.settings.update': { hu: 'Sablon beállítások frissítve', de: 'Vorlageneinstellungen aktualisiert', en: 'Template settings updated', fr: 'Paramètres du modèle mis à jour', it: 'Impostazioni modello aggiornate' },
     };
 
     const translation = translations[action];
     if (translation) {
-      return language === 'de' ? translation.de : translation.hu;
+      return translation[language] || translation.en || translation.hu;
     }
     return action;
   };

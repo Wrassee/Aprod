@@ -58,6 +58,10 @@ Prefers free AI APIs (Groq) over paid solutions.
 - Smart Help Wizard now has 4 tabs: Tips, FAQ, AI Chat, Manual
 - Switched from Gemini API to Groq API for cost-free AI chat functionality
 - Added defaultIfHidden auto-fill logic for conditional questions
+- Fixed audit log "Művelet" column: action labels now fully translated in all 5 languages (hu/de/en/fr/it)
+- Added audit log health diagnostic endpoint (`/api/admin/audit-logs/health`)
+- Fixed audit log fallback SQL query to handle both array and object result shapes
+- Unified version number to v0.9.6 across admin UI, VERSION file, manifest.json, and service worker
 
 ## External Dependencies
 ### Frontend

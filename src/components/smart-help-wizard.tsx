@@ -381,9 +381,9 @@ export function SmartHelpWizard({ currentPage, formData, currentQuestionId, erro
   );
 
   const renderManualContent = () => {
-    const manualLang = ['hu', 'de', 'en'].includes(language) ? language : 'hu';
+    const manualLang = ['hu', 'de', 'en', 'fr', 'it'].includes(language) ? language : 'hu';
     
-    const manualTexts = {
+    const manualTexts: Record<string, { title: string; description: string; viewOnline: string; download: string; contents: string; sections: string[] }> = {
       hu: {
         title: 'Teljes Használati Útmutató',
         description: 'Töltse le vagy tekintse meg a részletes használati útmutatót, amely tartalmazza az összes funkció leírását, lépésről lépésre útmutatókat és hibaelhárítási tippeket.',
@@ -449,10 +449,54 @@ export function SmartHelpWizard({ currentPage, formData, currentQuestionId, erro
           'Keyboard Shortcuts',
           'Privacy and Security'
         ]
+      },
+      fr: {
+        title: 'Manuel d\'Utilisation Complet',
+        description: 'Téléchargez ou consultez le manuel d\'utilisation détaillé contenant les descriptions de toutes les fonctionnalités, des guides étape par étape et des conseils de dépannage.',
+        viewOnline: 'Voir dans le navigateur',
+        download: 'Télécharger en HTML',
+        contents: 'Contenu du manuel :',
+        sections: [
+          'Introduction et premiers pas',
+          'Création d\'un nouveau protocole',
+          'Répondre aux questions',
+          'Gestion des questions conditionnelles',
+          'Utilisation du système Niedervolt',
+          'Documentation des erreurs avec images',
+          'Signature numérique',
+          'Génération Excel et PDF',
+          'Gestion des protocoles précédents',
+          'Fonctions d\'administration',
+          'Dépannage',
+          'Raccourcis clavier',
+          'Confidentialité et sécurité'
+        ]
+      },
+      it: {
+        title: 'Manuale Utente Completo',
+        description: 'Scaricate o consultate il manuale utente dettagliato contenente le descrizioni di tutte le funzionalità, guide passo per passo e suggerimenti per la risoluzione dei problemi.',
+        viewOnline: 'Visualizza nel browser',
+        download: 'Scarica come HTML',
+        contents: 'Contenuto del manuale:',
+        sections: [
+          'Introduzione e primi passi',
+          'Creazione di un nuovo protocollo',
+          'Rispondere alle domande',
+          'Gestione delle domande condizionali',
+          'Utilizzo del sistema Niedervolt',
+          'Documentazione degli errori con immagini',
+          'Firma digitale',
+          'Generazione Excel e PDF',
+          'Gestione dei protocolli precedenti',
+          'Funzioni di amministrazione',
+          'Risoluzione dei problemi',
+          'Scorciatoie da tastiera',
+          'Privacy e sicurezza'
+        ]
       }
     };
     
-    const mt = manualTexts[manualLang as keyof typeof manualTexts] || manualTexts.hu;
+    const mt = manualTexts[manualLang] || manualTexts.hu;
     
     return (
       <div className="space-y-4">

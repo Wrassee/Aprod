@@ -5,14 +5,16 @@ const router = Router();
 
 router.get('/download', (req, res) => {
   const lang = (req.query.lang as string) || 'hu';
-  const validLang = ['hu', 'de', 'en'].includes(lang) ? lang as 'hu' | 'de' | 'en' : 'hu';
+  const validLang = ['hu', 'de', 'en', 'fr', 'it'].includes(lang) ? lang as 'hu' | 'de' | 'en' | 'fr' | 'it' : 'hu';
   
   const html = generateManualHTML(validLang);
   
   const titles: Record<string, string> = {
     hu: 'OTIS_APROD_Hasznalati_Utmutato',
     de: 'OTIS_APROD_Benutzerhandbuch',
-    en: 'OTIS_APROD_User_Manual'
+    en: 'OTIS_APROD_User_Manual',
+    fr: 'OTIS_APROD_Manuel_Utilisateur',
+    it: 'OTIS_APROD_Manuale_Utente'
   };
   
   res.setHeader('Content-Type', 'text/html; charset=utf-8');
@@ -22,7 +24,7 @@ router.get('/download', (req, res) => {
 
 router.get('/view', (req, res) => {
   const lang = (req.query.lang as string) || 'hu';
-  const validLang = ['hu', 'de', 'en'].includes(lang) ? lang as 'hu' | 'de' | 'en' : 'hu';
+  const validLang = ['hu', 'de', 'en', 'fr', 'it'].includes(lang) ? lang as 'hu' | 'de' | 'en' | 'fr' | 'it' : 'hu';
   
   const html = generateManualHTML(validLang);
   

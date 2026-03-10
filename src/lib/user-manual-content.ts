@@ -440,10 +440,182 @@ Ha "Nem"-et válaszol:
       }
     ],
     footer: "© 2026 OTIS Elevator Company - APROD Application"
+  },
+  fr: {
+    title: "OTIS APROD - Manuel d'Utilisation Complet",
+    subtitle: "Application de Numérisation du Protocole de Réception d'Ascenseur",
+    version: "v0.9.6 - 2026",
+    sections: [
+      {
+        title: "1. Introduction",
+        content: `L'application OTIS APROD est conçue pour numériser les protocoles de réception d'ascenseurs. L'application vous guide tout au long du processus de réception, aide à documenter les erreurs et génère automatiquement les documents requis (Excel, PDF).
+
+**Principaux avantages :**
+• Travail sans papier
+• Calculs et validations automatiques
+• Documentation des erreurs avec images
+• Signature numérique
+• Support multilingue (Hongrois, Allemand, Anglais, Français, Italien)
+• Fonctionnement hors ligne en tant que PWA`
+      },
+      {
+        title: "2. Premiers Pas",
+        content: `**Connexion :**
+1. Ouvrez l'application dans votre navigateur
+2. Cliquez sur le bouton "Connexion"
+3. Entrez votre adresse e-mail et votre mot de passe
+4. Après une connexion réussie, vous serez redirigé vers la page principale
+
+**Paramètres de langue :**
+• Utilisez le sélecteur de langue en haut à droite pour changer de langue
+• La langue sélectionnée est automatiquement enregistrée
+
+**Installation PWA (optionnel) :**
+• Chrome/Edge : Cliquez sur l'icône "Installer" dans la barre d'adresse
+• Mobile : Option "Ajouter à l'écran d'accueil"`
+      },
+      {
+        title: "3. Création d'un Nouveau Protocole",
+        content: `**Étapes :**
+1. Cliquez sur "Nouveau Protocole" sur la page principale
+2. Sélectionnez le type d'ascenseur :
+   • MOD - Modernisation
+   • BEX - Ascenseur intégré
+   • NEU - Nouvel ascenseur
+   • PERSONNALISÉ - Configuration personnalisée
+
+3. Sélectionnez le sous-type (si disponible)
+4. Entrez les données de base :
+   • Date de réception
+   • Lieu
+   • Données client
+
+5. Cliquez sur "Démarrer le Protocole"
+
+**Important :** Le protocole est automatiquement sauvegardé après chaque modification !`
+      },
+      {
+        title: "4. Répondre aux Questions",
+        content: `**Types de questions :**
+
+**Questions Oui/Non/N.A. :**
+• Cliquez sur le bouton approprié
+• N.A. = Non Applicable (si la question n'est pas pertinente)
+
+**Champs de texte :**
+• Entrez le texte souhaité
+• Les caractères spéciaux sont autorisés
+
+**Liste de sélection :**
+• Cliquez sur le champ
+• Choisissez dans la liste
+
+**Mesures :**
+• Entrez la valeur numérique
+• L'unité s'affiche automatiquement
+• Indicateur rouge = valeur hors tolérance
+
+**Champs calculés :**
+• Remplis automatiquement en fonction des valeurs saisies
+• Ne peuvent pas être modifiés manuellement
+
+**Navigation :**
+• Utilisez les boutons "Précédent" / "Suivant" pour naviguer
+• Accédez à n'importe quelle section depuis le menu de gauche
+• Coche verte = section complétée`
+      }
+    ],
+    footer: "© 2026 OTIS Elevator Company - Application APROD"
+  },
+  it: {
+    title: "OTIS APROD - Manuale Utente Completo",
+    subtitle: "Applicazione per la Digitalizzazione del Protocollo di Accettazione Ascensori",
+    version: "v0.9.6 - 2026",
+    sections: [
+      {
+        title: "1. Introduzione",
+        content: `L'applicazione OTIS APROD è progettata per digitalizzare i protocolli di accettazione degli ascensori. L'applicazione vi guida attraverso l'intero processo di accettazione, aiuta a documentare gli errori e genera automaticamente i documenti richiesti (Excel, PDF).
+
+**Vantaggi principali:**
+• Lavoro senza carta
+• Calcoli e validazioni automatiche
+• Documentazione degli errori con immagini
+• Firma digitale
+• Supporto multilingue (Ungherese, Tedesco, Inglese, Francese, Italiano)
+• Funzionamento offline come PWA`
+      },
+      {
+        title: "2. Primi Passi",
+        content: `**Accesso:**
+1. Aprire l'applicazione nel browser
+2. Fare clic sul pulsante "Accedi"
+3. Inserire l'indirizzo e-mail e la password
+4. Dopo l'accesso riuscito, verrete reindirizzati alla pagina principale
+
+**Impostazioni lingua:**
+• Utilizzare il selettore di lingua in alto a destra per cambiare lingua
+• La lingua selezionata viene salvata automaticamente
+
+**Installazione PWA (opzionale):**
+• Chrome/Edge: Fare clic sull'icona "Installa" nella barra degli indirizzi
+• Mobile: Opzione "Aggiungi alla schermata iniziale"`
+      },
+      {
+        title: "3. Creazione di un Nuovo Protocollo",
+        content: `**Passaggi:**
+1. Fare clic su "Nuovo Protocollo" nella pagina principale
+2. Selezionare il tipo di ascensore:
+   • MOD - Modernizzazione
+   • BEX - Ascensore integrato
+   • NEU - Nuovo ascensore
+   • PERSONALIZZATO - Configurazione personalizzata
+
+3. Selezionare il sottotipo (se disponibile)
+4. Inserire i dati di base:
+   • Data di accettazione
+   • Luogo
+   • Dati del cliente
+
+5. Fare clic su "Avvia Protocollo"
+
+**Importante:** Il protocollo viene salvato automaticamente dopo ogni modifica!`
+      },
+      {
+        title: "4. Rispondere alle Domande",
+        content: `**Tipi di domande:**
+
+**Domande Sì/No/N.A.:**
+• Fare clic sul pulsante appropriato
+• N.A. = Non Applicabile (se la domanda non è pertinente)
+
+**Campi di testo:**
+• Inserire il testo desiderato
+• I caratteri speciali sono consentiti
+
+**Lista di selezione:**
+• Fare clic sul campo
+• Scegliere dalla lista
+
+**Misurazioni:**
+• Inserire il valore numerico
+• L'unità viene visualizzata automaticamente
+• Indicatore rosso = valore fuori tolleranza
+
+**Campi calcolati:**
+• Compilati automaticamente in base ai valori inseriti
+• Non possono essere modificati manualmente
+
+**Navigazione:**
+• Utilizzare i pulsanti "Precedente" / "Successivo" per navigare
+• Passare a qualsiasi sezione dal menu a sinistra
+• Segno di spunta verde = sezione completata`
+      }
+    ],
+    footer: "© 2026 OTIS Elevator Company - Applicazione APROD"
   }
 };
 
-export function generateManualHTML(lang: 'hu' | 'de' | 'en' = 'hu'): string {
+export function generateManualHTML(lang: 'hu' | 'de' | 'en' | 'fr' | 'it' = 'hu'): string {
   const manual = userManualContent[lang] || userManualContent.hu;
   
   let html = `<!DOCTYPE html>
@@ -521,7 +693,7 @@ export function generateManualHTML(lang: 'hu' | 'de' | 'en' = 'hu'): string {
   </div>
   
   <div class="toc">
-    <h3>${lang === 'hu' ? 'Tartalomjegyzék' : lang === 'de' ? 'Inhaltsverzeichnis' : 'Table of Contents'}</h3>
+    <h3>${lang === 'hu' ? 'Tartalomjegyzék' : lang === 'de' ? 'Inhaltsverzeichnis' : lang === 'fr' ? 'Table des Matières' : lang === 'it' ? 'Indice' : 'Table of Contents'}</h3>
     <ul>
       ${manual.sections.map((s, i) => `<li><a href="#section-${i}">${s.title}</a></li>`).join('\n      ')}
     </ul>

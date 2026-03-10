@@ -347,8 +347,6 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
             handleHomeClick();
           }}
           onAdminAccess={() => onNavigate('admin')}
-          receptionDate={new Date().toISOString().split('T')[0]}
-          onReceptionDateChange={() => {}}
         />
         
         <div className="container max-w-4xl mx-auto px-4 py-8">
@@ -379,8 +377,6 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
             handleHomeClick();
           }}
           onAdminAccess={() => onNavigate('admin')}
-          receptionDate={new Date().toISOString().split('T')[0]}
-          onReceptionDateChange={() => {}}
         />
 
         <div className={`min-h-screen relative ${
@@ -524,8 +520,6 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
           setSelectedSubtype(null);
         }}
         onAdminAccess={() => onNavigate('admin')}
-        receptionDate={new Date().toISOString().split('T')[0]}
-        onReceptionDateChange={() => {}}
       />
 
       <div className={`min-h-screen relative ${

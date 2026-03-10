@@ -85,6 +85,60 @@ self.addEventListener('fetch', (event) => {
 
   const url = new URL(event.request.url);
   
+  if (url.pathname.startsWith('/api/questions/')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(TEMPLATE_CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+            console.log('[SW] Cached API questions response:', url.pathname);
+          }
+          return response;
+        })
+        .catch(() => {
+          console.log('[SW] Offline - serving questions from cache:', url.pathname);
+          return caches.match(event.request).then((cached) => {
+            if (cached) return cached;
+            return new Response(JSON.stringify([]), {
+              status: 503,
+              headers: { 'Content-Type': 'application/json' },
+            });
+          });
+        })
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith('/api/lifts/available')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(TEMPLATE_CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseClone);
+            });
+            console.log('[SW] Cached lift types response');
+          }
+          return response;
+        })
+        .catch(() => {
+          console.log('[SW] Offline - serving lift types from cache');
+          return caches.match(event.request).then((cached) => {
+            if (cached) return cached;
+            return new Response(JSON.stringify([]), {
+              status: 503,
+              headers: { 'Content-Type': 'application/json' },
+            });
+          });
+        })
+    );
+    return;
+  }
+
   if (url.pathname.startsWith('/api') || url.pathname.startsWith('/auth')) {
     console.log('[SW] Ignoring auth/api request, letting browser handle:', url.pathname);
     return;
@@ -170,8 +224,11 @@ self.addEventListener('sync', (event) => {
 });
 
 async function syncProtocols() {
-  console.log('[SW] Syncing offline protocols...');
-  // Placeholder for future offline sync implementation
+  console.log('[SW] Background sync triggered for offline protocols');
+  const clients = await self.clients.matchAll({ type: 'window' });
+  for (const client of clients) {
+    client.postMessage({ type: 'TRIGGER_SYNC' });
+  }
 }
 
 // Message handler for cache management

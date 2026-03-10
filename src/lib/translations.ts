@@ -495,6 +495,19 @@ export interface Translation {
       templatesDesc: string;
     };
   };
+  offline: {
+    offlineMode: string;
+    onlineMode: string;
+    pendingSync: string;
+    syncingNow: string;
+    syncComplete: string;
+    syncFailed: string;
+    savedLocally: string;
+    savedToServer: string;
+    willSyncWhenOnline: string;
+    questionsFromCache: string;
+    noConnection: string;
+  };
 }
 
 // Fordítási objektumok
@@ -993,6 +1006,19 @@ export const translations: Record<string, Translation> = {
         templates: "Sablon Kezelés",
         templatesDesc: "Helyezd át a régi sablon logikát egy új TemplateManagement komponensbe."
       }
+    },
+    offline: {
+      offlineMode: "Offline mód",
+      onlineMode: "Online",
+      pendingSync: "szinkronizálásra vár",
+      syncingNow: "Szinkronizálás...",
+      syncComplete: "Szinkronizálás kész!",
+      syncFailed: "Szinkronizálás sikertelen",
+      savedLocally: "Helyben mentve",
+      savedToServer: "Szerverre mentve",
+      willSyncWhenOnline: "Automatikusan szinkronizálódik, ha visszajön a hálózat.",
+      questionsFromCache: "Kérdések offline gyorsítótárból betöltve",
+      noConnection: "Nincs internetkapcsolat",
     },
   },
   de: {
@@ -1496,6 +1522,19 @@ export const translations: Record<string, Translation> = {
         templatesDesc: "Verschieben Sie die alte Vorlagenlogik in eine neue TemplateManagement-Komponente."
       }
     },
+    offline: {
+      offlineMode: "Offline-Modus",
+      onlineMode: "Online",
+      pendingSync: "warten auf Synchronisation",
+      syncingNow: "Synchronisiere...",
+      syncComplete: "Synchronisation abgeschlossen!",
+      syncFailed: "Synchronisation fehlgeschlagen",
+      savedLocally: "Lokal gespeichert",
+      savedToServer: "Auf Server gespeichert",
+      willSyncWhenOnline: "Wird automatisch synchronisiert, wenn die Verbindung wiederhergestellt ist.",
+      questionsFromCache: "Fragen aus dem Offline-Cache geladen",
+      noConnection: "Keine Internetverbindung",
+    },
   },
 
   en: {
@@ -1982,6 +2021,19 @@ export const translations: Record<string, Translation> = {
         templates: "Template Management",
         templatesDesc: "Move old template logic to a new TemplateManagement component."
       }
+    },
+    offline: {
+      offlineMode: "Offline mode",
+      onlineMode: "Online",
+      pendingSync: "pending sync",
+      syncingNow: "Syncing...",
+      syncComplete: "Sync complete!",
+      syncFailed: "Sync failed",
+      savedLocally: "Saved locally",
+      savedToServer: "Saved to server",
+      willSyncWhenOnline: "Will sync automatically when connection is restored.",
+      questionsFromCache: "Questions loaded from offline cache",
+      noConnection: "No internet connection",
     },
   },
 
@@ -2470,6 +2522,19 @@ export const translations: Record<string, Translation> = {
         templatesDesc: "Déplacez l'ancienne logique de modèle vers un nouveau composant TemplateManagement."
       }
     },
+    offline: {
+      offlineMode: "Mode hors ligne",
+      onlineMode: "En ligne",
+      pendingSync: "en attente de synchronisation",
+      syncingNow: "Synchronisation...",
+      syncComplete: "Synchronisation terminée !",
+      syncFailed: "Échec de la synchronisation",
+      savedLocally: "Enregistré localement",
+      savedToServer: "Enregistré sur le serveur",
+      willSyncWhenOnline: "Sera synchronisé automatiquement lorsque la connexion sera rétablie.",
+      questionsFromCache: "Questions chargées depuis le cache hors ligne",
+      noConnection: "Pas de connexion Internet",
+    },
   },
 
   it: {
@@ -2955,6 +3020,19 @@ export const translations: Record<string, Translation> = {
         templates: "Gestione Modelli",
         templatesDesc: "Sposta la vecchia logica del modello in un nuovo componente TemplateManagement."
         }
+    },
+    offline: {
+      offlineMode: "Modalità offline",
+      onlineMode: "Online",
+      pendingSync: "in attesa di sincronizzazione",
+      syncingNow: "Sincronizzazione...",
+      syncComplete: "Sincronizzazione completata!",
+      syncFailed: "Sincronizzazione fallita",
+      savedLocally: "Salvato localmente",
+      savedToServer: "Salvato sul server",
+      willSyncWhenOnline: "Si sincronizzerà automaticamente quando la connessione verrà ripristinata.",
+      questionsFromCache: "Domande caricate dalla cache offline",
+      noConnection: "Nessuna connessione Internet",
     },
   },
 };

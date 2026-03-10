@@ -1,67 +1,92 @@
 import { useState, useEffect, useRef } from 'react';
 import { Question } from '@shared/schema';
 
-export function useStableQuestions(language: 'hu' | 'de' | 'en' | 'fr' | 'it') {
+function getCacheKey(language: string, templateId?: string): string {
+  return `otis-questions-cache-${language}${templateId ? `-${templateId}` : ''}`;
+}
+
+function loadFromCache(language: string, templateId?: string): Question[] | null {
+  try {
+    const key = getCacheKey(language, templateId);
+    const cached = localStorage.getItem(key);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        console.log(`📦 Loaded ${parsed.length} questions from offline cache (${key})`);
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load questions from cache:', e);
+  }
+  return null;
+}
+
+function saveToCache(questions: Question[], language: string, templateId?: string) {
+  try {
+    const key = getCacheKey(language, templateId);
+    localStorage.setItem(key, JSON.stringify(questions));
+    console.log(`💾 Cached ${questions.length} questions for offline use (${key})`);
+  } catch (e) {
+    console.warn('Failed to cache questions:', e);
+  }
+}
+
+export function useStableQuestions(language: 'hu' | 'de' | 'en' | 'fr' | 'it', templateId?: string) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fromCache, setFromCache] = useState(false);
   const currentLanguageRef = useRef(language);
+  const currentTemplateRef = useRef(templateId);
   
   useEffect(() => {
-    // Only fetch if language actually changed
-    if (currentLanguageRef.current === language && questions.length > 0) {
+    if (currentLanguageRef.current === language && currentTemplateRef.current === templateId && questions.length > 0) {
       return;
     }
     
     currentLanguageRef.current = language;
+    currentTemplateRef.current = templateId;
     
     const fetchQuestions = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/questions/${language}`);
+        setFromCache(false);
+        
+        const url = templateId
+          ? `/api/questions/${language}?templateId=${templateId}`
+          : `/api/questions/${language}`;
+        
+        const response = await fetch(url);
         if (response.ok) {
           const questionsData = await response.json();
           setQuestions(questionsData);
+          saveToCache(questionsData, language, templateId);
         } else {
-          // Fallback questions
-          setQuestions([
-            {
-              id: 'q1',
-              title: language === 'hu' ? 'Lift telepítés kész?' : 'Aufzuginstallation abgeschlossen?',
-              type: 'yes_no_na',
-              required: true,
-            },
-            {
-              id: 'q2',
-              title: language === 'hu' ? 'Biztonsági rendszerek működnek?' : 'Sicherheitssysteme funktionsfähig?',
-              type: 'yes_no_na',
-              required: true,
-            },
-            {
-              id: 'q3',
-              title: language === 'hu' ? 'Teherbírás (kg)' : 'Tragfähigkeit (kg)',
-              type: 'number',
-              required: true,
-              placeholder: 'Enter load capacity',
-            },
-            {
-              id: 'q4',
-              title: language === 'hu' ? 'További megjegyzések' : 'Zusätzliche Kommentare',
-              type: 'text',
-              required: false,
-              placeholder: 'Enter any additional comments',
-            },
-          ]);
+          const cached = loadFromCache(language, templateId);
+          if (cached) {
+            setQuestions(cached);
+            setFromCache(true);
+          } else {
+            setQuestions([]);
+          }
         }
       } catch (error) {
-        console.error('Error fetching questions:', error);
-        setQuestions([]);
+        console.warn('⚡ Network error fetching questions, trying offline cache...');
+        const cached = loadFromCache(language, templateId);
+        if (cached) {
+          setQuestions(cached);
+          setFromCache(true);
+        } else {
+          console.error('❌ No cached questions available offline');
+          setQuestions([]);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchQuestions();
-  }, [language, questions.length]);
+  }, [language, templateId, questions.length]);
 
-  return { questions, loading };
+  return { questions, loading, fromCache };
 }

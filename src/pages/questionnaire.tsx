@@ -205,11 +205,35 @@ function Questionnaire({
         
         const url = getApiUrl(relativePath); // 👈 EZ A KULCS!
         
-        console.log('🔗 Fetching questions from:', url);
-        const response = await fetch(url);
+        const cacheKey = `otis-questions-cache-${language}${templateId ? `-${templateId}` : ''}`;
         
-        if (response.ok) {
-          const questionsData = await response.json();
+        console.log('🔗 Fetching questions from:', url);
+        let questionsData: any[] | null = null;
+        
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            questionsData = await response.json();
+            try {
+              localStorage.setItem(cacheKey, JSON.stringify(questionsData));
+              console.log(`💾 Cached ${questionsData.length} questions for offline use`);
+            } catch (e) { /* storage full, ignore */ }
+          }
+        } catch (fetchError) {
+          console.warn('⚡ Network error fetching questions, trying offline cache...');
+        }
+        
+        if (!questionsData) {
+          try {
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+              questionsData = JSON.parse(cached);
+              console.log(`📦 Loaded ${questionsData?.length || 0} questions from offline cache`);
+            }
+          } catch (e) { /* parse error */ }
+        }
+        
+        if (questionsData && questionsData.length > 0) {
           console.log('✅ Questions loaded:', questionsData.length);
 
           // Nyelvi placeholder és groupName beállítása (5 nyelv támogatás)

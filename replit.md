@@ -39,6 +39,7 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **Excel Integration**: XML-based manipulation preserving formatting, handling unicode, and supporting complex cell mapping. Calculations handled by Excel's formulas.
 - **Dual PDF Generation System**: LibreOffice for protocol PDFs (Excel-to-PDF conversion) and jsPDF for error list PDFs (with embedded Roboto fonts for Unicode support).
 - **Data Persistence**: Form data saved to localStorage and PostgreSQL.
+- **Offline Support**: Questions cached in localStorage after first load for offline access. Completed protocols queued in localStorage offline queue (`otis-offline-queue`) and auto-synced when network returns. OfflineStatusBar component shows connection status and pending sync count. Service worker caches `/api/questions` and `/api/lifts/available` responses for offline use. PDF generation happens server-side on sync.
 - **Backup & Restore System**: Full database backup/restore via admin panel. Creates downloadable JSON containing all tables (protocols, templates, lift types, profiles, audit logs). Restore with confirmation dialog showing record counts and warnings. Admin-only access.
 - **Error Documentation**: Allows adding, editing, and deleting protocol errors with image attachments.
 - **Digital Signature**: Canvas-based signature capture with printed name functionality.
@@ -63,6 +64,7 @@ Prefers free AI APIs (Groq) over paid solutions.
 - Added audit log health diagnostic endpoint (`/api/admin/audit-logs/health`)
 - Fixed audit log fallback SQL query to handle both array and object result shapes
 - Unified version number to v0.9.6 across admin UI, VERSION file, manifest.json, and service worker
+- Implemented offline support: questions caching, offline protocol queue with auto-sync, OfflineStatusBar UI component, service worker API caching for questions and lift types
 
 ## External Dependencies
 ### Frontend

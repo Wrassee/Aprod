@@ -42,6 +42,8 @@ import { FormData, MeasurementRow } from "./lib/types";
 /* -------------------- Shared schema -------------------- */
 import { AnswerValue, ProtocolError } from "../shared/schema";
 import { getApiUrl } from '@/lib/queryClient';
+import { OfflineQueue } from '@/utils/offline-queue';
+import { OfflineStatusBar } from '@/components/offline-status-bar';
 
 type Screen = 
   | 'start' 
@@ -327,28 +329,57 @@ function AppContent({
       
       console.log('📤 Sending protocol to backend...');
 
-      const headers = await getAuthHeaders();
-      
-      const response = await fetch(getApiUrl('/api/protocols'), {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(protocolData),
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log('✅ Protocol saved:', result.id);
+      if (!navigator.onLine) {
+        console.log('📥 Device is offline — queuing protocol for later sync');
+        OfflineQueue.addToQueue(protocolData);
         setCurrentScreen('completion');
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Protocol creation failed:', errorText);
-        alert(`Protokoll mentési hiba: ${errorText}`);
-        delete (window as any).lastCompleteAttempt;
+        return;
+      }
+
+      try {
+        const headers = await getAuthHeaders();
+        
+        const response = await fetch(getApiUrl('/api/protocols'), {
+          method: 'POST',
+          headers: {
+            ...headers,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(protocolData),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          console.log('✅ Protocol saved:', result.id);
+          setCurrentScreen('completion');
+        } else if (response.status >= 500) {
+          const errorText = await response.text();
+          console.error('❌ Server error, queuing for retry:', errorText);
+          OfflineQueue.addToQueue(protocolData);
+          setCurrentScreen('completion');
+        } else {
+          const errorText = await response.text();
+          console.error('❌ Protocol creation failed:', errorText);
+          alert(`Protokoll mentési hiba: ${errorText}`);
+          delete (window as any).lastCompleteAttempt;
+        }
+      } catch (networkError) {
+        console.warn('⚡ Network error — saving protocol to offline queue');
+        OfflineQueue.addToQueue(protocolData);
+        setCurrentScreen('completion');
       }
     } catch (error) {
       console.error('❌ Error completing protocol:', error);
-      alert(`Protokoll befejezési hiba: ${error instanceof Error ? error.message : 'Ismeretlen hiba'}`);
-      delete (window as any).lastCompleteAttempt;
+      OfflineQueue.addToQueue({
+        receptionDate: formData.receptionDate || new Date().toISOString().split('T')[0],
+        language,
+        answers: formData.answers,
+        errors: formData.errors || [],
+        signature: formData.signature || '',
+        signatureName: finalSignerName.trim(),
+        completed: true,
+      });
+      setCurrentScreen('completion');
     }
   };
 
@@ -676,6 +707,7 @@ function AppContent({
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        <OfflineStatusBar language={language} />
         {renderCurrentScreen()}
       </TooltipProvider>
     </QueryClientProvider>

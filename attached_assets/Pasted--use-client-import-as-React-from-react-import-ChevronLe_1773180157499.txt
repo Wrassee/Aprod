@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
@@ -164,6 +166,7 @@ function Calendar({
           position: relative;
         }
 
+        /* Range highlight background spans full cell */
         .cal-cell:has([aria-selected]) {
           background: rgba(99,102,241,0.12);
         }
@@ -206,6 +209,7 @@ function Calendar({
           transform: scale(1.08);
         }
 
+        /* TODAY */
         .cal-day.rdp-day_today {
           color: #818cf8;
           font-weight: 600;
@@ -213,6 +217,7 @@ function Calendar({
           border: 1px solid rgba(99,102,241,0.3);
         }
 
+        /* SELECTED */
         .cal-day[aria-selected="true"]:not(.rdp-day_range_middle) {
           background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
           color: #fff;
@@ -225,12 +230,14 @@ function Calendar({
           box-shadow: 0 6px 20px rgba(99,102,241,0.55);
         }
 
+        /* RANGE MIDDLE */
         .cal-day.rdp-day_range_middle[aria-selected="true"] {
           background: transparent;
           color: #c7d2fe;
           border-radius: 0;
         }
 
+        /* OUTSIDE */
         .cal-day.rdp-day_outside {
           color: rgba(148,163,184,0.25);
         }
@@ -240,6 +247,7 @@ function Calendar({
           color: rgba(199,210,254,0.5);
         }
 
+        /* DISABLED */
         .cal-day:disabled,
         .cal-day.rdp-day_disabled {
           opacity: 0.2;
@@ -269,8 +277,8 @@ function Calendar({
           row: "cal-row",
           cell: "cal-cell",
           day: "cal-day",
-          day_range_end: "day-range-end",
-          day_range_start: "day-range-start",
+          day_range_end: "rdp-day_range_end",
+          day_range_start: "rdp-day_range_start",
           day_selected: "",
           day_today: "rdp-day_today",
           day_outside: "rdp-day_outside",

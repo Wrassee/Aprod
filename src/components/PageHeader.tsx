@@ -1,12 +1,16 @@
 // src/components/PageHeader.tsx - RESZPONZÍV CÍM JAVÍTÁS (Mobil: Rövid, PC: Hosszú)
 
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { RotateCcw, Settings, Sparkles } from "lucide-react";
+import { RotateCcw, Settings, Sparkles, CalendarDays } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from "@/contexts/theme-context";
+import { format, parse, isValid } from "date-fns";
+import { hu, de, enUS, fr, it } from "date-fns/locale";
+import type { Locale } from "date-fns";
 
 interface PageHeaderProps {
   title?: string;
@@ -51,6 +55,46 @@ const PageHeader: FC<PageHeaderProps> = ({
   };
 
   const displayTitle = title || safeT("title", "OTIS APROD - Protokoll");
+
+  const dateLocaleMap: Record<string, Locale> = { hu, de, en: enUS, fr, it };
+  const dateLocale = dateLocaleMap[language] || hu;
+
+  const parsedDate = receptionDate
+    ? parse(receptionDate, 'yyyy-MM-dd', new Date())
+    : undefined;
+  const selectedDate = parsedDate && isValid(parsedDate) ? parsedDate : undefined;
+
+  const handleCalendarSelect = (day: Date | undefined) => {
+    if (day && onReceptionDateChange) {
+      onReceptionDateChange(format(day, 'yyyy-MM-dd'));
+    }
+  };
+
+  const formattedDate = selectedDate
+    ? format(selectedDate, 'PP', { locale: dateLocale })
+    : safeT("receptionDate", "Átvétel dátuma");
+
+  const DatePickerButton = ({ className: btnClass }: { className?: string }) => (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          className={btnClass || "flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600 transition-colors cursor-pointer"}
+        >
+          <CalendarDays className="h-4 w-4 text-blue-500" />
+          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{formattedDate}</span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="end" className="w-auto p-0 border-0 bg-transparent shadow-none">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={handleCalendarSelect}
+          locale={dateLocale}
+          defaultMonth={selectedDate || new Date()}
+        />
+      </PopoverContent>
+    </Popover>
+  );
 
   const calculateUnifiedProgress = (): number => {
     if (totalSteps && currentStep !== undefined) {
@@ -134,16 +178,8 @@ const PageHeader: FC<PageHeaderProps> = ({
             {/* RIGHT SIDE */}
             <div className="flex items-center gap-3 flex-shrink-0">
               {receptionDate !== undefined && onReceptionDateChange && (
-                <div className="hidden lg:flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800">
-                  <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                    {safeT("receptionDate", "Átvétel dátuma")}
-                  </Label>
-                  <Input
-                    type="date"
-                    value={receptionDate}
-                    onChange={(e) => onReceptionDateChange(e.target.value)}
-                    className="w-auto border-blue-300 focus:ring-blue-500 focus:border-blue-500"
-                  />
+                <div className="hidden lg:block">
+                  <DatePickerButton />
                 </div>
               )}
 
@@ -180,16 +216,8 @@ const PageHeader: FC<PageHeaderProps> = ({
 
           {/* Mobile Reception Date */}
           {receptionDate !== undefined && onReceptionDateChange && (
-            <div className="lg:hidden flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 mb-4">
-              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
-                {safeT("receptionDate", "Átvétel dátuma")}
-              </Label>
-              <Input
-                type="date"
-                value={receptionDate}
-                onChange={(e) => onReceptionDateChange(e.target.value)}
-                className="flex-1 border-blue-300 focus:ring-blue-500 focus:border-blue-500"
-              />
+            <div className="lg:hidden mb-4">
+              <DatePickerButton className="flex items-center gap-2 w-full px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 hover:border-blue-400 dark:hover:border-blue-600 transition-colors cursor-pointer" />
             </div>
           )}
 
@@ -268,17 +296,7 @@ const PageHeader: FC<PageHeaderProps> = ({
 
           <div className="flex-1 flex justify-end items-center space-x-4">
             {receptionDate !== undefined && onReceptionDateChange && (
-              <div className="flex items-center space-x-2">
-                <Label className="text-sm font-medium text-gray-600 whitespace-nowrap">
-                  {safeT("receptionDate", "Átvétel dátuma")}
-                </Label>
-                <Input
-                  type="date"
-                  value={receptionDate}
-                  onChange={(e) => onReceptionDateChange(e.target.value)}
-                  className="w-auto"
-                />
-              </div>
+              <DatePickerButton className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-300 hover:border-blue-400 transition-colors cursor-pointer" />
             )}
             {onStartNew && (
               <Button

@@ -1,6 +1,6 @@
 # OTIS APROD (Acceptance Protocol Document) Application
 
-## Version: 0.9.6
+## Version: 0.9.7
 
 ## Overview
 This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German with complete multilingual support across all interfaces, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
@@ -53,18 +53,22 @@ Prefers free AI APIs (Groq) over paid solutions.
   - Interactive AI chat powered by Groq (llama-3.3-70b-versatile)
   - Downloadable user manual in HTML format
 
-## Recent Changes (v0.9.6)
-- Added AI-powered help system with Groq LLM integration (free, no credit card required)
-- Implemented comprehensive FAQ with 6 categories and 40+ questions in 5 languages
-- Created downloadable/viewable user manual with 14 detailed sections
-- Smart Help Wizard now has 4 tabs: Tips, FAQ, AI Chat, Manual
-- Switched from Gemini API to Groq API for cost-free AI chat functionality
+## Recent Changes (v0.9.7)
+- **Offline Support**: Full offline data persistence — completed protocols queued locally when offline and auto-synced on reconnect
+- **Questions Caching**: Questions cached in localStorage and service worker cache after first load, available offline
+- **Lift Types Caching**: `/api/lifts/available` responses cached by service worker for offline use
+- **OfflineStatusBar**: Visual indicator showing online/offline status with pending sync count, auto-sync on reconnect, manual sync button
+- **Service Worker v0.9.7**: Updated to intercept and cache `/api/questions` and `/api/lifts/available` API responses
+- **Offline Queue Service**: `OfflineQueue` utility with robust sync logic (stale-safe iteration, in-flight guard, network vs server error distinction)
+- **5-Language Offline Translations**: All offline status messages translated (hu/de/en/fr/it)
+- **Backup version updated** to 0.9.7
+
+### Previous (v0.9.6)
+- Added AI-powered help system with Groq LLM integration
+- Implemented FAQ with 6 categories and 40+ questions in 5 languages
+- Smart Help Wizard with 4 tabs: Tips, FAQ, AI Chat, Manual
 - Added defaultIfHidden auto-fill logic for conditional questions
-- Fixed audit log "Művelet" column: action labels now fully translated in all 5 languages (hu/de/en/fr/it)
-- Added audit log health diagnostic endpoint (`/api/admin/audit-logs/health`)
-- Fixed audit log fallback SQL query to handle both array and object result shapes
-- Unified version number to v0.9.6 across admin UI, VERSION file, manifest.json, and service worker
-- Implemented offline support: questions caching, offline protocol queue with auto-sync, OfflineStatusBar UI component, service worker API caching for questions and lift types
+- Audit log translations and health diagnostics
 
 ## External Dependencies
 ### Frontend

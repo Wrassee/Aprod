@@ -953,7 +953,7 @@ router.get('/backup/create', requireAdmin, async (req, res) => {
     }
 
     const backup = {
-      version: '0.9.6',
+      version: '0.9.7',
       created_at: new Date().toISOString(),
       tables: {
         protocols: protocolsRows,

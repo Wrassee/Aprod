@@ -1,5 +1,5 @@
-// OTIS APROD Service Worker v0.9.6 - Complete PWA Support + Local Template Caching
-const CACHE_NAME = 'otis-aprod-v0.9.6';
+// OTIS APROD Service Worker v0.9.7 - Offline Support + API Caching + Auto-Sync
+const CACHE_NAME = 'otis-aprod-v0.9.7';
 const TEMPLATE_CACHE_NAME = 'otis-templates-v1';
 const OFFLINE_URL = '/offline.html';
 
@@ -28,11 +28,11 @@ const TEMPLATE_URLS = [
   '/questions_grounding_de.json'
 ];
 
-console.log('[SW] OTIS APROD Service Worker v0.9.6 initializing');
+console.log('[SW] OTIS APROD Service Worker v0.9.7 initializing');
 
 // Install event - cache essential resources only (templates cached at runtime)
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing Service Worker v0.9.6');
+  console.log('[SW] Installing Service Worker v0.9.7');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -52,7 +52,7 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating Service Worker v0.9.6');
+  console.log('[SW] Activating Service Worker v0.9.7');
   
   event.waitUntil(
     caches.keys()
@@ -67,7 +67,7 @@ self.addEventListener('activate', (event) => {
         );
       })
       .then(() => {
-        console.log('[SW] Service Worker v0.9.6 activated');
+        console.log('[SW] Service Worker v0.9.7 activated');
         return self.clients.claim();
       })
   );

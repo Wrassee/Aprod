@@ -393,10 +393,10 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
   const handlePreview = async (templateId: string) => {
     try {
       const headers = await getAuthHeaders();
-      // 🔥 JAVÍTVA: BASE_URL használata (mindkét fetch-nél)
+      const lang = language || 'hu';
       const [templateResponse, questionsResponse] = await Promise.all([
         fetch(`${BASE_URL}/api/admin/templates/${templateId}/preview`, { headers }),
-        fetch(`${BASE_URL}/api/questions/hu`, { headers })
+        fetch(`${BASE_URL}/api/questions/${lang}?templateId=${templateId}`, { headers })
       ]);
       
       if (templateResponse.ok) {
@@ -427,10 +427,41 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
     }
   };
 
-  const handleDownload = (templateId: string) => {
-    // 🔥 JAVÍTVA: Teljes URL megadása a letöltéshez
-    // Telefonon a relatív URL nem működik
-    window.location.href = `${BASE_URL}/api/admin/templates/${templateId}/download`;
+  const handleDownload = async (templateId: string) => {
+    try {
+      const headers = await getAuthHeaders();
+      const response = await fetch(`${BASE_URL}/api/admin/templates/${templateId}/download`, { headers });
+      
+      if (!response.ok) {
+        throw new Error(`Download failed: ${response.status}`);
+      }
+      
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get('Content-Disposition');
+      let filename = 'template.xlsx';
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (match && match[1]) {
+          filename = match[1].replace(/['"]/g, '');
+        }
+      }
+      
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading template:', error);
+      toast({
+        title: t("error"),
+        description: t("failedToDownloadTemplate") || "Failed to download template",
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleDelete = async (templateId: string, templateName: string) => {
@@ -470,6 +501,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
   // MODERN THEME RENDER
   if (theme === 'modern') {
     return (
+      <>
       <Tabs defaultValue="templates" className="w-full">
         {/* Modern Tab List */}
         <TabsList className="grid w-full grid-cols-3 bg-white/70 backdrop-blur-md border-2 border-blue-100 p-1 rounded-2xl shadow-lg mb-6">
@@ -1064,6 +1096,55 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
           </div>
         </TabsContent>
       </Tabs>
+
+      {previewOpen && previewData && (
+        <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{t("templatePreview") || "Sablon előnézet"}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <span className="font-medium text-muted-foreground">{t("name") || "Név"}:</span>
+                <span>{previewData.name}</span>
+                <span className="font-medium text-muted-foreground">{t("type") || "Típus"}:</span>
+                <span className="capitalize">{previewData.type}</span>
+                <span className="font-medium text-muted-foreground">{t("language") || "Nyelv"}:</span>
+                <span className="capitalize">{previewData.language}</span>
+                <span className="font-medium text-muted-foreground">{t("fileName") || "Fájlnév"}:</span>
+                <span className="break-all">{previewData.file_name}</span>
+                <span className="font-medium text-muted-foreground">{t("status") || "Állapot"}:</span>
+                <span>{previewData.is_active 
+                  ? (t("active") || "Aktív") 
+                  : (t("inactive") || "Inaktív")}</span>
+                <span className="font-medium text-muted-foreground">{t("created") || "Létrehozva"}:</span>
+                <span>{previewData.created_at 
+                  ? new Date(previewData.created_at).toLocaleDateString() 
+                  : "-"}</span>
+              </div>
+              {previewData.questions && previewData.questions.length > 0 && (
+                <div className="mt-4">
+                  <p className="font-medium text-sm mb-2">{t("questions") || "Kérdések"}: {previewData.questions.length} db</p>
+                  <div className="max-h-48 overflow-y-auto border rounded-lg p-2 space-y-1">
+                    {previewData.questions.slice(0, 20).map((q: any, i: number) => (
+                      <div key={i} className="text-xs p-1.5 bg-muted/50 rounded flex justify-between">
+                        <span className="truncate flex-1">{q.titleHu || q.title || q.id}</span>
+                        <span className="text-muted-foreground ml-2">{q.type}</span>
+                      </div>
+                    ))}
+                    {previewData.questions.length > 20 && (
+                      <p className="text-xs text-muted-foreground text-center pt-1">
+                        ...+{previewData.questions.length - 20}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+      </>
     );
   }
 
@@ -1071,6 +1152,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
   // CLASSIC THEME RENDER
   // ========================================
   return (
+    <>
     <Tabs defaultValue="templates" className="w-full">
       <TabsList className="grid w-full grid-cols-3 mb-6">
         <TabsTrigger value="templates">
@@ -1423,5 +1505,54 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
         </Card>
       </TabsContent>
     </Tabs>
+
+    {previewOpen && previewData && (
+      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t("templatePreview") || "Sablon előnézet"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <span className="font-medium text-muted-foreground">{t("name") || "Név"}:</span>
+              <span>{previewData.name}</span>
+              <span className="font-medium text-muted-foreground">{t("type") || "Típus"}:</span>
+              <span className="capitalize">{previewData.type}</span>
+              <span className="font-medium text-muted-foreground">{t("language") || "Nyelv"}:</span>
+              <span className="capitalize">{previewData.language}</span>
+              <span className="font-medium text-muted-foreground">{t("fileName") || "Fájlnév"}:</span>
+              <span className="break-all">{previewData.file_name}</span>
+              <span className="font-medium text-muted-foreground">{t("status") || "Állapot"}:</span>
+              <span>{previewData.is_active 
+                ? (t("active") || "Aktív") 
+                : (t("inactive") || "Inaktív")}</span>
+              <span className="font-medium text-muted-foreground">{t("created") || "Létrehozva"}:</span>
+              <span>{previewData.created_at 
+                ? new Date(previewData.created_at).toLocaleDateString() 
+                : "-"}</span>
+            </div>
+            {previewData.questions && previewData.questions.length > 0 && (
+              <div className="mt-4">
+                <p className="font-medium text-sm mb-2">{t("questions") || "Kérdések"}: {previewData.questions.length} db</p>
+                <div className="max-h-48 overflow-y-auto border rounded-lg p-2 space-y-1">
+                  {previewData.questions.slice(0, 20).map((q: any, i: number) => (
+                    <div key={i} className="text-xs p-1.5 bg-muted/50 rounded flex justify-between">
+                      <span className="truncate flex-1">{q.titleHu || q.title || q.id}</span>
+                      <span className="text-muted-foreground ml-2">{q.type}</span>
+                    </div>
+                  ))}
+                  {previewData.questions.length > 20 && (
+                    <p className="text-xs text-muted-foreground text-center pt-1">
+                      ...+{previewData.questions.length - 20}
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    )}
+    </>
   );
 }

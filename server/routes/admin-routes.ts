@@ -607,6 +607,29 @@ router.get("/templates", async (_req, res) => {
   }
 });
 
+router.get("/templates/:id/preview", async (req, res) => {
+  const templateId = req.params.id;
+  try {
+    const template = await storage.getTemplate(templateId);
+    if (!template) {
+      return res.status(404).json({ message: "Template not found" });
+    }
+    res.json({
+      id: template.id,
+      name: template.name,
+      type: template.type,
+      language: template.language,
+      file_name: template.file_name,
+      is_active: template.is_active,
+      created_at: template.created_at,
+      load_strategy: template.load_strategy,
+    });
+  } catch (error: any) {
+    console.error("Error fetching template preview:", error);
+    res.status(500).json({ message: "Failed to load template preview" });
+  }
+});
+
 // MÓDOSÍTVA: requireAdmin eltávolítva
 router.get("/templates/:id/download", async (req, res) => {
   const templateId = req.params.id;

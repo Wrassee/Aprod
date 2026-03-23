@@ -543,7 +543,7 @@ export const translations: Record<string, Translation> = {
     // Answers
     yes: "Igen",
     no: "Nem",
-    notApplicable: "Nem alkalmazható",
+    notApplicable: "N.a.",
     
     // Error List
     errorList: "Hibalista",

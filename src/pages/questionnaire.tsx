@@ -554,6 +554,7 @@ function Questionnaire({
                 ))}
               </div>
             ) : (() => {
+              const yesNoNaQuestions = (currentQuestions as Question[]).filter(q => q.type === 'yes_no_na');
               const radioQuestions = (currentQuestions as Question[]).filter(q => q.type === 'radio' || q.type === 'checkbox' || q.type === 'yes_no_na');
               const measurementQuestions = (currentQuestions as Question[]).filter(q => q.type === 'measurement' || q.type === 'calculated');
               const otherQuestions = (currentQuestions as Question[]).filter(q => 
@@ -574,6 +575,7 @@ function Questionnaire({
                 ))
               );
               
+              // Csak yes_no_na (vagy boolean radio) kérdések → táblázat
               if (hasOnlyRadio && allRadioAreBoolean) {
                 return (
                   <TrueFalseGroup
@@ -593,6 +595,43 @@ function Questionnaire({
                     onChange={handleLocalAnswerChange}
                     onAddError={handleAddError}
                   />
+                );
+              }
+
+              // Vegyes blokk: ha ≥3 yes_no_na kérdés van, azokat táblázatban jelenítjük meg
+              const nonYesNoNaQuestions = (currentQuestions as Question[]).filter(q => q.type !== 'yes_no_na');
+              if (yesNoNaQuestions.length >= 3 && nonYesNoNaQuestions.length > 0) {
+                const nonTableQuestions = nonYesNoNaQuestions.filter(q => q.type !== 'measurement' && q.type !== 'calculated');
+                const mixedMeasurements = nonYesNoNaQuestions.filter(q => q.type === 'measurement' || q.type === 'calculated');
+                return (
+                  <div className="space-y-6">
+                    {mixedMeasurements.length > 0 && (
+                      <MeasurementBlock
+                        questions={mixedMeasurements}
+                        values={localAnswers}
+                        onChange={handleLocalAnswerChange}
+                        onAddError={handleAddError}
+                      />
+                    )}
+                    <TrueFalseGroup
+                      questions={yesNoNaQuestions}
+                      values={localAnswers}
+                      onChange={handleLocalAnswerChange}
+                      groupName={currentGroup?.name || t("questions")}
+                    />
+                    {nonTableQuestions.length > 0 && (
+                      <div className={`grid gap-8 ${theme === 'modern' ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-1 lg:grid-cols-2'}`}>
+                        {nonTableQuestions.map((question: Question) => (
+                          <IsolatedQuestion
+                            key={question.id}
+                            question={question}
+                            value={localAnswers[question.id] ?? ""}
+                            onChange={(value) => handleLocalAnswerChange(question.id, value)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               }
 

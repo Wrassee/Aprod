@@ -1,6 +1,6 @@
 # OTIS APROD (Acceptance Protocol Document) Application
 
-## Version: 0.9.7
+## Version: 0.9.8
 
 ## Overview
 This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German with complete multilingual support across all interfaces, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
@@ -34,8 +34,8 @@ Prefers free AI APIs (Groq) over paid solutions.
 ### Key Features & Design Patterns
 - **Multi-language Support**: Hungarian and German localization with dynamic switching, using stable `groupKey` slugs for filtering logic and 5-language coverage for core features.
 - **Conditional Question Filtering**: Excel-driven visibility control using stable `groupKey` architecture for language-independent filtering. Supports `conditional_group_key` for hiding/showing question blocks based on yes/no answers, with `defaultIfHidden` for automatic Excel cell population when questions are hidden.
-- **Mixed-Type Question Blocks**: Flexible rendering supporting any combination of question types (radio, text, select, measurement, calculated) within a block.
-- **Template Management System**: Admin interface for uploading, activating, and deleting Excel-based question and protocol templates, supporting unified multilingual templates.
+- **Mixed-Type Question Blocks**: Flexible rendering supporting any combination of question types (radio, text, select, measurement, calculated) within a block. Smart table/card layout logic: if ≥3 `yes_no_na` questions exist in a mixed block, they render as a table; 1-2 render as individual cards.
+- **Template Management System**: Admin interface for uploading, activating, and deleting Excel-based question and protocol templates, supporting unified multilingual templates. Template download uses authenticated fetch+blob (not window.location.href). Template preview dialog shows metadata and question list for both modern and classic themes.
 - **Excel Integration**: XML-based manipulation preserving formatting, handling unicode, and supporting complex cell mapping. Calculations handled by Excel's formulas.
 - **Dual PDF Generation System**: LibreOffice for protocol PDFs (Excel-to-PDF conversion) and jsPDF for error list PDFs (with embedded Roboto fonts for Unicode support).
 - **Data Persistence**: Form data saved to localStorage and PostgreSQL.
@@ -52,8 +52,17 @@ Prefers free AI APIs (Groq) over paid solutions.
   - FAQ with 6 categories in 5 languages
   - Interactive AI chat powered by Groq (llama-3.3-70b-versatile)
   - Downloadable user manual in HTML format
+- **Modern Calendar Date Picker**: `calendar.tsx` redesigned with dark glassmorphism style (Syne + DM Mono fonts, indigo gradient, blur backdrop). `PageHeader.tsx` uses Radix Popover + react-day-picker with locale-aware `PP` date format for all 5 languages. Date picker only shown on relevant pages (not on lift selector).
 
-## Recent Changes (v0.9.7)
+## Recent Changes (v0.9.8)
+- **Modern Calendar Date Picker**: HTML `<input type="date">` replaced with dark glassmorphism Radix Popover + react-day-picker Calendar in `PageHeader.tsx`. Locale-aware `PP` format, `isValid()` guard, Syne + DM Mono fonts.
+- **Lift Selector Date Picker Fix**: Removed `receptionDate`/`onReceptionDateChange` props from all 3 PageHeader instances in `lift-selector.tsx` — date picker no longer appears during lift type/subtype selection.
+- **Template Download Auth Fix**: `handleDownload` in `template-management.tsx` now uses `fetch()` + blob URL instead of `window.location.href`, correctly sending the Authorization header. Server no longer returns 401.
+- **Template Preview Endpoint**: New `GET /api/admin/templates/:id/preview` endpoint in `admin-routes.ts` returns template metadata. Preview dialog added to both modern and classic themes in `template-management.tsx`. Questions fetched with correct `templateId` query param and active language.
+- **yes_no_na Smart Table Layout**: Mixed question blocks with ≥3 `yes_no_na` questions now render those questions in table format (TrueFalseGroup), while remaining questions appear as individual cards. Blocks with 1–2 `yes_no_na` questions remain as individual cards. Logic in `questionnaire.tsx`.
+- **Hungarian „N.a." Translation**: `notApplicable` key in `translations.ts` changed from `"Nem alkalmazható"` to `"N.a."` for Hungarian — prevents text overflow in button labels.
+
+### Previous (v0.9.7)
 - **Offline Support**: Full offline data persistence — completed protocols queued locally when offline and auto-synced on reconnect
 - **Questions Caching**: Questions cached in localStorage and service worker cache after first load, available offline
 - **Lift Types Caching**: `/api/lifts/available` responses cached by service worker for offline use
@@ -61,7 +70,6 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **Service Worker v0.9.7**: Updated to intercept and cache `/api/questions` and `/api/lifts/available` API responses
 - **Offline Queue Service**: `OfflineQueue` utility with robust sync logic (stale-safe iteration, in-flight guard, network vs server error distinction)
 - **5-Language Offline Translations**: All offline status messages translated (hu/de/en/fr/it)
-- **Backup version updated** to 0.9.7
 
 ### Previous (v0.9.6)
 - Added AI-powered help system with Groq LLM integration
@@ -69,6 +77,28 @@ Prefers free AI APIs (Groq) over paid solutions.
 - Smart Help Wizard with 4 tabs: Tips, FAQ, AI Chat, Manual
 - Added defaultIfHidden auto-fill logic for conditional questions
 - Audit log translations and health diagnostics
+
+## Key File Reference
+| File | Purpose |
+|------|---------|
+| `src/pages/questionnaire.tsx` | Main questionnaire page; block rendering logic (table vs card) |
+| `src/components/true-false-group.tsx` | Table-style renderer for yes_no_na / boolean radio blocks |
+| `src/components/isolated-question.tsx` | Individual question card renderer |
+| `src/components/template-management.tsx` | Admin template upload/download/preview/activate |
+| `src/components/PageHeader.tsx` | Header with modern calendar date picker |
+| `src/components/ui/calendar.tsx` | Dark glassmorphism calendar component |
+| `src/components/offline-status-bar.tsx` | Online/offline status indicator with sync |
+| `src/utils/offline-queue.ts` | Offline protocol queue with auto-sync logic |
+| `src/lib/translations.ts` | All 5-language translation strings |
+| `server/routes/admin-routes.ts` | Admin API: templates, users, audit, backup |
+| `server/routes.ts` | Main API route registration |
+| `public/sw.js` | Service worker for offline caching |
+
+## Environment Variables Required
+- `GROQ_API_KEY` - For AI chat functionality (free from console.groq.com)
+- `SUPABASE_SERVICE_ROLE_KEY` - For Supabase admin operations
+- `VITE_SUPABASE_ANON_KEY` - For frontend Supabase access
+- `DATABASE_URL` - PostgreSQL connection string
 
 ## External Dependencies
 ### Frontend
@@ -79,6 +109,7 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **Date Handling**: `date-fns`
 - **Routing**: `wouter`
 - **Signature Capture**: `react-signature-canvas`
+- **Calendar**: `react-day-picker` (Radix Popover + custom dark glassmorphism styling)
 
 ### Backend
 - **Server Framework**: `express`
@@ -89,9 +120,3 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **Authentication**: `supabase-js`
 - **AI Integration**: `openai` (used with Groq API baseURL)
 - **Utilities**: `nanoid`
-
-## Environment Variables Required
-- `GROQ_API_KEY` - For AI chat functionality (free from console.groq.com)
-- `SUPABASE_SERVICE_ROLE_KEY` - For Supabase admin operations
-- `VITE_SUPABASE_ANON_KEY` - For frontend Supabase access
-- `DATABASE_URL` - PostgreSQL connection string

@@ -257,6 +257,7 @@ export default function LiftManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lift-mappings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lifts/available"] });
       toast({ title: t("success"), description: t("mapping_created_successfully") });
       setCreateMappingDialog(false);
       setMappingForm({
@@ -283,6 +284,7 @@ export default function LiftManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lift-mappings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lifts/available"] });
       toast({ title: t("success"), description: t("mapping_activated_successfully") });
     },
     onError: (error: Error) => {
@@ -302,6 +304,7 @@ export default function LiftManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/lift-mappings"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/lifts/available"] });
       toast({ title: t("success"), description: "Mapping deleted successfully" });
       setDeleteConfirmDialog({ ...deleteConfirmDialog, open: false });
     },

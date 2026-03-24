@@ -15,6 +15,7 @@ import { formatDate } from '@/lib/utils';
 import { Upload, FileSpreadsheet, Eye, Trash2, Download, Loader2, FileText, Sparkles, CheckCircle, Calendar, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/auth-context';
+import { queryClient } from '@/lib/queryClient';
 
 // 🔥 1. URL DEFINIÁLÁSA (fejlesztésben üres = relatív URL)
 const BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -294,6 +295,8 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
         });
         setQuestionsUpload({ name: '', file: null });
         fetchTemplates();
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/templates"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/templates/available"] });
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Upload failed');
@@ -343,6 +346,8 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
         });
         setProtocolUpload({ name: '', file: null });
         fetchTemplates();
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/templates"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/templates/available"] });
       } else {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Upload failed');
@@ -375,6 +380,9 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
           description: t("templateActivatedSuccessfully"),
         });
         fetchTemplates();
+        // Cache frissítése: LiftManagement is lássa az új template-et
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/templates"] });
+        queryClient.invalidateQueries({ queryKey: ["/api/admin/templates/available"] });
       } else {
         throw new Error('Activation failed');
       }

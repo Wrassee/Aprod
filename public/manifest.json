@@ -1,10 +1,10 @@
 {
-  "name": "OTIS APROD v0.9.7 - Átvételi Protokoll",
-  "short_name": "OTIS APROD v0.9.7",
-  "description": "OTIS lift inspection protocol application v0.9.7 with offline support, AI-powered help and multilingual support",
+  "name": "OTIS APROD v0.9.8 - Átvételi Protokoll",
+  "short_name": "OTIS APROD",
+  "description": "OTIS lift inspection protocol application v0.9.8 with offline support, AI-powered help and multilingual support",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#0d1117",
   "theme_color": "#1f2937",
   "orientation": "portrait-primary",
   "scope": "/",
@@ -26,6 +26,11 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
     }
   ],
   "shortcuts": [
@@ -50,7 +55,7 @@
       "form_factor": "wide"
     },
     {
-      "src": "/screenshot-mobile.png", 
+      "src": "/screenshot-mobile.png",
       "sizes": "750x1334",
       "type": "image/png",
       "form_factor": "narrow"

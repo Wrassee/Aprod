@@ -19,11 +19,19 @@ const config: CapacitorConfig = {
     androidScheme: 'https'
   },
 
-  // 🔥 ÚJ RÉSZ: PLUGINS KONFIGURÁCIÓ (Immersive Mode) 🔥
   plugins: {
     StatusBar: {
-      // Ez engedi, hogy az app tartalma a status bar mögé csússzon (teljesebb élmény)
       overlaysWebView: true,
+    },
+    SplashScreen: {
+      launchShowDuration: 2000,
+      launchAutoHide: true,
+      backgroundColor: "#0d1117",
+      androidSplashResourceName: "splash",
+      androidScaleType: "CENTER_CROP",
+      showSpinner: false,
+      splashFullScreen: true,
+      splashImmersive: true,
     },
   },
 };

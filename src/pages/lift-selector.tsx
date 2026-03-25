@@ -709,22 +709,22 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
           <div className="mt-12 flex justify-center sm:justify-start max-w-5xl mx-auto">
             {theme === 'modern' ? (
               <button
-                onClick={handleHomeClick}
+                onClick={() => setSelectedType(null)}
                 className="group relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20"
               >
                 <div className="flex items-center justify-center gap-2">
                   <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
-                  <span className="font-semibold">{t("back_to_start")}</span>
+                  <span className="font-semibold">{t("back")}</span>
                 </div>
               </button>
             ) : (
               <Button
                 variant="outline"
-                onClick={handleHomeClick}
+                onClick={() => setSelectedType(null)}
                 className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                {t("back_to_start")}
+                {t("back")}
               </Button>
             )}
           </div>

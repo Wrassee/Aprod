@@ -1,0 +1,284 @@
+{
+  "groups": [
+    {
+      "id": "sec_2_1",
+      "title": "2.1 Főkapcsoló (Berendezéskapcsoló)",
+      "questions": [
+        { "id": "H_2.1.2", "text": "Megfelel-e a főkapcsoló alkalmazási tartománya az üzemszerű maximális áramnak?" },
+        { "id": "H_2.1.3", "text": "A főkapcsoló a megfelelő helyre van szerelve?" },
+        { "id": "H_2.1.5", "text": "A gép felállítási helyétől < 1 m távolságon belül van-e főkapcsoló vagy vészfékkapcsoló?" },
+        { "id": "H_2.1.6", "text": "A vészhelyzeti és vizsgálati tableautól < 1 m távolságon belül van-e berendezéskapcsoló vagy vészstop?" },
+        { "id": "H_2.1.7", "text": "A gördítőgép-térben a bejárat közelében van-e vészstop elhelyezve, működőképes és megfelelően jelölve?" }
+      ]
+    },
+    {
+      "id": "sec_2_2",
+      "title": "2.2 Világítás és konnektorok",
+      "questions": [
+        { "id": "H_2.2.1", "text": "A gépházban, a gép és a vezérlés felállítási helyein min. 200 lux megvilágítás van a padlón?" },
+        { "id": "H_2.2.2", "text": "A gördítőgép-térben min. 100 lux megvilágítás van a görgőknél?" },
+        { "id": "H_2.2.3", "text": "A gördítőgép-térben van-e csatlakozóaljzat a 13.6.2 szerint?" },
+        { "id": "H_2.2.4", "text": "A kabin, vezérlő, akna, gépház, gördítőgép-tér és vészhelyzeti tableau megvilágításának energiaellátása független a berendezéskapcsoló állásától?" },
+        { "id": "H_2.2.5", "text": "Minden kapcsolóval vezérelt áramkörnek van önálló rövidzárlat-biztosítója?" },
+        { "id": "H_2.2.6", "text": "A vészhelyzeti és vizsgálati berendezésnél min. 50 lux fényerő van, és van világítási kapcsoló?" }
+      ]
+    },
+    {
+      "id": "sec_2_3",
+      "title": "2.3 Méretek / Hozzáférés / Idegen berendezések",
+      "questions": [
+        { "id": "H_2.3.1", "text": "A méretek és biztonsági távolságok megfelelnek-e a minimum követelményeknek?" },
+        { "id": "H_2.3.2", "text": "A hozzáférés biztonságos, megvilágított, közvetlen és nem magánterületen vezet át?" },
+        { "id": "H_2.3.3", "text": "A gépházi szellőztetés megfelel-e az elrendezési tervnek?" },
+        { "id": "H_2.3.4", "text": "Az ajtók / búvónyílások helyi kulcshenger-zárral és belső forgatógombbal vannak ellátva?" },
+        { "id": "H_2.3.5", "text": "MRL-vezérlőszekrénynél kulcs nélküli zárás és zárolás biztosított?" },
+        { "id": "H_2.3.6", "text": "A padlónyílások legalább 50 mm magas manzsettával vannak biztosítva?" },
+        { "id": "H_2.3.7", "text": "A gépházi padló lamináttal vagy olajálló festékkel van bevonva, és egy küszöb vagy olajfelfogó megakadályozza az olaj kifolyását?" },
+        { "id": "H_2.3.8", "text": "A gépház mentes idegen berendezésektől?" }
+      ]
+    },
+    {
+      "id": "sec_2_4",
+      "title": "2.4 Feliratok / 2.5 Hangközlő rendszer / 2.6 Emelési segédeszközök",
+      "questions": [
+        { "id": "H_2.4.1", "text": "Minden útmutatás és tábla fel van szerelve?" },
+        { "id": "H_2.4.2", "text": "Közös gépházzal rendelkező több lift esetén minden berendezésrész megfelelően meg van jelölve?" },
+        { "id": "H_2.5.1", "text": "30 m-nél nagyobb emelési magasságnál vagy közvetlen hangkommunikáció hiányában van-e vészárammal ellátott hangközlő rendszer a vészhelyzeti beavatkozási hely és a kabin között?" },
+        { "id": "H_2.6.1", "text": "Rendelkezésre állnak-e nehéz alkatrészek emeléséhez szükséges eszközök, megengedett teherbírással megjelölve?" }
+      ]
+    },
+    {
+      "id": "sec_3_1",
+      "title": "3.1 Biztonsági távolságok az aknafejben",
+      "questions": [
+        { "id": "H_3.1.1", "text": "A biztonsági távolságok megfelelnek-e a normál előírásoknak, amikor a kolben a legfelső helyzetben van vagy a védelmi tér biztosítása aktiválva van?" },
+        { "id": "H_3.1.2", "text": "A kabintetőn a tartófelület legalább 0,12 m² és a kisebb oldalhossz legalább 250 mm?" },
+        { "id": "H_3.1.3", "text": "A kabintetőn a védelmi tér min. 500 x 600 x 800 mm-es téglatestnek felel meg?" },
+        { "id": "H_3.1.4", "text": "Az ellensúly megmaradó vezető hossza megfelel a névleges értéknek, ha a kabin a teljesen összenyomott pufferokon nyugszik?" },
+        { "id": "H_3.1.6", "text": "A végálláskapcsoló megfelelően van elhelyezve és működőképes?" }
+      ]
+    },
+    {
+      "id": "sec_3_2",
+      "title": "3.2 Biztonsági távolságok az aknagödörben",
+      "questions": [
+        { "id": "H_3.2.1", "text": "A biztonsági távolságok megfelelnek-e a normál előírásoknak, ha a kabin a teljesen összenyomott pufferokon nyugszik?" },
+        { "id": "H_3.2.2", "text": "A kabin alatti védelmi tér min. 500 x 600 x 1000 mm-es téglatestnek felel meg?" },
+        { "id": "H_3.2.3", "text": "Csökkentett védelmi tér esetén a biztonsági berendezés megfelel-e a tervezési vizsgálatban foglaltaknak?" },
+        { "id": "H_3.2.4", "text": "A kabinalap és a legalsó megálló közötti távolság kisebb-e 120 mm-nél, ha a kabin névleges terheléssel a pufferokon nyugszik?" }
+      ]
+    },
+    {
+      "id": "sec_3_3",
+      "title": "3.3 Ütközők (Pufferek)",
+      "questions": [
+        { "id": "H_3.3.1.1", "text": "A felszerelt kabinpufferek megfelelnek-e az üzemi könyvben foglalt adatoknak?" },
+        { "id": "H_3.3.1.2", "text": "(Energiatároló puffer) A pufferlöket megfelel-e a gyártói előírásoknak, ha a kabin névleges terheléssel és laza kötelekkel rágurul a pufferre?" },
+        { "id": "H_3.3.1.3", "text": "(Energianyelő puffer) Kizárt-e a lift károsodása, ha a kabin névleges terheléssel rágurul a pufferre?" },
+        { "id": "H_3.3.1.4", "text": "A lift a puffer-teszt után kifogástalanul működik?" }
+      ]
+    },
+    {
+      "id": "sec_3_4",
+      "title": "3.4 Aknabiztonság",
+      "questions": [
+        { "id": "H_3.4.1", "text": "A teljesen körülzárt aknaburkolatban csak az engedélyezett nyílások vannak?" },
+        { "id": "H_3.4.2", "text": "Közlekedési területen lévő sík vagy ívelt üvegtáblák rétegelt biztonsági üvegből készültek?" },
+        { "id": "H_3.4.3", "text": "Az ellensúlynál szilárd elválasztás van elhelyezve?" },
+        { "id": "H_3.4.4", "text": "Az ellensúly és a kabin közötti távolság legalább 50 mm?" },
+        { "id": "H_3.4.5", "text": "Közös aknában lévő liftlisták esetén van-e elválasztás az aknagödörben (magasság: a legalsó megálló szintjétől 2,5 m-ig)?" },
+        { "id": "H_3.4.7", "text": "A karbantartási és vészajtók, valamint a karbantartási nyílások megfelelnek-e az előírásoknak?" },
+        { "id": "H_3.4.8", "text": "Az aknagödörbe való hozzáférés megfelel-e az előírásoknak (létra)?" },
+        { "id": "H_3.4.10", "text": "Az akna szellőztetése megfelel-e az elrendezési terv adatainak?" },
+        { "id": "H_3.4.11", "text": "A hozzáférési oldalon lévő aknafal megfelel-e az elrendezési terv vagy a norma adatainak?" },
+        { "id": "H_3.4.12", "text": "Az aknában nincsenek liftidegen berendezések?" },
+        { "id": "H_3.4.13", "text": "Az aknagödör alatt beléphető tereknél megfelelő védelmi intézkedések történtek?" },
+        { "id": "H_3.4.14", "text": "A kötélgörgőknél és lánctárcsáknál a szükséges védőberendezések megvannak?" },
+        { "id": "H_3.4.15", "text": "Az aknagödör-kapcsoló (vészfékkapcsoló) helyesen van elhelyezve, működőképes és megfelelően megjelölve?" },
+        { "id": "H_3.4.16", "text": "Az aknagödörből való szabadításhoz szükséges vészhívó-berendezés fel van szerelve és működőképes?" },
+        { "id": "H_3.4.17", "text": "A kabin megállításához szükséges mechanikus berendezés karbantartási és vizsgálati munkálatokhoz működik?" }
+      ]
+    },
+    {
+      "id": "sec_3_5",
+      "title": "3.5 Aknavilágítás / Csatlakozóaljzat — 3.6 Vezető sínek",
+      "questions": [
+        { "id": "H_3.5.1", "text": "Az aknavilágítás megvilágítása a kabintetőtől vagy az aknagödör padlójától 1000 mm magasságban legalább 50 lux?" },
+        { "id": "H_3.5.3", "text": "Az aknavilágítás mind az aknagödör bejáratától, mind a főkapcsoló közeléből kapcsolható?" },
+        { "id": "H_3.5.4", "text": "Az aknagödörben és a gép, valamint a vezérlés felállítási helyén van-e csatlakozóaljzat?" },
+        { "id": "H_3.6.1", "text": "A vezető sínek méretei megfelelnek-e a gyártó adatainak?" },
+        { "id": "H_3.6.2", "text": "A sínrögzítő konzol távolsága megfelel-e az elrendezési tervnek?" }
+      ]
+    },
+    {
+      "id": "sec_4_1",
+      "title": "4.1 Aknaajtók",
+      "questions": [
+        { "id": "H_4.1.1", "text": "Zárt ajtóknál az ajtószárnyak közötti, ill. az ajtószárnyak és a keret vagy küszöb közötti rések legfeljebb 6 mm-esek?" },
+        { "id": "H_4.1.2", "text": "Az aknaajtók külső oldalán a mélyedések és emelkedések legfeljebb 3 mm-esek?" },
+        { "id": "H_4.1.3", "text": "Az aknaajtók megfelelnek-e a helyes tűzállósági osztálynak?" },
+        { "id": "H_4.1.8", "text": "A megfelelő ajtóreteszek vannak felszerelve?" },
+        { "id": "H_4.1.9", "text": "Minden aknaajtón tesztelve van-e a kontaktus, hogy meghibásodás esetén lezárjon és megakadályozza a kabin mozgását a kioldási zónán kívül?" },
+        { "id": "H_4.1.10", "text": "A záróeszközök legalább 7 mm-es bekapcsolással rendelkeznek, mielőtt a kabin elindulhat?" },
+        { "id": "H_4.1.11", "text": "Minden aknaajtón tesztelve van-e a mechanikus retesz helyes működése?" },
+        { "id": "H_4.1.13", "text": "A kioldási zóna legfeljebb 200 mm az aknaajtók fölé és alá (ill. 350 mm egyidejűleg működő kabin- és aknaajtóknál)?" },
+        { "id": "H_4.1.14", "text": "Az automatikus zárómechanizmus helyesen működik?" },
+        { "id": "H_4.1.15", "text": "Az ajtóterelők megfelelnek-e a minimális előírásoknak (hossz, dőlésszög stb.)?" },
+        { "id": "H_4.1.16", "text": "Minden aknaajtó kívülről vészkulccsal kinyitható?" },
+        { "id": "H_4.1.18", "text": "Az aknaajtók közelében a padlón a megvilágítás legalább 50 lux?" },
+        { "id": "H_4.1.19", "text": "A megállókon fel vannak-e ragasztva az ISO 3864-1:2002 szerinti tiltó jelzések? (Tűz esetén lifthasználat tilos)" }
+      ]
+    },
+    {
+      "id": "sec_5_1",
+      "title": "5.1 Kabin belső tér",
+      "questions": [
+        { "id": "H_5.1.1", "text": "A kabinban megvannak-e a névleges teherre, a gyártó/szerelővállalat nevére, a személyek számára és a gyári számra vonatkozó adatok?" },
+        { "id": "H_5.1.4", "text": "A kabinvészjelző lehetővé teszi-e a kétirányú kommunikációt az ügyelettel?" },
+        { "id": "H_5.1.5", "text": "A kabinvilágítás a padlón és a kezelőelemeken eléri-e a min. 50 lux értéket?" },
+        { "id": "H_5.1.6", "text": "A kabinban a vészvilágítás működik?" },
+        { "id": "H_5.1.7", "text": "A túlterhelés-biztosítás az előírásnak megfelelően működik (10%-os túlterhelésnél, de min. 75 kg)?" },
+        { "id": "H_5.1.9", "text": "A kabinban megfelelő szellőztetés van biztosítva?" },
+        { "id": "H_5.1.10", "text": "A kabinfalak, padló és tető tömör kivitelűek, a megengedett szellőzőnyílások kivételével?" }
+      ]
+    },
+    {
+      "id": "sec_5_2",
+      "title": "5.2 Kabintető / 5.3 Kabinkapu",
+      "questions": [
+        { "id": "H_5.2.1", "text": "A kabintetőn az ellenőrző vezérlő, vészstop és csatlakozóaljzat helyesen van-e elhelyezve és tesztelve?" },
+        { "id": "H_5.2.2", "text": "A kabintetőn a vészhívó helyesen működik?" },
+        { "id": "H_5.3.1", "text": "Zárt kabinkapunál az ajtószárnyak közötti, ill. az ajtószárnyak és a keret közötti rések legfeljebb 6 mm-esek?" },
+        { "id": "H_5.3.2", "text": "A kabinkapu belső oldalán a mélyedések és emelkedések legfeljebb 3 mm-esek?" },
+        { "id": "H_5.3.3", "text": "Az aknaajtó- és kabinkapu-küszöb vízszintes távolsága legfeljebb 35 mm?" },
+        { "id": "H_5.3.10", "text": "A kabinkapu-terelő megfelel-e a minimális előírásoknak (hossz, dőlésszög stb.)?" }
+      ]
+    },
+    {
+      "id": "sec_5_4",
+      "title": "5.4 Kabinkapu-vizsgálat",
+      "questions": [
+        { "id": "H_5.4.1", "text": "A zárás megakadályozásához szükséges maximális erő 150 N vagy kevesebb?" },
+        { "id": "H_5.4.2", "text": "Nyitásirányban 150 N kézi erőnél a legkedvezőtlenebb ponton a zárókél rései legfeljebb 30 mm (egyoldalas) ill. 45 mm (középen nyíló) ajtóknál?" },
+        { "id": "H_5.4.3", "text": "A mozgási energia átlagos zárási sebességnél legfeljebb 10 J?" },
+        { "id": "H_5.4.4", "text": "Ha egy személy az ajtóterületen érintve van, a védelmi berendezés visszanyitja az ajtót?" },
+        { "id": "H_5.4.6", "text": "A kabinkapu a kioldási zónán belül legfeljebb 300 N erővel kézzel kinyitható, ha az áram ki van kapcsolva?" },
+        { "id": "H_5.4.9", "text": "A kabinkapu kontaktusa tesztelve van-e, hogy meghibásodás esetén lezárjon és megakadályozza a kabin mozgását a kioldási zónán kívül?" }
+      ]
+    },
+    {
+      "id": "sec_6",
+      "title": "6 Felfüggesztés / Védelmi berendezés akaratlan elmozdulás ellen",
+      "questions": [
+        { "id": "H_6.1.a", "text": "A kötelek száma és névleges átmérője egyezik-e?" },
+        { "id": "H_6.1.b", "text": "A megfelelő kötelek vannak felszerelve és a terhelés elosztása biztosított?" },
+        { "id": "H_6.4.1", "text": "A kabin akaratlan elmozdulása elleni védelmi berendezés megfelel-e az üzemi könyv adatainak?" },
+        { "id": "H_6.4.2", "text": "A védelmi berendezés felismeri és megakadályozza a kabin akaratlan elmozdulását a megállótól, ha az akna- és kabinkapu nincs biztosítva?" },
+        { "id": "H_6.4.3", "text": "A biztonsági távolságok betartottak?" },
+        { "id": "H_6.4.4", "text": "A védelmi berendezés kioldásakor az elektromos biztonsági berendezés aktiválódik?" },
+        { "id": "H_6.4.5", "text": "A lift oldása vagy visszaállítása a védelmi berendezés kioldása után csak szakképzett személy által végezhető?" }
+      ]
+    },
+    {
+      "id": "sec_7_1",
+      "title": "7.1 Kabinfogószerkezet",
+      "questions": [
+        { "id": "H_7.1.1", "text": "A megfelelő fogószerkezet van felszerelve?" },
+        { "id": "H_7.1.3", "text": "(Tőrfogó) A fogószerkezet névleges terheléssel névleges sebességnél megállítja-e a kabint?" },
+        { "id": "H_7.1.5", "text": "(Rugós fogó) A fogószerkezet névleges terheléssel névleges sebességnél megállítja-e a kabint?" },
+        { "id": "H_7.1.7", "text": "Fogás közben egyenletesen elosztott terhelésnél a kabinalap legfeljebb 5%-kal dől el a vízszintestől?" },
+        { "id": "H_7.1.8", "text": "A fogószerkezet kioldásakor az elektromos kapcsoló működésbe lép (a meghajtás kikapcsol)?" },
+        { "id": "H_7.1.9", "text": "A fogószerkezet-teszt után a lift kifogástalanul működik?" }
+      ]
+    },
+    {
+      "id": "sec_7_2",
+      "title": "7.2 Sebességkorlátozó (kabin)",
+      "questions": [
+        { "id": "H_7.2.1", "text": "A megfelelő sebességkorlátozó van felszerelve?" },
+        { "id": "H_7.2.2", "text": "A sebességkorlátozó hozzáférhető, vagy távirányítással tesztelhető és visszaállítható?" },
+        { "id": "H_7.2.4", "text": "A sebességkorlátozó elektromos biztonsági eleme megállítja-e a liftet?" },
+        { "id": "H_7.2.6", "text": "A sebességkorlátozó kötél elektromos felügyelete működik és megállítja a liftet?" }
+      ]
+    },
+    {
+      "id": "sec_7_5_6_7",
+      "title": "7.5 Csőtörés-szelep — 7.6 Fojtószelep — 7.7 Süllyedés elleni intézkedések",
+      "questions": [
+        { "id": "H_7.5.1", "text": "A megfelelő csőtörés-szelep van beszerelve?" },
+        { "id": "H_7.5.2", "text": "Van-e vizsgálati célú berendezés a csőtörés-szelephez?" },
+        { "id": "H_7.5.3", "text": "A csőtörés-szelep tesztje sikeres? (A kabin legkésőbb lefelé haladó névleges sebességen + 0,3 m/s-on megáll.)" },
+        { "id": "H_7.6.1", "text": "A megfelelő fojtószelep van beszerelve?" },
+        { "id": "H_7.6.2", "text": "Van-e vizsgálati célú berendezés a fojtószelephez?" },
+        { "id": "H_7.6.3", "text": "A fojtószelep-teszt sikeres? (Kabinsebesség < vmax + 0,3 m/s)" },
+        { "id": "H_7.7.1.1", "text": "(Elektromos süllyedéskorrekciós rendszer) Az elektromos utánállítási rendszer legkésőbb akkor működésbe lép, ha a névleges terheléssel megtelt kabin 120 mm-t süllyed?" },
+        { "id": "H_7.7.1.2", "text": "A kabin önállóan, legkésőbb az utolsó menetindítástól számított 15 perc elteltével a legalsó megállóra hajt?" },
+        { "id": "H_7.8.1", "text": "A vizsgálatok után az esetleges elektromos áthidalások el lettek-e távolítva?" },
+        { "id": "H_7.8.2", "text": "A vizsgálatok után az esetlegesen módosított beállítások visszaállítottak az eredeti állapotra?" }
+      ]
+    },
+    {
+      "id": "sec_8",
+      "title": "8 Hidraulikus berendezés",
+      "questions": [
+        { "id": "H_8.1.1", "text": "A hidraulikus aggregát megfelel-e a gyártó adatainak?" },
+        { "id": "H_8.1.2", "text": "Van-e manométer a megfelelő helyen elhelyezve?" },
+        { "id": "H_8.1.3", "text": "Van-e nyomáskorlátozó szeleppel ellátott kézipumpa? (Fogó- vagy szorítószerkezettel ellátott lift)" },
+        { "id": "H_8.1.4", "text": "Van-e hálózatfüggetlen helyzetjelző (ajtó kioldási zóna), amely vészevakuálás közben jól látható?" },
+        { "id": "H_8.1.5", "text": "A kabin megállási pontossága ±10 mm-en belül van?" },
+        { "id": "H_8.1.6", "text": "20 mm-nél nagyobb szintellérésnél ±20 mm-es utánszabályozás biztosított?" },
+        { "id": "H_8.2.1", "text": "Leengedett kabinnál az olajkészlet megfelelően töltött, és az olajszint könnyen ellenőrizhető, feltölthető és ürítható?" },
+        { "id": "H_8.3.1", "text": "A henger megfelel-e a gyártó adatainak?" },
+        { "id": "H_8.3.2", "text": "A talajba süllyesztett hengernek van-e védőcső?" },
+        { "id": "H_8.4.1.1", "text": "A csővezetékek megfelelnek-e a gyártó adatainak?" },
+        { "id": "H_8.4.2.1", "text": "A tömlővezetékek megfelelnek-e a gyártó adatainak?" },
+        { "id": "H_8.4.2.2", "text": "A tömlővezetékek minimális hajlítási sugarait betartják?" }
+      ]
+    },
+    {
+      "id": "sec_9_10",
+      "title": "9 Elektromos rendszer / Teljesítménymérések — 10 Vezérlés",
+      "questions": [
+        { "id": "H_9.1.1.1", "text": "Az üres kabinnal mért sebesség legfeljebb 108%-a a névleges sebességnek felfelé haladásban?" },
+        { "id": "H_9.1.1.2", "text": "A névleges terheléssel mért sebesség legfeljebb 108%-a a névleges sebességnek lefelé haladásban?" },
+        { "id": "H_9.2.1", "text": "Az NIV-protokoll (Niedervolt-protokoll) el van-e készítve?" },
+        { "id": "H_9.2.1a", "text": "Az NIV-protokoll minden feltétele teljesített?" },
+        { "id": "H_9.2.2", "text": "Minden vezető sín és esetleges aknakeret csatlakoztatva van-e a potenciálkiegyenlítéshez?" },
+        { "id": "H_9.2.3", "text": "Biztosítva van-e, hogy fáziscsere nem vezet veszélyes üzemállapothoz?" },
+        { "id": "H_10.1", "text": "A biztonsági kör tesztelve lett annak biztosítására, hogy egy földzárlat lekapcsolást vált ki? (Lásd NIV-protokoll)" },
+        { "id": "H_10.2", "text": "A nyílt ajtókkal való behajtás és utánállítás áramkörei helyesen működnek?" },
+        { "id": "H_10.3", "text": "A motorüzem-idő felügyelete helyesen van beállítva?" },
+        { "id": "H_10.4", "text": "Az olaJhőmérséklet-felügyelet helyesen működik, és a hőérzékelő kioldása után a lift még eljut a következő megállóig?" },
+        { "id": "H_10.5", "text": "Az ellenőrző vezérlés helyesen működik?" },
+        { "id": "H_10.7", "text": "A rámpajárat-vezérlés helyesen működik?" }
+      ]
+    },
+    {
+      "id": "sec_11",
+      "title": "11 Liftviselkedés tűzvész esetén",
+      "questions": [
+        { "id": "H_11.1", "text": "Van-e tűzeset-vezérlés?" },
+        { "id": "H_11.1.2", "text": "A korai tűzérzékelő és -jelző rendszer jele csatlakoztatva van?" },
+        { "id": "H_11.1.4", "text": "A tűzeset-vezérlés visszaállítása csak kulcsos kapcsolóval lehetséges?" },
+        { "id": "H_11.1.5", "text": "Áramkimaradás vagy vezérlő-reset nem okozza a tűzeset-vezérlés visszaállítását?" },
+        { "id": "H_11.2.1", "text": "A tűzeset-kulcsos kapcsoló biszabil kialakítású és a kulcs minden állásban kihúzható?" },
+        { "id": "H_11.2.2", "text": "A helyi kulcshenger be van építve?" },
+        { "id": "H_11.3.1", "text": "Aktív tűzeset-jelnél minden kabin-, külső-hívó és 'AJTÓ NYITVA' nyomógomb hatástalan?" },
+        { "id": "H_11.3.2", "text": "Aktív tűzeset-jelnél minden tárolt menetparancs törlésre kerül?" },
+        { "id": "H_11.3.3", "text": "Az automatikus ajtók zárnak és a lift megszakítás nélkül a tűzeset-megállóra hajt?" },
+        { "id": "H_11.3.11", "text": "Az ellenőrző vezérlést és az elektromos visszahúzó vezérlést a tűzérzékelő rendszer nem befolyásolja?" }
+      ]
+    },
+    {
+      "id": "sec_12_13",
+      "title": "12 Dokumentáció — 13 Megfelelőségi nyilatkozat",
+      "questions": [
+        { "id": "H_12.1", "text": "Van-e üzemeltetői kézikönyv (üzemi könyv)?" },
+        { "id": "H_12.2", "text": "Van-e kezelési útmutató?" },
+        { "id": "H_13.1", "text": "Minden, a berendezéssel összefüggő alkatrész, amelyért a gyártó/szerelővállalat nem közvetlenül felelős, megfelelő állapotban van-e a lift üzembe helyezéséhez?" },
+        { "id": "H_13.2", "text": "Az előírásoknak való megfelelés igazolásához szükséges minden vizsgálat és ellenőrzés elvégzésre került?" },
+        { "id": "H_13.3", "text": "A megfelelőségi nyilatkozat kiállítható-e ehhez a lifthez?" }
+      ]
+    }
+  ]
+}

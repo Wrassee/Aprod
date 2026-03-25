@@ -1,0 +1,284 @@
+{
+  "groups": [
+    {
+      "id": "sec_2_1",
+      "title": "2.1 Hauptschalter (Anlageschalter)",
+      "questions": [
+        { "id": "H_2.1.2", "text": "Entspricht der Einsatzbereich des Hauptschalters dem im Normalbetrieb auftretendem Maximalstrom?" },
+        { "id": "H_2.1.3", "text": "Ist der Hauptschalter am richtigen Ort montiert?" },
+        { "id": "H_2.1.5", "text": "Ist im Abstand < 1 m vom Aufstellungsort der Maschine der Hauptschalter oder ein Notbremsschalter vorhanden?" },
+        { "id": "H_2.1.6", "text": "Ist im Abstand von < 1 m von dem/den Tableau(s) für Notfälle und Prüfungen der Anlageschalter oder ein Notbremsschalter (Notstopp) vorhanden?" },
+        { "id": "H_2.1.7", "text": "Ist im Rollenraum in der Nähe des Eingangs ein Notbremsschalter (Notstopp) angebracht, funktionstüchtig und dementsprechend gekennzeichnet?" }
+      ]
+    },
+    {
+      "id": "sec_2_2",
+      "title": "2.2 Beleuchtung und Steckdosen",
+      "questions": [
+        { "id": "H_2.2.1", "text": "Beträgt die Lichtstärke im Maschinenraum, bei den Aufstellungsorten der Maschine und der Steuerung mind. 200 Lux auf dem Boden?" },
+        { "id": "H_2.2.2", "text": "Beträgt die Lichtstärke im Rollenraum mind. 100 Lux an den Rollen?" },
+        { "id": "H_2.2.3", "text": "Ist im Rollenraum eine Steckdose nach 13.6.2 vorhanden?" },
+        { "id": "H_2.2.4", "text": "Ist die Energiezufuhr für die Beleuchtung von Kabine, Steuerung, Schacht, Maschinen- und Rollenraum sowie Tableau für Notfälle unabhängig von der Stellung des Anlageschalters?" },
+        { "id": "H_2.2.5", "text": "Besteht für jeden Stromkreis, der mit Schaltern geschaltet wird, eine eigene unabhängige Kurzschlusssicherung?" },
+        { "id": "H_2.2.6", "text": "Beträgt die Lichtstärke an der Einrichtung für Notfälle und Prüfungen mind. 50 Lux und ist ein Schalter für diese Beleuchtung vorhanden?" }
+      ]
+    },
+    {
+      "id": "sec_2_3",
+      "title": "2.3 Abmessungen / Zugang / Fremde Einrichtungen",
+      "questions": [
+        { "id": "H_2.3.1", "text": "Entsprechen Masse und Sicherheitsabstände den Mindestanforderungen?" },
+        { "id": "H_2.3.2", "text": "Ist der Zugang sicher, beleuchtet, direkt und nicht durch private Räume geführt?" },
+        { "id": "H_2.3.3", "text": "Entspricht die Maschinenraumbelüftung dem Dispoplan?" },
+        { "id": "H_2.3.4", "text": "Sind die Türen / Luken mit einem ortsüblichen Zylinder und Innendrehknopf versehen?" },
+        { "id": "H_2.3.5", "text": "Ist das Schliessen und Verriegeln ohne Schlüssel bei einem MRL-Steuerschrank gewährleistet?" },
+        { "id": "H_2.3.6", "text": "Sind Öffnungen im Fussboden mit Manschetten von mind. 50 mm Höhe abgesichert?" },
+        { "id": "H_2.3.7", "text": "Ist der Maschinenraumboden mit einem Laminat oder einem ölfesten Anstrich beschichtet und verhindert eine Schwelle oder ein Ölfauffang das Auslaufen des Öles?" },
+        { "id": "H_2.3.8", "text": "Ist der Maschinenraum frei von fremden Einrichtungen?" }
+      ]
+    },
+    {
+      "id": "sec_2_4",
+      "title": "2.4 Beschriftungen / 2.5 Sprechanlage / 2.6 Hebezubehör",
+      "questions": [
+        { "id": "H_2.4.1", "text": "Sind alle Hinweise und Schilder angebracht?" },
+        { "id": "H_2.4.2", "text": "Sind bei mehreren Aufzügen mit gemeinsamem Maschinenraum alle Anlageteile entsprechend ihrer Zugehörigkeit gekennzeichnet?" },
+        { "id": "H_2.5.1", "text": "Ist bei einer Förderhöhe > 30 m oder wenn eine direkte akustische Verständigung nicht möglich ist, eine Sprechanlage mit Notstromversorgung zwischen dem Notfallort und der Kabine vorhanden?" },
+        { "id": "H_2.6.1", "text": "Sind Mittel zum Heben schwerer Bauelemente vorhanden und mit der zulässigen Tragkraft gekennzeichnet?" }
+      ]
+    },
+    {
+      "id": "sec_3_1",
+      "title": "3.1 Sicherheitsabstände im Schachtkopf",
+      "questions": [
+        { "id": "H_3.1.1", "text": "Entsprechen die Sicherheitsabstände den Norm-Anforderungen, wenn sich der Kolben in der höchsten Stellung befindet oder die Schutzraumsicherung aktiviert ist?" },
+        { "id": "H_3.1.2", "text": "Beträgt die Standfläche auf dem Kabinendach min. 0.12 m² und beträgt die kleinere Seitenlänge mindestens 250 mm?" },
+        { "id": "H_3.1.3", "text": "Entspricht der Schutzraum auf dem Kabinendach einem Quader von min. 500 x 600 x 800 mm?" },
+        { "id": "H_3.1.4", "text": "Entspricht die noch vorhandene Führungsdistanz des Ausgleichsgewichts dem Nennwert, wenn die Kabine auf den voll komprimierten Puffern aufliegt?" },
+        { "id": "H_3.1.6", "text": "Ist der Notendschalter korrekt positioniert und funktionstüchtig?" }
+      ]
+    },
+    {
+      "id": "sec_3_2",
+      "title": "3.2 Sicherheitsabstände in der Schachtgrube",
+      "questions": [
+        { "id": "H_3.2.1", "text": "Entsprechen die Sicherheitsabstände den Norm-Anforderungen, wenn die Kabine auf den völlig zusammengedrückten Puffern ruht?" },
+        { "id": "H_3.2.2", "text": "Entspricht der Schutzraum unter der Kabine einem Quader von min. 500 x 600 x 1000 mm?" },
+        { "id": "H_3.2.3", "text": "Entspricht bei vermindertem Schutzraum die Sicherungseinrichtung der Entwurfsprüfung im Aufzugsbuch?" },
+        { "id": "H_3.2.4", "text": "Beträgt der Abstand zwischen Kabinenboden und unterster Haltestelle < 120 mm, wenn die Kabine mit Nennlast auf den Puffern aufliegt?" }
+      ]
+    },
+    {
+      "id": "sec_3_3",
+      "title": "3.3 Puffer",
+      "questions": [
+        { "id": "H_3.3.1.1", "text": "Entsprechen die installierten Kabinenpuffer den Angaben im Aufzugsbuch?" },
+        { "id": "H_3.3.1.2", "text": "(Energiespeichernde Puffer) Entspricht der Pufferhub den Herstellerangaben, wenn die Kabine mit Nennlast und schlaffen Seilen auf den Puffer aufsetzt?" },
+        { "id": "H_3.3.1.3", "text": "(Energieverzehrende Puffer) Ist eine Beeinträchtigung des Aufzugs ausgeschlossen, wenn die Kabine mit Nennlast auf den Puffer aufsetzt?" },
+        { "id": "H_3.3.1.4", "text": "Funktioniert der Aufzug nach dem Puffer-Test einwandfrei?" }
+      ]
+    },
+    {
+      "id": "sec_3_4",
+      "title": "3.4 Sicherheit im Schacht",
+      "questions": [
+        { "id": "H_3.4.1", "text": "Sind in einer vollen Schachtumwehrung nur die zulässigen Öffnungen vorhanden?" },
+        { "id": "H_3.4.2", "text": "Sind ebene oder gebogene Glasscheiben im Verkehrsbereich aus Verbundsicherheitsglas?" },
+        { "id": "H_3.4.3", "text": "Ist eine feste Abtrennung beim Ausgleichsgewicht vorhanden?" },
+        { "id": "H_3.4.4", "text": "Entspricht der Abstand zwischen Ausgleichsgewicht und Kabine mindestens 50 mm?" },
+        { "id": "H_3.4.5", "text": "Ist bei Aufzügen in gemeinsamem Schacht eine Abtrennung in der Schachtgrube vorhanden (Höhe bis 2.5 m über dem Niveau der untersten Haltestelle)?" },
+        { "id": "H_3.4.7", "text": "Genügen die Wartungs- und Nottüren sowie die Wartungsklappen den Anforderungen?" },
+        { "id": "H_3.4.8", "text": "Erfüllt der Zugang zur Schachtgrube die Anforderungen (Leiter)?" },
+        { "id": "H_3.4.10", "text": "Entspricht die Schachtentlüftung den Angaben gemäss Dispoplan?" },
+        { "id": "H_3.4.11", "text": "Entspricht die Schachtwand an der Zugangsseite den Angaben gemäss Dispoplan bzw. der Norm?" },
+        { "id": "H_3.4.12", "text": "Sind keine aufzugsfremden Einrichtungen im Schacht?" },
+        { "id": "H_3.4.13", "text": "Wurden bei betretbaren Räumen unter der Schachtgrube geeignete Schutzmassnahmen getroffen?" },
+        { "id": "H_3.4.14", "text": "Sind an den Seilrollen und Kettenrädern die nötigen Schutzeinrichtungen vorhanden?" },
+        { "id": "H_3.4.15", "text": "Ist der Schachtgrubenschalter (Notbremsschalter) korrekt positioniert, funktionstüchtig und dementsprechend gekennzeichnet?" },
+        { "id": "H_3.4.16", "text": "Ist eine Notrufeinrichtung für die Befreiung aus der Schachtgrube angebracht und funktionstüchtig?" },
+        { "id": "H_3.4.17", "text": "Funktioniert die mechanische Einrichtung zum Anhalten der Kabine während der Wartungs- und Prüfarbeiten?" }
+      ]
+    },
+    {
+      "id": "sec_3_5",
+      "title": "3.5 Schachtbeleuchtung / Steckdose — 3.6 Führungsschienen",
+      "questions": [
+        { "id": "H_3.5.1", "text": "Beträgt die Schachtbeleuchtungsstärke auf einer Höhe von 1000 mm über dem Kabinendach oder dem Grubenboden mind. 50 Lux?" },
+        { "id": "H_3.5.3", "text": "Kann die Schachtbeleuchtung sowohl vom Schachtgrubenzugang als auch in der Nähe des Hauptschalters ein- und ausgeschaltet werden?" },
+        { "id": "H_3.5.4", "text": "Ist in der Schachtgrube und beim Aufstellungsort der Maschine und der Steuerung eine Steckdose vorhanden?" },
+        { "id": "H_3.6.1", "text": "Entsprechen die Abmessungen der Führungsschienen den Angaben des Herstellers?" },
+        { "id": "H_3.6.2", "text": "Entspricht der Schienenbefestigungsbügel-Abstand dem Dispoplan?" }
+      ]
+    },
+    {
+      "id": "sec_4_1",
+      "title": "4.1 Schachttüren",
+      "questions": [
+        { "id": "H_4.1.1", "text": "Betragen bei geschlossener Tür die Spalte zwischen den Türblättern oder zwischen Türblättern und Türrahmen oder der Schwelle höchstens 6 mm?" },
+        { "id": "H_4.1.2", "text": "Betragen die Vertiefungen und Erhöhungen auf der Aussenseite der Schachttüren höchstens 3 mm?" },
+        { "id": "H_4.1.3", "text": "Entsprechen die Schachttüren der richtigen Feuerwiderstandsklasse?" },
+        { "id": "H_4.1.8", "text": "Sind die richtigen Türverriegelungen angebracht?" },
+        { "id": "H_4.1.9", "text": "Sind die Kontakte an jeder Schachttür getestet worden, so dass sie bei einem Defekt sperren und die Bewegung der Kabine ausserhalb der Entriegelungszone verhindern?" },
+        { "id": "H_4.1.10", "text": "Beträgt der Eingriff der Sperrmittel mind. 7 mm, bevor die Kabine wegfahren kann?" },
+        { "id": "H_4.1.11", "text": "Sind die mechanischen Verriegelungen an jeder Schachttür auf korrekte Verriegelung getestet worden?" },
+        { "id": "H_4.1.13", "text": "Beträgt die Entriegelungszone max. 200 mm ober- und unterhalb der Schachttüren (bzw. 350 mm bei gleichzeitig betriebenen Kabinen- und Schachttüren)?" },
+        { "id": "H_4.1.14", "text": "Funktioniert der automatische Schliessmechanismus korrekt?" },
+        { "id": "H_4.1.15", "text": "Entsprechen die Schürzen den Mindestanforderungen bezüglich Länge, Abschrägung usw.?" },
+        { "id": "H_4.1.16", "text": "Kann jede Schachttüre mit einem Notschlüssel von aussen entriegelt werden?" },
+        { "id": "H_4.1.18", "text": "Erreicht die Beleuchtung in der Nähe der Schachttüren auf dem Fussboden mindestens 50 Lux?" },
+        { "id": "H_4.1.19", "text": "Sind in den Haltestellen Verbotszeichen nach ISO 3864-1:2002 angebracht? (Aufzug im Brandfall nicht benützen)" }
+      ]
+    },
+    {
+      "id": "sec_5_1",
+      "title": "5.1 Kabine innen",
+      "questions": [
+        { "id": "H_5.1.1", "text": "Sind die Angaben über die Nennlast, Name des Herstellers / Montagebetriebs, Anzahl Personen und Fabrik-Nr. in der Kabine vorhanden?" },
+        { "id": "H_5.1.4", "text": "Gestattet die Kabinennotrufeinrichtung ein Gegensprechen mit einem Pikettdienst?" },
+        { "id": "H_5.1.5", "text": "Erreicht die Beleuchtung in der Kabine einen Mindestwert von 50 Lux am Boden und an den Bedienelementen?" },
+        { "id": "H_5.1.6", "text": "Funktioniert die Notbeleuchtung in der Kabine?" },
+        { "id": "H_5.1.7", "text": "Funktioniert die Kabinenüberlastsicherung gemäss Vorschrift (bei einer Überlast von 10% aber min. 75 kg)?" },
+        { "id": "H_5.1.9", "text": "Ist in der Kabine für genügend Belüftung gesorgt?" },
+        { "id": "H_5.1.10", "text": "Sind Kabinenwände, Boden und Dach vollwandig, ausgenommen zugelassene Lüftungsöffnungen?" }
+      ]
+    },
+    {
+      "id": "sec_5_2",
+      "title": "5.2 Kabinendach / 5.3 Kabinentüre",
+      "questions": [
+        { "id": "H_5.2.1", "text": "Sind auf dem Kabinendach Steuereinrichtung (Inspektionssteuerung), Notstopp (Notbremsschalter) und Steckdose korrekt platziert und getestet?" },
+        { "id": "H_5.2.2", "text": "Funktioniert die Notrufeinrichtung auf dem Kabinendach korrekt?" },
+        { "id": "H_5.3.1", "text": "Betragen bei geschlossener Kabinentür die Spalte zwischen den Türblättern oder zwischen Türblättern und Türrahmen höchstens 6 mm?" },
+        { "id": "H_5.3.2", "text": "Betragen die Vertiefungen und Erhöhungen auf der Innenseite der Kabinentüren höchstens 3 mm?" },
+        { "id": "H_5.3.3", "text": "Beträgt der horizontale Abstand zwischen Schachttür- und Kabinentürschwelle max. 35 mm?" },
+        { "id": "H_5.3.10", "text": "Entspricht die Kabinentürschürze den Mindestanforderungen bezüglich Länge, Abschrägung usw.?" }
+      ]
+    },
+    {
+      "id": "sec_5_4",
+      "title": "5.4 Kabinentürprüfung",
+      "questions": [
+        { "id": "H_5.4.1", "text": "Ist die maximal aufzuwendende Kraft zur Verhinderung des Schliessens 150 N oder geringer?" },
+        { "id": "H_5.4.2", "text": "Betragen die Abstände bei einer Handkraft von 150 N in Öffnungsrichtung am ungünstigsten Punkt der Schliesskante max. 30 mm (einseitig öffnend) bzw. 45 mm (mittig öffnend)?" },
+        { "id": "H_5.4.3", "text": "Beträgt die kinetische Energie bei mittlerer Schliessgeschwindigkeit max. 10 J?" },
+        { "id": "H_5.4.4", "text": "Öffnet eine Schutzeinrichtung die Türe wieder, wenn eine Person im Türbereich getroffen wird oder werden könnte?" },
+        { "id": "H_5.4.6", "text": "Kann die Kabinentür innerhalb der Entriegelungszone mit max. 300 N manuell geöffnet werden, wenn der Strom abgeschaltet ist?" },
+        { "id": "H_5.4.9", "text": "Sind die Kontakte an der Kabinentür getestet worden, so dass sie bei einem Defekt sperren und die Bewegung der Kabine ausserhalb der Entriegelungszone verhindern?" }
+      ]
+    },
+    {
+      "id": "sec_6",
+      "title": "6 Aufhängung / Schutz gegen unbeabsichtigte Bewegung",
+      "questions": [
+        { "id": "H_6.1.a", "text": "Stimmen Anzahl und Nenndurchmesser der Tragmittel (Seile)?" },
+        { "id": "H_6.1.b", "text": "Wurden die richtigen Tragmittelenden montiert und ist die Lastverteilung zwischen den Tragmitteln sichergestellt?" },
+        { "id": "H_6.4.1", "text": "Entspricht die Schutzeinrichtung für ein unbeabsichtigtes Bewegen der Kabine den Angaben im Aufzugsbuch?" },
+        { "id": "H_6.4.2", "text": "Erkennt und verhindert die Schutzeinrichtung ein unbeabsichtigtes Bewegen der Kabine im Bereich von der Haltestelle weg, wenn Schacht- und Kabinentüre nicht gesichert sind?" },
+        { "id": "H_6.4.3", "text": "Werden die entsprechenden Sicherheitsabstände eingehalten?" },
+        { "id": "H_6.4.4", "text": "Wird beim Ansprechen der Schutzeinrichtung die elektrische Sicherheitseinrichtung betätigt?" },
+        { "id": "H_6.4.5", "text": "Kann das Lösen oder das Rückstellen des Aufzuges nach dem Ansprechen der Schutzeinrichtung nur durch eine sachkundige Person ausgeführt werden?" }
+      ]
+    },
+    {
+      "id": "sec_7_1",
+      "title": "7.1 Kabinenfangvorrichtung",
+      "questions": [
+        { "id": "H_7.1.1", "text": "Ist die richtige Fangvorrichtung vorhanden?" },
+        { "id": "H_7.1.3", "text": "(Sperrfangvorrichtung) Hält die Fangvorrichtung die Kabine mit Nennlast bei Nenngeschwindigkeit an?" },
+        { "id": "H_7.1.5", "text": "(Bremsfangvorrichtung) Hält die Fangvorrichtung die Kabine mit Nennlast bei Nenngeschwindigkeit an?" },
+        { "id": "H_7.1.7", "text": "Neigt sich der Kabinenboden beim Fangen mit gleichmässig verteilter Last um höchstens 5% von der Horizontalen?" },
+        { "id": "H_7.1.8", "text": "Funktioniert die elektrische Abschaltvorrichtung beim Auslösen der Fangvorrichtung (Antrieb wird ausgeschaltet)?" },
+        { "id": "H_7.1.9", "text": "Funktioniert der Aufzug nach dem Fangvorrichtungstest einwandfrei?" }
+      ]
+    },
+    {
+      "id": "sec_7_2",
+      "title": "7.2 Geschwindigkeitsbegrenzer (Kabine)",
+      "questions": [
+        { "id": "H_7.2.1", "text": "Ist der richtige Geschwindigkeitsbegrenzer vorhanden?" },
+        { "id": "H_7.2.2", "text": "Ist der Geschwindigkeitsbegrenzer zugänglich oder kann er per Fernauslösung getestet und zurückgesetzt werden?" },
+        { "id": "H_7.2.4", "text": "Hält das elektrische Sicherheitsbauteil am Geschwindigkeitsbegrenzer den Aufzug an?" },
+        { "id": "H_7.2.6", "text": "Funktioniert die elektrische Überwachung des Geschwindigkeitsbegrenzerseils und hält den Aufzug an?" }
+      ]
+    },
+    {
+      "id": "sec_7_5_6_7",
+      "title": "7.5 Rohrbruchventil — 7.6 Drosselventil — 7.7 Massnahmen gegen Absinken",
+      "questions": [
+        { "id": "H_7.5.1", "text": "Ist das richtige Rohrbruchventil eingebaut?" },
+        { "id": "H_7.5.2", "text": "Ist eine Einrichtung für Prüfzwecke des Rohrbruchventils vorhanden?" },
+        { "id": "H_7.5.3", "text": "Ist der Test des Rohrbruchventils erfolgreich? (Die Kabine stoppt spätestens bei Abwärts-Nenngeschwindigkeit zuzüglich 0.3 m/s.)" },
+        { "id": "H_7.6.1", "text": "Ist das richtige Drosselventil eingebaut?" },
+        { "id": "H_7.6.2", "text": "Ist eine Einrichtung für Prüfzwecke des Drosselventils vorhanden?" },
+        { "id": "H_7.6.3", "text": "Ist der Drosseltest erfolgreich? (Kabinengeschwindigkeit < vmax + 0.3 m/s)" },
+        { "id": "H_7.7.1.1", "text": "(Elektr. Absinkkorrektursystem) Funktioniert das elektrische System zur Nachkorrektur, spätestens wenn die mit Nennlast beladene Kabine um 120 mm absinkt?" },
+        { "id": "H_7.7.1.2", "text": "Fährt die Kabine selbständig spätestens nach 15 Min. nach der letzten Fahrt zur untersten Haltestelle?" },
+        { "id": "H_7.8.1", "text": "Wurden allfällige elektrische Überbrückungen nach den Prüfungen entfernt?" },
+        { "id": "H_7.8.2", "text": "Wurden allfällig veränderte Einstellungen nach den Prüfungen in ihren ursprünglichen Zustand gebracht?" }
+      ]
+    },
+    {
+      "id": "sec_8",
+      "title": "8 Hydraulikanlage",
+      "questions": [
+        { "id": "H_8.1.1", "text": "Entspricht das Hydraulikaggregat den Herstellerangaben?" },
+        { "id": "H_8.1.2", "text": "Ist ein Manometer in der richtigen Position vorhanden?" },
+        { "id": "H_8.1.3", "text": "Ist eine Handpumpe mit Druckbegrenzungsventil vorhanden? (Aufzug mit Fang- oder Klemmvorrichtung)" },
+        { "id": "H_8.1.4", "text": "Ist eine netzunabhängige Positionsanzeige (Türentriegelungsbereich) vorhanden und so angebracht, dass sie während dem Notevakuieren gut sichtbar ist?" },
+        { "id": "H_8.1.5", "text": "Liegt die Anhaltegenauigkeit der Kabine innerhalb ±10 mm?" },
+        { "id": "H_8.1.6", "text": "Ist bei einer Bündigabweichung von mehr als 20 mm eine Nachregulierung von ±20 mm gewährleistet?" },
+        { "id": "H_8.2.1", "text": "Ist bei abgesenkter Kabine der Ölbehälter angemessen gefüllt und kann der Ölstand leicht nachgeprüft, nachgefüllt und entleert werden?" },
+        { "id": "H_8.3.1", "text": "Entspricht der Heber den Herstellerangaben?" },
+        { "id": "H_8.3.2", "text": "Ist der im Untergrund eingelassene Heber mit einem Schutzrohr versehen?" },
+        { "id": "H_8.4.1.1", "text": "Entsprechen die Rohrleitungen den Herstellerangaben?" },
+        { "id": "H_8.4.2.1", "text": "Entsprechen die Schlauchleitungen den Herstellerangaben?" },
+        { "id": "H_8.4.2.2", "text": "Werden die minimalen Biegeradien der Schlauchleitungen eingehalten?" }
+      ]
+    },
+    {
+      "id": "sec_9_10",
+      "title": "9 Elektrisches System / Leistungsmessungen — 10 Steuerung",
+      "questions": [
+        { "id": "H_9.1.1.1", "text": "Beträgt die gemessene Geschwindigkeit mit leerer Kabine höchstens 108% der Nenngeschwindigkeit in Aufwärtsrichtung?" },
+        { "id": "H_9.1.1.2", "text": "Beträgt die gemessene Geschwindigkeit mit Nennlast höchstens 108% der Nenngeschwindigkeit in Abwärtsrichtung?" },
+        { "id": "H_9.2.1", "text": "Ist das NIV-Protokoll (Niedervolt-Protokoll) erstellt worden?" },
+        { "id": "H_9.2.1a", "text": "Sind alle Bedingungen des NIV-Protokolls erfüllt?" },
+        { "id": "H_9.2.2", "text": "Sind alle Führungsschienen und ein allfälliges Schachtgerüst mit dem Potenzialausgleich verbunden?" },
+        { "id": "H_9.2.3", "text": "Ist gewährleistet, dass eine Phasenumkehrung nicht zu einem gefährlichen Betriebszustand führen kann?" },
+        { "id": "H_10.1", "text": "Wurde der Sicherheitskreis geprüft, um zu gewährleisten, dass ein Erdfehler eine Abschaltung auslöst? (Siehe NIV-Protokoll)" },
+        { "id": "H_10.2", "text": "Funktionieren die Schaltkreise zum Einfahren und zur Nachstellung bei offenen Türen?" },
+        { "id": "H_10.3", "text": "Ist die Motorlaufzeitüberwachung korrekt eingestellt?" },
+        { "id": "H_10.4", "text": "Funktioniert die Überwachung der Öltemperatur korrekt und fährt der Aufzug nach dem Auslösen des Temperaturfühlers noch bis zum nächsten Halt?" },
+        { "id": "H_10.5", "text": "Funktioniert die Inspektionssteuerung korrekt?" },
+        { "id": "H_10.7", "text": "Funktioniert die Rampenfahrtsteuerung korrekt?" }
+      ]
+    },
+    {
+      "id": "sec_11",
+      "title": "11 Verhalten von Aufzügen im Brandfall",
+      "questions": [
+        { "id": "H_11.1", "text": "Ist eine Brandfallsteuerung vorhanden?" },
+        { "id": "H_11.1.2", "text": "Ist das Signal der Brandfrüherkennungs- und -meldeanlage aufgeschaltet?" },
+        { "id": "H_11.1.4", "text": "Erfolgt die Rückstellung der Brandfallsteuerung nur mit dem Schlüsselschalter?" },
+        { "id": "H_11.1.5", "text": "Führt ein Stromunterbruch oder ein Steuerungsreset nicht zu einem Rückstellen der Brandfallsteuerung?" },
+        { "id": "H_11.2.1", "text": "Ist der Brandfallschlüsselschalter bistabil eingerichtet und der Schlüssel in jeder Stellung abziehbar?" },
+        { "id": "H_11.2.2", "text": "Ist der ortsübliche Schlüsselzylinder eingebaut?" },
+        { "id": "H_11.3.1", "text": "Sind beim aktiven Brandfallsignal alle Kabinen-, Aussenruf- und der 'TÜR AUF'-Taster unwirksam?" },
+        { "id": "H_11.3.2", "text": "Werden beim aktiven Brandfallsignal alle gespeicherten Fahrbefehle gelöscht?" },
+        { "id": "H_11.3.3", "text": "Schliessen die automatischen Türen und fährt der Aufzug ohne Unterbrechung in die Brandfallhaltestelle?" },
+        { "id": "H_11.3.11", "text": "Werden die Inspektionssteuerung und die elektrische Rückholsteuerung nicht durch das Branderkennungssystem beeinträchtigt?" }
+      ]
+    },
+    {
+      "id": "sec_12_13",
+      "title": "12 Unterlagen — 13 Konformitätserklärung",
+      "questions": [
+        { "id": "H_12.1", "text": "Ist ein Betreiberhandbuch (Aufzugsbuch) vorhanden?" },
+        { "id": "H_12.2", "text": "Ist eine Betriebsanleitung vorhanden?" },
+        { "id": "H_13.1", "text": "Befinden sich sämtliche mit der Anlage zusammenhängenden Teile, für die der Hersteller nicht direkt verantwortlich ist, in einem geeigneten Zustand, damit der Aufzug in Betrieb gesetzt werden kann?" },
+        { "id": "H_13.2", "text": "Wurden sämtliche Prüfungen und Untersuchungen zum Nachweis der Übereinstimmung mit den Vorschriften durchgeführt?" },
+        { "id": "H_13.3", "text": "Kann die Konformitätserklärung für diesen Aufzug ausgestellt werden?" }
+      ]
+    }
+  ]
+}

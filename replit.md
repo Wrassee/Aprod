@@ -54,6 +54,12 @@ Prefers free AI APIs (Groq) over paid solutions.
   - Downloadable user manual in HTML format
 - **Modern Calendar Date Picker**: `calendar.tsx` redesigned with dark glassmorphism style (Syne + DM Mono fonts, indigo gradient, blur backdrop). `PageHeader.tsx` uses Radix Popover + react-day-picker with locale-aware `PP` date format for all 5 languages. Date picker only shown on relevant pages (not on lift selector).
 
+## MOD_HYD Hydraulic Protocol — Work In Progress
+- **Question JSON files created** (all 5 languages): `public/questions_hydro_de.json`, `questions_hydro_hu.json`, `questions_hydro_en.json`, `questions_hydro_fr.json`, `questions_hydro_it.json`
+- **Structure**: 21 groups, ~164 Ja/Nein questions extracted from ABNAHME_HYDRO.DOC (sections 2–13)
+- **ID format**: `H_2.1.2`, `H_7.5.3`, etc. — matching document section numbers
+- **Next steps**: (1) User uploads PDF AcroForm → extract field names; (2) Create `server/config/hydro-pdf-mapping.ts`; (3) Create `server/services/hydro-pdf-service.ts`; (4) Create `src/pages/hydraulic-protocol.tsx`; (5) Add `/download-hydro-pdf` route; (6) Wire MOD_HYD subtype in App.tsx
+
 ## Recent Changes (v0.9.8)
 - **Modern Calendar Date Picker**: HTML `<input type="date">` replaced with dark glassmorphism Radix Popover + react-day-picker Calendar in `PageHeader.tsx`. Locale-aware `PP` format, `isValid()` guard, Syne + DM Mono fonts.
 - **Lift Selector Date Picker Fix**: Removed `receptionDate`/`onReceptionDateChange` props from all 3 PageHeader instances in `lift-selector.tsx` — date picker no longer appears during lift type/subtype selection.

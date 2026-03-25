@@ -1,0 +1,200 @@
+{
+  "groups": [
+    { "id": "sec_2_1", "title": "2.1 Main Switch", "questions": [
+      { "id": "H_2.1.2", "text": "Does the main switch operating range correspond to the maximum current occurring in normal operation?" },
+      { "id": "H_2.1.3", "text": "Is the main switch installed in the correct location?" },
+      { "id": "H_2.1.5", "text": "Is there a main switch or emergency stop switch within < 1 m of the machine installation location?" },
+      { "id": "H_2.1.6", "text": "Is there an installation switch or emergency stop within < 1 m of the emergency and test tableau(s)?" },
+      { "id": "H_2.1.7", "text": "Is an emergency stop switch installed near the entrance of the pulley room, functional and appropriately labelled?" }
+    ]},
+    { "id": "sec_2_2", "title": "2.2 Lighting and Sockets", "questions": [
+      { "id": "H_2.2.1", "text": "Is the light intensity in the machine room, at the machine and control installation locations, at least 200 lux on the floor?" },
+      { "id": "H_2.2.2", "text": "Is the light intensity in the pulley room at least 100 lux at the pulleys?" },
+      { "id": "H_2.2.3", "text": "Is a socket outlet per 13.6.2 available in the pulley room?" },
+      { "id": "H_2.2.4", "text": "Is the power supply for the lighting of the car, control, shaft, machine and pulley room, and emergency tableau independent of the position of the installation switch?" },
+      { "id": "H_2.2.5", "text": "Does each circuit controlled by switches have its own independent short-circuit protection?" },
+      { "id": "H_2.2.6", "text": "Is the light intensity at the emergency and test equipment at least 50 lux and is a switch for this lighting provided?" }
+    ]},
+    { "id": "sec_2_3", "title": "2.3 Dimensions / Access / Foreign Installations", "questions": [
+      { "id": "H_2.3.1", "text": "Do the dimensions and safety clearances meet the minimum requirements?" },
+      { "id": "H_2.3.2", "text": "Is the access safe, lit, direct and not routed through private areas?" },
+      { "id": "H_2.3.3", "text": "Does the machine room ventilation comply with the layout plan?" },
+      { "id": "H_2.3.4", "text": "Are the doors/hatches fitted with a conventional cylinder lock and interior turn knob?" },
+      { "id": "H_2.3.5", "text": "Is closing and locking without a key guaranteed for an MRL control cabinet?" },
+      { "id": "H_2.3.6", "text": "Are floor openings secured with collars of at least 50 mm height?" },
+      { "id": "H_2.3.7", "text": "Is the machine room floor coated with laminate or oil-resistant paint, and does a threshold or oil catch prevent oil from leaking?" },
+      { "id": "H_2.3.8", "text": "Is the machine room free of foreign installations?" }
+    ]},
+    { "id": "sec_2_4", "title": "2.4 Labels / 2.5 Intercom / 2.6 Lifting Equipment", "questions": [
+      { "id": "H_2.4.1", "text": "Are all notices and signs in place?" },
+      { "id": "H_2.4.2", "text": "For multiple lifts with a shared machine room, are all installation components identified according to their affiliation?" },
+      { "id": "H_2.5.1", "text": "For a travel height > 30 m or where direct acoustic communication is not possible, is an intercom with emergency power supply available between the emergency intervention location and the car?" },
+      { "id": "H_2.6.1", "text": "Are means for lifting heavy components available and marked with the permissible load capacity?" }
+    ]},
+    { "id": "sec_3_1", "title": "3.1 Safety Clearances at the Top of the Shaft", "questions": [
+      { "id": "H_3.1.1", "text": "Do the safety clearances comply with the standard requirements when the piston is in the uppermost position limited by the travel limiter, or the refuge space safety device is activated?" },
+      { "id": "H_3.1.2", "text": "Is the standing area on the car roof at least 0.12 m² and is the smaller side length at least 250 mm?" },
+      { "id": "H_3.1.3", "text": "Does the refuge space on the car roof correspond to a cuboid of at least 500 x 600 x 800 mm?" },
+      { "id": "H_3.1.4", "text": "Does the remaining guide length of the counterweight correspond to the rated value when the car rests on the fully compressed buffers?" },
+      { "id": "H_3.1.6", "text": "Is the final limit switch correctly positioned and functional?" }
+    ]},
+    { "id": "sec_3_2", "title": "3.2 Safety Clearances in the Pit", "questions": [
+      { "id": "H_3.2.1", "text": "Do the safety clearances comply with the standard requirements when the car rests on the fully compressed buffers?" },
+      { "id": "H_3.2.2", "text": "Does the refuge space under the car correspond to a cuboid of at least 500 x 600 x 1000 mm?" },
+      { "id": "H_3.2.3", "text": "For a reduced refuge space, does the safety device comply with the design examination in the lift book?" },
+      { "id": "H_3.2.4", "text": "Is the distance between the car floor and the lowest landing less than 120 mm when the car with rated load rests on the buffers?" }
+    ]},
+    { "id": "sec_3_3", "title": "3.3 Buffers", "questions": [
+      { "id": "H_3.3.1.1", "text": "Do the installed car buffers comply with the specifications in the lift book?" },
+      { "id": "H_3.3.1.2", "text": "(Energy accumulation buffers) Does the buffer stroke comply with the manufacturer's specifications when the car with rated load and slack ropes lands on the buffer?" },
+      { "id": "H_3.3.1.3", "text": "(Energy dissipation buffers) Is damage to the lift ruled out when the car with rated load lands on the buffer?" },
+      { "id": "H_3.3.1.4", "text": "Does the lift function correctly after the buffer test?" }
+    ]},
+    { "id": "sec_3_4", "title": "3.4 Shaft Safety", "questions": [
+      { "id": "H_3.4.1", "text": "In a fully enclosed shaft enclosure, are only the permitted openings present?" },
+      { "id": "H_3.4.2", "text": "Are flat or curved glass panels in the traffic area made of laminated safety glass?" },
+      { "id": "H_3.4.3", "text": "Is a solid partition at the counterweight present?" },
+      { "id": "H_3.4.4", "text": "Is the distance between counterweight and car at least 50 mm?" },
+      { "id": "H_3.4.5", "text": "For lifts in a shared shaft, is a partition in the pit present (height up to 2.5 m above the lowest landing)?" },
+      { "id": "H_3.4.7", "text": "Do the maintenance and emergency doors and maintenance hatches meet the requirements?" },
+      { "id": "H_3.4.8", "text": "Does the access to the pit meet the requirements (ladder)?" },
+      { "id": "H_3.4.10", "text": "Does the shaft ventilation comply with the layout plan specifications?" },
+      { "id": "H_3.4.11", "text": "Does the shaft wall on the access side comply with the layout plan or standard specifications?" },
+      { "id": "H_3.4.12", "text": "Are there no foreign installations in the shaft?" },
+      { "id": "H_3.4.13", "text": "For accessible rooms below the pit, have appropriate protective measures been taken?" },
+      { "id": "H_3.4.14", "text": "Are the necessary guards present at the rope pulleys and chain wheels?" },
+      { "id": "H_3.4.15", "text": "Is the pit switch (emergency stop switch) correctly positioned, functional and appropriately labelled?" },
+      { "id": "H_3.4.16", "text": "Is an emergency call device for rescue from the pit installed and functional?" },
+      { "id": "H_3.4.17", "text": "Does the mechanical device for stopping the car during maintenance and inspection work function correctly?" }
+    ]},
+    { "id": "sec_3_5", "title": "3.5 Shaft Lighting / Socket — 3.6 Guide Rails", "questions": [
+      { "id": "H_3.5.1", "text": "Is the shaft illumination at least 50 lux at a height of 1000 mm above the car roof or pit floor?" },
+      { "id": "H_3.5.3", "text": "Can the shaft lighting be switched on and off from both the pit access and near the main switch?" },
+      { "id": "H_3.5.4", "text": "Is a socket outlet available in the pit and at the machine and control installation location?" },
+      { "id": "H_3.6.1", "text": "Do the dimensions of the guide rails comply with the manufacturer's specifications?" },
+      { "id": "H_3.6.2", "text": "Does the guide rail bracket spacing comply with the layout plan?" }
+    ]},
+    { "id": "sec_4_1", "title": "4.1 Landing Doors", "questions": [
+      { "id": "H_4.1.1", "text": "With the door closed, do the gaps between door panels or between panels and frame or sill not exceed 6 mm?" },
+      { "id": "H_4.1.2", "text": "Do the recesses and projections on the outer side of landing doors not exceed 3 mm?" },
+      { "id": "H_4.1.3", "text": "Do the landing doors correspond to the correct fire resistance class?" },
+      { "id": "H_4.1.8", "text": "Are the correct door locks installed?" },
+      { "id": "H_4.1.9", "text": "Have the contacts on each landing door been tested to ensure they lock on failure and prevent car movement outside the unlocking zone?" },
+      { "id": "H_4.1.10", "text": "Do the locking elements engage at least 7 mm before the car can move?" },
+      { "id": "H_4.1.11", "text": "Have the mechanical locks on each landing door been tested for correct locking?" },
+      { "id": "H_4.1.13", "text": "Is the unlocking zone a maximum of 200 mm above and below the landing doors (or 350 mm for simultaneously operated car and landing doors)?" },
+      { "id": "H_4.1.14", "text": "Does the automatic closing mechanism work correctly?" },
+      { "id": "H_4.1.15", "text": "Do the door aprons meet the minimum requirements regarding length, chamfering, etc.?" },
+      { "id": "H_4.1.16", "text": "Can each landing door be unlocked from the outside with an emergency key?" },
+      { "id": "H_4.1.18", "text": "Is the illumination at the landing doors on the floor at least 50 lux?" },
+      { "id": "H_4.1.19", "text": "Are prohibitory signs as per ISO 3864-1:2002 installed at the landings? (Do not use lift in case of fire)" }
+    ]},
+    { "id": "sec_5_1", "title": "5.1 Car Interior", "questions": [
+      { "id": "H_5.1.1", "text": "Is information on rated load, manufacturer/installer name, number of persons and serial number present in the car?" },
+      { "id": "H_5.1.4", "text": "Does the car emergency call device allow two-way communication with a duty service?" },
+      { "id": "H_5.1.5", "text": "Does the car lighting achieve a minimum of 50 lux on the floor and at the controls?" },
+      { "id": "H_5.1.6", "text": "Does the emergency lighting in the car work?" },
+      { "id": "H_5.1.7", "text": "Does the overload protection function as required (at 10% overload but min. 75 kg)?" },
+      { "id": "H_5.1.9", "text": "Is adequate ventilation provided in the car?" },
+      { "id": "H_5.1.10", "text": "Are car walls, floor and ceiling solid, except for permitted ventilation openings?" }
+    ]},
+    { "id": "sec_5_2", "title": "5.2 Car Roof / 5.3 Car Door", "questions": [
+      { "id": "H_5.2.1", "text": "Are the inspection control, emergency stop and socket outlet on the car roof correctly positioned and tested?" },
+      { "id": "H_5.2.2", "text": "Does the emergency call device on the car roof work correctly?" },
+      { "id": "H_5.3.1", "text": "With the car door closed, do the gaps between panels or between panels and frame not exceed 6 mm?" },
+      { "id": "H_5.3.2", "text": "Do the recesses and projections on the inner side of car doors not exceed 3 mm?" },
+      { "id": "H_5.3.3", "text": "Is the horizontal distance between landing door and car door sill a maximum of 35 mm?" },
+      { "id": "H_5.3.10", "text": "Does the car door apron meet the minimum requirements regarding length, chamfering, etc.?" }
+    ]},
+    { "id": "sec_5_4", "title": "5.4 Car Door Testing", "questions": [
+      { "id": "H_5.4.1", "text": "Is the maximum force required to prevent closing 150 N or less?" },
+      { "id": "H_5.4.2", "text": "At an opening force of 150 N at the most unfavourable point of the closing edge, do the gaps not exceed 30 mm (single-side opening) or 45 mm (centre opening)?" },
+      { "id": "H_5.4.3", "text": "Is the kinetic energy at average closing speed a maximum of 10 J?" },
+      { "id": "H_5.4.4", "text": "Does a protective device reopen the door if a person is struck or could be struck in the door area?" },
+      { "id": "H_5.4.6", "text": "Can the car door be opened manually within the unlocking zone with a maximum of 300 N when the power is switched off?" },
+      { "id": "H_5.4.9", "text": "Have the contacts on the car door been tested to ensure they lock on failure and prevent car movement outside the unlocking zone?" }
+    ]},
+    { "id": "sec_6", "title": "6 Suspension / Protection Against Unintended Car Movement", "questions": [
+      { "id": "H_6.1.a", "text": "Do the number and nominal diameter of ropes match?" },
+      { "id": "H_6.1.b", "text": "Are the correct rope ends installed and is load distribution between the ropes ensured?" },
+      { "id": "H_6.4.1", "text": "Does the protection device against unintended car movement comply with the lift book specifications?" },
+      { "id": "H_6.4.2", "text": "Does the protection device detect and prevent unintended car movement away from the landing when the shaft and car doors are not secured?" },
+      { "id": "H_6.4.3", "text": "Are the required safety clearances maintained?" },
+      { "id": "H_6.4.4", "text": "When the protection device is triggered, is the electrical safety device actuated?" },
+      { "id": "H_6.4.5", "text": "Can releasing or resetting the lift after the protection device is triggered only be performed by a qualified person?" }
+    ]},
+    { "id": "sec_7_1", "title": "7.1 Car Safety Gear", "questions": [
+      { "id": "H_7.1.1", "text": "Is the correct safety gear installed?" },
+      { "id": "H_7.1.3", "text": "(Instantaneous safety gear) Does the safety gear stop the car with rated load at rated speed?" },
+      { "id": "H_7.1.5", "text": "(Progressive safety gear) Does the safety gear stop the car with rated load at rated speed?" },
+      { "id": "H_7.1.7", "text": "When catching with uniformly distributed load, does the car floor tilt by a maximum of 5% from horizontal?" },
+      { "id": "H_7.1.8", "text": "Does the electrical cut-off device function when the safety gear is triggered (drive is switched off)?" },
+      { "id": "H_7.1.9", "text": "Does the lift function correctly after the safety gear test?" }
+    ]},
+    { "id": "sec_7_2", "title": "7.2 Car Overspeed Governor", "questions": [
+      { "id": "H_7.2.1", "text": "Is the correct overspeed governor installed?" },
+      { "id": "H_7.2.2", "text": "Is the overspeed governor accessible or can it be tested and reset remotely?" },
+      { "id": "H_7.2.4", "text": "Does the electrical safety component on the overspeed governor stop the lift?" },
+      { "id": "H_7.2.6", "text": "Does the electrical monitoring of the governor rope function and stop the lift?" }
+    ]},
+    { "id": "sec_7_5_6_7", "title": "7.5 Pipe Rupture Valve — 7.6 Throttle Valve — 7.7 Anti-Creep Measures", "questions": [
+      { "id": "H_7.5.1", "text": "Is the correct pipe rupture valve installed?" },
+      { "id": "H_7.5.2", "text": "Is a test device for the pipe rupture valve available?" },
+      { "id": "H_7.5.3", "text": "Is the pipe rupture valve test successful? (Car stops at downward rated speed plus max. 0.3 m/s.)" },
+      { "id": "H_7.6.1", "text": "Is the correct throttle valve installed?" },
+      { "id": "H_7.6.2", "text": "Is a test device for the throttle valve available?" },
+      { "id": "H_7.6.3", "text": "Is the throttle valve test successful? (Car speed < vmax + 0.3 m/s)" },
+      { "id": "H_7.7.1.1", "text": "(Electrical anti-creep system) Does the electrical levelling correction system function at the latest when the car with rated load sinks 120 mm?" },
+      { "id": "H_7.7.1.2", "text": "Does the car independently travel to the lowest landing at the latest 15 min after the last trip?" },
+      { "id": "H_7.8.1", "text": "Were any electrical bypasses removed after the tests?" },
+      { "id": "H_7.8.2", "text": "Were any changed settings restored to their original state after the tests?" }
+    ]},
+    { "id": "sec_8", "title": "8 Hydraulic Installation", "questions": [
+      { "id": "H_8.1.1", "text": "Does the hydraulic power unit comply with the manufacturer's specifications?" },
+      { "id": "H_8.1.2", "text": "Is a pressure gauge in the correct position available?" },
+      { "id": "H_8.1.3", "text": "Is a hand pump with pressure relief valve available? (Lift with safety or clamping device)" },
+      { "id": "H_8.1.4", "text": "Is a mains-independent position indicator (door unlocking zone) available and positioned so it is clearly visible during emergency evacuation?" },
+      { "id": "H_8.1.5", "text": "Is the stopping accuracy of the car within ±10 mm?" },
+      { "id": "H_8.1.6", "text": "Is a levelling correction of ±20 mm guaranteed for a levelling deviation of more than 20 mm?" },
+      { "id": "H_8.2.1", "text": "With the car lowered, is the oil reservoir adequately filled and can the oil level be easily checked, refilled and drained?" },
+      { "id": "H_8.3.1", "text": "Does the jack comply with the manufacturer's specifications?" },
+      { "id": "H_8.3.2", "text": "Is the jack installed in the ground fitted with a protective tube?" },
+      { "id": "H_8.4.1.1", "text": "Do the pipelines comply with the manufacturer's specifications?" },
+      { "id": "H_8.4.2.1", "text": "Do the hose assemblies comply with the manufacturer's specifications?" },
+      { "id": "H_8.4.2.2", "text": "Are the minimum bending radii of the hose assemblies maintained?" }
+    ]},
+    { "id": "sec_9_10", "title": "9 Electrical System / Performance Measurements — 10 Control", "questions": [
+      { "id": "H_9.1.1.1", "text": "Is the measured speed with empty car at most 108% of the rated speed in the upward direction?" },
+      { "id": "H_9.1.1.2", "text": "Is the measured speed with rated load at most 108% of the rated speed in the downward direction?" },
+      { "id": "H_9.2.1", "text": "Has the NIV protocol (low-voltage protocol) been prepared?" },
+      { "id": "H_9.2.1a", "text": "Are all conditions of the NIV protocol fulfilled?" },
+      { "id": "H_9.2.2", "text": "Are all guide rails and any shaft structure connected to the equipotential bonding?" },
+      { "id": "H_9.2.3", "text": "Is it ensured that phase reversal cannot lead to a dangerous operating condition?" },
+      { "id": "H_10.1", "text": "Has the safety circuit been tested to ensure that an earth fault triggers a shutdown? (See NIV protocol)" },
+      { "id": "H_10.2", "text": "Do the circuits for inching and relevelling with open doors function correctly?" },
+      { "id": "H_10.3", "text": "Is the motor running time monitoring correctly adjusted?" },
+      { "id": "H_10.4", "text": "Does the oil temperature monitoring function correctly and does the lift travel to the next stop after the temperature sensor triggers?" },
+      { "id": "H_10.5", "text": "Does the inspection control function correctly?" },
+      { "id": "H_10.7", "text": "Does the ramp travel control function correctly?" }
+    ]},
+    { "id": "sec_11", "title": "11 Lift Behaviour in Case of Fire", "questions": [
+      { "id": "H_11.1", "text": "Is a fire recall control available?" },
+      { "id": "H_11.1.2", "text": "Is the signal of the early fire detection and alarm system connected?" },
+      { "id": "H_11.1.4", "text": "Can the fire recall control only be reset with the key switch?" },
+      { "id": "H_11.1.5", "text": "Does a power interruption or control reset not cause the fire recall control to reset?" },
+      { "id": "H_11.2.1", "text": "Is the fire recall key switch of bistable design and the key removable in each position?" },
+      { "id": "H_11.2.2", "text": "Is the conventional key cylinder installed?" },
+      { "id": "H_11.3.1", "text": "With an active fire signal, are all car call, landing call and 'DOOR OPEN' buttons inoperative?" },
+      { "id": "H_11.3.2", "text": "With an active fire signal, are all stored travel commands deleted?" },
+      { "id": "H_11.3.3", "text": "Do the automatic doors close and does the lift travel without interruption to the fire recall landing?" },
+      { "id": "H_11.3.11", "text": "Are the inspection control and electric recall control not impaired by the fire detection system?" }
+    ]},
+    { "id": "sec_12_13", "title": "12 Documentation — 13 Declaration of Conformity", "questions": [
+      { "id": "H_12.1", "text": "Is an operator's manual (lift book) available?" },
+      { "id": "H_12.2", "text": "Is an operating manual available?" },
+      { "id": "H_13.1", "text": "Are all parts related to the installation, for which the manufacturer/installer is not directly responsible, in a suitable condition for the lift to be commissioned?" },
+      { "id": "H_13.2", "text": "Have all tests and inspections been carried out to prove compliance with the regulations?" },
+      { "id": "H_13.3", "text": "Can the declaration of conformity be issued for this lift?" }
+    ]}
+  ]
+}

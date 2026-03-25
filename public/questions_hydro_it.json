@@ -1,0 +1,200 @@
+{
+  "groups": [
+    { "id": "sec_2_1", "title": "2.1 Interruttore principale", "questions": [
+      { "id": "H_2.1.2", "text": "Il campo di utilizzo dell'interruttore principale corrisponde alla corrente massima che si verifica in condizioni normali?" },
+      { "id": "H_2.1.3", "text": "L'interruttore principale e montato nel posto giusto?" },
+      { "id": "H_2.1.5", "text": "A meno di 1 m dal luogo di installazione della macchina e presente un interruttore principale o un interruttore di arresto di emergenza?" },
+      { "id": "H_2.1.6", "text": "A meno di 1 m dai quadri di emergenza e di prova e presente un interruttore d'impianto o un interruttore di arresto di emergenza?" },
+      { "id": "H_2.1.7", "text": "Nel locale delle pulegge, vicino all'ingresso, e installato un interruttore di arresto di emergenza, funzionante e appropriatamente segnalato?" }
+    ]},
+    { "id": "sec_2_2", "title": "2.2 Illuminazione e prese elettriche", "questions": [
+      { "id": "H_2.2.1", "text": "L'intensita luminosa nel locale macchine e nei luoghi di installazione della macchina e del comando e di almeno 200 lux sul pavimento?" },
+      { "id": "H_2.2.2", "text": "L'intensita luminosa nel locale delle pulegge e di almeno 100 lux alle pulegge?" },
+      { "id": "H_2.2.3", "text": "E presente una presa elettrica secondo 13.6.2 nel locale delle pulegge?" },
+      { "id": "H_2.2.4", "text": "L'alimentazione elettrica per l'illuminazione della cabina, del comando, del vano, del locale macchine e del quadro di emergenza e indipendente dalla posizione dell'interruttore d'impianto?" },
+      { "id": "H_2.2.5", "text": "Ogni circuito comandato da interruttori dispone di una propria protezione indipendente contro i cortocircuiti?" },
+      { "id": "H_2.2.6", "text": "L'intensita luminosa all'apparecchiatura di emergenza e di prova e di almeno 50 lux ed e presente un interruttore per questa illuminazione?" }
+    ]},
+    { "id": "sec_2_3", "title": "2.3 Dimensioni / Accesso / Impianti estranei", "questions": [
+      { "id": "H_2.3.1", "text": "Le dimensioni e le distanze di sicurezza soddisfano i requisiti minimi?" },
+      { "id": "H_2.3.2", "text": "L'accesso e sicuro, illuminato, diretto e non attraverso spazi privati?" },
+      { "id": "H_2.3.3", "text": "La ventilazione del locale macchine e conforme al disegno di disposizione?" },
+      { "id": "H_2.3.4", "text": "Le porte/botole sono dotate di una serratura a cilindro locale e di un pomolo rotante interno?" },
+      { "id": "H_2.3.5", "text": "La chiusura e il bloccaggio senza chiave sono garantiti per un armadio di comando MRL?" },
+      { "id": "H_2.3.6", "text": "Le aperture nel pavimento sono protette con collari di almeno 50 mm di altezza?" },
+      { "id": "H_2.3.7", "text": "Il pavimento del locale macchine e rivestito con laminato o vernice resistente all'olio, e una soglia o una vasca di raccolta olio impedisce la fuoriuscita?" },
+      { "id": "H_2.3.8", "text": "Il locale macchine e privo di impianti estranei?" }
+    ]},
+    { "id": "sec_2_4", "title": "2.4 Etichettature / 2.5 Interfono / 2.6 Attrezzature di sollevamento", "questions": [
+      { "id": "H_2.4.1", "text": "Tutti gli avvisi e i cartelli sono applicati?" },
+      { "id": "H_2.4.2", "text": "Per piu ascensori con un locale macchine comune, tutte le parti dell'impianto sono identificate in base alla loro appartenenza?" },
+      { "id": "H_2.5.1", "text": "Per un'altezza di corsa > 30 m o quando non e possibile una comunicazione acustica diretta, e presente un interfono con alimentazione di emergenza tra il luogo di intervento di emergenza e la cabina?" },
+      { "id": "H_2.6.1", "text": "Sono disponibili mezzi per sollevare componenti pesanti, contrassegnati con la portata ammissibile?" }
+    ]},
+    { "id": "sec_3_1", "title": "3.1 Distanze di sicurezza in testa al vano", "questions": [
+      { "id": "H_3.1.1", "text": "Le distanze di sicurezza sono conformi ai requisiti normativi quando il pistone e nella posizione piu alta limitata dal limitatore di corsa o il dispositivo di sicurezza dello spazio rifugio e attivato?" },
+      { "id": "H_3.1.2", "text": "La superficie di stazionamento sul tetto della cabina e di almeno 0,12 m² e il lato minore e di almeno 250 mm?" },
+      { "id": "H_3.1.3", "text": "Lo spazio rifugio sul tetto della cabina corrisponde a un parallelepipedo di min. 500 x 600 x 800 mm?" },
+      { "id": "H_3.1.4", "text": "La lunghezza residua di guida del contrappeso corrisponde al valore nominale quando la cabina poggia sugli ammortizzatori completamente compressi?" },
+      { "id": "H_3.1.6", "text": "Il finecorsa di sicurezza e correttamente posizionato e funzionante?" }
+    ]},
+    { "id": "sec_3_2", "title": "3.2 Distanze di sicurezza nella fossa", "questions": [
+      { "id": "H_3.2.1", "text": "Le distanze di sicurezza sono conformi ai requisiti normativi quando la cabina poggia sugli ammortizzatori completamente compressi?" },
+      { "id": "H_3.2.2", "text": "Lo spazio rifugio sotto la cabina corrisponde a un parallelepipedo di min. 500 x 600 x 1000 mm?" },
+      { "id": "H_3.2.3", "text": "Per uno spazio rifugio ridotto, il dispositivo di sicurezza e conforme all'esame del progetto nel libretto dell'ascensore?" },
+      { "id": "H_3.2.4", "text": "La distanza tra il pavimento della cabina e il livello di fermata piu basso e inferiore a 120 mm quando la cabina con carico nominale poggia sugli ammortizzatori?" }
+    ]},
+    { "id": "sec_3_3", "title": "3.3 Ammortizzatori", "questions": [
+      { "id": "H_3.3.1.1", "text": "Gli ammortizzatori di cabina installati sono conformi alle specifiche del libretto dell'ascensore?" },
+      { "id": "H_3.3.1.2", "text": "(Ammortizzatori ad accumulo di energia) La corsa dell'ammortizzatore e conforme alle specifiche del fabbricante quando la cabina con carico nominale e funi lente si appoggia sull'ammortizzatore?" },
+      { "id": "H_3.3.1.3", "text": "(Ammortizzatori a dissipazione di energia) E escluso qualsiasi danno all'ascensore quando la cabina con carico nominale si appoggia sull'ammortizzatore?" },
+      { "id": "H_3.3.1.4", "text": "L'ascensore funziona correttamente dopo il test dell'ammortizzatore?" }
+    ]},
+    { "id": "sec_3_4", "title": "3.4 Sicurezza nel vano", "questions": [
+      { "id": "H_3.4.1", "text": "In un'enceinte di vano completamente chiusa, sono presenti solo le aperture autorizzate?" },
+      { "id": "H_3.4.2", "text": "Le lastre di vetro piane o curve nelle zone di traffico sono in vetro di sicurezza stratificato?" },
+      { "id": "H_3.4.3", "text": "E presente una separazione fissa al contrappeso?" },
+      { "id": "H_3.4.4", "text": "La distanza tra contrappeso e cabina e di almeno 50 mm?" },
+      { "id": "H_3.4.5", "text": "Per ascensori in un vano comune, e presente una separazione nella fossa (altezza fino a 2,5 m sopra il livello della fermata piu bassa)?" },
+      { "id": "H_3.4.7", "text": "Le porte e botole di manutenzione e di emergenza soddisfano i requisiti?" },
+      { "id": "H_3.4.8", "text": "L'accesso alla fossa soddisfa i requisiti (scala)?" },
+      { "id": "H_3.4.10", "text": "La ventilazione del vano e conforme alle specifiche del disegno di disposizione?" },
+      { "id": "H_3.4.11", "text": "La parete del vano sul lato di accesso e conforme al disegno di disposizione o alla norma?" },
+      { "id": "H_3.4.12", "text": "Non sono presenti impianti estranei nel vano?" },
+      { "id": "H_3.4.13", "text": "Per i locali accessibili sotto la fossa, sono state adottate misure di protezione adeguate?" },
+      { "id": "H_3.4.14", "text": "I dispositivi di protezione necessari sono presenti alle pulegge dei cavi e alle ruote a catena?" },
+      { "id": "H_3.4.15", "text": "L'interruttore di fossa (interruttore di arresto di emergenza) e correttamente posizionato, funzionante e appropriatamente segnalato?" },
+      { "id": "H_3.4.16", "text": "Un dispositivo di chiamata di emergenza per il salvataggio dalla fossa e installato e funzionante?" },
+      { "id": "H_3.4.17", "text": "Il dispositivo meccanico di arresto della cabina durante i lavori di manutenzione e ispezione funziona?" }
+    ]},
+    { "id": "sec_3_5", "title": "3.5 Illuminazione vano / Presa — 3.6 Guide", "questions": [
+      { "id": "H_3.5.1", "text": "L'intensita luminosa nel vano e di almeno 50 lux a un'altezza di 1000 mm sopra il tetto della cabina o il pavimento della fossa?" },
+      { "id": "H_3.5.3", "text": "L'illuminazione del vano puo essere accesa e spenta sia dall'accesso alla fossa che vicino all'interruttore principale?" },
+      { "id": "H_3.5.4", "text": "E presente una presa elettrica nella fossa e nel luogo di installazione della macchina e del comando?" },
+      { "id": "H_3.6.1", "text": "Le dimensioni delle guide sono conformi alle specifiche del fabbricante?" },
+      { "id": "H_3.6.2", "text": "L'interasse dei supporti di fissaggio delle guide e conforme al disegno di disposizione?" }
+    ]},
+    { "id": "sec_4_1", "title": "4.1 Porte di piano", "questions": [
+      { "id": "H_4.1.1", "text": "Con la porta chiusa, i giochi tra i battenti o tra i battenti e il telaio o la soglia non superano 6 mm?" },
+      { "id": "H_4.1.2", "text": "Le rientranze e le sporgenze sulla faccia esterna delle porte di piano non superano 3 mm?" },
+      { "id": "H_4.1.3", "text": "Le porte di piano corrispondono alla classe di resistenza al fuoco corretta?" },
+      { "id": "H_4.1.8", "text": "Sono installati i giusti dispositivi di blocco delle porte?" },
+      { "id": "H_4.1.9", "text": "I contatti di ogni porta di piano sono stati testati per garantire che si blocchino in caso di guasto e impediscano il movimento della cabina al di fuori della zona di sblocco?" },
+      { "id": "H_4.1.10", "text": "L'innesto degli organi di blocco e di almeno 7 mm prima che la cabina possa muoversi?" },
+      { "id": "H_4.1.11", "text": "I blocchi meccanici di ogni porta di piano sono stati testati per un corretto bloccaggio?" },
+      { "id": "H_4.1.13", "text": "La zona di sblocco e di massimo 200 mm sopra e sotto le porte di piano (o 350 mm per porte di cabina e di piano azionate simultaneamente)?" },
+      { "id": "H_4.1.14", "text": "Il meccanismo di chiusura automatica funziona correttamente?" },
+      { "id": "H_4.1.15", "text": "Le deflettori soddisfano i requisiti minimi di lunghezza, smussatura, ecc.?" },
+      { "id": "H_4.1.16", "text": "Ogni porta di piano puo essere sbloccata dall'esterno con una chiave di emergenza?" },
+      { "id": "H_4.1.18", "text": "L'illuminazione sul pavimento vicino alle porte di piano raggiunge almeno 50 lux?" },
+      { "id": "H_4.1.19", "text": "Ai piani sono installati cartelli di divieto secondo ISO 3864-1:2002? (Non utilizzare l'ascensore in caso di incendio)" }
+    ]},
+    { "id": "sec_5_1", "title": "5.1 Interno della cabina", "questions": [
+      { "id": "H_5.1.1", "text": "Sono presenti in cabina le informazioni sul carico nominale, il nome del fabbricante/installatore, il numero di persone e il numero di fabbrica?" },
+      { "id": "H_5.1.4", "text": "Il dispositivo di chiamata di emergenza in cabina consente la comunicazione bidirezionale con un servizio di reperibilita?" },
+      { "id": "H_5.1.5", "text": "L'illuminazione della cabina raggiunge un minimo di 50 lux sul pavimento e ai comandi?" },
+      { "id": "H_5.1.6", "text": "L'illuminazione di emergenza nella cabina funziona?" },
+      { "id": "H_5.1.7", "text": "La protezione da sovraccarico funziona come prescritto (al 10% di sovraccarico ma min. 75 kg)?" },
+      { "id": "H_5.1.9", "text": "E garantita una ventilazione sufficiente nella cabina?" },
+      { "id": "H_5.1.10", "text": "Le pareti, il pavimento e il soffitto della cabina sono pieni, ad eccezione delle aperture di ventilazione autorizzate?" }
+    ]},
+    { "id": "sec_5_2", "title": "5.2 Tetto cabina / 5.3 Porta di cabina", "questions": [
+      { "id": "H_5.2.1", "text": "Il comando di ispezione, l'arresto di emergenza e la presa elettrica sul tetto della cabina sono correttamente posizionati e testati?" },
+      { "id": "H_5.2.2", "text": "Il dispositivo di chiamata di emergenza sul tetto della cabina funziona correttamente?" },
+      { "id": "H_5.3.1", "text": "Con la porta di cabina chiusa, i giochi tra i battenti o tra i battenti e il telaio non superano 6 mm?" },
+      { "id": "H_5.3.2", "text": "Le rientranze e le sporgenze sulla faccia interna delle porte di cabina non superano 3 mm?" },
+      { "id": "H_5.3.3", "text": "La distanza orizzontale tra la soglia della porta di piano e quella della porta di cabina e di massimo 35 mm?" },
+      { "id": "H_5.3.10", "text": "Il deflettore della porta di cabina soddisfa i requisiti minimi di lunghezza, smussatura, ecc.?" }
+    ]},
+    { "id": "sec_5_4", "title": "5.4 Prova della porta di cabina", "questions": [
+      { "id": "H_5.4.1", "text": "La forza massima necessaria per impedire la chiusura e di 150 N o meno?" },
+      { "id": "H_5.4.2", "text": "Con una forza manuale di 150 N in direzione di apertura nel punto piu sfavorevole del bordo di chiusura, i giochi non superano 30 mm (apertura laterale) o 45 mm (apertura centrale)?" },
+      { "id": "H_5.4.3", "text": "L'energia cinetica alla velocita di chiusura media e di massimo 10 J?" },
+      { "id": "H_5.4.4", "text": "Un dispositivo di protezione riapre la porta se una persona viene colpita o potrebbe essere colpita nella zona della porta?" },
+      { "id": "H_5.4.6", "text": "La porta di cabina puo essere aperta manualmente nella zona di sblocco con una forza massima di 300 N quando la corrente e interrotta?" },
+      { "id": "H_5.4.9", "text": "I contatti della porta di cabina sono stati testati per garantire che si blocchino in caso di guasto e impediscano il movimento della cabina al di fuori della zona di sblocco?" }
+    ]},
+    { "id": "sec_6", "title": "6 Sospensione / Protezione contro movimenti non intenzionali", "questions": [
+      { "id": "H_6.1.a", "text": "Il numero e il diametro nominale dei cavi corrispondono?" },
+      { "id": "H_6.1.b", "text": "Sono montate le terminazioni di cavo corrette e la distribuzione del carico tra i cavi e garantita?" },
+      { "id": "H_6.4.1", "text": "Il dispositivo di protezione contro i movimenti non intenzionali della cabina e conforme alle specifiche del libretto dell'ascensore?" },
+      { "id": "H_6.4.2", "text": "Il dispositivo di protezione rileva e impedisce il movimento non intenzionale della cabina in allontanamento dal piano quando le porte di piano e di cabina non sono protette?" },
+      { "id": "H_6.4.3", "text": "Le distanze di sicurezza richieste sono rispettate?" },
+      { "id": "H_6.4.4", "text": "Quando il dispositivo di protezione e attivato, il dispositivo di sicurezza elettrico viene azionato?" },
+      { "id": "H_6.4.5", "text": "Lo sblocco o il ripristino dell'ascensore dopo l'attivazione del dispositivo di protezione puo essere eseguito solo da una persona qualificata?" }
+    ]},
+    { "id": "sec_7_1", "title": "7.1 Paracadute di cabina", "questions": [
+      { "id": "H_7.1.1", "text": "E installato il paracadute corretto?" },
+      { "id": "H_7.1.3", "text": "(Paracadute istantaneo) Il paracadute arresta la cabina con carico nominale alla velocita nominale?" },
+      { "id": "H_7.1.5", "text": "(Paracadute progressivo) Il paracadute arresta la cabina con carico nominale alla velocita nominale?" },
+      { "id": "H_7.1.7", "text": "Durante la presa con carico uniformemente distribuito, il pavimento della cabina si inclina di massimo il 5% rispetto all'orizzontale?" },
+      { "id": "H_7.1.8", "text": "Il dispositivo di interruzione elettrica funziona quando il paracadute scatta (l'azionamento viene disinserito)?" },
+      { "id": "H_7.1.9", "text": "L'ascensore funziona correttamente dopo il test del paracadute?" }
+    ]},
+    { "id": "sec_7_2", "title": "7.2 Limitatore di velocita (cabina)", "questions": [
+      { "id": "H_7.2.1", "text": "E installato il limitatore di velocita corretto?" },
+      { "id": "H_7.2.2", "text": "Il limitatore di velocita e accessibile o puo essere testato e ripristinato a distanza?" },
+      { "id": "H_7.2.4", "text": "Il componente di sicurezza elettrico del limitatore di velocita arresta l'ascensore?" },
+      { "id": "H_7.2.6", "text": "Il monitoraggio elettrico del cavo del limitatore di velocita funziona e arresta l'ascensore?" }
+    ]},
+    { "id": "sec_7_5_6_7", "title": "7.5 Valvola antirottura — 7.6 Valvola di strozzamento — 7.7 Misure antiscivolamento", "questions": [
+      { "id": "H_7.5.1", "text": "E installata la valvola antirottura del tubo corretta?" },
+      { "id": "H_7.5.2", "text": "E disponibile un dispositivo di prova per la valvola antirottura del tubo?" },
+      { "id": "H_7.5.3", "text": "Il test della valvola antirottura e superato? (La cabina si arresta al piu tardi alla velocita nominale in discesa piu 0,3 m/s.)" },
+      { "id": "H_7.6.1", "text": "E installata la valvola di strozzamento corretta?" },
+      { "id": "H_7.6.2", "text": "E disponibile un dispositivo di prova per la valvola di strozzamento?" },
+      { "id": "H_7.6.3", "text": "Il test della valvola di strozzamento e superato? (Velocita cabina < vmax + 0,3 m/s)" },
+      { "id": "H_7.7.1.1", "text": "(Sistema elettrico di correzione dello scivolamento) Il sistema di correzione del livellamento elettrico funziona al piu tardi quando la cabina con carico nominale scende di 120 mm?" },
+      { "id": "H_7.7.1.2", "text": "La cabina si reca autonomamente alla fermata piu bassa al piu tardi 15 min dopo l'ultima corsa?" },
+      { "id": "H_7.8.1", "text": "Eventuali ponticellature elettriche sono state rimosse dopo i test?" },
+      { "id": "H_7.8.2", "text": "Eventuali regolazioni modificate sono state riportate allo stato originale dopo i test?" }
+    ]},
+    { "id": "sec_8", "title": "8 Impianto idraulico", "questions": [
+      { "id": "H_8.1.1", "text": "Il gruppo idraulico e conforme alle specifiche del fabbricante?" },
+      { "id": "H_8.1.2", "text": "E presente un manometro nella posizione corretta?" },
+      { "id": "H_8.1.3", "text": "E presente una pompa a mano con valvola limitatrice di pressione? (Ascensore con paracadute o dispositivo di bloccaggio)" },
+      { "id": "H_8.1.4", "text": "E presente un indicatore di posizione indipendente dalla rete (zona di sblocco porte), ben visibile durante l'evacuazione di emergenza?" },
+      { "id": "H_8.1.5", "text": "La precisione di arresto della cabina e entro ±10 mm?" },
+      { "id": "H_8.1.6", "text": "Per uno scarto di livellamento superiore a 20 mm, e garantita una correzione di ±20 mm?" },
+      { "id": "H_8.2.1", "text": "Con la cabina abbassata, il serbatoio dell'olio e adeguatamente pieno e il livello dell'olio puo essere facilmente controllato, rabboccato e svuotato?" },
+      { "id": "H_8.3.1", "text": "Il martinetto e conforme alle specifiche del fabbricante?" },
+      { "id": "H_8.3.2", "text": "Il martinetto incassato nel suolo e dotato di un tubo di protezione?" },
+      { "id": "H_8.4.1.1", "text": "Le tubazioni rigide sono conformi alle specifiche del fabbricante?" },
+      { "id": "H_8.4.2.1", "text": "I tubi flessibili sono conformi alle specifiche del fabbricante?" },
+      { "id": "H_8.4.2.2", "text": "I raggi di curvatura minimi dei tubi flessibili sono rispettati?" }
+    ]},
+    { "id": "sec_9_10", "title": "9 Sistema elettrico / Misurazioni di prestazione — 10 Comando", "questions": [
+      { "id": "H_9.1.1.1", "text": "La velocita misurata con cabina vuota e al massimo il 108% della velocita nominale in direzione ascendente?" },
+      { "id": "H_9.1.1.2", "text": "La velocita misurata con carico nominale e al massimo il 108% della velocita nominale in direzione discendente?" },
+      { "id": "H_9.2.1", "text": "Il protocollo NIV (protocollo a bassa tensione) e stato predisposto?" },
+      { "id": "H_9.2.1a", "text": "Tutte le condizioni del protocollo NIV sono soddisfatte?" },
+      { "id": "H_9.2.2", "text": "Tutte le guide e un'eventuale struttura del vano sono collegate al collegamento equipotenziale?" },
+      { "id": "H_9.2.3", "text": "E garantito che un'inversione di fase non possa portare a una condizione operativa pericolosa?" },
+      { "id": "H_10.1", "text": "Il circuito di sicurezza e stato verificato per garantire che un guasto a terra provochi uno spegnimento? (Vedere protocollo NIV)" },
+      { "id": "H_10.2", "text": "I circuiti per l'acostaggio e il riallineamento con porte aperte funzionano correttamente?" },
+      { "id": "H_10.3", "text": "Il monitoraggio del tempo di marcia del motore e correttamente regolato?" },
+      { "id": "H_10.4", "text": "Il monitoraggio della temperatura dell'olio funziona correttamente e l'ascensore raggiunge ancora la fermata successiva dopo l'attivazione del sensore di temperatura?" },
+      { "id": "H_10.5", "text": "Il comando di ispezione funziona correttamente?" },
+      { "id": "H_10.7", "text": "Il comando di marcia a rampa funziona correttamente?" }
+    ]},
+    { "id": "sec_11", "title": "11 Comportamento degli ascensori in caso di incendio", "questions": [
+      { "id": "H_11.1", "text": "E presente un comando di richiamo in caso di incendio?" },
+      { "id": "H_11.1.2", "text": "Il segnale del sistema di rilevamento e allarme precoce degli incendi e collegato?" },
+      { "id": "H_11.1.4", "text": "Il ripristino del comando di richiamo in caso di incendio avviene solo con l'interruttore a chiave?" },
+      { "id": "H_11.1.5", "text": "Un'interruzione di corrente o un reset del comando non provoca un ripristino del comando di richiamo in caso di incendio?" },
+      { "id": "H_11.2.1", "text": "L'interruttore a chiave per il richiamo in caso di incendio e di tipo bistabile e la chiave e estraibile in ogni posizione?" },
+      { "id": "H_11.2.2", "text": "Il cilindro di chiave locale e installato?" },
+      { "id": "H_11.3.1", "text": "Con un segnale di incendio attivo, tutti i pulsanti di chiamata cabina, di piano e 'PORTA APERTA' sono inoperanti?" },
+      { "id": "H_11.3.2", "text": "Con un segnale di incendio attivo, tutti i comandi di corsa memorizzati vengono cancellati?" },
+      { "id": "H_11.3.3", "text": "Le porte automatiche si chiudono e l'ascensore si reca senza interruzioni alla fermata di richiamo?" },
+      { "id": "H_11.3.11", "text": "Il comando di ispezione e il comando di richiamo elettrico non sono disturbati dal sistema di rilevamento degli incendi?" }
+    ]},
+    { "id": "sec_12_13", "title": "12 Documentazione — 13 Dichiarazione di conformita", "questions": [
+      { "id": "H_12.1", "text": "E disponibile un manuale dell'operatore (libretto dell'ascensore)?" },
+      { "id": "H_12.2", "text": "E disponibile un manuale d'uso?" },
+      { "id": "H_13.1", "text": "Tutte le parti relative all'impianto, di cui il fabbricante/installatore non e direttamente responsabile, sono in condizioni idonee per la messa in servizio dell'ascensore?" },
+      { "id": "H_13.2", "text": "Tutti i test e le ispezioni per dimostrare la conformita alle normative sono stati effettuati?" },
+      { "id": "H_13.3", "text": "La dichiarazione di conformita puo essere rilasciata per questo ascensore?" }
+    ]}
+  ]
+}

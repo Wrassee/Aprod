@@ -425,6 +425,10 @@ function Questionnaire({
     onPageChange?.(Math.max(0, pageFromApp - 1));
   }, [pageFromApp, onPageChange]);
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [pageFromApp]);
+
   // 🔥 ÚJ: Lift selection info display
   const LiftSelectionInfo = () => {
     const liftSelectionStr = localStorage.getItem("liftSelection");

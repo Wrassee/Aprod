@@ -130,7 +130,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
     try {
       const headers = await getAuthHeaders();
       const resp = await fetch(
-        getApiUrl(`/api/technician/assignments/${repairModal.protocolId}/errors/${repairModal.error.id}`),
+        getApiUrl(`/api/technician/assignments/${repairModal.protocolId}/errors/${encodeURIComponent(repairModal.error.id)}`),
         {
           method: 'PATCH',
           headers: { ...headers, 'Content-Type': 'application/json' },

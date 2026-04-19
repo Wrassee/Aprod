@@ -83,20 +83,23 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
     // 6. Ha van helyi profil, de valami eltér, frissítjük
     else {
-      const needsUpdate = 
-        localProfile.role !== supabaseRole || 
-        localProfile.email_confirmed !== emailConfirmed;
+      // A HELYI adatbázis a szerepkör forrása (nem a Supabase metadata).
+      // A Supabase metadata-ból csak akkor frissítünk, ha ott expliciten
+      // be van állítva valami nem-'user' érték (pl. 'admin' Supabase oldalon).
+      // Ha Supabase metadata 'user' (alapértelmezett), NEM írjuk felül a helyi szerepkört.
+      const shouldSyncRole = supabaseRole !== 'user' && localProfile.role !== supabaseRole;
+      const needsUpdate = shouldSyncRole || localProfile.email_confirmed !== emailConfirmed;
 
       if (needsUpdate) {
+        const updatePayload: Record<string, any> = { email_confirmed: emailConfirmed };
+        if (shouldSyncRole) updatePayload.role = supabaseRole;
+
         console.log(`🔄 [Auth] Syncing profile for ${user.id}:`, {
-          role: `${localProfile.role} -> ${supabaseRole}`,
+          role: shouldSyncRole ? `${localProfile.role} -> ${supabaseRole}` : `${localProfile.role} (kept)`,
           email_confirmed: `${localProfile.email_confirmed} -> ${emailConfirmed}`
         });
 
-        const updatedProfile = await storage.updateProfile(user.id, { 
-          role: supabaseRole,
-          email_confirmed: emailConfirmed
-        });
+        const updatedProfile = await storage.updateProfile(user.id, updatePayload);
 
         if (updatedProfile) {
           localProfile = updatedProfile;

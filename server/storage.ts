@@ -142,13 +142,14 @@ export class DatabaseStorage implements IStorage {
         `🗄️ Storage: Fetching protocols for user ${options.userId} (Limit: ${options.limit}, Offset: ${options.offset})`,
       );
 
-      const whereClause = eq(protocols.user_id, options.userId);
+      // user_id nincs a schema-ban (DB quirk), ezért raw SQL-t használunk
+      const userIdClause = sql`"protocols"."user_id" = ${options.userId}`;
 
       // 1. Lekérjük az adott oldal elemeit
       const items = await (db as any)
         .select()
         .from(protocols)
-        .where(whereClause)
+        .where(userIdClause)
         .orderBy(desc(protocols.created_at))
         .limit(options.limit)
         .offset(options.offset);
@@ -157,7 +158,7 @@ export class DatabaseStorage implements IStorage {
       const [totalResult] = await (db as any)
         .select({ count: sql<number>`count(*)` })
         .from(protocols)
-        .where(whereClause);
+        .where(userIdClause);
 
       const total = Number(totalResult?.count || 0);
 
@@ -213,8 +214,9 @@ export class DatabaseStorage implements IStorage {
 
       // Ha van userId, szigorúbb szűrés (biztonsági ellenőrzés)
       // Ha nincs, csak ID alapján törlünk (admin funkció)
+      // user_id nincs a schema-ban, ezért raw SQL-t használunk
       const whereClause = userId
-        ? and(eq(protocols.id, id), eq(protocols.user_id, userId))
+        ? and(eq(protocols.id, id), sql`"protocols"."user_id" = ${userId}`)
         : eq(protocols.id, id);
 
       const result = await (db as any)

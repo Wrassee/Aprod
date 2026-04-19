@@ -298,16 +298,17 @@ router.delete('/users/:id', requireAdmin, async (req, res, next) => {
       console.log(`🗑️ Deleting protocols for user ${id}...`);
       
       // Lekérjük a felhasználó összes protokollját
+      // user_id nincs a schema-ban, raw SQL-t használunk
       const userProtocols = await (db as any)
         .select({ id: protocols.id })
         .from(protocols)
-        .where(eq(protocols.user_id, id));
+        .where(sql`"protocols"."user_id" = ${id}`);
       
       if (userProtocols.length > 0) {
         // Töröljük az összes protokollt
         await (db as any)
           .delete(protocols)
-          .where(eq(protocols.user_id, id));
+          .where(sql`"protocols"."user_id" = ${id}`);
         
         console.log(`✅ Deleted ${userProtocols.length} protocols for user ${id}`);
       } else {
@@ -387,6 +388,17 @@ router.patch('/users/:id/role', requireAdmin, async (req, res) => {
     await db.execute(
       sql`UPDATE profiles SET role = ${role} WHERE user_id = ${id}`
     );
+
+    // Supabase app_metadata szinkronizáció – hogy a middleware ne írja vissza az old role-t
+    try {
+      await supabaseAdmin.auth.admin.updateUserById(id, {
+        app_metadata: { role }
+      });
+      console.log(`✅ Supabase app_metadata updated: user ${id} → role ${role}`);
+    } catch (metaErr: any) {
+      console.warn(`⚠️ Supabase metadata update failed (non-fatal):`, metaErr.message);
+    }
+
     console.log(`✅ Admin ${adminUser.id} changed user ${id} role to ${role}`);
     res.json({ message: 'Szerepkör sikeresen frissítve.', role });
   } catch (error: any) {

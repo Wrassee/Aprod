@@ -1,5 +1,6 @@
 // src/pages/technician-dashboard.tsx - Technikus modul
 import { useState, useEffect, useRef } from 'react';
+import ReactCountryFlag from 'react-country-flag';
 import { useLanguageContext, type SupportedLanguage } from "@/components/language-context";
 import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
@@ -12,12 +13,12 @@ import {
 } from 'lucide-react';
 import type { ProtocolError } from '@shared/schema';
 
-const LANGUAGE_FLAGS: { code: SupportedLanguage; flag: string; label: string }[] = [
-  { code: 'hu', flag: '🇭🇺', label: 'Magyar' },
-  { code: 'de', flag: '🇩🇪', label: 'Deutsch' },
-  { code: 'en', flag: '🇬🇧', label: 'English' },
-  { code: 'fr', flag: '🇫🇷', label: 'Français' },
-  { code: 'it', flag: '🇮🇹', label: 'Italiano' },
+const LANGUAGE_FLAGS: { code: SupportedLanguage; countryCode: string; label: string }[] = [
+  { code: 'hu', countryCode: 'HU', label: 'Magyar' },
+  { code: 'de', countryCode: 'DE', label: 'Deutsch' },
+  { code: 'en', countryCode: 'GB', label: 'English' },
+  { code: 'fr', countryCode: 'FR', label: 'Français' },
+  { code: 'it', countryCode: 'IT', label: 'Italiano' },
 ];
 
 interface Protocol {
@@ -28,12 +29,20 @@ interface Protocol {
   completed: boolean;
   created_at: string;
   assigned_technician_id: string | null;
+  answers?: Record<string, any>;
   errorSummary?: {
     totalErrors: number;
     doneErrors: number;
     pendingErrors: number;
     blockedErrors: number;
   };
+}
+
+/** Visszaadja az Otis Lift-azonosítót (answers['7']) vagy fallback UUID-t */
+function getLiftId(protocol: Protocol): string {
+  const v = protocol.answers?.['7'];
+  if (v && String(v).trim()) return String(v).trim();
+  return '#' + protocol.id.slice(0, 8).toUpperCase();
 }
 
 interface RepairModalState {
@@ -209,18 +218,24 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
           </div>
           {/* Language selector row */}
           <div className="flex items-center gap-1 flex-wrap">
-            {LANGUAGE_FLAGS.map(({ code, flag, label }) => (
+            {LANGUAGE_FLAGS.map(({ code, countryCode, label }) => (
               <button
                 key={code}
                 onClick={() => setLanguage(code)}
                 title={label}
-                className={`text-lg px-2 py-0.5 rounded-lg transition-all border ${
+                className={`px-1.5 py-0.5 rounded-lg transition-all border flex items-center gap-1 ${
                   language === code
-                    ? 'border-orange-400 bg-orange-50 dark:bg-orange-950 shadow-sm scale-110'
-                    : 'border-transparent hover:border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 opacity-60 hover:opacity-100'
+                    ? 'border-orange-400 bg-orange-50 dark:bg-orange-950 shadow-sm scale-105'
+                    : 'border-transparent hover:border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 opacity-50 hover:opacity-100'
                 }`}
               >
-                {flag}
+                <ReactCountryFlag
+                  countryCode={countryCode}
+                  svg
+                  style={{ width: '1.4em', height: '1.4em', borderRadius: '2px' }}
+                  title={label}
+                />
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{label.split(' ')[0].substring(0, 3)}</span>
               </button>
             ))}
             <span className="text-xs text-gray-400 ml-1">
@@ -268,7 +283,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                         <div className="flex items-center gap-2 mb-1">
                           <ClipboardList className="h-4 w-4 text-orange-500" />
                           <CardTitle className="text-base font-bold text-gray-900 dark:text-white">
-                            #{protocol.id.slice(0, 8).toUpperCase()}
+                            {getLiftId(protocol)}
                           </CardTitle>
                           {allDone && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded-full">

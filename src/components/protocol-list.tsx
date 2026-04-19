@@ -26,6 +26,14 @@ interface Protocol {
   status?: string | null;
   user_id?: string;
   assigned_technician_id?: string | null;
+  answers?: Record<string, any>;
+}
+
+/** Visszaadja a lift azonosítót (answers['7']) vagy fallback UUID-t */
+function getLiftId(protocol: Protocol): string {
+  const fromAnswers = protocol.answers?.['7'];
+  if (fromAnswers && String(fromAnswers).trim()) return String(fromAnswers).trim();
+  return protocol.protocol_number || protocol.id.substring(0, 8);
 }
 
 interface Technician {
@@ -361,7 +369,7 @@ export function ProtocolList() {
                         className="hover:bg-gradient-to-r hover:from-blue-50/50 hover:via-transparent hover:to-cyan-50/50 transition-all border-l-4 border-l-transparent hover:border-l-blue-500"
                       >
                         <TableCell className="font-mono text-sm font-medium text-gray-900 dark:text-gray-100">
-                          {protocol.protocol_number || `${protocol.id.substring(0, 8)}...`}
+                          {getLiftId(protocol)}
                         </TableCell>
                         <TableCell className="text-sm text-gray-600 dark:text-gray-400">
                           {formatDate(new Date(protocol.created_at), language)}
@@ -400,7 +408,7 @@ export function ProtocolList() {
                               variant="ghost"
                               size="sm"
                               className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                              onClick={() => handleDelete(protocol.id, protocol.protocol_number || undefined)}
+                              onClick={() => handleDelete(protocol.id, getLiftId(protocol))}
                               disabled={deletingId === protocol.id}
                             >
                               {deletingId === protocol.id ? (
@@ -478,7 +486,7 @@ export function ProtocolList() {
                 {protocols.map((protocol) => (
                   <TableRow key={protocol.id}>
                     <TableCell className="font-mono text-sm">
-                      {protocol.protocol_number || protocol.id.substring(0, 8)}...
+                      {getLiftId(protocol)}
                     </TableCell>
                     <TableCell className="text-sm text-gray-600">
                       {formatDate(new Date(protocol.created_at), language)}
@@ -513,7 +521,7 @@ export function ProtocolList() {
                           variant="ghost"
                           size="sm"
                           className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                          onClick={() => handleDelete(protocol.id, protocol.protocol_number || undefined)}
+                          onClick={() => handleDelete(protocol.id, getLiftId(protocol))}
                           disabled={deletingId === protocol.id}
                         >
                           {deletingId === protocol.id ? (

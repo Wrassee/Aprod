@@ -1,15 +1,24 @@
 // src/pages/technician-dashboard.tsx - Technikus modul
 import { useState, useEffect, useRef } from 'react';
-import { useLanguageContext } from "@/components/language-context";
+import { useLanguageContext, type SupportedLanguage } from "@/components/language-context";
+import { useAuth } from '@/contexts/auth-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getApiUrl, getAuthHeaders } from '@/lib/queryClient';
 import {
   Wrench, ClipboardList, CheckCircle2, Clock, AlertTriangle, Ban, 
-  ChevronDown, ChevronUp, Camera, MessageSquare, ArrowLeft, Loader2,
-  CheckCheck, Sparkles, RefreshCw
+  ChevronDown, ChevronUp, Camera, MessageSquare, Loader2,
+  CheckCheck, Sparkles, RefreshCw, LogOut
 } from 'lucide-react';
 import type { ProtocolError } from '@shared/schema';
+
+const LANGUAGE_FLAGS: { code: SupportedLanguage; flag: string; label: string }[] = [
+  { code: 'hu', flag: '🇭🇺', label: 'Magyar' },
+  { code: 'de', flag: '🇩🇪', label: 'Deutsch' },
+  { code: 'en', flag: '🇬🇧', label: 'English' },
+  { code: 'fr', flag: '🇫🇷', label: 'Français' },
+  { code: 'it', flag: '🇮🇹', label: 'Italiano' },
+];
 
 interface Protocol {
   id: string;
@@ -37,7 +46,8 @@ interface TechnicianDashboardProps {
 }
 
 export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
-  const { t } = useLanguageContext();
+  const { t, language, setLanguage } = useLanguageContext();
+  const { signOut, user } = useAuth();
 
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [loading, setLoading] = useState(true);
@@ -165,26 +175,58 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
       )}
 
       {/* Header */}
-      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-4 shadow-sm">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={onBack} className="mr-1">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center shadow-md">
-              <Wrench className="h-5 w-5 text-white" />
+      <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 shadow-sm">
+        <div className="max-w-4xl mx-auto">
+          {/* Top row: icon + title + refresh + logout */}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center shadow-md">
+                <Wrench className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 dark:text-white">{t('technicianDashboard')}</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  {user?.email}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-900 dark:text-white">{t('technicianDashboard')}</h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
-                <Sparkles className="h-3 w-3" />
-                {protocols.length} {t('myAssignments').toLowerCase()}
-              </p>
+            <div className="flex items-center gap-1">
+              <Button variant="ghost" size="sm" onClick={fetchAssignments} disabled={loading} title={t('refresh')}>
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => signOut()}
+                className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+                title={t('Profile.logout')}
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="ml-1 text-xs font-medium hidden sm:inline">{t('Profile.logout')}</span>
+              </Button>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={fetchAssignments} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
+          {/* Language selector row */}
+          <div className="flex items-center gap-1 flex-wrap">
+            {LANGUAGE_FLAGS.map(({ code, flag, label }) => (
+              <button
+                key={code}
+                onClick={() => setLanguage(code)}
+                title={label}
+                className={`text-lg px-2 py-0.5 rounded-lg transition-all border ${
+                  language === code
+                    ? 'border-orange-400 bg-orange-50 dark:bg-orange-950 shadow-sm scale-110'
+                    : 'border-transparent hover:border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 opacity-60 hover:opacity-100'
+                }`}
+              >
+                {flag}
+              </button>
+            ))}
+            <span className="text-xs text-gray-400 ml-1">
+              {protocols.length} {t('myAssignments').toLowerCase()}
+            </span>
+          </div>
         </div>
       </div>
 
@@ -241,7 +283,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                         {/* Error Summary Pills */}
                         <div className="flex flex-wrap gap-2 mt-2">
                           <span className="text-xs px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded-full font-medium text-gray-700 dark:text-gray-300">
-                            {summary.totalErrors} hiba
+                            {summary.totalErrors} {summary.totalErrors === 1 ? t('errorSingular') : t('errorPlural')}
                           </span>
                           {summary.doneErrors > 0 && (
                             <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">

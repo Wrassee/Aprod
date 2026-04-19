@@ -2,12 +2,18 @@
 import { useState, useEffect, useMemo } from "react";
 import { translations } from "@/lib/translations";
 
+const VALID_LANGUAGES = ['hu', 'de', 'en', 'fr', 'it'] as const;
+type ValidLanguage = typeof VALID_LANGUAGES[number];
+
+function isValidLanguage(v: string | null): v is ValidLanguage {
+  return !!v && (VALID_LANGUAGES as readonly string[]).includes(v);
+}
+
 export function useLanguage() {
-  const [language, setLanguage] = useState<"hu" | "de">(() => {
+  const [language, setLanguage] = useState<ValidLanguage>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("otis-protocol-language");
-      // Biztosítjuk, hogy csak érvényes nyelvet töltsünk vissza
-      return saved === "de" ? "de" : "hu";
+      return isValidLanguage(saved) ? saved : "hu";
     }
     return "hu";
   });
@@ -28,10 +34,8 @@ export function useLanguage() {
         }, langSet);
 
         // 2. Ha nem találtuk, próbáljuk meg a "csoport" nevét nagybetűsíteni (pl. admin -> Admin)
-        // Ez segít, ha a kódban kisbetűvel van, de a szótárban nagybetűvel
         if (value === undefined && key.includes('.')) {
             const parts = key.split('.');
-            // Csak az első elemet nagybetűsítjük (pl. admin -> Admin)
             parts[0] = parts[0].charAt(0).toUpperCase() + parts[0].slice(1);
             const upperKey = parts.join('.');
             
@@ -44,13 +48,11 @@ export function useLanguage() {
             return value;
         }
 
-        // DEBUG: Ha itt tartunk, akkor NINCS meg a fordítás
-        // Csak fejlesztés alatt hasznos, production buildben kivehető
         if (process.env.NODE_ENV === 'development') {
             console.warn(`[i18n] Hiányzó fordítás (${language}): "${key}"`);
         }
 
-        return key; // Visszaadjuk a kulcsot, hogy legalább látszódjon valami
+        return key;
       } catch (e) {
         return key;
       }
@@ -63,7 +65,7 @@ export function useLanguage() {
   useEffect(() => {
     const onStorage = (e: StorageEvent) => {
       if (e.key === "otis-protocol-language" && e.newValue) {
-        if (e.newValue === "hu" || e.newValue === "de") {
+        if (isValidLanguage(e.newValue)) {
           setLanguage(e.newValue);
         }
       }

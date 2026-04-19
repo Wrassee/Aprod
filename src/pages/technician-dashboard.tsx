@@ -410,17 +410,18 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
       {/* Repair Documentation Modal */}
       {repairModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white dark:bg-gray-900 w-full sm:max-w-lg sm:rounded-2xl shadow-2xl overflow-hidden">
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-4 flex items-center justify-between">
+          <div className="bg-white dark:bg-gray-900 w-full sm:max-w-lg sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh]">
+            {/* Modal Header — always visible */}
+            <div className="flex-shrink-0 bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-4 flex items-center justify-between sm:rounded-t-2xl">
               <div className="flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-white" />
                 <span className="text-white font-bold text-base">{t('documentRepair')}</span>
               </div>
-              <button onClick={closeRepairModal} className="text-white/80 hover:text-white text-xl font-bold">×</button>
+              <button onClick={closeRepairModal} className="text-white/80 hover:text-white text-2xl font-bold leading-none w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">×</button>
             </div>
 
-            <div className="p-5 space-y-4 overflow-y-auto max-h-[70vh]">
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {/* Error info */}
               <div className="rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
                 <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold mb-1">{t('errorTitle')}</p>
@@ -483,9 +484,9 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                 ) : (
                   <button
                     onClick={() => photoInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl py-8 flex flex-col items-center justify-center gap-2 text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-colors"
+                    className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl py-4 flex items-center justify-center gap-3 text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-colors"
                   >
-                    <Camera className="h-8 w-8" />
+                    <Camera className="h-5 w-5" />
                     <span className="text-sm font-medium">{t('uploadPhotos')}</span>
                   </button>
                 )}
@@ -500,8 +501,8 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
               </div>
             </div>
 
-            {/* Modal Footer */}
-            <div className="px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex gap-3">
+            {/* Modal Footer — always visible */}
+            <div className="flex-shrink-0 px-5 py-4 border-t border-gray-200 dark:border-gray-700 flex gap-3 bg-white dark:bg-gray-900">
               <Button variant="outline" onClick={closeRepairModal} className="flex-1">
                 {t('cancel')}
               </Button>

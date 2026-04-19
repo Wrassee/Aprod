@@ -366,6 +366,36 @@ router.delete('/users/:id', requireAdmin, async (req, res, next) => {
 });
 
 // ===============================================
+//      USER ROLE CHANGE
+// ===============================================
+
+router.patch('/users/:id/role', requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+  const adminUser = (req as any).user;
+
+  const validRoles = ['admin', 'user', 'technician'];
+  if (!validRoles.includes(role)) {
+    return res.status(400).json({ message: 'Érvénytelen szerepkör. Lehetséges értékek: admin, user, technician' });
+  }
+
+  if (id === adminUser.id && role !== 'admin') {
+    return res.status(400).json({ message: 'Admin nem változtathatja meg saját szerepkörét.' });
+  }
+
+  try {
+    await db.execute(
+      sql`UPDATE profiles SET role = ${role} WHERE user_id = ${id}`
+    );
+    console.log(`✅ Admin ${adminUser.id} changed user ${id} role to ${role}`);
+    res.json({ message: 'Szerepkör sikeresen frissítve.', role });
+  } catch (error: any) {
+    console.error('❌ Role change error:', error);
+    res.status(500).json({ message: 'Hiba a szerepkör módosításakor.', error: error.message });
+  }
+});
+
+// ===============================================
 //          PROTOCOL MANAGEMENT
 // ===============================================
 

@@ -1,6 +1,6 @@
 # OTIS APROD (Acceptance Protocol Document) Application
 
-## Version: 0.9.8
+## Version: 0.9.9
 
 ## Overview
 This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German with complete multilingual support across all interfaces, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
@@ -60,7 +60,23 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **ID format**: `H_2.1.2`, `H_7.5.3`, etc. — matching document section numbers
 - **Next steps**: (1) User uploads PDF AcroForm → extract field names; (2) Create `server/config/hydro-pdf-mapping.ts`; (3) Create `server/services/hydro-pdf-service.ts`; (4) Create `src/pages/hydraulic-protocol.tsx`; (5) Add `/download-hydro-pdf` route; (6) Wire MOD_HYD subtype in App.tsx
 
-## Recent Changes (v0.9.8)
+## Recent Changes (v0.9.9) — Technician Module COMPLETE
+
+### Technician Module
+- **Backend**: `server/routes/technician-routes.ts` — GET /my-assignments, PATCH /assignments/:protocolId/errors/:errorId, GET /technicians, POST /assign/:protocolId
+- **DB Schema**: `assigned_technician_id` column added to `protocols` table (`npm run db:push --force`)
+- **Auth Middleware**: `requireTechnicianOrAdmin` middleware in `server/middleware/auth.ts`
+- **Storage Methods**: `getProtocolsByTechnicianId` + `getTechnicianUsers` added to `server/storage.ts`
+- **Technician Dashboard**: `src/pages/technician-dashboard.tsx` — full repair workflow with status management, comment, proof photo upload
+- **Role-Based Routing**: App.tsx routes technicians to `technician-dashboard` after login (via `useEffect` watching `role` from `useAuth`)
+- **3 Roles**: admin, technician, user — role change dropdown added to user-list.tsx (admin panel)
+- **PATCH /api/admin/users/:id/role**: Admin can change user role to technician/admin/user
+- **Error Status Badges**: `error-list.tsx` shows repair status (done/in_progress/blocked/pending) with color-coded badges in both Modern and Classic themes
+- **Assign Technician UI**: Protocol list (`protocol-list.tsx`) shows technician assignment dropdown for admin — only visible if technicians exist in the system
+- **Translations**: `roleTechnician`, `assignTechnician`, `technicianAssigned` + 27 other technician module keys in all 5 languages
+- **getAuthHeaders fix**: `getAuthHeaders()` called without params (uses singleton supabase client from `@/lib/supabaseClient`)
+
+## Previous Changes (v0.9.8)
 - **Modern Calendar Date Picker**: HTML `<input type="date">` replaced with dark glassmorphism Radix Popover + react-day-picker Calendar in `PageHeader.tsx`. Locale-aware `PP` format, `isValid()` guard, Syne + DM Mono fonts.
 - **Lift Selector Date Picker Fix**: Removed `receptionDate`/`onReceptionDateChange` props from all 3 PageHeader instances in `lift-selector.tsx` — date picker no longer appears during lift type/subtype selection.
 - **Template Download Auth Fix**: `handleDownload` in `template-management.tsx` now uses `fetch()` + blob URL instead of `window.location.href`, correctly sending the Authorization header. Server no longer returns 401.
@@ -96,7 +112,9 @@ Prefers free AI APIs (Groq) over paid solutions.
 | `src/components/offline-status-bar.tsx` | Online/offline status indicator with sync |
 | `src/utils/offline-queue.ts` | Offline protocol queue with auto-sync logic |
 | `src/lib/translations.ts` | All 5-language translation strings |
-| `server/routes/admin-routes.ts` | Admin API: templates, users, audit, backup |
+| `server/routes/admin-routes.ts` | Admin API: templates, users, audit, backup, PATCH /users/:id/role |
+| `server/routes/technician-routes.ts` | Technician API: assignments, repair status updates, assign to protocol |
+| `src/pages/technician-dashboard.tsx` | Technician-only dashboard: assigned protocols, error repair workflow |
 | `server/routes.ts` | Main API route registration |
 | `public/sw.js` | Service worker for offline caching |
 

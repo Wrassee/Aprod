@@ -1,0 +1,39 @@
+Technikus Modul és Hibakezelési Munkafolyamat Implementálása
+
+Az app jelenleg Admin és User (átvevő) jogosultságokkal rendelkezik, tud hibalistát generálni fotókkal és PDF-et menteni. Ezt kell kiegészíteni egy "Technikus" (Technician) munkafolyamattal.
+
+**Feladatok:**
+
+1.  **Felhasználói szerepkör bővítése:**
+    * Vezesd be a `Technician` (Technikus) szintet a meglévő `Admin` és `User` mellé.
+    * A Technikus bejelentkezés után csak a számára kiosztott (assigned) hibalistákat láthatja.
+
+2.  **Hibalista adatstruktúra módosítása:**
+    * Minden hibalista elemhez adj hozzá új mezőket: 
+        * `status`: (pl. "Függőben", "Kész", "Akadályoztatva")
+        * `assignedTechnicianId`: (A technikus azonosítója)
+        * `completionDate`: (A javítás dátuma)
+        * `technicianComment`: (Megjegyzés a javításhoz: pl. anyaghiány)
+        * `proofPhotoUrl`: (Bizonyító fotó a javítás után)
+
+3.  **Technikus Interfész (UI):**
+    * Hozz létre egy dedikált nézetet a Technikusoknak, ahol listázva látják a rájuk bízott feladatokat.
+    * Minden hiba mellett legyen egy "Javítás dokumentálása" gomb.
+    * A felugró ablakban/űrlapon a technikus tudja:
+        * Beállítani a státuszt (Kész / Folyamatban).
+        * Feltölteni a bizonyító fotót.
+        * Beírni a megjegyzést (pl. "Több ember kell a mozgatáshoz" vagy "Alkatrész megrendelve").
+        * A mentéskor a rendszer automatikusan rögzítse az aktuális dátumot.
+
+4.  **Admin és Követés (Tracking):**
+    * Az Admin felületen a hibalistánál látszódjon a javítás állapota (színkódolással: zöld = kész, piros = hiba, sárga = folyamatban).
+    * Az Admin tudjon technikust rendelni egy-egy hibalistához vagy konkrét hibaegységhez.
+
+5.  **Archiválás és PDF frissítés:**
+    * A folyamat végén a PDF generálás tartalmazza a javítás adatait is (mikor készült el, ki javította, és a javítás utáni fotót, ha van).
+    * A lezárt (minden hibája kijavított) protokollok kerüljenek egy "Archívum" mappába/nézetbe.
+
+**Technikai elvárások:**
+* Használd a meglévő adatbázis-logikát amit az app használ.
+* A fotófeltöltéshez használd a már meglévő képkezelő komponenst.
+* Biztosítsd, hogy a Technikus ne lássa azokat a hibalistákat, amik nincsenek hozzárendelve.

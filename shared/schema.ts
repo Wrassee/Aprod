@@ -29,7 +29,8 @@ export const protocols = pgTable("protocols", {
   signature: text("signature"),
   signature_name: text("signature_name"),
   completed: boolean("completed").notNull().default(false),
-  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(), 
+  created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
+  assigned_technician_id: text("assigned_technician_id"),
 });
 
 export const insertProtocolSchema = createInsertSchema(protocols);
@@ -42,12 +43,22 @@ export type InsertProtocol = typeof protocols.$inferInsert;
 export const ErrorSeverityEnum = z.enum(["critical", "medium", "low"]);
 export type ErrorSeverity = z.infer<typeof ErrorSeverityEnum>;
 
+export const RepairStatusEnum = z.enum(["pending", "in_progress", "done", "blocked"]);
+export type RepairStatus = z.infer<typeof RepairStatusEnum>;
+
 export const ProtocolErrorSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
   severity: ErrorSeverityEnum,
   images: z.array(z.string()).default([]),
+  // Technician repair documentation fields (all optional for backward compatibility)
+  status: RepairStatusEnum.optional(),
+  assignedTechnicianId: z.string().optional(),
+  assignedTechnicianName: z.string().optional(),
+  completionDate: z.string().optional(),
+  technicianComment: z.string().optional(),
+  proofPhotoUrl: z.string().optional(),
 });
 export type ProtocolError = z.infer<typeof ProtocolErrorSchema>;
 

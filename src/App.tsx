@@ -37,6 +37,7 @@ import { Login } from "@/pages/login";
 import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import AuthCallback from "@/pages/auth-callback";
+import { TechnicianDashboard } from "@/pages/technician-dashboard";
 import { FormData, MeasurementRow } from "./lib/types";
 
 /* -------------------- Shared schema -------------------- */
@@ -58,7 +59,8 @@ type Screen =
   | 'login' 
   | 'forgot-password' 
   | 'reset-password' 
-  | 'auth-callback';
+  | 'auth-callback'
+  | 'technician-dashboard';
 
 interface AppContentProps {
   currentScreen: Screen;
@@ -87,7 +89,7 @@ function AppContent({
 }: AppContentProps) {
 
   const { language, setLanguage } = useLanguageContext();
-  const { user, supabase, loading: authLoading } = useAuth();
+  const { user, supabase, loading: authLoading, role } = useAuth();
   const formDataRef = useRef(formData);
   const [languageSelected, setLanguageSelected] = useState(false);
 
@@ -108,10 +110,23 @@ function AppContent({
     
     // Szigorúbb ellenőrzés: savedLanguage megléte kötelező a redirecthez
     if (user && savedLanguage && currentScreen === 'start') {
-      console.log('✅ User logged in, language saved. Redirecting to lift selector...');
-      setCurrentScreen('lift-selector');
+      if (role === 'technician') {
+        console.log('🔧 Technikus bejelentkezés - Technikus Dashboard-ra irányítás...');
+        setCurrentScreen('technician-dashboard');
+      } else {
+        console.log('✅ User logged in, language saved. Redirecting to lift selector...');
+        setCurrentScreen('lift-selector');
+      }
     }
-  }, [user, currentScreen, setCurrentScreen]);
+  }, [user, currentScreen, setCurrentScreen, role]);
+
+  // Ha a profil késve töltődik és kiderül, hogy technikus, átirányítjuk
+  useEffect(() => {
+    if (role === 'technician' && currentScreen === 'lift-selector') {
+      console.log('🔧 Profil betöltve - Technikus átirányítás a Dashboard-ra...');
+      setCurrentScreen('technician-dashboard');
+    }
+  }, [role, currentScreen, setCurrentScreen]);
 
   const handleLanguageSelect = useCallback((selectedLanguage: 'hu' | 'de' | 'en' | 'fr' | 'it') => {
     console.log('🌍 App.tsx - Language selected:', selectedLanguage);
@@ -120,8 +135,13 @@ function AppContent({
     setLanguageSelected(true);
     
     if (user) {
-      console.log('📋 Navigating to lift selector...');
-      setCurrentScreen('lift-selector');
+      if (role === 'technician') {
+        console.log('🔧 Technikus - Technikus Dashboard-ra irányítás...');
+        setCurrentScreen('technician-dashboard');
+      } else {
+        console.log('📋 Navigating to lift selector...');
+        setCurrentScreen('lift-selector');
+      }
     } else {
       console.log('🔐 No user, navigating to login...');
       setCurrentScreen('login');
@@ -132,7 +152,7 @@ function AppContent({
     localStorage.removeItem('liftSelection');
     window.dispatchEvent(new CustomEvent('protocol-errors-cleared'));
     window.dispatchEvent(new Event('storage'));
-  }, [setLanguage, setCurrentScreen, user]);
+  }, [setLanguage, setCurrentScreen, user, role]);
 
   const handleSaveProgress = useCallback(() => {
     console.log('✅ Progress saved automatically');
@@ -220,9 +240,13 @@ function AppContent({
   }, [setCurrentScreen]);
 
   const handleLoginSuccess = useCallback(() => {
-    console.log('✅ Login successful - redirecting to lift selector');
-    setCurrentScreen('lift-selector');
-  }, [setCurrentScreen]);
+    console.log('✅ Login successful - role:', role);
+    if (role === 'technician') {
+      setCurrentScreen('technician-dashboard');
+    } else {
+      setCurrentScreen('lift-selector');
+    }
+  }, [setCurrentScreen, role]);
 
   const handleMeasurementsChange = useCallback((measurements: MeasurementRow[]) => {
     setFormData(prev => ({ ...prev, niedervoltMeasurements: measurements }));
@@ -558,10 +582,17 @@ function AppContent({
         return (
           <AuthCallback 
             onSuccess={() => {
-              console.log('✅ Auth callback successful - redirecting to lift selector');
-              setCurrentScreen('lift-selector');
+              console.log('✅ Auth callback successful');
+              setCurrentScreen(role === 'technician' ? 'technician-dashboard' : 'lift-selector');
             }}
             onError={() => setCurrentScreen('login')}
+          />
+        );
+      
+      case 'technician-dashboard':
+        return (
+          <TechnicianDashboard 
+            onBack={() => setCurrentScreen('lift-selector')}
           />
         );
 

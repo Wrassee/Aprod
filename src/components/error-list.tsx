@@ -209,10 +209,44 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                                 </h4>
                               </div>
                               
+                              {/* Repair Status Badge (Technician module) */}
+                              {error.status && (
+                                <div className="mb-2">
+                                  {error.status === 'done' && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full border border-green-300">
+                                      <CheckCircle className="h-3 w-3" /> {t("repairStatusDone")}
+                                    </span>
+                                  )}
+                                  {error.status === 'in_progress' && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full border border-blue-300">
+                                      ⏳ {t("repairStatusInProgress")}
+                                    </span>
+                                  )}
+                                  {error.status === 'blocked' && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-800 text-xs font-semibold rounded-full border border-red-300">
+                                      🚫 {t("repairStatusBlocked")}
+                                    </span>
+                                  )}
+                                  {error.status === 'pending' && (
+                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-300">
+                                      ⏰ {t("repairStatusPending")}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
                               {/* Description */}
                               <p className="text-gray-700 dark:text-gray-300 text-sm mb-3 leading-relaxed">
                                 {error.description}
                               </p>
+
+                              {/* Technician comment */}
+                              {error.technicianComment && (
+                                <p className="text-xs text-gray-500 dark:text-gray-400 italic mb-2 flex items-start gap-1">
+                                  <Info className="h-3 w-3 mt-0.5 flex-shrink-0" />
+                                  {error.technicianComment}
+                                </p>
+                              )}
                               
                               {/* Images */}
                               {error.images && error.images.length > 0 && (
@@ -390,7 +424,19 @@ export function ErrorList({ errors = [], onAddError, onEditError, onDeleteError 
                         </div>
                         <h4 className="font-medium text-gray-800">{error.title}</h4>
                       </div>
+                      {/* Repair Status Badge */}
+                      {error.status && (
+                        <div className="mb-2">
+                          {error.status === 'done' && <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-semibold rounded-full border border-green-300"><CheckCircle className="h-3 w-3" /> {t("repairStatusDone")}</span>}
+                          {error.status === 'in_progress' && <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full border border-blue-300">⏳ {t("repairStatusInProgress")}</span>}
+                          {error.status === 'blocked' && <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-800 text-xs font-semibold rounded-full border border-red-300">🚫 {t("repairStatusBlocked")}</span>}
+                          {error.status === 'pending' && <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full border border-yellow-300">⏰ {t("repairStatusPending")}</span>}
+                        </div>
+                      )}
                       <p className="text-gray-600 text-sm mb-3">{error.description}</p>
+                      {error.technicianComment && (
+                        <p className="text-xs text-gray-500 italic mb-2">{error.technicianComment}</p>
+                      )}
                       
                       {error.images && error.images.length > 0 && (
                         <div className="flex space-x-2">

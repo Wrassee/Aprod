@@ -13,6 +13,7 @@ import { protocolMappingRoutes } from "./routes/protocol-mapping.js";
 import { errorRoutes } from "./routes/error-routes.js";
 import aiHelpRoutes from "./routes/ai-help-routes.js";
 import userManualRoutes from "./routes/user-manual-routes.js";
+import technicianRoutes from "./routes/technician-routes.js";
 
 // ===== LIFT TYPE SELECTION ROUTES =====
 import liftTypesRoutes from "./routes/lift-types.js";
@@ -51,6 +52,7 @@ export async function registerRoutes(app: Express) {
   app.use("/api/errors", errorRoutes);
   app.use("/api/ai-help", aiHelpRoutes);
   app.use("/api/manual", userManualRoutes);
+  app.use("/api/technician", technicianRoutes);
 
   // ===== LIFT TYPE SELECTION API REGISZTRÁCIÓ =====
   app.use("/api/admin", requireAdmin, liftTypesRoutes);

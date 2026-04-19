@@ -16,7 +16,7 @@ interface UserProfile {
   user_id: string;
   full_name: string | null;
   email: string | null;
-  role: 'admin' | 'user' | null;
+  role: 'admin' | 'user' | 'technician' | null;
   created_at: string;
   last_sign_in_at?: string | null;
 }
@@ -30,6 +30,7 @@ export function UserList() {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [changingRoleUserId, setChangingRoleUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (supabase) {
@@ -134,6 +135,33 @@ export function UserList() {
       });
     } finally {
       setDeletingUserId(null);
+    }
+  };
+
+  const handleChangeRole = async (userId: string, newRole: 'admin' | 'user' | 'technician') => {
+    if (!supabase) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    setChangingRoleUserId(userId);
+    try {
+      const response = await fetch(getApiUrl(`/api/admin/users/${userId}/role`), {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role: newRole }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
+      
+      setUsers(prev => prev.map(u => u.user_id === userId ? { ...u, role: newRole } : u));
+      toast({ title: t("success"), description: result.message });
+    } catch (error: any) {
+      toast({ title: t("error"), description: error.message, variant: 'destructive' });
+    } finally {
+      setChangingRoleUserId(null);
     }
   };
 
@@ -335,19 +363,37 @@ export function UserList() {
                         {user.email || '-'}
                       </TableCell>
                       <TableCell>
-                        <Badge 
-                          className={`${
-                            user.role === 'admin' 
-                              ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-0' 
-                              : 'bg-gradient-to-r from-blue-500 to-sky-500 text-white border-0'
-                          } px-3 py-1 shadow-md`}
-                        >
-                          {user.role === 'admin' 
-                            // JAVÍTVA
-                            ? t("Admin.UserManagement.roleAdmin")
-                            : t("Admin.UserManagement.roleUser")
-                          }
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge 
+                            className={`${
+                              user.role === 'admin' 
+                                ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white border-0'
+                                : user.role === 'technician'
+                                  ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white border-0'
+                                  : 'bg-gradient-to-r from-blue-500 to-sky-500 text-white border-0'
+                            } px-3 py-1 shadow-md`}
+                          >
+                            {user.role === 'admin' 
+                              ? t("Admin.UserManagement.roleAdmin")
+                              : user.role === 'technician'
+                                ? t("roleTechnician")
+                                : t("Admin.UserManagement.roleUser")
+                            }
+                          </Badge>
+                          {changingRoleUserId === user.user_id ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                          ) : (
+                            <select
+                              className="text-xs bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded px-1 py-0.5 cursor-pointer"
+                              value={user.role || 'user'}
+                              onChange={(e) => handleChangeRole(user.user_id, e.target.value as 'admin' | 'user' | 'technician')}
+                            >
+                              <option value="user">{t("Admin.UserManagement.roleUser")}</option>
+                              <option value="technician">{t("roleTechnician")}</option>
+                              <option value="admin">{t("Admin.UserManagement.roleAdmin")}</option>
+                            </select>
+                          )}
+                        </div>
                       </TableCell>
                       <TableCell className="text-sm text-gray-500">
                         {(() => {
@@ -434,16 +480,35 @@ export function UserList() {
                     {user.email || '-'}
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={user.role === 'admin' ? 'default' : 'secondary'}
-                      className={user.role === 'admin' ? 'bg-blue-600' : ''}
-                    >
-                      {user.role === 'admin' 
-                        // JAVÍTVA
-                        ? t("Admin.UserManagement.roleAdmin")
-                        : t("Admin.UserManagement.roleUser")
-                      }
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge 
+                        variant={user.role === 'admin' ? 'default' : 'secondary'}
+                        className={
+                          user.role === 'admin' ? 'bg-blue-600 text-white' : 
+                          user.role === 'technician' ? 'bg-orange-500 text-white' : ''
+                        }
+                      >
+                        {user.role === 'admin' 
+                          ? t("Admin.UserManagement.roleAdmin")
+                          : user.role === 'technician'
+                            ? t("roleTechnician")
+                            : t("Admin.UserManagement.roleUser")
+                        }
+                      </Badge>
+                      {changingRoleUserId === user.user_id ? (
+                        <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                      ) : (
+                        <select
+                          className="text-xs bg-gray-100 border border-gray-200 rounded px-1 py-0.5 cursor-pointer"
+                          value={user.role || 'user'}
+                          onChange={(e) => handleChangeRole(user.user_id, e.target.value as 'admin' | 'user' | 'technician')}
+                        >
+                          <option value="user">{t("Admin.UserManagement.roleUser")}</option>
+                          <option value="technician">{t("roleTechnician")}</option>
+                          <option value="admin">{t("Admin.UserManagement.roleAdmin")}</option>
+                        </select>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell className="text-sm text-gray-500">
                     {(() => {

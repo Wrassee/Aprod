@@ -103,6 +103,10 @@ export interface IStorage {
   /* ---------- Audit Logs (ÚJ SZEKCIÓ) ---------- */
   createAuditLog(log: InsertAuditLog): Promise<void>;
   getAuditLogs(limit?: number): Promise<any[]>;
+
+  /* ---------- Technician module ---------- */
+  getProtocolsByTechnicianId(technicianId: string): Promise<Protocol[]>;
+  getTechnicianUsers(): Promise<Profile[]>;
 }
 
 // ------------------------------------------------------------
@@ -838,6 +842,35 @@ export class DatabaseStorage implements IStorage {
     } catch (error: any) {
       console.error("❌ Error fetching audit logs:", error?.message || error);
       console.error("❌ Full error:", error);
+      return [];
+    }
+  }
+
+  // --- Technician module ---
+  async getProtocolsByTechnicianId(technicianId: string): Promise<Protocol[]> {
+    try {
+      const items = await (db as any)
+        .select()
+        .from(protocols)
+        .where(eq(protocols.assigned_technician_id, technicianId))
+        .orderBy(desc(protocols.created_at));
+      return items;
+    } catch (error) {
+      console.error("❌ Error in getProtocolsByTechnicianId:", error);
+      return [];
+    }
+  }
+
+  async getTechnicianUsers(): Promise<Profile[]> {
+    try {
+      const items = await (db as any)
+        .select()
+        .from(profiles)
+        .where(eq(profiles.role, 'technician'))
+        .orderBy(profiles.name);
+      return items;
+    } catch (error) {
+      console.error("❌ Error in getTechnicianUsers:", error);
       return [];
     }
   }

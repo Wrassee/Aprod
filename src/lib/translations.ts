@@ -508,6 +508,34 @@ export interface Translation {
     questionsFromCache: string;
     noConnection: string;
   };
+
+  // Technician Module
+  technician: string;
+  technicianDashboard: string;
+  myAssignments: string;
+  noAssignments: string;
+  noAssignmentsDesc: string;
+  documentRepair: string;
+  repairStatus: string;
+  repairStatusPending: string;
+  repairStatusInProgress: string;
+  repairStatusDone: string;
+  repairStatusBlocked: string;
+  repairComment: string;
+  repairCommentPlaceholder: string;
+  proofPhoto: string;
+  repairSaved: string;
+  saveRepair: string;
+  assignTechnician: string;
+  selectTechnician: string;
+  technicianAssigned: string;
+  noTechnicianAssigned: string;
+  assignedTo: string;
+  errorRepaired: string;
+  repairInfo: string;
+  allErrorsDone: string;
+  archiveView: string;
+  roleTechnician: string;
 }
 
 // Fordítási objektumok
@@ -1020,6 +1048,34 @@ export const translations: Record<string, Translation> = {
       questionsFromCache: "Kérdések offline gyorsítótárból betöltve",
       noConnection: "Nincs internetkapcsolat",
     },
+
+    // Technician Module
+    technician: "Technikus",
+    technicianDashboard: "Technikus vezérlőpult",
+    myAssignments: "Feladataim",
+    noAssignments: "Nincs hozzárendelt feladat",
+    noAssignmentsDesc: "Jelenleg nincs Önhöz rendelt protokoll javítani.",
+    documentRepair: "Javítás dokumentálása",
+    repairStatus: "Javítás státusza",
+    repairStatusPending: "Függőben",
+    repairStatusInProgress: "Folyamatban",
+    repairStatusDone: "Kész",
+    repairStatusBlocked: "Akadályoztatva",
+    repairComment: "Megjegyzés",
+    repairCommentPlaceholder: "Pl. anyaghiány, több személy szükséges...",
+    proofPhoto: "Bizonyítófotó (javítás után)",
+    repairSaved: "Javítás mentve!",
+    saveRepair: "Mentés",
+    assignTechnician: "Technikus hozzárendelése",
+    selectTechnician: "Válasszon technikust...",
+    technicianAssigned: "Technikus hozzárendelve",
+    noTechnicianAssigned: "Nincs hozzárendelt technikus",
+    assignedTo: "Hozzárendelve:",
+    errorRepaired: "Javítva",
+    repairInfo: "Javítási adatok",
+    allErrorsDone: "Minden hiba javítva!",
+    archiveView: "Archívum",
+    roleTechnician: "Technikus",
   },
   de: {
     // Start Screen
@@ -1535,6 +1591,34 @@ export const translations: Record<string, Translation> = {
       questionsFromCache: "Fragen aus dem Offline-Cache geladen",
       noConnection: "Keine Internetverbindung",
     },
+
+    // Technician Module
+    technician: "Techniker",
+    technicianDashboard: "Techniker-Dashboard",
+    myAssignments: "Meine Aufgaben",
+    noAssignments: "Keine zugewiesenen Aufgaben",
+    noAssignmentsDesc: "Aktuell sind Ihnen keine Protokolle zur Reparatur zugewiesen.",
+    documentRepair: "Reparatur dokumentieren",
+    repairStatus: "Reparaturstatus",
+    repairStatusPending: "Ausstehend",
+    repairStatusInProgress: "In Bearbeitung",
+    repairStatusDone: "Erledigt",
+    repairStatusBlocked: "Blockiert",
+    repairComment: "Kommentar",
+    repairCommentPlaceholder: "z.B. Materialmangel, mehrere Personen erforderlich...",
+    proofPhoto: "Nachweisfoto (nach der Reparatur)",
+    repairSaved: "Reparatur gespeichert!",
+    saveRepair: "Speichern",
+    assignTechnician: "Techniker zuweisen",
+    selectTechnician: "Techniker auswählen...",
+    technicianAssigned: "Techniker zugewiesen",
+    noTechnicianAssigned: "Kein Techniker zugewiesen",
+    assignedTo: "Zugewiesen an:",
+    errorRepaired: "Repariert",
+    repairInfo: "Reparaturdaten",
+    allErrorsDone: "Alle Fehler behoben!",
+    archiveView: "Archiv",
+    roleTechnician: "Techniker",
   },
 
   en: {
@@ -2035,6 +2119,34 @@ export const translations: Record<string, Translation> = {
       questionsFromCache: "Questions loaded from offline cache",
       noConnection: "No internet connection",
     },
+
+    // Technician Module
+    technician: "Technician",
+    technicianDashboard: "Technician Dashboard",
+    myAssignments: "My Assignments",
+    noAssignments: "No assigned tasks",
+    noAssignmentsDesc: "No protocols are currently assigned to you for repair.",
+    documentRepair: "Document Repair",
+    repairStatus: "Repair Status",
+    repairStatusPending: "Pending",
+    repairStatusInProgress: "In Progress",
+    repairStatusDone: "Done",
+    repairStatusBlocked: "Blocked",
+    repairComment: "Comment",
+    repairCommentPlaceholder: "e.g. material shortage, more personnel needed...",
+    proofPhoto: "Proof Photo (after repair)",
+    repairSaved: "Repair saved!",
+    saveRepair: "Save",
+    assignTechnician: "Assign Technician",
+    selectTechnician: "Select technician...",
+    technicianAssigned: "Technician assigned",
+    noTechnicianAssigned: "No technician assigned",
+    assignedTo: "Assigned to:",
+    errorRepaired: "Repaired",
+    repairInfo: "Repair Details",
+    allErrorsDone: "All errors resolved!",
+    archiveView: "Archive",
+    roleTechnician: "Technician",
   },
 
   fr: {
@@ -2535,6 +2647,34 @@ export const translations: Record<string, Translation> = {
       questionsFromCache: "Questions chargées depuis le cache hors ligne",
       noConnection: "Pas de connexion Internet",
     },
+
+    // Technician Module
+    technician: "Technicien",
+    technicianDashboard: "Tableau de bord technicien",
+    myAssignments: "Mes tâches",
+    noAssignments: "Aucune tâche assignée",
+    noAssignmentsDesc: "Aucun protocole ne vous est actuellement assigné pour réparation.",
+    documentRepair: "Documenter la réparation",
+    repairStatus: "Statut de la réparation",
+    repairStatusPending: "En attente",
+    repairStatusInProgress: "En cours",
+    repairStatusDone: "Terminé",
+    repairStatusBlocked: "Bloqué",
+    repairComment: "Commentaire",
+    repairCommentPlaceholder: "p.ex. manque de matériaux, plus de personnel nécessaire...",
+    proofPhoto: "Photo de preuve (après réparation)",
+    repairSaved: "Réparation enregistrée !",
+    saveRepair: "Enregistrer",
+    assignTechnician: "Assigner un technicien",
+    selectTechnician: "Sélectionner un technicien...",
+    technicianAssigned: "Technicien assigné",
+    noTechnicianAssigned: "Aucun technicien assigné",
+    assignedTo: "Assigné à :",
+    errorRepaired: "Réparé",
+    repairInfo: "Détails de réparation",
+    allErrorsDone: "Toutes les erreurs résolues !",
+    archiveView: "Archives",
+    roleTechnician: "Technicien",
   },
 
   it: {
@@ -3034,6 +3174,34 @@ export const translations: Record<string, Translation> = {
       questionsFromCache: "Domande caricate dalla cache offline",
       noConnection: "Nessuna connessione Internet",
     },
+
+    // Technician Module
+    technician: "Tecnico",
+    technicianDashboard: "Dashboard tecnico",
+    myAssignments: "I miei compiti",
+    noAssignments: "Nessun compito assegnato",
+    noAssignmentsDesc: "Nessun protocollo è attualmente assegnato a te per la riparazione.",
+    documentRepair: "Documenta riparazione",
+    repairStatus: "Stato della riparazione",
+    repairStatusPending: "In attesa",
+    repairStatusInProgress: "In corso",
+    repairStatusDone: "Completato",
+    repairStatusBlocked: "Bloccato",
+    repairComment: "Commento",
+    repairCommentPlaceholder: "es. carenza di materiale, necessario più personale...",
+    proofPhoto: "Foto di prova (dopo la riparazione)",
+    repairSaved: "Riparazione salvata!",
+    saveRepair: "Salva",
+    assignTechnician: "Assegna tecnico",
+    selectTechnician: "Seleziona tecnico...",
+    technicianAssigned: "Tecnico assegnato",
+    noTechnicianAssigned: "Nessun tecnico assegnato",
+    assignedTo: "Assegnato a:",
+    errorRepaired: "Riparato",
+    repairInfo: "Dettagli riparazione",
+    allErrorsDone: "Tutti gli errori risolti!",
+    archiveView: "Archivio",
+    roleTechnician: "Tecnico",
   },
 };
 

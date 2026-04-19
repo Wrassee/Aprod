@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
   Loader2, FileText, AlertCircle, Calendar, CheckCircle, 
-  Download, Eye, Trash2, RefreshCw, Sparkles 
+  Download, Eye, Trash2, RefreshCw, Sparkles, Wrench 
 } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
 
@@ -25,6 +25,13 @@ interface Protocol {
   created_at: string;
   status?: string | null;
   user_id?: string;
+  assigned_technician_id?: string | null;
+}
+
+interface Technician {
+  user_id: string;
+  full_name: string | null;
+  email: string | null;
 }
 
 interface ProtocolsResponse {
@@ -46,6 +53,8 @@ export function ProtocolList() {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [technicians, setTechnicians] = useState<Technician[]>([]);
+  const [assigningId, setAssigningId] = useState<string | null>(null);
 
   useEffect(() => {
     console.log('📋 ProtocolList useEffect triggered');
@@ -164,6 +173,55 @@ export function ProtocolList() {
       });
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  // Technikusok betöltése (csak admin számára)
+  useEffect(() => {
+    if (role === 'admin' && supabase) {
+      (async () => {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session) return;
+          const resp = await fetch(`${API_BASE_URL}/api/technician/technicians`, {
+            headers: { 'Authorization': `Bearer ${session.access_token}` },
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            setTechnicians(Array.isArray(data) ? data : []);
+          }
+        } catch {
+          // Silent - technikusok listája nem kritikus
+        }
+      })();
+    }
+  }, [role, supabase]);
+
+  const handleAssignTechnician = async (protocolId: string, technicianId: string) => {
+    if (!supabase) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    setAssigningId(protocolId);
+    try {
+      const resp = await fetch(`${API_BASE_URL}/api/technician/assign/${protocolId}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ technicianId: technicianId || null }),
+      });
+      if (!resp.ok) throw new Error('Hozzárendelés sikertelen');
+      
+      setProtocols(prev => prev.map(p => 
+        p.id === protocolId ? { ...p, assigned_technician_id: technicianId || null } : p
+      ));
+      toast({ title: t("success"), description: t("technicianAssigned") });
+    } catch (err: any) {
+      toast({ title: t("error"), description: err.message, variant: 'destructive' });
+    } finally {
+      setAssigningId(null);
     }
   };
 
@@ -316,6 +374,28 @@ export function ProtocolList() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-2">
+                            {role === 'admin' && technicians.length > 0 && (
+                              assigningId === protocol.id ? (
+                                <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
+                              ) : (
+                                <div className="flex items-center gap-1">
+                                  <Wrench className="h-3 w-3 text-orange-500" />
+                                  <select
+                                    className="text-xs bg-orange-50 border border-orange-200 rounded px-1 py-0.5 cursor-pointer max-w-28"
+                                    value={protocol.assigned_technician_id || ''}
+                                    onChange={(e) => handleAssignTechnician(protocol.id, e.target.value)}
+                                    title={t("assignTechnician")}
+                                  >
+                                    <option value="">—</option>
+                                    {technicians.map(tech => (
+                                      <option key={tech.user_id} value={tech.user_id}>
+                                        {tech.full_name || tech.email}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              )
+                            )}
                             <Button
                               variant="ghost"
                               size="sm"
@@ -409,19 +489,40 @@ export function ProtocolList() {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-600 hover:text-red-800 hover:bg-red-50"
-                        onClick={() => handleDelete(protocol.id, protocol.protocol_number || undefined)}
-                        disabled={deletingId === protocol.id}
-                      >
-                        {deletingId === protocol.id ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                          <Trash2 className="h-4 w-4" />
+                      <div className="flex items-center justify-end gap-2">
+                        {role === 'admin' && technicians.length > 0 && (
+                          assigningId === protocol.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-orange-500" />
+                          ) : (
+                            <select
+                              className="text-xs bg-gray-100 border border-gray-200 rounded px-1 py-0.5 cursor-pointer max-w-28"
+                              value={protocol.assigned_technician_id || ''}
+                              onChange={(e) => handleAssignTechnician(protocol.id, e.target.value)}
+                              title={t("assignTechnician")}
+                            >
+                              <option value="">—</option>
+                              {technicians.map(tech => (
+                                <option key={tech.user_id} value={tech.user_id}>
+                                  {tech.full_name || tech.email}
+                                </option>
+                              ))}
+                            </select>
+                          )
                         )}
-                      </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                          onClick={() => handleDelete(protocol.id, protocol.protocol_number || undefined)}
+                          disabled={deletingId === protocol.id}
+                        >
+                          {deletingId === protocol.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

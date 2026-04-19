@@ -213,3 +213,24 @@ export async function requireAdmin(req: Request, res: Response, next: NextFuncti
     res.status(403).json({ message: 'Forbidden: Admin access required.' });
   }
 }
+
+/**
+ * Middleware to ensure technicians or admins can access certain routes.
+ * This should be used AFTER requireAuth middleware.
+ */
+export async function requireTechnicianOrAdmin(req: Request, res: Response, next: NextFunction) {
+  const authenticatedUser = (req as any).user;
+
+  if (!authenticatedUser) {
+    console.warn('⚠️ [Auth] requireTechnicianOrAdmin: No authenticated user found');
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+
+  if (authenticatedUser.role === 'admin' || authenticatedUser.role === 'technician') {
+    console.log(`✅ [Auth] Technician/Admin access granted for user: ${authenticatedUser.user_id || authenticatedUser.id} (role: ${authenticatedUser.role})`);
+    next();
+  } else {
+    console.warn(`⚠️ [Auth] requireTechnicianOrAdmin: User ${authenticatedUser.user_id || authenticatedUser.id} has role '${authenticatedUser.role}', technician/admin required`);
+    res.status(403).json({ message: 'Forbidden: Technician or Admin access required.' });
+  }
+}

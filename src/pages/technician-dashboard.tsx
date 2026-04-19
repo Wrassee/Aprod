@@ -13,12 +13,12 @@ import {
 } from 'lucide-react';
 import type { ProtocolError } from '@shared/schema';
 
-const LANGUAGE_FLAGS: { code: SupportedLanguage; countryCode: string; label: string }[] = [
-  { code: 'hu', countryCode: 'HU', label: 'Magyar' },
-  { code: 'de', countryCode: 'DE', label: 'Deutsch' },
-  { code: 'en', countryCode: 'GB', label: 'English' },
-  { code: 'fr', countryCode: 'FR', label: 'Français' },
-  { code: 'it', countryCode: 'IT', label: 'Italiano' },
+const LANGUAGE_FLAGS: { code: SupportedLanguage; countryCode: string; label: string; short: string }[] = [
+  { code: 'hu', countryCode: 'HU', label: 'Magyar', short: 'Hu' },
+  { code: 'de', countryCode: 'DE', label: 'Deutsch', short: 'De' },
+  { code: 'en', countryCode: 'GB', label: 'English', short: 'En' },
+  { code: 'fr', countryCode: 'FR', label: 'Français', short: 'Fr' },
+  { code: 'it', countryCode: 'IT', label: 'Italiano', short: 'It' },
 ];
 
 interface Protocol {
@@ -218,7 +218,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
           </div>
           {/* Language selector row */}
           <div className="flex items-center gap-1 flex-wrap">
-            {LANGUAGE_FLAGS.map(({ code, countryCode, label }) => (
+            {LANGUAGE_FLAGS.map(({ code, countryCode, label, short }) => (
               <button
                 key={code}
                 onClick={() => setLanguage(code)}
@@ -235,7 +235,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                   style={{ width: '1.4em', height: '1.4em', borderRadius: '2px' }}
                   title={label}
                 />
-                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{label.split(' ')[0].substring(0, 3)}</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">{short}</span>
               </button>
             ))}
             <span className="text-xs text-gray-400 ml-1">

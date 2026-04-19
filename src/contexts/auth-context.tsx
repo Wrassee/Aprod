@@ -202,7 +202,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ============================================
   const resetPasswordForEmail = async (email: string) => {
     try {
-      const appUrl = import.meta.env.VITE_APP_URL || window.location.origin;
+      // VITE_APP_URL env változó, vagy ha localhost-on fut, a szerver adja meg a valós URL-t
+      const envUrl = import.meta.env.VITE_APP_URL;
+      const origin = window.location.origin;
+      const isLocalhost = origin.includes('localhost') || origin.includes('127.0.0.1');
+      const appUrl = envUrl || (isLocalhost ? '' : origin);
+      
       console.log('📧 Sending password reset email to:', email, 'with redirect:', `${appUrl}/reset-password`);
 
       const { error } = await supabase.auth.resetPasswordForEmail(email, {

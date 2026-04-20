@@ -452,10 +452,16 @@ class ExcelParserService {
             
             if (sheetName && workbook.Sheets[sheetName]) {
               const worksheet = workbook.Sheets[sheetName];
-              // Ha ez a kiválasztott opció, "X"-et írunk, különben "-"-t
-              const value = (answer === optionsArr[index]) ? 'X' : '-';
+              // Többnyelvű opció-támogatás: ha az opció tartalmaz | elválasztót,
+              // az összes nyelvi változat ellen ellenőrizzük a tárolt választ
+              const rawOption = optionsArr[index];
+              const optionVariants = rawOption.includes('|')
+                ? rawOption.split('|').map((v: string) => v.trim())
+                : [rawOption];
+              const isSelected = optionVariants.includes(String(answer ?? ''));
+              const value = isSelected ? 'X' : '-';
               worksheet[actualCellRef] = { v: value, t: 's' };
-              console.log(`🖋️ select_extended ${sheetName}!${actualCellRef} = "${value}" (option: ${optionsArr[index]})`);
+              console.log(`🖋️ select_extended ${sheetName}!${actualCellRef} = "${value}" (option: ${rawOption})`);
             }
           });
           return; // Megvan, tovább a következő kérdésre

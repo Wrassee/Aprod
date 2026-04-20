@@ -23,7 +23,7 @@ const IsolatedQuestionComponent = memo(({
   onImageUpload,
   images = []
 }: IsolatedQuestionProps) => {
-  const { t } = useLanguageContext();
+  const { t, language } = useLanguageContext();
   const { theme } = useTheme();
   
   // Fókusz állapot követése - MINDEN kérdésen
@@ -137,6 +137,7 @@ const IsolatedQuestionComponent = memo(({
         maxLength={question.maxLength}
         unit={question.unit}
         calculationConfig={question.calculationConfig}
+        language={language}
       />
     );
   }, [question, value, onChange, t, theme, handleEnterKeyNavigation]);

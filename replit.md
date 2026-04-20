@@ -1,7 +1,9 @@
 # OTIS APROD (Acceptance Protocol Document) Application
 
 ## Overview
-This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in both Hungarian and German with complete multilingual support, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
+This full-stack TypeScript application digitalizes the OTIS elevator acceptance protocol process. It guides users through a step-by-step questionnaire, enables error documentation with images, generates PDFs, and supports sharing. The system operates in Hungarian, German, English, French and Italian with complete multilingual support, aiming to streamline and standardize the acceptance process, reduce manual errors, and improve efficiency for OTIS technicians. The project envisions a future of fully digitized and seamlessly integrated elevator inspection and acceptance procedures within existing OTIS systems.
+
+**Current version: v0.9.8 - 2026**
 
 ## User Preferences
 Preferred communication style: Simple, everyday language (Hungarian preferred).
@@ -24,13 +26,14 @@ Prefers free AI APIs (Groq) over paid solutions.
 ### Backend
 - **Runtime**: Node.js with TypeScript.
 - **Framework**: Express.js.
-- **Database**: PostgreSQL with Drizzle ORM.
+- **Database**: PostgreSQL with Drizzle ORM (Supabase hosted).
 - **File Generation**: Dedicated services for Excel and PDF document creation.
 - **API Endpoints**: RESTful API for protocols, templates, and question configurations.
 - **AI Integration**: Groq API with llama-3.3-70b-versatile model for interactive help chat.
 
 ### Key Features & Design Patterns
-- **Multi-language Support**: Hungarian and German localization with dynamic switching, using stable `groupKey` slugs and 5-language coverage for core features.
+- **Multi-language Support**: 5-language localization (hu/de/en/fr/it) with dynamic switching, using stable `groupKey` slugs. Language selector uses country flag icons with short codes (Hu/De/En/Fr/It).
+- **Multilingual Select Options**: Excel template `options` column supports pipe-separated language variants (`Kórház|Krankenhaus|Hospital|Hôpital|Ospedale`). Frontend auto-resolves stored answers to current language. Backend `select_extended` matches against all language variants.
 - **Conditional Question Filtering**: Excel-driven visibility control using stable `groupKey` architecture. Supports `conditional_group_key` for dynamic question block visibility, with `defaultIfHidden` for automatic Excel cell population.
 - **Mixed-Type Question Blocks**: Flexible rendering supporting any combination of question types. Smart table/card layout logic for `yes_no_na` questions within a block.
 - **Template Management System**: Admin interface for uploading, activating, and deleting Excel-based question and protocol templates, supporting unified multilingual templates. Template preview dialog with metadata and question list.
@@ -44,9 +47,16 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **Measurement & Calculation**: Supports 'measurement' and 'calculated' question types with a dedicated engine and automatic error detection.
 - **Excel Template-Based Niedervolt System**: Dynamic device loading from Excel templates with custom device creation and FI measurement columns.
 - **Deployment**: Configured for Vercel with serverless API, PWA functionality.
-- **Authentication & Authorization**: Supabase integration for user authentication with role-based access control (admin, technician, user), including user profiles, session management, multilingual login/registration, protected routes, and API security with JWT token validation and Zod validation.
+- **Authentication & Authorization**: Supabase integration for user authentication with role-based access control (admin, technician, user), including user profiles, session management, multilingual login/registration, protected routes, and API security with JWT token validation and Zod validation. Local DB is authoritative for roles; Supabase metadata only overrides for elevated roles.
 - **AI-Powered Help System**: Integrated Smart Help Wizard with contextual suggestions, FAQ (5 languages), interactive AI chat (Groq), and downloadable user manual.
-- **Technician Module**: Full repair workflow, role-based routing, assignment management, and error status tracking for technicians.
+- **Technician Module**: Full repair workflow, role-based routing, assignment management, and error status tracking for technicians. Dashboard shows lift identifier (answers['7']), error counts by status, 5-language selector with flag icons.
+
+## Key Database Notes
+- `protocols.user_id` column exists in DB but NOT in `shared/schema.ts` — must use raw SQL (`sql` template literals) for user_id filtering in `storage.ts` and `admin-routes.ts`.
+- Protocol identifier shown in UI = `answers['7']` (Otis Lift-azonosító field).
+
+## Known URL Encoding Pattern
+- Error IDs may contain forward slashes (e.g. `grounding_OK3/1`). Always use `encodeURIComponent(errorId)` in frontend fetch URLs for technician repair PATCH requests.
 
 ## External Dependencies
 ### Frontend
@@ -58,6 +68,7 @@ Prefers free AI APIs (Groq) over paid solutions.
 - **Routing**: `wouter`
 - **Signature Capture**: `react-signature-canvas`
 - **Calendar**: `react-day-picker`
+- **Flag Icons**: `react-country-flag` (installed with --legacy-peer-deps due to Capacitor conflict)
 
 ### Backend
 - **Server Framework**: `express`

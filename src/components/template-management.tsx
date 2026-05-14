@@ -846,17 +846,21 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                       {selectedQuestionTemplate && (
                         <div className="flex items-center gap-2">
                           <span className="text-blue-600">📝</span>
-                          <span>{hybridTemplates?.local.find(t => t.id === selectedQuestionTemplate)?.name || 
-                                 hybridTemplates?.remote.find(t => t.id === selectedQuestionTemplate)?.name || 
-                                 selectedQuestionTemplate}</span>
+                          <span>{(() => {
+                            const loc = hybridTemplates?.local.find(t => t.id === selectedQuestionTemplate);
+                            if (loc) return language === 'de' ? (loc.name_de || loc.name) : loc.name;
+                            return hybridTemplates?.remote.find(t => t.id === selectedQuestionTemplate)?.name || selectedQuestionTemplate;
+                          })()}</span>
                         </div>
                       )}
                       {selectedProtocolTemplate && (
                         <div className="flex items-center gap-2">
                           <span className="text-green-600">📋</span>
-                          <span>{hybridTemplates?.local.find(t => t.id === selectedProtocolTemplate)?.name || 
-                                 hybridTemplates?.remote.find(t => t.id === selectedProtocolTemplate)?.name || 
-                                 selectedProtocolTemplate}</span>
+                          <span>{(() => {
+                            const loc = hybridTemplates?.local.find(t => t.id === selectedProtocolTemplate);
+                            if (loc) return language === 'de' ? (loc.name_de || loc.name) : loc.name;
+                            return hybridTemplates?.remote.find(t => t.id === selectedProtocolTemplate)?.name || selectedProtocolTemplate;
+                          })()}</span>
                         </div>
                       )}
                     </div>

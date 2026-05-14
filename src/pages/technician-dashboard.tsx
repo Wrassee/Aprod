@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import ReactCountryFlag from 'react-country-flag';
 import { useLanguageContext, type SupportedLanguage } from "@/components/language-context";
 import { useAuth } from '@/contexts/auth-context';
+import { useTheme } from '@/contexts/theme-context';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getApiUrl, getAuthHeaders } from '@/lib/queryClient';
@@ -57,6 +58,40 @@ interface TechnicianDashboardProps {
 export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
   const { t, language, setLanguage } = useLanguageContext();
   const { signOut, user } = useAuth();
+  const { theme } = useTheme();
+
+  // Téma-függő stílusok segédobjektuma
+  const th = {
+    bg: theme === 'modern'
+      ? 'bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800'
+      : 'bg-light-surface dark:bg-gray-900',
+    iconBadge: theme === 'modern'
+      ? 'bg-gradient-to-br from-orange-500 to-amber-400'
+      : 'bg-otis-blue',
+    langActive: theme === 'modern'
+      ? 'border-orange-400 bg-orange-50 dark:bg-orange-950 shadow-sm scale-105'
+      : 'border-otis-blue bg-blue-50 dark:bg-blue-950 shadow-sm scale-105',
+    spinner: theme === 'modern' ? 'text-orange-500' : 'text-otis-blue',
+    modalHeader: theme === 'modern'
+      ? 'bg-gradient-to-r from-orange-500 to-amber-400'
+      : 'bg-otis-blue',
+    modalRounded: theme === 'modern' ? 'sm:rounded-2xl' : 'sm:rounded-lg',
+    itemRounded: theme === 'modern' ? 'rounded-xl' : 'rounded-md',
+    statusSelected: theme === 'modern'
+      ? 'border-orange-500 bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-300'
+      : 'border-otis-blue bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300',
+    textareaRing: theme === 'modern' ? 'focus:ring-orange-400' : 'focus:ring-blue-500',
+    photoBorder: theme === 'modern' ? 'border-orange-300' : 'border-blue-300',
+    uploadHover: theme === 'modern'
+      ? 'hover:border-orange-400 hover:text-orange-500'
+      : 'hover:border-otis-blue hover:text-otis-blue',
+    saveBtn: theme === 'modern'
+      ? 'bg-orange-500 hover:bg-orange-600 text-white font-semibold'
+      : 'bg-otis-blue hover:bg-blue-700 text-white font-semibold',
+    repairBtnPending: theme === 'modern'
+      ? 'bg-orange-500 hover:bg-orange-600 text-white'
+      : 'bg-otis-blue hover:bg-blue-700 text-white',
+  };
 
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [loading, setLoading] = useState(true);
@@ -175,7 +210,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
 
   // ---- RENDER ----
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+    <div className={`min-h-screen ${th.bg}`}>
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl font-semibold shadow-lg text-white transition-all ${toast.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
@@ -189,7 +224,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
           {/* Top row: icon + title + refresh + logout */}
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500 to-amber-400 flex items-center justify-center shadow-md">
+              <div className={`w-10 h-10 rounded-xl ${th.iconBadge} flex items-center justify-center shadow-md`}>
                 <Wrench className="h-5 w-5 text-white" />
               </div>
               <div>
@@ -225,7 +260,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                 title={label}
                 className={`px-1.5 py-0.5 rounded-lg transition-all border flex items-center gap-1 ${
                   language === code
-                    ? 'border-orange-400 bg-orange-50 dark:bg-orange-950 shadow-sm scale-105'
+                    ? th.langActive
                     : 'border-transparent hover:border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 opacity-50 hover:opacity-100'
                 }`}
               >
@@ -250,7 +285,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="h-12 w-12 animate-spin text-orange-500 mb-4" />
+            <Loader2 className={`h-12 w-12 animate-spin ${th.spinner} mb-4`} />
             <p className="text-gray-500">{t('loading')}...</p>
           </div>
         ) : protocols.length === 0 ? (
@@ -335,7 +370,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                       return (
                         <div
                           key={error.id}
-                          className={`rounded-xl border p-4 transition-all ${error.status === 'done' ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'}`}
+                          className={`${th.itemRounded} border p-4 transition-all ${error.status === 'done' ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'}`}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
@@ -389,7 +424,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                               <Button
                                 size="sm"
                                 onClick={() => openRepairModal(protocol.id, error)}
-                                className={`text-xs font-semibold shadow-sm ${error.status === 'done' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-orange-500 hover:bg-orange-600 text-white'}`}
+                                className={`text-xs font-semibold shadow-sm ${error.status === 'done' ? 'bg-green-600 hover:bg-green-700 text-white' : th.repairBtnPending}`}
                               >
                                 <Wrench className="h-3 w-3 mr-1" />
                                 {error.status === 'done' ? t('errorRepaired') : t('documentRepair')}
@@ -410,9 +445,9 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
       {/* Repair Documentation Modal */}
       {repairModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="bg-white dark:bg-gray-900 w-full sm:max-w-lg sm:rounded-2xl shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh]">
+          <div className={`bg-white dark:bg-gray-900 w-full sm:max-w-lg ${th.modalRounded} shadow-2xl flex flex-col max-h-[92vh] sm:max-h-[85vh]`}>
             {/* Modal Header — always visible */}
-            <div className="flex-shrink-0 bg-gradient-to-r from-orange-500 to-amber-400 px-5 py-4 flex items-center justify-between sm:rounded-t-2xl">
+            <div className={`flex-shrink-0 ${th.modalHeader} px-5 py-4 flex items-center justify-between ${theme === 'modern' ? 'sm:rounded-t-2xl' : 'sm:rounded-t-lg'}`}>
               <div className="flex items-center gap-2">
                 <Wrench className="h-5 w-5 text-white" />
                 <span className="text-white font-bold text-base">{t('documentRepair')}</span>
@@ -440,7 +475,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                       <button
                         key={s}
                         onClick={() => setRepairStatus(s)}
-                        className={`flex items-center gap-2 p-3 rounded-xl border-2 text-sm font-semibold transition-all ${repairStatus === s ? 'border-orange-500 bg-orange-50 dark:bg-orange-950/30 text-orange-700 dark:text-orange-300' : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300'}`}
+                        className={`flex items-center gap-2 p-3 ${th.itemRounded} border-2 text-sm font-semibold transition-all ${repairStatus === s ? th.statusSelected : 'border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:border-gray-300'}`}
                       >
                         <StatusIcon className="h-4 w-4 flex-shrink-0" />
                         <span className="truncate">{cfg.label}</span>
@@ -461,7 +496,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                   onChange={(e) => setRepairComment(e.target.value)}
                   placeholder={t('repairCommentPlaceholder')}
                   rows={3}
-                  className="w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 resize-none"
+                  className={`w-full ${th.itemRounded} border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white px-3 py-2 text-sm focus:outline-none focus:ring-2 ${th.textareaRing} resize-none`}
                 />
               </div>
 
@@ -473,7 +508,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                 </label>
                 {proofPhotoBase64 ? (
                   <div className="relative inline-block">
-                    <img src={proofPhotoBase64} alt="proof" className="w-32 h-32 object-cover rounded-xl border-2 border-orange-300 shadow" />
+                    <img src={proofPhotoBase64} alt="proof" className={`w-32 h-32 object-cover ${th.itemRounded} border-2 ${th.photoBorder} shadow`} />
                     <button
                       onClick={() => setProofPhotoBase64('')}
                       className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full text-xs font-bold hover:bg-red-600 flex items-center justify-center"
@@ -484,7 +519,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
                 ) : (
                   <button
                     onClick={() => photoInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl py-4 flex items-center justify-center gap-3 text-gray-500 hover:border-orange-400 hover:text-orange-500 transition-colors"
+                    className={`w-full border-2 border-dashed border-gray-300 dark:border-gray-600 ${th.itemRounded} py-4 flex items-center justify-center gap-3 text-gray-500 ${th.uploadHover} transition-colors`}
                   >
                     <Camera className="h-5 w-5" />
                     <span className="text-sm font-medium">{t('uploadPhotos')}</span>
@@ -509,7 +544,7 @@ export function TechnicianDashboard({ onBack }: TechnicianDashboardProps) {
               <Button
                 onClick={saveRepair}
                 disabled={savingRepair}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+                className={`flex-1 ${th.saveBtn}`}
               >
                 {savingRepair ? (
                   <><Loader2 className="h-4 w-4 animate-spin mr-2" /> {t('saving')}</>

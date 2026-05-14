@@ -1144,4 +1144,45 @@ router.post('/backup/restore', requireAdmin, async (req, res) => {
   }
 });
 
+// ========================================
+// DATABASE RESET (admin only – test phase)
+// ========================================
+router.delete('/reset-database', requireAdmin, async (req, res) => {
+  try {
+    console.log('🗑️ DATABASE RESET initiated by admin...');
+
+    const deletedProtocols = await queryRows(sql`SELECT COUNT(*) as count FROM protocols`);
+    const protocolCount = Number((deletedProtocols[0] as any)?.count || 0);
+
+    await (db as any).execute(sql`DELETE FROM protocols`);
+    console.log(`✅ Deleted ${protocolCount} protocols`);
+
+    let auditCount = 0;
+    try {
+      const deletedAudit = await queryRows(sql`SELECT COUNT(*) as count FROM audit_logs`);
+      auditCount = Number((deletedAudit[0] as any)?.count || 0);
+      await (db as any).execute(sql`DELETE FROM audit_logs`);
+      console.log(`✅ Deleted ${auditCount} audit logs`);
+    } catch (e) {
+      console.warn('⚠️ audit_logs table not available');
+    }
+
+    try {
+      await createManualAuditLog(req, 'settings.update', 'database', 'all', {
+        action: 'database_reset',
+        deleted: { protocols: protocolCount, audit_logs: auditCount }
+      }, 'success', 'Full database reset performed by admin');
+    } catch (e) { /* non-blocking */ }
+
+    console.log(`🗑️ DATABASE RESET complete: ${protocolCount} protocols + ${auditCount} audit logs deleted`);
+    res.json({
+      message: 'Database reset successful',
+      deleted: { protocols: protocolCount, audit_logs: auditCount }
+    });
+  } catch (error: any) {
+    console.error('❌ Database reset failed:', error?.message);
+    res.status(500).json({ message: error?.message || 'Database reset failed' });
+  }
+});
+
 export const adminRoutes = router;

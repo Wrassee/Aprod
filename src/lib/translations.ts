@@ -494,6 +494,14 @@ export interface Translation {
       restoreWarningDesc: string;
       confirmRestore: string;
       backupDate: string;
+      resetDatabase: string;
+      resetDatabaseDesc: string;
+      resetConfirm1Title: string;
+      resetConfirm1Desc: string;
+      resetConfirm2Title: string;
+      resetConfirm2Desc: string;
+      resetSuccess: string;
+      resetError: string;
     };
     comingSoon: {
       dashboard: string;
@@ -1043,6 +1051,14 @@ export const translations: Record<string, Translation> = {
         restoreWarningDesc: "A visszaállítás felülírja az aktuális adatbázis tartalmát. Kérjük, először készítsen mentést a jelenlegi állapotról!",
         confirmRestore: "Visszaállítás megerősítése",
         backupDate: "Mentés dátuma",
+        resetDatabase: "Adatbázis nullázása",
+        resetDatabaseDesc: "Törli az összes protokollt, naplót és tevékenységi naplót. Sablonok és konfiguráció megmarad.",
+        resetConfirm1Title: "Biztosan törölni akarja az összes adatot?",
+        resetConfirm1Desc: "Ez a művelet visszavonhatatlan! Minden protokoll és tevékenységi napló véglegesen törlésre kerül. A sablonok és beállítások megmaradnak.",
+        resetConfirm2Title: "VÉGLEGES MEGERŐSÍTÉS – Utolsó lehetőség!",
+        resetConfirm2Desc: "Az összes protokoll és napló VÉGLEGESEN és VISSZAVONHATATLANUL törlésre kerül. Biztosan folytatni kívánja?",
+        resetSuccess: "Az adatbázis sikeresen nullázva! Minden protokoll és napló törölve.",
+        resetError: "Hiba az adatbázis törlésekor!",
       },
       comingSoon: {
         dashboard: "Dashboard hamarosan",
@@ -1595,6 +1611,14 @@ export const translations: Record<string, Translation> = {
         restoreWarningDesc: "Die Wiederherstellung überschreibt den aktuellen Datenbankinhalt. Bitte erstellen Sie zuerst eine Sicherung des aktuellen Zustands!",
         confirmRestore: "Wiederherstellung bestätigen",
         backupDate: "Sicherungsdatum",
+        resetDatabase: "Datenbank zurücksetzen",
+        resetDatabaseDesc: "Löscht alle Protokolle, Protokolleinträge und Aktivitätsprotokolle. Vorlagen und Konfiguration bleiben erhalten.",
+        resetConfirm1Title: "Alle Daten wirklich löschen?",
+        resetConfirm1Desc: "Diese Aktion ist unwiderruflich! Alle Protokolle und Aktivitätsprotokolle werden dauerhaft gelöscht. Vorlagen und Einstellungen bleiben erhalten.",
+        resetConfirm2Title: "ENDGÜLTIGE BESTÄTIGUNG – Letzte Chance!",
+        resetConfirm2Desc: "Alle Protokolle und Einträge werden DAUERHAFT und UNWIDERRUFLICH gelöscht. Wirklich fortfahren?",
+        resetSuccess: "Datenbank erfolgreich zurückgesetzt! Alle Protokolle und Einträge wurden gelöscht.",
+        resetError: "Fehler beim Zurücksetzen der Datenbank!",
       },
       comingSoon: {
         dashboard: "Dashboard kommt bald",
@@ -2138,6 +2162,14 @@ export const translations: Record<string, Translation> = {
         restoreWarningDesc: "Restoring will overwrite the current database contents. Please create a backup of the current state first!",
         confirmRestore: "Confirm Restore",
         backupDate: "Backup date",
+        resetDatabase: "Reset Database",
+        resetDatabaseDesc: "Deletes all protocols, logs and activity logs. Templates and configuration are preserved.",
+        resetConfirm1Title: "Are you sure you want to delete all data?",
+        resetConfirm1Desc: "This action is irreversible! All protocols and activity logs will be permanently deleted. Templates and settings will remain.",
+        resetConfirm2Title: "FINAL CONFIRMATION – Last chance!",
+        resetConfirm2Desc: "All protocols and logs will be PERMANENTLY and IRREVERSIBLY deleted. Are you sure you want to proceed?",
+        resetSuccess: "Database successfully reset! All protocols and logs have been deleted.",
+        resetError: "Error resetting the database!",
       },
       comingSoon: {
         dashboard: "Dashboard coming soon",
@@ -2681,6 +2713,14 @@ export const translations: Record<string, Translation> = {
         restoreWarningDesc: "La restauration écrasera le contenu actuel de la base de données. Veuillez d'abord créer une sauvegarde de l'état actuel !",
         confirmRestore: "Confirmer la restauration",
         backupDate: "Date de sauvegarde",
+        resetDatabase: "Réinitialiser la base de données",
+        resetDatabaseDesc: "Supprime tous les protocoles, journaux et journaux d'activité. Les modèles et la configuration sont conservés.",
+        resetConfirm1Title: "Voulez-vous vraiment supprimer toutes les données ?",
+        resetConfirm1Desc: "Cette action est irréversible ! Tous les protocoles et journaux d'activité seront définitivement supprimés. Les modèles et paramètres resteront.",
+        resetConfirm2Title: "CONFIRMATION FINALE – Dernière chance !",
+        resetConfirm2Desc: "Tous les protocoles et journaux seront supprimés DÉFINITIVEMENT et IRRÉVERSIBLEMENT. Voulez-vous vraiment continuer ?",
+        resetSuccess: "Base de données réinitialisée avec succès ! Tous les protocoles et journaux ont été supprimés.",
+        resetError: "Erreur lors de la réinitialisation de la base de données !",
       },
       comingSoon: {
         dashboard: "Tableau de Bord bientôt disponible",
@@ -3223,6 +3263,14 @@ export const translations: Record<string, Translation> = {
         restoreWarningDesc: "Il ripristino sovrascriverà il contenuto attuale del database. Si prega di creare prima un backup dello stato attuale!",
         confirmRestore: "Conferma ripristino",
         backupDate: "Data del backup",
+        resetDatabase: "Azzera il database",
+        resetDatabaseDesc: "Elimina tutti i protocolli, i log e i registri di attività. I modelli e la configurazione vengono conservati.",
+        resetConfirm1Title: "Eliminare davvero tutti i dati?",
+        resetConfirm1Desc: "Questa azione è irreversibile! Tutti i protocolli e i registri di attività verranno eliminati definitivamente. I modelli e le impostazioni rimarranno.",
+        resetConfirm2Title: "CONFERMA DEFINITIVA – Ultima possibilità!",
+        resetConfirm2Desc: "Tutti i protocolli e i registri verranno eliminati DEFINITIVAMENTE e IRREVERSIBILMENTE. Vuoi davvero continuare?",
+        resetSuccess: "Database azzerato con successo! Tutti i protocolli e i registri sono stati eliminati.",
+        resetError: "Errore durante l'azzeramento del database!",
       },
       comingSoon: {
         dashboard: "Dashboard in arrivo",

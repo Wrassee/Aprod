@@ -22,7 +22,9 @@ import {
   Sparkles,
   CheckCircle,
   Palette,
-  Zap
+  Zap,
+  Trash2,
+  ShieldAlert
 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
 import { getApiUrl } from '@/lib/queryClient';
@@ -44,7 +46,7 @@ export function SystemSettings() {
   const { t, language } = useLanguageContext();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-  const { supabase, initialized } = useAuth();
+  const { supabase, initialized, profile } = useAuth();
   
   const [info, setInfo] = useState<SystemInfo | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,6 +57,10 @@ export function SystemSettings() {
   const [restoreFile, setRestoreFile] = useState<File | null>(null);
   const [restorePreview, setRestorePreview] = useState<any>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [showResetConfirm1, setShowResetConfirm1] = useState(false);
+  const [showResetConfirm2, setShowResetConfirm2] = useState(false);
+  const isAdmin = profile?.role === 'admin';
 
   useEffect(() => {
     console.log('ℹ️ SystemSettings useEffect triggered');
@@ -228,6 +234,42 @@ export function SystemSettings() {
       });
     } finally {
       setRestoreLoading(false);
+    }
+  };
+
+  const handleResetDatabase = async () => {
+    setResetLoading(true);
+    try {
+      if (!supabase) throw new Error("Not authenticated");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Authentication required');
+
+      const response = await fetch(getApiUrl('/api/admin/reset-database'), {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${session.access_token}` },
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Reset failed');
+      }
+
+      setShowResetConfirm1(false);
+      setShowResetConfirm2(false);
+
+      toast({
+        title: t("success"),
+        description: t("Admin.Settings.resetSuccess"),
+      });
+    } catch (error: any) {
+      console.error('Database reset failed:', error);
+      toast({
+        title: t("error"),
+        description: error.message || t("Admin.Settings.resetError"),
+        variant: 'destructive',
+      });
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -670,6 +712,92 @@ export function SystemSettings() {
                   </div>
                 </div>
               )}
+
+              {/* ── ADATBÁZIS NULLÁZÁS – csak admin ── */}
+              {isAdmin && (
+                <div className="mt-8 pt-6 border-t-2 border-dashed border-red-200 dark:border-red-900">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-600 to-rose-700 flex items-center justify-center shadow">
+                      <Trash2 className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-red-800 dark:text-red-300 text-sm">{t("Admin.Settings.resetDatabase")}</p>
+                      <p className="text-xs text-red-600 dark:text-red-400">{t("Admin.Settings.resetDatabaseDesc")}</p>
+                    </div>
+                  </div>
+
+                  {!showResetConfirm1 && !showResetConfirm2 && (
+                    <button
+                      onClick={() => setShowResetConfirm1(true)}
+                      className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-700 to-rose-800 hover:from-red-800 hover:to-rose-900 text-white font-semibold shadow-lg transition-all duration-300 hover:shadow-xl"
+                    >
+                      <div className="flex items-center gap-2">
+                        <Trash2 className="h-4 w-4" />
+                        {t("Admin.Settings.resetDatabase")}
+                      </div>
+                    </button>
+                  )}
+
+                  {showResetConfirm1 && !showResetConfirm2 && (
+                    <div className="p-5 rounded-xl bg-red-50 dark:bg-red-950/30 border-2 border-red-400 dark:border-red-700">
+                      <div className="flex items-start gap-3 mb-4">
+                        <ShieldAlert className="h-6 w-6 text-red-600 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-bold text-red-900 dark:text-red-100">{t("Admin.Settings.resetConfirm1Title")}</p>
+                          <p className="text-sm text-red-700 dark:text-red-300 mt-1">{t("Admin.Settings.resetConfirm1Desc")}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => setShowResetConfirm2(true)}
+                          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-700 hover:to-rose-800 text-white font-semibold shadow-lg transition-all"
+                        >
+                          <div className="flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4" />
+                            {t("yes")}
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => setShowResetConfirm1(false)}
+                          className="px-5 py-2.5 rounded-xl bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-semibold transition-all"
+                        >
+                          {t("cancel")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {showResetConfirm2 && (
+                    <div className="p-5 rounded-xl bg-red-900 dark:bg-red-950 border-2 border-red-500 shadow-2xl">
+                      <div className="flex items-start gap-3 mb-4">
+                        <ShieldAlert className="h-7 w-7 text-red-300 flex-shrink-0 mt-0.5 animate-pulse" />
+                        <div>
+                          <p className="font-extrabold text-white text-base">{t("Admin.Settings.resetConfirm2Title")}</p>
+                          <p className="text-sm text-red-200 mt-1">{t("Admin.Settings.resetConfirm2Desc")}</p>
+                        </div>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={handleResetDatabase}
+                          disabled={resetLoading}
+                          className="px-5 py-2.5 rounded-xl bg-white hover:bg-red-100 text-red-900 font-extrabold shadow-lg transition-all disabled:opacity-50"
+                        >
+                          <div className="flex items-center gap-2">
+                            {resetLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                            {t("Admin.Settings.resetDatabase")}
+                          </div>
+                        </button>
+                        <button
+                          onClick={() => { setShowResetConfirm1(false); setShowResetConfirm2(false); }}
+                          className="px-5 py-2.5 rounded-xl bg-red-800 hover:bg-red-700 text-white font-semibold transition-all"
+                        >
+                          {t("cancel")}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -1005,6 +1133,70 @@ export function SystemSettings() {
                   {t("cancel")}
                 </Button>
               </div>
+            </div>
+          )}
+
+          {/* ── ADATBÁZIS NULLÁZÁS – csak admin (classic) ── */}
+          {isAdmin && (
+            <div className="mt-6 pt-4 border-t-2 border-dashed border-red-200">
+              <div className="flex items-center gap-2 mb-2">
+                <Trash2 className="h-4 w-4 text-red-700" />
+                <p className="font-semibold text-red-800 text-sm">{t("Admin.Settings.resetDatabase")}</p>
+              </div>
+              <p className="text-xs text-red-600 mb-3">{t("Admin.Settings.resetDatabaseDesc")}</p>
+
+              {!showResetConfirm1 && !showResetConfirm2 && (
+                <Button
+                  onClick={() => setShowResetConfirm1(true)}
+                  variant="destructive"
+                  size="sm"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  {t("Admin.Settings.resetDatabase")}
+                </Button>
+              )}
+
+              {showResetConfirm1 && !showResetConfirm2 && (
+                <div className="p-4 rounded-lg bg-red-50 border-2 border-red-400">
+                  <div className="flex items-start gap-2 mb-3">
+                    <ShieldAlert className="h-5 w-5 text-red-700 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-red-900 text-sm">{t("Admin.Settings.resetConfirm1Title")}</p>
+                      <p className="text-xs text-red-700 mt-1">{t("Admin.Settings.resetConfirm1Desc")}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={() => setShowResetConfirm2(true)} variant="destructive" size="sm">
+                      <AlertCircle className="h-4 w-4 mr-1" />
+                      {t("yes")}
+                    </Button>
+                    <Button onClick={() => setShowResetConfirm1(false)} variant="outline" size="sm">
+                      {t("cancel")}
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {showResetConfirm2 && (
+                <div className="p-4 rounded-lg bg-red-900 border-2 border-red-500">
+                  <div className="flex items-start gap-2 mb-3">
+                    <ShieldAlert className="h-5 w-5 text-red-300 flex-shrink-0 mt-0.5 animate-pulse" />
+                    <div>
+                      <p className="font-extrabold text-white text-sm">{t("Admin.Settings.resetConfirm2Title")}</p>
+                      <p className="text-xs text-red-200 mt-1">{t("Admin.Settings.resetConfirm2Desc")}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button onClick={handleResetDatabase} disabled={resetLoading} variant="outline" size="sm" className="bg-white text-red-900 font-extrabold hover:bg-red-100 border-white">
+                      {resetLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Trash2 className="h-4 w-4 mr-1" />}
+                      {t("Admin.Settings.resetDatabase")}
+                    </Button>
+                    <Button onClick={() => { setShowResetConfirm1(false); setShowResetConfirm2(false); }} size="sm" className="bg-red-700 hover:bg-red-600 text-white border-0">
+                      {t("cancel")}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>

@@ -64,6 +64,8 @@ function Questionnaire({
   const [questionsLoading, setQuestionsLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [liftSelectionError, setLiftSelectionError] = useState<string | null>(null); // 🔥 ÚJ
+  const [isMobileView, setIsMobileView] = useState(false);
+  const [mobileSubPage, setMobileSubPage] = useState(0);
   
   const [localAnswers, setLocalAnswers] = useState<Record<string, AnswerValue>>(answers);
   
@@ -401,6 +403,12 @@ function Questionnaire({
 
   const isLastPage = pageFromApp === totalPages - 1;
   const progressPercent = totalPages > 0 ? Math.round(((pageFromApp + 1) / totalPages) * 100) : 0;
+  const mobileSubPageCount = Math.max(1, Math.ceil(currentQuestions.length / 2));
+  const mobileVisibleQuestions = isMobileView
+    ? currentQuestions.slice(mobileSubPage * 2, (mobileSubPage + 1) * 2)
+    : currentQuestions;
+  const isLastMobileSubPage = mobileSubPage >= mobileSubPageCount - 1;
+  const isReallyLastPage = isLastPage && (!isMobileView || isLastMobileSubPage);
 
   // Save handler
   const handleSave = useCallback(() => {
@@ -418,15 +426,42 @@ function Questionnaire({
 
   // Navigation handlers
   const handleNextPage = useCallback(() => {
-    onPageChange?.(pageFromApp + 1);
-  }, [pageFromApp, onPageChange]);
+    const subPageCount = Math.max(1, Math.ceil(currentQuestions.length / 2));
+    if (isMobileView && mobileSubPage < subPageCount - 1) {
+      setMobileSubPage(p => p + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setMobileSubPage(0);
+      onPageChange?.(pageFromApp + 1);
+    }
+  }, [isMobileView, mobileSubPage, currentQuestions.length, pageFromApp, onPageChange]);
 
   const handlePreviousPage = useCallback(() => {
-    onPageChange?.(Math.max(0, pageFromApp - 1));
-  }, [pageFromApp, onPageChange]);
+    if (isMobileView && mobileSubPage > 0) {
+      setMobileSubPage(p => p - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (pageFromApp > 0) {
+      if (isMobileView) {
+        const prevCount = questionGroups[pageFromApp - 1]?.questions?.length || 0;
+        setMobileSubPage(Math.max(0, Math.ceil(prevCount / 2) - 1));
+      }
+      onPageChange?.(pageFromApp - 1);
+    }
+  }, [isMobileView, mobileSubPage, pageFromApp, questionGroups, onPageChange]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [pageFromApp]);
+
+  useEffect(() => {
+    const check = () => setIsMobileView(window.innerWidth < 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  useEffect(() => {
+    setMobileSubPage(0);
   }, [pageFromApp]);
 
   // 🔥 ÚJ: Lift selection info display
@@ -544,11 +579,32 @@ function Questionnaire({
             )
           )}
 
+          {/* Mobil folyamatjelző (csak < 1024px, és csak ha >2 kérdés van a csoportban) */}
+          {isMobileView && currentQuestions.length > 2 && (
+            <div className="mb-4 flex items-center justify-between">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {mobileSubPage * 2 + 1}–{Math.min((mobileSubPage + 1) * 2, currentQuestions.length)} / {currentQuestions.length} {t("questionsSuffix")}
+              </span>
+              <div className="flex gap-1.5 items-center">
+                {Array.from({ length: mobileSubPageCount }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`rounded-full transition-all ${
+                      i === mobileSubPage
+                        ? 'w-4 h-2 bg-blue-500'
+                        : 'w-2 h-2 bg-gray-300 dark:bg-gray-600'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Kérdések renderelése */}
           <div className="mb-8">
             {pageFromApp === 0 || pageFromApp === 1 ? (
               <div className={`grid gap-8 ${theme === 'modern' ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-2'}`}>
-                {(currentQuestions as Question[]).map((question: Question) => (
+                {(mobileVisibleQuestions as Question[]).map((question: Question) => (
                   <IsolatedQuestion
                     key={question.id}
                     question={question}
@@ -558,10 +614,10 @@ function Questionnaire({
                 ))}
               </div>
             ) : (() => {
-              const yesNoNaQuestions = (currentQuestions as Question[]).filter(q => q.type === 'yes_no_na');
-              const radioQuestions = (currentQuestions as Question[]).filter(q => q.type === 'radio' || q.type === 'checkbox' || q.type === 'yes_no_na');
-              const measurementQuestions = (currentQuestions as Question[]).filter(q => q.type === 'measurement' || q.type === 'calculated');
-              const otherQuestions = (currentQuestions as Question[]).filter(q => 
+              const yesNoNaQuestions = (mobileVisibleQuestions as Question[]).filter(q => q.type === 'yes_no_na');
+              const radioQuestions = (mobileVisibleQuestions as Question[]).filter(q => q.type === 'radio' || q.type === 'checkbox' || q.type === 'yes_no_na');
+              const measurementQuestions = (mobileVisibleQuestions as Question[]).filter(q => q.type === 'measurement' || q.type === 'calculated');
+              const otherQuestions = (mobileVisibleQuestions as Question[]).filter(q => 
                 q.type !== 'radio' && 
                 q.type !== 'checkbox' && 
                 q.type !== 'yes_no_na' && 
@@ -569,8 +625,8 @@ function Questionnaire({
                 q.type !== 'calculated'
               );
 
-              const hasOnlyRadio = radioQuestions.length === currentQuestions.length;
-              const hasOnlyMeasurement = measurementQuestions.length === currentQuestions.length;
+              const hasOnlyRadio = radioQuestions.length === mobileVisibleQuestions.length;
+              const hasOnlyMeasurement = measurementQuestions.length === mobileVisibleQuestions.length;
 
               const allRadioAreBoolean = radioQuestions.every(q => 
                 !q.options || q.options.length === 0 || 
@@ -603,7 +659,7 @@ function Questionnaire({
               }
 
               // Vegyes blokk: ha ≥3 yes_no_na kérdés van, azokat táblázatban jelenítjük meg
-              const nonYesNoNaQuestions = (currentQuestions as Question[]).filter(q => q.type !== 'yes_no_na');
+              const nonYesNoNaQuestions = (mobileVisibleQuestions as Question[]).filter(q => q.type !== 'yes_no_na');
               if (yesNoNaQuestions.length >= 3 && nonYesNoNaQuestions.length > 0) {
                 const nonTableQuestions = nonYesNoNaQuestions.filter(q => q.type !== 'measurement' && q.type !== 'calculated');
                 const mixedMeasurements = nonYesNoNaQuestions.filter(q => q.type === 'measurement' || q.type === 'calculated');
@@ -686,7 +742,7 @@ function Questionnaire({
             {theme === 'modern' ? (
               <button
                 onClick={handlePreviousPage}
-                disabled={pageFromApp === 0}
+                disabled={pageFromApp === 0 && (!isMobileView || mobileSubPage === 0)}
                 className="group relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 disabled:border-gray-300 disabled:text-gray-400 disabled:cursor-not-allowed transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20"
               >
                 <div className="flex items-center justify-center gap-2">
@@ -698,7 +754,7 @@ function Questionnaire({
               <Button
                 variant="outline"
                 onClick={handlePreviousPage}
-                disabled={pageFromApp === 0}
+                disabled={pageFromApp === 0 && (!isMobileView || mobileSubPage === 0)}
                 className="flex items-center border-otis-blue text-otis-blue hover:bg-otis-blue hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -791,7 +847,7 @@ function Questionnaire({
               {/* Tovább gomb */}
               {theme === 'modern' ? (
                 <button
-                  onClick={isLastPage ? onNext : handleNextPage}
+                  onClick={isReallyLastPage ? onNext : handleNextPage}
                   disabled={!canProceed}
                   className="group relative overflow-hidden px-8 py-3 rounded-xl font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -819,7 +875,7 @@ function Questionnaire({
                   <div className={`absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 ${canProceed ? 'pointer-events-none' : 'hidden'}`}></div>
                 </button>
               ) : (
-                isLastPage ? (
+                isReallyLastPage ? (
                   <Button
                     type="button"
                     onClick={onNext}

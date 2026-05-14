@@ -191,7 +191,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
       if (response.ok) {
         toast({
           title: t("success"),
-          description: language === 'hu' ? 'Beállítások mentve' : 'Einstellungen gespeichert',
+          description: t("settingsSaved"),
         });
         fetchHybridTemplates();
       } else {
@@ -203,7 +203,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
       setLoadStrategy(previousStrategy);
       toast({
         title: t("error"),
-        description: language === 'hu' ? 'Beállítások mentése sikertelen' : 'Einstellungen konnten nicht gespeichert werden',
+        description: t("settingsSaveFailed"),
         variant: 'destructive',
       });
     } finally {
@@ -552,7 +552,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                   </span>
                   <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
                   <Badge variant="outline" className="ml-auto">
-                    {templates.length} sablon
+                    {templates.length} {t("templateCount")}
                   </Badge>
                 </CardTitle>
               </CardHeader>
@@ -568,9 +568,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                         {t("noTemplatesUploaded")}
                       </p>
                       <p className="text-xs text-gray-400 mt-2">
-                        {language === 'hu' 
-                          ? 'Töltsd fel az első sablont a "Feltöltés" fülön!' 
-                          : 'Upload your first template in the "Upload" tab!'}
+                        {t("uploadFirstTemplate")}
                       </p>
                     </div>
                   ) : (
@@ -622,11 +620,11 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                                   try {
                                     const date = new Date(template.uploaded_at);
                                     if (isNaN(date.getTime()) || date.getFullYear() > 2030) {
-                                      return 'Ismeretlen dátum';
+                                      return t("unknownDate");
                                     }
                                     return formatDate(date, language);
                                   } catch {
-                                    return 'Ismeretlen dátum';
+                                    return t("unknownDate");
                                   }
                                 })()}
                               </span>
@@ -707,9 +705,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                   </span>
                 </CardTitle>
                 <CardDescription className="text-base">
-                  {language === 'hu' 
-                    ? 'A betöltési stratégia meghatározza, honnan töltődnek be a sablonok. A "Helyi először" opció offline működést biztosít.' 
-                    : 'Die Ladestrategie bestimmt, woher die Vorlagen geladen werden. Die Option "Lokal zuerst" ermöglicht den Offline-Betrieb.'}
+                  {t("settingsDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -720,9 +716,9 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                   </Label>
                   <div className="grid gap-3">
                     {[
-                      { value: 'local_first', label: t("localFirst"), desc: language === 'hu' ? 'Helyi sablonokat használ először (offline működés)' : 'Verwendet zuerst lokale Vorlagen (Offline-Betrieb)', icon: '📁' },
-                      { value: 'cache_first', label: t("cacheFirst"), desc: language === 'hu' ? 'Gyorsítótárazott sablonokat próbálja először' : 'Versucht zuerst zwischengespeicherte Vorlagen', icon: '💾' },
-                      { value: 'remote_only', label: t("remoteOnly"), desc: language === 'hu' ? 'Csak szerveren tárolt sablonokat használ' : 'Verwendet nur auf dem Server gespeicherte Vorlagen', icon: '☁️' }
+                      { value: 'local_first', label: t("localFirst"), desc: t("localFirstDescription"), icon: '📁' },
+                      { value: 'cache_first', label: t("cacheFirst"), desc: t("cacheFirstDescription"), icon: '💾' },
+                      { value: 'remote_only', label: t("remoteOnly"), desc: t("remoteOnlyDescription"), icon: '☁️' }
                     ].map((strategy) => (
                       <div
                         key={strategy.value}
@@ -756,11 +752,11 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                 {hybridTemplates && (
                   <div className="space-y-3">
                     <Label className="font-semibold text-gray-700 dark:text-gray-300">
-                      📝 {language === 'hu' ? 'Kérdés sablon' : 'Fragenvorlage'}
+                      📝 {t("questionTemplate")}
                     </Label>
                     <Select value={selectedQuestionTemplate} onValueChange={setSelectedQuestionTemplate}>
                       <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-blue-500/30">
-                        <SelectValue placeholder={language === 'hu' ? 'Válassz kérdés sablont...' : 'Fragenvorlage wählen...'} />
+                        <SelectValue placeholder={t("selectQuestionTemplate")} />
                       </SelectTrigger>
                       <SelectContent>
                         {hybridTemplates.local.filter(t => t.type === 'questions' || t.type === 'unified').length > 0 && (
@@ -780,7 +776,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                         {hybridTemplates.remote.filter(t => t.type === 'questions' || t.type === 'unified').length > 0 && (
                           <>
                             <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-blue-50 mt-2">
-                              ☁️ {language === 'hu' ? 'Feltöltött sablonok' : 'Hochgeladene Vorlagen'}
+                              ☁️ {t("uploadedTemplates")}
                             </div>
                             {hybridTemplates.remote
                               .filter(template => template.type === 'questions' || template.type === 'unified')
@@ -800,11 +796,11 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                 {hybridTemplates && (
                   <div className="space-y-3">
                     <Label className="font-semibold text-gray-700 dark:text-gray-300">
-                      📋 {language === 'hu' ? 'Protokoll sablon' : 'Protokollvorlage'}
+                      📋 {t("protocolTemplateName")}
                     </Label>
                     <Select value={selectedProtocolTemplate} onValueChange={setSelectedProtocolTemplate}>
                       <SelectTrigger className="h-12 border-2 focus:ring-4 focus:ring-green-500/30">
-                        <SelectValue placeholder={language === 'hu' ? 'Válassz protokoll sablont...' : 'Protokollvorlage wählen...'} />
+                        <SelectValue placeholder={t("selectProtocolTemplate")} />
                       </SelectTrigger>
                       <SelectContent>
                         {hybridTemplates.local.filter(t => t.type === 'protocol').length > 0 && (
@@ -824,7 +820,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                         {hybridTemplates.remote.filter(t => t.type === 'protocol').length > 0 && (
                           <>
                             <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 bg-green-50 mt-2">
-                              ☁️ {language === 'hu' ? 'Feltöltött sablonok' : 'Hochgeladene Vorlagen'}
+                              ☁️ {t("uploadedTemplates")}
                             </div>
                             {hybridTemplates.remote
                               .filter(template => template.type === 'protocol')
@@ -844,7 +840,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                 {(selectedQuestionTemplate || selectedProtocolTemplate) && (
                   <div className="p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-xl border border-blue-200">
                     <div className="text-sm font-semibold text-gray-700 mb-2">
-                      {language === 'hu' ? 'Kiválasztott sablonok:' : 'Ausgewählte Vorlagen:'}
+                      {t("selectedTemplates")}
                     </div>
                     <div className="space-y-1 text-sm">
                       {selectedQuestionTemplate && (
@@ -872,7 +868,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                         className="mt-4 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2"
                         data-testid="button-quick-start"
                       >
-                        🚀 {language === 'hu' ? 'Gyors Indítás ezzel a sablonnal' : 'Schnellstart mit dieser Vorlage'}
+                        🚀 {t("quickStart")}
                       </button>
                     )}
                   </div>
@@ -908,7 +904,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                       {t("localTemplates")}
                     </span>
                     <Badge className="ml-auto bg-green-100 text-green-700">
-                      {hybridTemplates.local.length} {language === 'hu' ? 'sablon' : 'Vorlagen'}
+                      {hybridTemplates.local.length} {t("templateCount")}
                     </Badge>
                   </CardTitle>
                 </CardHeader>
@@ -928,7 +924,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                           </div>
                         </div>
                         <Badge className="bg-green-100 text-green-700 border-green-200">
-                          📁 {language === 'hu' ? 'Helyi' : 'Lokal'}
+                          📁 {t("localLabel")}
                         </Badge>
                       </div>
                     ))}
@@ -1193,9 +1189,7 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                   <FileSpreadsheet className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                   <p>{t("noTemplatesUploaded")}</p>
                   <p className="text-xs text-gray-400 mt-2">
-                    {language === 'hu' 
-                      ? 'Töltsd fel az első sablont a "Feltöltés" fülön!' 
-                      : 'Upload your first template in the "Upload" tab!'}
+                    {t("uploadFirstTemplate")}
                   </p>
                 </div>
               ) : (
@@ -1222,11 +1216,11 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                           try {
                             const date = new Date(template.uploaded_at);
                             if (isNaN(date.getTime()) || date.getFullYear() > 2030) {
-                              return 'Ismeretlen dátum';
+                              return t("unknownDate");
                             }
                             return formatDate(date, language);
                           } catch {
-                            return 'Ismeretlen dátum';
+                            return t("unknownDate");
                           }
                         })()}
                       </p>
@@ -1294,24 +1288,24 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
             {hybridTemplates && (
               <div className="space-y-4">
                 <div>
-                  <Label>{language === 'hu' ? 'Kérdés sablon' : 'Fragenvorlage'}</Label>
+                  <Label>{t("questionTemplate")}</Label>
                   <Select value={selectedQuestionTemplate} onValueChange={setSelectedQuestionTemplate}>
                     <SelectTrigger>
-                      <SelectValue placeholder={t("chooseTemplate")} />
+                      <SelectValue placeholder={t("selectQuestionTemplate")} />
                     </SelectTrigger>
                     <SelectContent>
                       {hybridTemplates.local
                         .filter(template => template.type === 'questions' || template.type === 'unified')
                         .map((template) => (
                           <SelectItem key={template.id} value={template.id}>
-                            {template.name} (helyi)
+                            {language === 'de' ? template.name_de : template.name} ({t("localLabel")})
                           </SelectItem>
                         ))}
                       {hybridTemplates.remote
                         .filter(template => template.type === 'questions' || template.type === 'unified')
                         .map((template) => (
                           <SelectItem key={template.id} value={template.id}>
-                            {template.name} (távoli)
+                            {template.name} ({t("remoteTemplates")})
                           </SelectItem>
                         ))}
                     </SelectContent>
@@ -1319,24 +1313,24 @@ export function TemplateManagement({ onQuickStart }: TemplateManagementProps = {
                 </div>
 
                 <div>
-                  <Label>{language === 'hu' ? 'Protokoll sablon' : 'Protokollvorlage'}</Label>
+                  <Label>{t("protocolTemplateName")}</Label>
                   <Select value={selectedProtocolTemplate} onValueChange={setSelectedProtocolTemplate}>
                     <SelectTrigger>
-                      <SelectValue placeholder={language === 'hu' ? 'Válassz protokoll sablont...' : 'Protokollvorlage wählen...'} />
+                      <SelectValue placeholder={t("selectProtocolTemplate")} />
                     </SelectTrigger>
                     <SelectContent>
                       {hybridTemplates.local
                         .filter(template => template.type === 'protocol')
                         .map((template) => (
                           <SelectItem key={template.id} value={template.id}>
-                            {template.name} (helyi)
+                            {language === 'de' ? template.name_de : template.name} ({t("localLabel")})
                           </SelectItem>
                         ))}
                       {hybridTemplates.remote
                         .filter(template => template.type === 'protocol')
                         .map((template) => (
                           <SelectItem key={template.id} value={template.id}>
-                            {template.name} (távoli)
+                            {template.name} ({t("remoteTemplates")})
                           </SelectItem>
                         ))}
                     </SelectContent>

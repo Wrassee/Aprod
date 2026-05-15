@@ -416,22 +416,30 @@ router.get('/protocols', requireAdmin, async (req, res) => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 50;
-    
-    console.log(`📋 Fetching protocols (Page: ${page}, Limit: ${limit})...`);
-    
-    const protocols = await storage.getRecentProtocols(limit);
-    const totalCount = await storage.getProtocolsCount();
+    const offset = (page - 1) * limit;
 
-    console.log(`✅ Found ${protocols.length} protocols (Total: ${totalCount})`);
-    
+    console.log(`📋 [Admin] Fetching protocols page=${page} limit=${limit} offset=${offset}...`);
+
+    // Raw SQL ensures items + total are always consistent regardless of Drizzle schema
+    const [countResult] = await queryRows(sql`SELECT count(*) AS count FROM protocols`);
+    const total = Number((countResult as any)?.count || 0);
+
+    const items = await queryRows(sql`
+      SELECT * FROM protocols
+      ORDER BY created_at DESC
+      LIMIT ${limit} OFFSET ${offset}
+    `);
+
+    console.log(`✅ [Admin] Found ${(items as any[]).length} protocols (Total: ${total})`);
+
     res.json({
-      items: protocols,
-      totalPages: Math.ceil(totalCount / limit),
+      items: items || [],
+      totalPages: Math.ceil(total / limit),
       currentPage: page,
-      total: totalCount,
+      total,
     });
-  } catch (error) {
-    console.error('❌ Failed to fetch protocols:', error);
+  } catch (error: any) {
+    console.error('❌ [Admin] Failed to fetch protocols:', error?.message || error);
     res.status(500).json({ message: 'Hiba történt a protokollok lekérdezése során.' });
   }
 });

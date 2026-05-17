@@ -3,6 +3,7 @@ import { Question, AnswerValue } from '@shared/schema';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { StyledRadioGroup } from './StyledRadioGroup';
 import { useLanguageContext } from "@/components/language-context";
+import { AlertTriangle } from 'lucide-react';
 
 interface TrueFalseGroupProps {
   questions: Question[];
@@ -10,9 +11,10 @@ interface TrueFalseGroupProps {
   onChange: (questionId: string, value: AnswerValue) => void;
   groupName: string;  // Display name (already localized from parent)
   language?: 'hu' | 'de' | 'en' | 'fr' | 'it';  // Optional language for direct group.title access
+  onRequestAddError?: (questionTitle: string) => void;
 }
 
-export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, language }: TrueFalseGroupProps) => {
+export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, language, onRequestAddError }: TrueFalseGroupProps) => {
   const { t, language: contextLanguage } = useLanguageContext();
   
   // Use NEW group.title structure if available, fallback to groupName prop
@@ -39,7 +41,6 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
             style={{ width: hasThreeOptionQuestion ? '280px' : '220px' }} 
             className="flex-shrink-0"
           >
-            {/* A fix szélességű részen belül egy rácsot hozunk létre a címkéknek */}
             <div className={`grid ${hasThreeOptionQuestion ? 'grid-cols-3' : 'grid-cols-2'} gap-x-2 sm:gap-x-3 text-center`}>
               <div className="text-sm font-semibold text-green-600 flex items-center justify-center gap-1">
                 <span className="font-bold">✓</span>
@@ -56,9 +57,10 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
               )}
             </div>
           </div>
+          {/* Spacer a háromszög gomb oszlopához */}
+          {onRequestAddError && <div className="w-9 flex-shrink-0 ml-1" />}
         </div>
 
-        {/* === A KÉRDÉS SOROK RÉSZ VÁLTOZATLAN MARADT === */}
         <div className="space-y-1">
           {questions.map((question) => {
             const isThreeOption = question.type === 'checkbox' || question.type === 'yes_no_na';
@@ -72,12 +74,15 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
                   { value: 'true', label: t("yes") || 'Igen' },
                   { value: 'false', label: t("no") || 'Nem' }
                 ];
+
+            const currentValue = values[question.id]?.toString() || '';
+            const isNegative = currentValue === 'no' || currentValue === 'false';
+            const questionTitle = question.title?.[lang] || (question.title as unknown as string) || '';
               
             return (
               <div key={question.id} className="flex items-center p-3 rounded-lg hover:bg-gray-50 min-h-[60px]">
                 <span className="flex-1 text-gray-800 text-sm sm:text-base font-medium">
-                  {/* NEW: Use localized title object if available */}
-                  {question.title?.[lang] || question.title}
+                  {questionTitle}
                   {question.required && <span className="text-red-500 ml-1">*</span>}
                 </span>
 
@@ -87,11 +92,27 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
                 >
                   <StyledRadioGroup
                     questionId={question.id}
-                    value={values[question.id]?.toString() || ''}
+                    value={currentValue}
                     onChange={(val) => onChange(question.id, val as AnswerValue)}
                     options={currentOptions}
                   />
                 </div>
+
+                {/* Hibalistára adás gomb — csak ha prop megvan ÉS "Nem" van kiválasztva */}
+                {onRequestAddError && (
+                  <div className="w-9 flex-shrink-0 ml-1 flex justify-center">
+                    {isNegative && (
+                      <button
+                        type="button"
+                        onClick={() => onRequestAddError(questionTitle)}
+                        title={t("addErrorTitle") || 'Hiba hozzáadása'}
+                        className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors animate-pulse hover:animate-none"
+                      >
+                        <AlertTriangle className="h-5 w-5" />
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             )
           })}

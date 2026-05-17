@@ -29,9 +29,10 @@ interface AddErrorModalProps {
   onClose: () => void;
   onSave: (error: Omit<ProtocolError, 'id'>) => void;
   editingError?: ProtocolError | null;
+  prefillTitle?: string;
 }
 
-export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErrorModalProps) {
+export function AddErrorModal({ isOpen, onClose, onSave, editingError, prefillTitle }: AddErrorModalProps) {
   const { t } = useLanguageContext();
   const { theme } = useTheme();
   
@@ -46,13 +47,18 @@ export function AddErrorModal({ isOpen, onClose, onSave, editingError }: AddErro
       setDescription(editingError.description);
       setSeverity(editingError.severity);
       setImages(editingError.images);
+    } else if (isOpen && prefillTitle) {
+      setTitle(prefillTitle);
+      setDescription('');
+      setSeverity('medium');
+      setImages([]);
     } else {
       setTitle('');
       setDescription('');
       setSeverity('medium');
       setImages([]);
     }
-  }, [editingError]);
+  }, [editingError, isOpen, prefillTitle]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);

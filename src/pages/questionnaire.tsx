@@ -8,6 +8,7 @@ import PageHeader from '@/components/PageHeader';
 import { IsolatedQuestion } from '@/components/isolated-question';
 import { TrueFalseGroup } from '@/components/true-false-group';
 import { ErrorList } from '@/components/error-list';
+import { AddErrorModal } from '@/components/add-error-modal';
 import { QuestionGroupHeader } from '@/components/question-group-header';
 import { useLanguageContext } from "@/components/language-context";
 import { useTheme } from '@/contexts/theme-context';
@@ -359,6 +360,19 @@ function Questionnaire({
     });
   }, [allQuestions, localAnswers, onAnswerChange]);
 
+  // Kérdésből indított hibamodal state
+  const [questionErrorPrefill, setQuestionErrorPrefill] = useState<string | null>(null);
+
+  const handleRequestAddErrorFromQuestion = useCallback((questionTitle: string) => {
+    setQuestionErrorPrefill(questionTitle);
+  }, []);
+
+  const handleSaveFromQuestionError = useCallback((error: Omit<ProtocolError, 'id'>) => {
+    const newError: ProtocolError = { ...error, id: Date.now().toString() };
+    onErrorsChange([...errors, newError]);
+    setQuestionErrorPrefill(null);
+  }, [errors, onErrorsChange]);
+
   // Error handlers
   const handleAddError = useCallback((error: Omit<ProtocolError, 'id'>) => {
     const newError: ProtocolError = {
@@ -643,6 +657,7 @@ function Questionnaire({
                     values={localAnswers}
                     onChange={handleLocalAnswerChange}
                     groupName={currentGroup?.name || t("questions")}
+                    onRequestAddError={handleRequestAddErrorFromQuestion}
                   />
                 );
               }
@@ -678,6 +693,7 @@ function Questionnaire({
                       values={localAnswers}
                       onChange={handleLocalAnswerChange}
                       groupName={currentGroup?.name || t("questions")}
+                      onRequestAddError={handleRequestAddErrorFromQuestion}
                     />
                     {nonTableQuestions.length > 0 && (
                       <div className={`grid gap-8 ${theme === 'modern' ? 'grid-cols-1 lg:grid-cols-2 gap-6' : 'grid-cols-1 lg:grid-cols-2'}`}>
@@ -731,6 +747,14 @@ function Questionnaire({
               onDeleteError={handleDeleteError}
             />
           </div>
+
+          {/* Kérdésből indított hiba-modal (előtöltött kérdéscímmel) */}
+          <AddErrorModal
+            isOpen={questionErrorPrefill !== null}
+            onClose={() => setQuestionErrorPrefill(null)}
+            onSave={handleSaveFromQuestionError}
+            prefillTitle={questionErrorPrefill || ''}
+          />
 
           {/* Navigáció */}
           <div className={`flex justify-between ${

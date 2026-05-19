@@ -921,65 +921,65 @@ router.delete("/templates/:id", async (req, res) => {
   const templateId = req.params.id;
   
   try {
-    const template = await storage.getTemplate(templateId);
+    // 1. Sablon lekérdezése raw SQL-lel
+    console.log(`🗑️ Deleting template: ${templateId}`);
+    const tplRows: any[] = await (db as any).execute(
+      sql`SELECT id, name, type, file_name, file_path FROM templates WHERE id = ${templateId}`
+    );
+    const template = Array.isArray(tplRows) ? tplRows[0] : (tplRows as any)?.rows?.[0];
 
     if (!template) {
+      console.warn(`⚠️ Template not found: ${templateId}`);
+      return res.status(404).json({ message: "Template to delete not found." });
+    }
+    console.log(`✅ Template found: ${template.name}`);
+
+    // 2. Kapcsolódó question_configs törlése raw SQL-lel
+    try {
+      await (db as any).execute(
+        sql`DELETE FROM question_configs WHERE template_id = ${templateId}`
+      );
+      console.log(`✅ Question configs deleted for template: ${templateId}`);
+    } catch (qcError: any) {
+      console.warn(`⚠️ Could not delete question_configs (continuing): ${qcError?.message}`);
+    }
+
+    // 3. Fájl törlése Supabase Storage-ból (nem blokkoló)
+    if (template.file_path) {
+      try {
+        await supabaseStorage.deleteFile(template.file_path);
+        console.log(`✅ File deleted from Supabase: ${template.file_path}`);
+      } catch (fileError: any) {
+        console.warn(`⚠️ Could not delete file from Supabase Storage (continuing): ${fileError?.message}`);
+      }
+    }
+
+    // 4. Sablon törlése raw SQL-lel
+    await (db as any).execute(
+      sql`DELETE FROM templates WHERE id = ${templateId}`
+    );
+    console.log(`✅ Template ${templateId} deleted from DB`);
+
+    // 5. Audit log (nem blokkoló)
+    try {
       await createManualAuditLog(
         req,
         'template.delete',
         'template',
         templateId,
-        { reason: 'Template not found' },
-        'failure',
-        'Template not found'
+        { template_name: template.name, template_type: template.type, file_name: template.file_name },
+        'success'
       );
-      
-      return res.status(404).json({ message: "Template to delete not found." });
+    } catch (auditError: any) {
+      console.warn(`⚠️ Audit log failed (continuing): ${auditError?.message}`);
     }
-
-    await storage.deleteQuestionConfigsByTemplate(templateId);
-
-    if (template.file_path) {
-      try {
-        await supabaseStorage.deleteFile(template.file_path);
-      } catch (fileError: any) {
-        console.warn(`⚠️ Could not delete file from Supabase Storage (proceeding with DB delete): ${fileError?.message}`);
-      }
-    }
-
-    await storage.deleteTemplate(templateId);
-
-    // ✅ SIKER - Audit log
-    await createManualAuditLog(
-      req,
-      'template.delete',
-      'template',
-      template.id,
-      { 
-        template_name: template.name,
-        template_type: template.type,
-        file_name: template.file_name 
-      },
-      'success'
-    );
 
     console.log(`✅ Template ${templateId} deleted successfully`);
     res.json({ success: true });
     
   } catch (error: any) {
-    console.error("Error deleting template:", error);
-    
-    await createManualAuditLog(
-      req,
-      'template.delete',
-      'template',
-      templateId,
-      { error: error.message },
-      'failure',
-      error.message
-    );
-    
-    res.status(500).json({ message: "Failed to delete template" });
+    console.error(`❌ Error deleting template ${templateId}:`, error?.message, error?.stack);
+    res.status(500).json({ message: "Failed to delete template", detail: error?.message });
   }
 });
 

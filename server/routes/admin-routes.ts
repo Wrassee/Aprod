@@ -803,6 +803,7 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
           option_cells: q.optionCells ?? null, // select_extended típushoz
           default_if_hidden: q.defaultIfHidden ?? null, // conditional_group_key-hez: alapértelmezett érték ha rejtett
           max_length: q.maxLength ?? null,
+          error_reportable: q.errorReportable ?? false,
         });
       }
     } else {

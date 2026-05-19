@@ -57,6 +57,9 @@ export interface ParsedQuestion {
   defaultIfHidden?: string;
   
   maxLength?: number;
+
+  // Ha true: nemleges válasz esetén megjelenik a hibalistára adás gomb
+  errorReportable?: boolean;
 }
 
 export interface TemplateInfo {
@@ -246,7 +249,8 @@ class ExcelParserService {
         MIN_VALUE: this.findHeaderIndex(headers, 'min_value', 'minValue', 'min', 'Min Value', 'MinValue'),
         MAX_VALUE: this.findHeaderIndex(headers, 'max_value', 'maxValue', 'max', 'Max Value', 'MaxValue'),
         CALC_FORMULA: this.findHeaderIndex(headers, 'calculation_formula', 'calculationFormula', 'képlet', 'Calculation Formula', 'CalculationFormula'),
-        CALC_INPUTS: this.findHeaderIndex(headers, 'calculation_inputs', 'calculationInputs', 'bemenetek', 'Calculation Inputs', 'CalculationInputs')
+        CALC_INPUTS: this.findHeaderIndex(headers, 'calculation_inputs', 'calculationInputs', 'bemenetek', 'Calculation Inputs', 'CalculationInputs'),
+        ERROR_REPORTABLE: this.findHeaderIndex(headers, 'error_reportable', 'errorReportable', 'errorReportable', 'Error Reportable', 'ErrorReportable', 'hiba_jelolheto', 'hibajelolheto')
       };
       
       console.log('📊 Column indices found:', {
@@ -345,7 +349,10 @@ class ExcelParserService {
           
           conditionalGroupKey: safeString(colIndices.CONDITIONAL_GROUP_KEY),
           defaultIfHidden: safeString(colIndices.DEFAULT_IF_HIDDEN),
-          
+          errorReportable: colIndices.ERROR_REPORTABLE !== -1
+            ? this.parseBoolean(row[colIndices.ERROR_REPORTABLE])
+            : false,
+
           unit: safeString(colIndices.UNIT),
           minValue: colIndices.MIN_VALUE !== -1 && row[colIndices.MIN_VALUE] 
             ? parseFloat(String(row[colIndices.MIN_VALUE])) 

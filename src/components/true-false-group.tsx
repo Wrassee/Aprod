@@ -98,10 +98,10 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
                   />
                 </div>
 
-                {/* Hibalistára adás gomb — csak ha prop megvan ÉS "Nem" van kiválasztva */}
+                {/* Hibalistára adás gomb — csak ha prop megvan ÉS error_reportable=true ÉS "Nem" van kiválasztva */}
                 {onRequestAddError && (
                   <div className="w-9 flex-shrink-0 ml-1 flex justify-center">
-                    {isNegative && (
+                    {question.error_reportable && isNegative && (
                       <button
                         type="button"
                         onClick={() => onRequestAddError(questionTitle)}

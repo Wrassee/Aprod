@@ -220,6 +220,7 @@ export const questionConfigs = pgTable("question_configs", {
   option_cells: text("option_cells"), // select_extended típushoz: cella referenciák (G59,G60,G61,N59,N60,N61)
   default_if_hidden: text("default_if_hidden"), // Alapértelmezett érték rejtett kérdéseknél (conditional_group_key használatakor)
   max_length: integer("max_length"),
+  error_reportable: boolean("error_reportable").notNull().default(false), // Megjelenjen-e a hibalistára adás gomb nemleges válasz esetén
   created_at: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`).notNull(),
 });
 

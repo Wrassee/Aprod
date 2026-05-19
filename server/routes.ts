@@ -212,6 +212,7 @@ export async function registerRoutes(app: Express) {
           cellReference: config.cellReference,
           sheetName: config.sheetName,
           conditional_group_key: config.conditionalGroupKey,
+          error_reportable: config.errorReportable ?? false,
         };
       });
 

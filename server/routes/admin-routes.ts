@@ -13,7 +13,7 @@ import { requireAdmin } from '../middleware/auth.js';
 import { createManualAuditLog } from '../middleware/audit-logger.js';
 import { db } from '../db.js';
 import { sql, eq } from 'drizzle-orm'; // ✅ eq HOZZÁADVA
-import { protocols } from '../db.js'; // ✅ ÚJ IMPORT (protokollok törléséhez)
+import { protocols, questionConfigs } from '../db.js'; // ✅ ÚJ IMPORT (protokollok + kérdések törléséhez)
 
 const router = express.Router();
 
@@ -761,13 +761,16 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
       const questions = await excelParserService.parseQuestionsFromExcel(tempPath);
       console.log(`✅ Parsed ${questions.length} questions`);
 
-      for (const q of questions) {
+      const validQuestions = questions.filter(q => {
         if (!q.questionId) {
           console.warn("Skipping question due to missing questionId:", q);
-          continue;
+          return false;
         }
+        return true;
+      });
 
-        await storage.createQuestionConfig({
+      if (validQuestions.length > 0) {
+        const rows = validQuestions.map(q => ({
           template_id: newTemplate.id,
           question_id: q.questionId,
           title: q.title || q.titleHu || q.titleDe || `Question ${q.questionId}`,
@@ -800,11 +803,14 @@ router.post("/templates/upload", upload.single('file'), async (req: any, res) =>
           calculation_formula: q.calculationFormula ?? null,
           calculation_inputs: q.calculationInputs ? [q.calculationInputs] : null,
           options: q.options ?? null,
-          option_cells: q.optionCells ?? null, // select_extended típushoz
-          default_if_hidden: q.defaultIfHidden ?? null, // conditional_group_key-hez: alapértelmezett érték ha rejtett
+          option_cells: q.optionCells ?? null,
+          default_if_hidden: q.defaultIfHidden ?? null,
           max_length: q.maxLength ?? null,
           error_reportable: q.errorReportable ?? false,
-        });
+        }));
+
+        await (db as any).insert(questionConfigs).values(rows);
+        console.log(`✅ Batch inserted ${rows.length} question configs in one DB call`);
       }
     } else {
       console.log(`Skipping question parsing for type "${type}".`);
@@ -934,7 +940,11 @@ router.delete("/templates/:id", async (req, res) => {
     await storage.deleteQuestionConfigsByTemplate(templateId);
 
     if (template.file_path) {
-      await supabaseStorage.deleteFile(template.file_path);
+      try {
+        await supabaseStorage.deleteFile(template.file_path);
+      } catch (fileError: any) {
+        console.warn(`⚠️ Could not delete file from Supabase Storage (proceeding with DB delete): ${fileError?.message}`);
+      }
     }
 
     await storage.deleteTemplate(templateId);

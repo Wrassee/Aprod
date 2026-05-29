@@ -404,16 +404,19 @@ function Questionnaire({
     onQuestionChange?.(questionId);
   }, [onAnswerChange, onQuestionChange]);
 
-  // Check if can proceed
+  // Check if can proceed — mobilon csak a látható 2 kérdést validálja, ne a teljes oldalt
   const canProceed = useMemo(() => {
-    const requiredQuestionsOnPage = (currentQuestions as Question[]).filter(q => q.required);
+    const visibleQuestions = isMobileView
+      ? currentQuestions.slice(mobileSubPage * 2, (mobileSubPage + 1) * 2)
+      : currentQuestions;
+    const requiredQuestionsOnPage = (visibleQuestions as Question[]).filter(q => q.required);
     if (requiredQuestionsOnPage.length === 0) return true;
 
     return requiredQuestionsOnPage.every(q => {
       const answer = localAnswers[q.id];
       return answer !== undefined && answer !== null && answer !== '';
     });
-  }, [currentQuestions, localAnswers]);
+  }, [currentQuestions, localAnswers, isMobileView, mobileSubPage]);
 
   const isLastPage = pageFromApp === totalPages - 1;
   const progressPercent = totalPages > 0 ? Math.round(((pageFromApp + 1) / totalPages) * 100) : 0;

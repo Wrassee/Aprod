@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 import { useQuery } from '@tanstack/react-query';
 import { useLanguageContext } from "@/components/language-context";
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, ArrowRight, Save, Settings, Check, Plus, Trash2, Filter, Sparkles, CheckCircle, BarChart3, Zap } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Settings, Check, Plus, Trash2, Filter, Sparkles, CheckCircle, BarChart3, Zap, ChevronDown, ChevronUp } from 'lucide-react';
 import PageHeader from '@/components/PageHeader';
 import type { NiedervoltMeasurement } from '@/types/niedervolt-devices';
 import { FormData } from '@/lib/types';
@@ -75,6 +75,8 @@ export function NiedervoltTable({
   const [showDeviceSelector, setShowDeviceSelector] = useState(false);
   const [newDeviceName, setNewDeviceName] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(() => window.innerWidth < 768);
+  const [expandedDevices, setExpandedDevices] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const handleClear = () => {
@@ -122,6 +124,12 @@ export function NiedervoltTable({
   useEffect(() => { if (isInitialized) { localStorage.setItem('niedervolt-table-measurements', JSON.stringify(measurements)); } }, [measurements, isInitialized]);
   useEffect(() => { if (isInitialized) { localStorage.setItem('niedervolt-selected-devices', JSON.stringify(Array.from(selectedDevices))); } }, [selectedDevices, isInitialized]);
   useEffect(() => { if (isInitialized) { localStorage.setItem('niedervolt-custom-devices', JSON.stringify(customDevices)); } }, [customDevices, isInitialized]);
+
+  useEffect(() => {
+    const check = () => setIsMobileView(window.innerWidth < 768);
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const getDeviceName = (device: any) => {
     if (device.name && typeof device.name === 'object') {
@@ -311,6 +319,132 @@ export function NiedervoltTable({
     );
   }
 
+  const MOBILE_FIELD_GROUPS = [
+    { groupLabel: { hu: 'Névleges áram', de: 'Nennstrom', en: 'Rated current', fr: 'Courant nominal', it: 'Corrente nominale' } as Record<string,string>, fields: ['biztositek', 'kismegszakito'] },
+    { groupLabel: null, fields: ['tipusjelzes'] },
+    { groupLabel: { hu: 'Szigetelés (MΩ)', de: 'Isolierung (MΩ)', en: 'Insulation (MΩ)', fr: 'Isolation (MΩ)', it: 'Isolamento (MΩ)' } as Record<string,string>, fields: ['szigetelesNPE', 'szigetelesL1PE', 'szigetelesL2PE', 'szigetelesL3PE'] },
+    { groupLabel: { hu: 'Rövidzárás Icc', de: 'Kurzschluss Icc', en: 'Short-circuit Icc', fr: 'Court-circuit Icc', it: 'Cortocircuito Icc' } as Record<string,string>, fields: ['iccLN', 'iccLPE'] },
+    { groupLabel: { hu: 'FI / RCD', de: 'FI / RCD', en: 'FI / RCD', fr: 'FI / RCD', it: 'FI / RCD' } as Record<string,string>, fields: ['fiIn', 'fiDin', 'fiTest'] },
+  ];
+
+  const fieldLabelKeyMap: Record<string, string> = {
+    szigetelesNPE: 'npe', szigetelesL1PE: 'l1pe',
+    szigetelesL2PE: 'l2pe', szigetelesL3PE: 'l3pe',
+    iccLN: 'ln', iccLPE: 'lpe',
+  };
+  const getMobileFieldLabel = (f: string) => getFieldLabel(fieldLabelKeyMap[f] || f);
+
+  const TOTAL_MOBILE_FIELDS = 12;
+  const getMobileFilledCount = (deviceId: string) => {
+    const m = measurements[deviceId] || {};
+    return ['biztositek','kismegszakito','tipusjelzes','szigetelesNPE','szigetelesL1PE','szigetelesL2PE','szigetelesL3PE','iccLN','iccLPE','fiIn','fiDin','fiTest']
+      .filter(f => m[f as keyof NiedervoltMeasurement] && m[f as keyof NiedervoltMeasurement] !== '').length;
+  };
+
+  const toggleExpandDevice = (deviceId: string) => {
+    setExpandedDevices(prev => {
+      const next = new Set(prev);
+      if (next.has(deviceId)) { next.delete(deviceId); } else { next.add(deviceId); }
+      return next;
+    });
+  };
+
+  const renderMobileCards = () => (
+    <div className="space-y-3 py-2">
+      {activeDevices.map((device, index) => {
+        const measurement = measurements[device.id] || {};
+        const filled = getMobileFilledCount(device.id);
+        const percent = Math.round((filled / TOTAL_MOBILE_FIELDS) * 100);
+        const isExpanded = expandedDevices.has(device.id) || (index === 0 && expandedDevices.size === 0);
+        const isComplete = filled === TOTAL_MOBILE_FIELDS;
+
+        return (
+          <div key={device.id} className="rounded-2xl shadow-md border border-blue-100 dark:border-blue-900/50 overflow-hidden">
+            <button
+              onClick={() => toggleExpandDevice(device.id)}
+              className="w-full flex items-center justify-between px-4 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="bg-white/20 text-white font-bold text-xs rounded-lg px-2 py-0.5">{index + 1}</span>
+                <span className="font-semibold text-sm text-left">{getDeviceName(device)}</span>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="text-right">
+                  <div className="text-xs text-blue-100">{filled}/{TOTAL_MOBILE_FIELDS}</div>
+                  <div className="h-1.5 w-14 bg-white/20 rounded-full mt-0.5 overflow-hidden">
+                    <div className="h-full bg-white rounded-full transition-all" style={{ width: `${percent}%` }} />
+                  </div>
+                </div>
+                {isComplete
+                  ? <CheckCircle className="h-5 w-5 text-green-300 flex-shrink-0" />
+                  : isExpanded
+                    ? <ChevronUp className="h-5 w-5 opacity-70 flex-shrink-0" />
+                    : <ChevronDown className="h-5 w-5 opacity-70 flex-shrink-0" />
+                }
+              </div>
+            </button>
+
+            {isExpanded && (
+              <div className="bg-white dark:bg-gray-900 px-3 pb-4 pt-3 space-y-4">
+                {MOBILE_FIELD_GROUPS.map((group, gi) => (
+                  <div key={gi}>
+                    {group.groupLabel && (
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="h-px flex-1 bg-blue-100 dark:bg-blue-900/50" />
+                        <span className="text-xs font-semibold text-blue-500 uppercase tracking-wide">{group.groupLabel[language]}</span>
+                        <div className="h-px flex-1 bg-blue-100 dark:bg-blue-900/50" />
+                      </div>
+                    )}
+                    <div className="grid grid-cols-2 gap-2">
+                      {group.fields.map(field => (
+                        <div key={field} className={field === 'tipusjelzes' ? 'col-span-2' : ''}>
+                          <label className="text-xs text-gray-500 dark:text-gray-400 font-medium mb-1 block">{getMobileFieldLabel(field)}</label>
+                          {field === 'biztositek' || field === 'kismegszakito' || field === 'fiTest' ? (
+                            <Select
+                              value={measurement[field as keyof NiedervoltMeasurement] || ''}
+                              onValueChange={(value) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, value)}
+                            >
+                              <SelectTrigger className="w-full h-9 text-sm border-blue-200 focus:border-blue-500">
+                                <SelectValue placeholder="-" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {(dropdownOptions[field as keyof typeof dropdownOptions] || []).map((option: string, oi: number) => (
+                                  <SelectItem key={oi} value={option}>{option}</SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : field === 'szigetelesNPE' || field === 'szigetelesL1PE' || field === 'szigetelesL2PE' || field === 'szigetelesL3PE' ? (
+                            <InfinityInput
+                              value={measurement[field as keyof NiedervoltMeasurement] || ''}
+                              onChange={(value) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, value)}
+                            />
+                          ) : field === 'tipusjelzes' ? (
+                            <TypeSelectorInput
+                              value={measurement.tipusjelzes || ''}
+                              onChange={(value) => updateMeasurement(device.id, 'tipusjelzes', value)}
+                            />
+                          ) : (
+                            <Input
+                              type="text"
+                              value={measurement[field as keyof NiedervoltMeasurement] || ''}
+                              onChange={(e) => updateMeasurement(device.id, field as keyof NiedervoltMeasurement, e.target.value)}
+                              className="w-full h-9 text-sm border-blue-200 focus:border-blue-500 text-center"
+                              placeholder="-"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
   // ✅ JAVÍTOTT SZERKEZET - MODERN THEME
   if (theme === 'modern') {
     return (
@@ -432,7 +566,8 @@ export function NiedervoltTable({
                 </div>
               </CardHeader>
 
-              <CardContent className="p-0">
+              <CardContent className={isMobileView ? "p-3" : "p-0"}>
+                {isMobileView ? renderMobileCards() : (
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead className="bg-gradient-to-r from-blue-50 via-sky-50 to-cyan-50 dark:from-blue-950/20 dark:via-sky-950/20 dark:to-cyan-950/20">
@@ -535,6 +670,7 @@ export function NiedervoltTable({
                     </tbody>
                   </table>
                 </div>
+                )}
               </CardContent>
             </Card>
 
@@ -772,7 +908,8 @@ export function NiedervoltTable({
                 </Button>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className={isMobileView ? "p-3" : ""}>
+              {isMobileView ? renderMobileCards() : (
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300">
                   <thead>
@@ -850,6 +987,7 @@ export function NiedervoltTable({
                   </tbody>
                 </table>
               </div>
+              )}
             </CardContent>
           </Card>
           <div className="mt-8 flex justify-between items-center">

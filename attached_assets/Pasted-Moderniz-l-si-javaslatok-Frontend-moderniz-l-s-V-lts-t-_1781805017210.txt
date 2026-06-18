@@ -1,0 +1,94 @@
+Modernizálási javaslatok
+Frontend modernizálás:
+Válts át modern keretrendszerre:
+
+Vue.js 3 vagy Svelte (ha könnyebbet akarsz)
+
+React 18 + Next.js (ha komplexebb alkalmazást tervezel)
+
+Előny: komponens-alapú fejlesztés, jobb teljesítmény, könnyebb karbantarthatóság
+
+Távolítsd el a jQuery-t:
+
+Modern böngészőkben már natívan támogatottak azok a funkciók (querySelector, fetch, classList)
+
+Csak a jQuery 93KB helyett natív megoldások
+
+Válts ES6+ moduláris kódra:
+
+Használj import/export rendszert a jelenlegi globális script-ek helyett
+
+Példa: src/js/app.js, src/js/database.js stb.
+
+Frissítsd Bootstrap-et 5.3+ -ra:
+
+Nincs jQuery függőség
+
+Jobb utility class-ok, grid rendszer
+
+Sötét mód támogatás
+
+PWA optimalizálás:
+javascript
+// Modern service worker Workbox-szal (Google által ajánlott)
+import { precacheAndRoute } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies';
+
+precacheAndRoute(self.__WB_MANIFEST);
+
+// Dinamikus cache API hívásokhoz
+registerRoute(
+  ({url}) => url.pathname.startsWith('/api/'),
+  new StaleWhileRevalidate({
+    cacheName: 'api-cache',
+  })
+);
+Backend modernizálás:
+PHP OOP vagy framework:
+
+Válts objektumorientált PHP-ra vagy használj Slim Framework-et (könnyű, REST API-hoz ideális)
+
+Alternatíva: Node.js + Express (teljes JavaScript stack)
+
+API design:
+
+RESTful végpontok konzisztens JSON válaszokkal
+
+Autentikáció JWT tokenekkel (ha szükséges)
+
+Input validáció
+
+Teljesítmény optimalizálás:
+Kód felosztás (code splitting):
+
+Lazy loading komponensekhez
+
+Dinamikus import() használata
+
+Asset optimalizálás:
+
+Használj Vite-t vagy Webpack-et bundler-ként
+
+Automatikus minifikálás, tree-shaking
+
+Modern képformátumok (WebP, AVIF)
+
+IndexedDB localStorage helyett:
+
+Nagyobb adatmennyiséghez, aszinkron
+
+Jobb teljesítményű offline tárolás
+
+Fejlesztési élmény javítása:
+json
+// package.json példa
+{
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src/",
+    "format": "prettier --write src/"
+  }
+}

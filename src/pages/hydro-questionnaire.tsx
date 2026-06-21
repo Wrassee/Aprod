@@ -1,7 +1,7 @@
 // src/pages/hydro-questionnaire.tsx
 // Önálló HYDRO (MOD_HYD) protokoll kérdőív — Grounding-stílusú UI
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, Fragment } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -268,6 +268,34 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
   const [isPdfGenerating, setIsPdfGenerating]     = useState(false);
   const [saveStatus, setSaveStatus]               = useState<'idle' | 'saving' | 'saved'>('idle');
 
+  // Question text maps loaded from public JSON (per language)
+  const [questionMap, setQuestionMap]       = useState<Record<string, string>>({});
+  const [groupTitleMap, setGroupTitleMap]   = useState<Record<string, string>>({});  // path → section title
+
+  useEffect(() => {
+    fetch(`/questions_hydro_${lang}.json`)
+      .then(r => r.json())
+      .then((data: { groups: { id: string; title: string; questions: { id: string; text: string }[] }[] }) => {
+        const qMap: Record<string, string>  = {};
+        const gMap: Record<string, string>  = {};
+        data.groups.forEach(group => {
+          group.questions.forEach(q => {
+            // Strip leading "H_" prefix, also handle H_9.2.1a → 9.2.1_a variant
+            const raw = q.id.replace(/^H_/, '');
+            qMap[raw] = q.text;
+            // Alternative: trailing lowercase letter without underscore → with underscore
+            const altKey = raw.replace(/([0-9])([a-z])$/, '$1_$2');
+            if (altKey !== raw) qMap[altKey] = q.text;
+            gMap[raw] = group.title;
+            if (altKey !== raw) gMap[altKey] = group.title;
+          });
+        });
+        setQuestionMap(qMap);
+        setGroupTitleMap(gMap);
+      })
+      .catch(() => { /* fallback: show path numbers only */ });
+  }, [lang]);
+
   const saved = loadState();
   const [header, setHeader] = useState<HydroHeader>(saved?.header ?? {
     installationType: 'Neuanlage', certType: 'Baumusterprüfung', machineRoomless: false,
@@ -461,6 +489,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
             <ChapterSection
               chapter={currentChapter} answers={answers} setAnswer={setAnswer}
               theme={theme} lang={lang}
+              questionMap={questionMap} groupTitleMap={groupTitleMap}
               b7={currentChapter.id === 7 ? b7 : undefined}       setB7={currentChapter.id === 7 ? setB7 : undefined}
               b8Data={currentChapter.id === 8 ? b8 : undefined}   setB8={currentChapter.id === 8 ? setB8 : undefined}
               b9Data={currentChapter.id === 9 ? b9 : undefined}   setB9={currentChapter.id === 9 ? setB9 : undefined}
@@ -661,10 +690,12 @@ function B0Section({ header, setHeader, theme, lang }: {
 
 function ChapterSection({
   chapter, answers, setAnswer, theme, lang,
+  questionMap, groupTitleMap,
   b1Data, setB1, b7, setB7, b8Data, setB8, b9Data, setB9, b13Data, setB13,
 }: {
   chapter: Chapter; answers: Record<string, string>; setAnswer: (path: string, value: string) => void;
   theme: 'modern' | 'classic'; lang: Lang;
+  questionMap: Record<string, string>; groupTitleMap: Record<string, string>;
   b1Data?: HydroB1Data;  setB1?:  React.Dispatch<React.SetStateAction<HydroB1Data>>;
   b7?:    HydroB7Comp;   setB7?:  React.Dispatch<React.SetStateAction<HydroB7Comp>>;
   b8Data?: HydroB8Data;  setB8?:  React.Dispatch<React.SetStateAction<HydroB8Data>>;
@@ -833,34 +864,59 @@ function ChapterSection({
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {chapter.paths.map(path => {
-            const rowOptions = chapter.specialOptions?.[path] ?? options;
-            const current    = answers[path] ?? '';
-            const rowBg      = current ? ROW_BG[current] : '';
+          {chapter.paths.map((path, idx) => {
+            const rowOptions  = chapter.specialOptions?.[path] ?? options;
+            const current     = answers[path] ?? '';
+            const rowBg       = current ? ROW_BG[current] : '';
+            const questionText = questionMap[path] ?? '';
+            const groupTitle   = groupTitleMap[path] ?? '';
+
+            // Show a thin group-title divider whenever the section changes
+            const prevPath      = chapter.paths[idx - 1];
+            const prevGroupTitle = prevPath ? (groupTitleMap[prevPath] ?? '') : '';
+            const showDivider   = idx > 0 && groupTitle && groupTitle !== prevGroupTitle;
+
             return (
-              <div key={path}
-                className={`relative border-b dark:border-gray-700 last:border-b-0 transition-all duration-300 ${
-                  rowBg || (modern
-                    ? 'bg-white dark:bg-gray-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/10'
-                    : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50')
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 sm:p-4">
-                  <span className="font-mono text-sm text-gray-600 dark:text-gray-400 shrink-0 w-28">{path}</span>
-                  <div className="flex flex-wrap items-center gap-2">
-                    {rowOptions.map(opt => {
-                      const isSelected = current === opt;
-                      return (
-                        <button key={opt} type="button" onClick={() => setAnswer(path, opt)}
-                          className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
-                            isSelected ? PILL_ACTIVE[opt] : `bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 ${PILL_HOVER[opt]}`
-                          }`}
-                        >{opt}</button>
-                      );
-                    })}
+              <Fragment key={path}>
+                {showDivider && (
+                  <div className="px-4 pt-3 pb-1.5 bg-gray-50 dark:bg-gray-800/60 border-b border-t border-blue-100 dark:border-blue-900/50">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+                      {groupTitle}
+                    </span>
+                  </div>
+                )}
+                <div
+                  className={`relative border-b dark:border-gray-700 last:border-b-0 transition-all duration-300 ${
+                    rowBg || (modern
+                      ? 'bg-white dark:bg-gray-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/10'
+                      : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50')
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 sm:p-4">
+                    {/* Path number badge */}
+                    <span className="font-mono text-xs text-blue-500 dark:text-blue-400 shrink-0 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 self-start mt-0.5">
+                      {path}
+                    </span>
+                    {/* Question text */}
+                    <span className="flex-1 text-sm text-gray-800 dark:text-gray-200 leading-snug min-w-0">
+                      {questionText || path}
+                    </span>
+                    {/* Option pills */}
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      {rowOptions.map(opt => {
+                        const isSelected = current === opt;
+                        return (
+                          <button key={opt} type="button" onClick={() => setAnswer(path, opt)}
+                            className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
+                              isSelected ? PILL_ACTIVE[opt] : `bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 ${PILL_HOVER[opt]}`
+                            }`}
+                          >{opt}</button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Fragment>
             );
           })}
         </CardContent>

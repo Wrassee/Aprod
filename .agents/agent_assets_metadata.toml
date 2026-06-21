@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "faHcWh2X3412JmnR0-joZ"
+uri = "file://attached_assets/Abnahme_MOD_HYD_template.xlsx"
+type = "table"
+title = "Abnahme_MOD_HYD_template.xlsx — Kész sablon (254 sor)"

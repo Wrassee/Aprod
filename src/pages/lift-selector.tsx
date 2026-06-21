@@ -275,7 +275,9 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
 
   // Handle subtype selection and navigation
   const handleSubtypeSelect = (subtype: LiftSubtype) => {
-    if (!subtype.mapping) {
+    // MOD_HYD: saját rögzített PDF flow, nincs szükség adatbázis sablonra
+    const isHydroFlow = selectedType?.code === 'MOD_HYD';
+    if (!subtype.mapping && !isHydroFlow) {
       return;
     }
 
@@ -283,9 +285,9 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
       language,
       liftType: selectedType?.code,
       liftSubtype: subtype.code,
-      mappingId: subtype.mapping.id,
-      questionTemplateId: subtype.mapping.question_template?.id,
-      protocolTemplateId: subtype.mapping.protocol_template?.id,
+      mappingId: subtype.mapping?.id ?? null,
+      questionTemplateId: subtype.mapping?.question_template?.id ?? null,
+      protocolTemplateId: subtype.mapping?.protocol_template?.id ?? null,
     };
 
     localStorage.setItem("liftSelection", JSON.stringify(selection));
@@ -555,7 +557,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
             </Alert>
           )}
 
-          {selectedType.subtypes.length > 0 && selectedType.subtypes.every(st => !st.mapping || !st.mapping.question_template || !st.mapping.protocol_template) && (
+          {selectedType.subtypes.length > 0 && selectedType.code !== 'MOD_HYD' && selectedType.subtypes.every(st => !st.mapping || !st.mapping.question_template || !st.mapping.protocol_template) && (
             <Alert className="mb-6 bg-yellow-50 border-yellow-200">
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800">
@@ -586,15 +588,16 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
             {selectedType.subtypes.map((subtype) => {
               const hasMapping = !!subtype.mapping;
               const hasQuestionTemplate = !!subtype.mapping?.question_template;
-              // const isComplete = hasQuestionTemplate && hasProtocolTemplate;
-              const isComplete = hasQuestionTemplate; 
+              // MOD_HYD: saját rögzített HYDRO PDF flow, nincs szükség sablonra
+              const isHydroType = selectedType?.code === 'MOD_HYD';
+              const isComplete = isHydroType || hasQuestionTemplate; 
               const IconComponent = getIconForSubtype(subtype.code);
 
               return theme === 'modern' ? (
                 <button
                   key={subtype.id}
                   onClick={() => {
-                    if (hasMapping && isComplete) {
+                    if (isComplete) {
                       console.log("🎯 Subtype selected:", subtype.code);
                       handleSubtypeSelect(subtype);
                     }
@@ -633,7 +636,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                         {subtype.code}
                       </Badge>
 
-                      {!hasMapping && (
+                      {!hasMapping && !isHydroType && (
                         <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
                           {t("no_mapping_available")}
                         </div>
@@ -650,7 +653,11 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                           <div className="mt-3 space-y-1 text-xs text-gray-600">
                             <div className="flex items-center justify-center gap-1">
                               <CheckCircle2 className="w-3 h-3 text-green-600" />
-                              <span>{subtype.mapping?.question_template?.name}</span>
+                              <span>
+                                {isHydroType
+                                  ? 'HYDRO PDF (Rögzített)'
+                                  : subtype.mapping?.question_template?.name}
+                              </span>
                             </div>
                           </div>
 
@@ -668,7 +675,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                 <button
                   key={subtype.id}
                   onClick={() => {
-                    if (hasMapping && isComplete) {
+                    if (isComplete) {
                       console.log("🎯 Subtype selected:", subtype.code);
                       handleSubtypeSelect(subtype);
                     }
@@ -702,7 +709,11 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                       <div className="mt-2 space-y-1 text-xs text-gray-600">
                         <div className="flex items-center justify-center gap-1">
                           <CheckCircle2 className="w-3 h-3 text-green-600" />
-                          <span>{subtype.mapping?.question_template?.name}</span>
+                          <span>
+                            {isHydroType
+                              ? 'HYDRO PDF (Rögzített)'
+                              : subtype.mapping?.question_template?.name}
+                          </span>
                         </div>
                       </div>
                     )}

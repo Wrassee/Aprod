@@ -439,6 +439,20 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                     key={type.id}
                     onClick={() => {
                       console.log("🎯 Type selected:", type.code);
+                      // MOD_HYD: rögzített HYDRO PDF flow, nincs subtype-kiválasztás
+                      if (type.code === 'MOD_HYD') {
+                        const selection = {
+                          language,
+                          liftType: type.code,
+                          liftSubtype: 'MOD_HYD',
+                          mappingId: null,
+                          questionTemplateId: null,
+                          protocolTemplateId: null,
+                        };
+                        localStorage.setItem("liftSelection", JSON.stringify(selection));
+                        onNavigate('hydro-questionnaire');
+                        return;
+                      }
                       setSelectedType(type);
                     }}
                     className="group relative w-full max-w-sm"
@@ -481,6 +495,20 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
                     key={type.id}
                     onClick={() => {
                       console.log("🎯 Type selected:", type.code);
+                      // MOD_HYD: rögzített HYDRO PDF flow, nincs subtype-kiválasztás
+                      if (type.code === 'MOD_HYD') {
+                        const selection = {
+                          language,
+                          liftType: type.code,
+                          liftSubtype: 'MOD_HYD',
+                          mappingId: null,
+                          questionTemplateId: null,
+                          protocolTemplateId: null,
+                        };
+                        localStorage.setItem("liftSelection", JSON.stringify(selection));
+                        onNavigate('hydro-questionnaire');
+                        return;
+                      }
                       setSelectedType(type);
                     }}
                     className="group flex flex-col items-center p-8 w-full max-w-sm h-auto border-2 border-gray-200 hover:border-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 transform hover:scale-105 bg-white shadow-sm hover:shadow-lg"

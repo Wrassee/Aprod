@@ -219,6 +219,8 @@ const FIELD_MAP: Record<string, 'checkbox' | 'text'> = {
 // szerepelnek (EN norma referencia) → "16.2" path = chapter 12
 // ============================================================
 function getChapterFromPath(questionPath: string): number | null {
+  // B6 speciális: A.6.x / B.6.x / C.6.x → fejezet 6 (TXT-ből azonosítva)
+  if (/^[A-C]\.6\./i.test(questionPath)) return 6;
   const match = questionPath.match(/^(\d+)[.\-_]/);
   if (!match) return null;
   const pathNum = parseInt(match[1], 10);

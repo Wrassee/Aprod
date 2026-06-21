@@ -1,0 +1,2 @@
+- [HYDRO Protocol Architecture](hydro-arch.md) — MOD_HYD = önálló flow (hydro-questionnaire screen), nem az általános questionnaire
+- [B6 Special Paths](hydro-b6-paths.md) — B6 A.6.x/B.6.x/C.6.x paths → getChapterFromPath fix /^[A-C]\.6\./

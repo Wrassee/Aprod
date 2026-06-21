@@ -48,6 +48,7 @@ type Screen =
   | 'start' 
   | 'lift-selector'
   | 'questionnaire' 
+  | 'hydro-questionnaire'
   | 'erdungskontrolle' 
   | 'niedervolt' 
   | 'signature' 
@@ -289,6 +290,12 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
 
     localStorage.setItem("liftSelection", JSON.stringify(selection));
     console.log("✅ Lift selection saved:", selection);
+
+    // MOD_HYD → önálló HYDRO kérdőív (nem az általános questionnaire)
+    if (selectedType?.code === 'MOD_HYD') {
+      onNavigate('hydro-questionnaire');
+      return;
+    }
 
     onNavigate('questionnaire');
   };

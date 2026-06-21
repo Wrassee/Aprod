@@ -38,6 +38,7 @@ import ForgotPassword from "@/pages/forgot-password";
 import ResetPassword from "@/pages/reset-password";
 import AuthCallback from "@/pages/auth-callback";
 import { TechnicianDashboard } from "@/pages/technician-dashboard";
+import { HydroQuestionnaire } from "@/pages/hydro-questionnaire";
 import { FormData, MeasurementRow } from "./lib/types";
 
 /* -------------------- Shared schema -------------------- */
@@ -50,6 +51,7 @@ type Screen =
   | 'start' 
   | 'lift-selector'
   | 'questionnaire' 
+  | 'hydro-questionnaire'
   | 'erdungskontrolle' 
   | 'niedervolt' 
   | 'signature' 
@@ -593,6 +595,13 @@ function AppContent({
         return (
           <TechnicianDashboard 
             onBack={() => setCurrentScreen('lift-selector')}
+          />
+        );
+
+      case 'hydro-questionnaire':
+        return (
+          <HydroQuestionnaire
+            onHome={handleGoHome}
           />
         );
 

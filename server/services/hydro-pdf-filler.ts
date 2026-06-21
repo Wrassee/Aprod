@@ -80,6 +80,12 @@ export interface HydroFormData {
   b7_nenndurchmesser2?: string;
   b7_rohrbruchTyp?: string;                                // Rohrbruchventil Typ
   b7_drosselTyp?: string;                                  // Drosselventil Typ
+  // Hydraulikus komponens checkboxok (B7) — az XML-ből azonosítva
+  b7_fang?: boolean;                                       // Fangvorrichtung checkbox
+  b7_ausgleich?: boolean;                                  // Ausgleichsgewicht checkbox
+  b7_begrenzer?: boolean;                                  // Geschwindigkeitsbegrenzer checkbox
+  b7_rohrbruch?: boolean;                                  // Rohrbruchventil checkbox
+  b7_drossel?: boolean;                                    // Drosselventil checkbox
 
   // === B8 HYDRAULIKANLAGE ===
   b8_hersteller?: string;                                  // Aggregat Hersteller
@@ -209,11 +215,16 @@ const FIELD_MAP: Record<string, 'checkbox' | 'text'> = {
 // ============================================================
 // CHAPTER DETECTION: groupKey-ből chapter meghatározás
 // pl. "2.1.1" → 2,  "3.4.5" → 3,  "11.3.7" → 11
+// B12 SPEC. ESET: a PDF B12 fejezet kérdései "16.x" jelöléssel
+// szerepelnek (EN norma referencia) → "16.2" path = chapter 12
 // ============================================================
 function getChapterFromPath(questionPath: string): number | null {
-  const match = questionPath.match(/^(\d+)\./);
+  const match = questionPath.match(/^(\d+)[.\-_]/);
   if (!match) return null;
-  return parseInt(match[1], 10);
+  const pathNum = parseInt(match[1], 10);
+  // B12 speciális: EN norma 16.x → fejezet 12
+  if (pathNum === 16) return 12;
+  return pathNum;
 }
 
 // ============================================================
@@ -370,6 +381,12 @@ export class HydroPdfFiller {
     setTextField(form, 'B7_Nenndurchmesser_2', data.b7_nenndurchmesser2 || '');
     setTextField(form, 'B7_RohrbruchTyp', data.b7_rohrbruchTyp || '');
     setTextField(form, 'B7_Drossel_Typ', data.b7_drosselTyp || '');
+    // B7 hydraulikus komponens checkboxok (PDF valódi mezőnevei pypdf alapján)
+    if (data.b7_fang) setCheckbox(form, 'B7_nz_7.3.Fang', true);
+    if (data.b7_ausgleich) setCheckbox(form, 'B7_nz_7.4.Ausgleich', true);
+    if (data.b7_begrenzer) setCheckbox(form, 'B7_nz_7.2.Begrenzer', true);
+    if (data.b7_rohrbruch) setCheckbox(form, 'B7_nz_7.5.Rohrbruch', true);
+    if (data.b7_drossel) setCheckbox(form, 'B7_nz_7.6.Drossel', true);
 
     // ----------------------------------------------------------
     // 7. B8 - HYDRAULIKANLAGE
@@ -453,20 +470,24 @@ export class HydroPdfFiller {
         const blockNum = chapter;
         const upperAnswer = answer.trim();
 
-        // YES/NO/NA/U jelölőnégyzetek
+        // YES/NO/NA/U/Siehe jelölőnégyzetek
         if (upperAnswer === 'Ja' || upperAnswer === 'ja' || upperAnswer === 'yes' || upperAnswer === 'igen') {
           setCheckbox(form, buildCheckboxFieldName(blockNum, 'Ja', questionPath), true);
         } else if (upperAnswer === 'Nein' || upperAnswer === 'nein' || upperAnswer === 'no' || upperAnswer === 'nem') {
-          // Nein lehet checkbox vagy text (mértékegység) a PDF-ben
           const neinField = buildCheckboxFieldName(blockNum, 'Nein', questionPath);
           setCheckbox(form, neinField, true);
         } else if (upperAnswer === 'nz' || upperAnswer === 'n.z.' || upperAnswer === 'na') {
           setCheckbox(form, buildCheckboxFieldName(blockNum, 'nz', questionPath), true);
         } else if (upperAnswer === 'U') {
           setCheckbox(form, buildCheckboxFieldName(blockNum, 'U', questionPath), true);
+        } else if (upperAnswer === 'Siehe' || upperAnswer === 'siehe') {
+          // "Siehe" = "Lásd" opció — B10.1-nél szerepel (XML: B10_Siehe_10.1)
+          setCheckbox(form, buildCheckboxFieldName(blockNum, 'Siehe', questionPath), true);
+        } else if (upperAnswer === 'keine' || upperAnswer === 'Keine') {
+          // "keine" = "nincs" opció — B1-nél szerepel (XML: B1_keine_1)
+          setCheckbox(form, buildCheckboxFieldName(blockNum, 'keine', questionPath), true);
         } else {
           // Szabad szöveg → szöveges mező kitöltés
-          // pl. mérési értékek (Nein szöveg mezőkbe kerülnek)
           const neinTextField = buildCheckboxFieldName(blockNum, 'Nein', questionPath);
           setTextField(form, neinTextField, upperAnswer);
         }

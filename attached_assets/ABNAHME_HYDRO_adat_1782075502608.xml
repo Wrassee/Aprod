@@ -1,0 +1,2018 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fields xmlns:xfdf="http://ns.adobe.com/xfdf-transition/"
+><B0_:Entwurfsprüfung xmlns:B0_="B0_"
+>Off</B0_:Entwurfsprüfung
+><B0_Baumusterprüfung
+>Off</B0_Baumusterprüfung
+><B0_Maschinenraum
+>Off</B0_Maschinenraum
+><B0_Neuanlage
+>Off</B0_Neuanlage
+><B0_Umbau
+>Off</B0_Umbau
+><B10_Ja_10
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></B10_Ja_10
+><B10_Nein_10
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></B10_Nein_10
+><B10_Siehe_10
+><field xfdf:original="1"
+>Off</field
+></B10_Siehe_10
+><B10_U_10
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></B10_U_10
+><B10_nz_10
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></B10_nz_10
+><B11_Ja_11
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><field xfdf:original="1_Main"
+>Off</field
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="11"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+></B11_Ja_11
+><B11_Nein_11
+><group xfdf:original="1"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><field xfdf:original="1_Main"
+>Off</field
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="11"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+></B11_Nein_11
+><B11_U_11
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+></group
+></B11_U_11
+><B11_nz_11
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+></group
+><field xfdf:original="1_Main"
+>Off</field
+><group xfdf:original="3"
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+></B11_nz_11
+><B12_Ja_16
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></B12_Ja_16
+><B12_Nein_16
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></B12_Nein_16
+><B12_U_16
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></B12_U_16
+><B13_Ja_13
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></B13_Ja_13
+><B13_U_13
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></B13_U_13
+><B13_nz_13
+><field xfdf:original="4"
+>Off</field
+></B13_nz_13
+><B14_Ja_14
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></B14_Ja_14
+><B14_nz_14
+><field xfdf:original="2"
+>Off</field
+></B14_nz_14
+><B14_nz_14_Main
+>Off</B14_nz_14_Main
+><B1_Ja_1
+>Off</B1_Ja_1
+><B1_keine_1
+>Off</B1_keine_1
+><B1_nz_1
+>Off</B1_nz_1
+><B2_Ja_2
+><group xfdf:original="1"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B2_Ja_2
+><B2_Nein_2
+><group xfdf:original="1"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B2_Nein_2
+><B2_U_2
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B2_U_2
+><B2_nz_2
+><group xfdf:original="1"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B2_nz_2
+><B3_Ja_3
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="3"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="11"
+>Off</field
+><field xfdf:original="12"
+>Off</field
+><field xfdf:original="13"
+>Off</field
+><field xfdf:original="14"
+>Off</field
+><field xfdf:original="15"
+>Off</field
+><field xfdf:original="16"
+>Off</field
+><field xfdf:original="17"
+>Off</field
+><field xfdf:original="18"
+>Off</field
+><field xfdf:original="19"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="2_A"
+>Off</field
+><field xfdf:original="2_B"
+>Off</field
+><field xfdf:original="2_C"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B3_Ja_3
+><B3_Ja_4
+><group xfdf:original="1"
+><field xfdf:original="3"
+>Off</field
+></group
+></B3_Ja_4
+><B3_Nein_3
+><group xfdf:original="1"
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="11"
+>Off</field
+><field xfdf:original="12"
+>Off</field
+><field xfdf:original="14"
+>Off</field
+><field xfdf:original="19"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B3_Nein_3
+><B3_Nein_4
+><group xfdf:original="1"
+><field xfdf:original="3"
+>Off</field
+></group
+></B3_Nein_4
+><B3_U_3
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="3"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="11"
+>Off</field
+><field xfdf:original="12"
+>Off</field
+><field xfdf:original="13"
+>Off</field
+><field xfdf:original="14"
+>Off</field
+><field xfdf:original="15"
+>Off</field
+><field xfdf:original="16"
+>Off</field
+><field xfdf:original="17"
+>Off</field
+><field xfdf:original="18"
+>Off</field
+><field xfdf:original="19"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="2_A"
+>Off</field
+><field xfdf:original="2_B"
+>Off</field
+><field xfdf:original="2_C"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B3_U_3
+><B3_U__3
+><group xfdf:original="4"
+><field xfdf:original="8"
+>Off</field
+></group
+></B3_U__3
+><B3_nz_3
+><group xfdf:original="1"
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="3"
+><group xfdf:original="1"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="13"
+>Off</field
+><field xfdf:original="14"
+>Off</field
+><field xfdf:original="16"
+>Off</field
+><field xfdf:original="17"
+>Off</field
+><field xfdf:original="18"
+>Off</field
+><field xfdf:original="19"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="6"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B3_nz_3
+><B4_Ja_4
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="11"
+>Off</field
+><field xfdf:original="12"
+>Off</field
+><field xfdf:original="13"
+>Off</field
+><field xfdf:original="14"
+>Off</field
+><field xfdf:original="15"
+>Off</field
+><field xfdf:original="16"
+>Off</field
+><field xfdf:original="17"
+>Off</field
+><field xfdf:original="18"
+>Off</field
+><field xfdf:original="19"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+></B4_Ja_4
+><B4_Nein_4
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="15"
+>Off</field
+><field xfdf:original="17"
+>Off</field
+><field xfdf:original="18"
+>Off</field
+><field xfdf:original="19"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+></B4_Nein_4
+><B4_U_4
+><group xfdf:original="1"
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="11"
+>Off</field
+><field xfdf:original="12"
+>Off</field
+><field xfdf:original="13"
+>Off</field
+><field xfdf:original="14"
+>Off</field
+><field xfdf:original="15"
+>Off</field
+><field xfdf:original="16"
+>Off</field
+><field xfdf:original="17"
+>Off</field
+><field xfdf:original="18"
+>Off</field
+><field xfdf:original="19"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+></B4_U_4
+><B4_nz_4
+><group xfdf:original="1"
+><field xfdf:original="12"
+>Off</field
+><field xfdf:original="15"
+>Off</field
+><field xfdf:original="17"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+></B4_nz_4
+><B5_Ja_5
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B5_Ja_5
+><B5_Nein_5
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B5_Nein_5
+><B5_U_5
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="10"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B5_U_5
+><B5_nz_5
+><group xfdf:original="1"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B5_nz_5
+><B6_Ja_6
+><field xfdf:original="3"
+>Off</field
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_Ja_6
+><B6_Ja_A
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></B6_Ja_A
+><B6_Ja_B
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></B6_Ja_B
+><B6_Ja_C
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_Ja_C
+><B6_Nein_6
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_Nein_6
+><B6_Nein_B
+><group xfdf:original="6"
+><field xfdf:original="2"
+>Off</field
+></group
+></B6_Nein_B
+><B6_Nein_C
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_Nein_C
+><B6_U_6
+><field xfdf:original="3"
+>Off</field
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_U_6
+><B6_U_A
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></B6_U_A
+><B6_U_B
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></B6_U_B
+><B6_U_C
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_U_C
+><B6_nz_6
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><group xfdf:original="4"
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_nz_6
+><B6_nz_C
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+></group
+></B6_nz_C
+><B7_Ja_7
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+></group
+><group xfdf:original="8"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="9"
+><field xfdf:original="1"
+>Off</field
+></group
+></B7_Ja_7
+><B7_Nein_7
+><group xfdf:original="1"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="7"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+></group
+><group xfdf:original="9"
+><field xfdf:original="1"
+>Off</field
+></group
+></B7_Nein_7
+><B7_U_7
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+><field xfdf:original="8"
+>Off</field
+><field xfdf:original="9"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+><field xfdf:original="7"
+>Off</field
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+></group
+></group
+><group xfdf:original="8"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="9"
+><field xfdf:original="1"
+>Off</field
+></group
+></B7_U_7
+><B7_nz_7
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><Begrenzer
+>Off</Begrenzer
+></group
+><group xfdf:original="3"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><Fang
+>Off</Fang
+></group
+><group xfdf:original="4"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><Ausgleich
+>Off</Ausgleich
+></group
+><group xfdf:original="5"
+><field xfdf:original="4"
+>Off</field
+><Rohrbruch
+>Off</Rohrbruch
+></group
+><group xfdf:original="6"
+><Drossel
+>Off</Drossel
+></group
+><group xfdf:original="7"
+><field xfdf:original="1_Absinken"
+>Off</field
+><group xfdf:original="2"
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+></group
+><field xfdf:original="2_Klemm"
+>Off</field
+><field xfdf:original="3_Aufsetz"
+>Off</field
+></group
+><group xfdf:original="9"
+><field xfdf:original="1"
+>Off</field
+></group
+></B7_nz_7
+><B8_Ja_8
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="4"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+></group
+></group
+><group xfdf:original="5"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B8_Ja_8
+><B8_Nein_8
+><group xfdf:original="1"
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="4"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+></group
+></group
+><group xfdf:original="5"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B8_Nein_8
+><B8_U_8
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+><field xfdf:original="4"
+>Off</field
+><field xfdf:original="5"
+>Off</field
+><field xfdf:original="6"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="4"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="1"
+>Off</field
+></group
+></group
+><group xfdf:original="5"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B8_U_8
+><B8_nz_8
+><group xfdf:original="1"
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="3"
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="4"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+><group xfdf:original="6"
+><field xfdf:original="3"
+>Off</field
+></group
+><group xfdf:original="7"
+><field xfdf:original="1"
+>Off</field
+></group
+></B8_nz_8
+><B9_Ja_9
+><group xfdf:original="1"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="1_a"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+></B9_Ja_9
+><B9_Nein_9
+><group xfdf:original="1"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></group
+><group xfdf:original="2"
+><field xfdf:original="1_a"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></B9_Nein_9
+><B9_U_9
+><group xfdf:original="1"
+><group xfdf:original="1"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></group
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="1_a"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+><field xfdf:original="3"
+>Off</field
+></group
+></B9_U_9
+><B9_nz_9
+><group xfdf:original="1"
+><group xfdf:original="1"
+><group xfdf:original="2"
+><field xfdf:original="1"
+>Off</field
+><field xfdf:original="2"
+>Off</field
+></group
+></group
+></group
+></B9_nz_9
+></fields
+>

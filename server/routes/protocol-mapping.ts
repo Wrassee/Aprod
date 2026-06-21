@@ -8,6 +8,7 @@ import { storage } from '../storage.js';
 import { insertProtocolSchema } from '../../shared/schema.js';
 import { pdfService } from '../services/pdf-service.js';
 import { GroundingPdfService } from '../services/grounding-pdf-service.js';
+import { HydroPdfFiller } from '../services/hydro-pdf-filler.js';
 import { requireAuth } from '../middleware/auth.js';
 import { emailService } from '../services/email-service.js';
 
@@ -372,6 +373,44 @@ router.post('/email', requireAuth, async (req, res) => {
     res.status(500).json({ 
       message: "Failed to send email", 
       error: errorMessage 
+    });
+  }
+});
+
+// =========================================================
+// === HYDRO PDF KITÖLTÉS (AcroForm)
+// POST /api/protocols/download-hydro-pdf
+// Body: { hydroData: HydroFormData }
+// =========================================================
+router.post('/download-hydro-pdf', async (req, res) => {
+  try {
+    console.log('🔵 HYDRO PDF generálás kérés érkezett');
+    const { hydroData } = req.body;
+
+    if (!hydroData) {
+      return res.status(400).json({ message: 'hydroData megadása kötelező.' });
+    }
+
+    const pdfBuffer = await HydroPdfFiller.generateFilledPdf(hydroData);
+
+    const fabNr = hydroData.fabrikationsNr
+      ? String(hydroData.fabrikationsNr).replace(/[^a-zA-Z0-9]/g, '_')
+      : 'Unknown';
+    const date = new Date().toISOString().split('T')[0];
+    const filename = `ABNAHME_HYDRO_${fabNr}_${date}.pdf`;
+
+    console.log(`✅ HYDRO PDF generálva: ${filename} (${pdfBuffer.length} bytes)`);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(pdfBuffer);
+
+  } catch (error) {
+    console.error('❌ HYDRO PDF generálási hiba:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Ismeretlen hiba';
+    res.status(500).json({
+      message: 'Szerverhiba a HYDRO PDF generálása közben.',
+      error: process.env.NODE_ENV === 'development' ? errorMessage : undefined
     });
   }
 });

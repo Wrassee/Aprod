@@ -83,6 +83,7 @@ export function Completion({
   const [isEmailSending, setIsEmailSending] = useState(false);
   const [isPdfDownloading, setIsPdfDownloading] = useState(false);
   const [isGroundingPdfDownloading, setIsGroundingPdfDownloading] = useState(false);
+  const [isHydroPdfDownloading, setIsHydroPdfDownloading] = useState(false);
   const [isExcelDownloading, setIsExcelDownloading] = useState(false);
   const [isPdfPreviewing, setIsPdfPreviewing] = useState(false);
   const [isEmailDialogOpen, setIsEmailDialogOpen] = useState(false);
@@ -345,6 +346,70 @@ export function Completion({
       setIsPdfDownloading(false);
     }
   };
+
+  // === HYDRO PDF (AcroForm kitöltés) ===
+  const handleDownloadHydroPDF = useCallback(async () => {
+    setIsHydroPdfDownloading(true);
+    try {
+      const savedData = JSON.parse(localStorage.getItem('otis-protocol-form-data') || '{}');
+
+      // Kérdések válaszainak összeállítása (groupKey → válasz)
+      const questionAnswers: Record<string, string> = {};
+      if (savedData.answers) {
+        for (const [key, val] of Object.entries(savedData.answers)) {
+          if (val && typeof val === 'string') {
+            questionAnswers[key] = val as string;
+          }
+        }
+      }
+
+      const hydroData = {
+        installationType: 'Neuanlage' as const,
+        fabrikationsNr: savedData.answers?.['7'] || '',
+        standortadresse: [
+          savedData.answers?.['5'],
+          savedData.answers?.['6'],
+          savedData.answers?.['4'],
+          savedData.answers?.['3'],
+        ].filter(Boolean).join(', '),
+        adresse: savedData.answers?.['9'] || '',
+        aufzugstyp: savedData.liftType || '',
+        b13_firma: savedData.answers?.['9'] || '',
+        b13_nameAbnahme: savedData.answers?.['2'] || savedData.answers?.['1'] || '',
+        b13_datum: savedData.receptionDate || new Date().toISOString().split('T')[0],
+        questionAnswers,
+      };
+
+      const response = await fetch(getApiUrl('/api/protocols/download-hydro-pdf'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ hydroData }),
+      });
+
+      if (!response.ok) {
+        let errMsg = 'HYDRO PDF generálási hiba';
+        try { const j = await response.json(); errMsg = j?.message || errMsg; } catch { /* noop */ }
+        throw new Error(errMsg);
+      }
+
+      const blob = await response.blob();
+      const fabNr = hydroData.fabrikationsNr
+        ? String(hydroData.fabrikationsNr).replace(/[^a-zA-Z0-9]/g, '_')
+        : 'HYDRO';
+      const filename = `ABNAHME_HYDRO_${fabNr}_${new Date().toISOString().split('T')[0]}.pdf`;
+
+      const uri = await saveFile(blob, filename);
+      if (Capacitor.isNativePlatform() && uri) {
+        try { await FileOpener.open({ filePath: uri, contentType: 'application/pdf' }); } catch { /* noop */ }
+      }
+
+      toast({ title: '✅ HYDRO PDF letöltve', description: filename });
+    } catch (error) {
+      toast({ title: 'Hiba', description: (error as Error).message, variant: 'destructive' });
+    } finally {
+      setIsHydroPdfDownloading(false);
+    }
+  }, [toast]);
 
   // === GROUNDING PDF ===
   const handleDownloadGroundingPDF = useCallback(async () => {
@@ -784,6 +849,30 @@ export function Completion({
               >
                 {isGroundingPdfDownloading ? <Loader2 className="h-5 w-5 mr-3 animate-spin" /> : <Download className="h-5 w-5 mr-3" />}
                 {isGroundingPdfDownloading ? t("generating") : t("downloadGroundingPDF")}
+              </Button>
+            )}
+
+            {/* Download HYDRO PDF */}
+            {theme === 'modern' ? (
+              <button
+                onClick={handleDownloadHydroPDF}
+                disabled={isHydroPdfDownloading}
+                className="group relative overflow-hidden p-6 rounded-2xl font-semibold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 disabled:opacity-50"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-cyan-700"></div>
+                <div className="relative flex flex-col items-center gap-3">
+                  {isHydroPdfDownloading ? <Loader2 className="h-8 w-8 animate-spin" /> : <FileText className="h-8 w-8" />}
+                  <span className="text-lg">{isHydroPdfDownloading ? t("generating") : 'HYDRO PDF'}</span>
+                </div>
+              </button>
+            ) : (
+              <Button
+                onClick={handleDownloadHydroPDF}
+                disabled={isHydroPdfDownloading}
+                className="bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center py-4 h-auto disabled:opacity-50"
+              >
+                {isHydroPdfDownloading ? <Loader2 className="h-5 w-5 mr-3 animate-spin" /> : <Download className="h-5 w-5 mr-3" />}
+                {isHydroPdfDownloading ? t("generating") : 'HYDRO PDF'}
               </Button>
             )}
 

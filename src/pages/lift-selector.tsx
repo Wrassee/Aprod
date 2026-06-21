@@ -275,9 +275,9 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
 
   // Handle subtype selection and navigation
   const handleSubtypeSelect = (subtype: LiftSubtype) => {
-    // MOD_HYD: saját rögzített PDF flow, nincs szükség adatbázis sablonra
-    const isHydroFlow = selectedType?.code === 'MOD_HYD';
-    if (!subtype.mapping && !isHydroFlow) {
+    // MOD_HYD altípus: saját rögzített PDF flow, nincs szükség adatbázis sablonra
+    const isHydroSubtype = subtype.code === 'MOD_HYD';
+    if (!subtype.mapping && !isHydroSubtype) {
       return;
     }
 
@@ -293,8 +293,8 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
     localStorage.setItem("liftSelection", JSON.stringify(selection));
     console.log("✅ Lift selection saved:", selection);
 
-    // MOD_HYD → önálló HYDRO kérdőív (nem az általános questionnaire)
-    if (selectedType?.code === 'MOD_HYD') {
+    // MOD_HYD altípus → önálló HYDRO kérdőív (nem az általános questionnaire)
+    if (isHydroSubtype) {
       onNavigate('hydro-questionnaire');
       return;
     }
@@ -585,7 +585,7 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
             </Alert>
           )}
 
-          {selectedType.subtypes.length > 0 && selectedType.code !== 'MOD_HYD' && selectedType.subtypes.every(st => !st.mapping || !st.mapping.question_template || !st.mapping.protocol_template) && (
+          {selectedType.subtypes.length > 0 && selectedType.subtypes.filter(st => st.code !== 'MOD_HYD').length > 0 && selectedType.subtypes.filter(st => st.code !== 'MOD_HYD').every(st => !st.mapping || !st.mapping.question_template || !st.mapping.protocol_template) && (
             <Alert className="mb-6 bg-yellow-50 border-yellow-200">
               <AlertCircle className="h-4 w-4 text-yellow-600" />
               <AlertDescription className="text-yellow-800">
@@ -616,8 +616,8 @@ export default function LiftSelector({ onNavigate, onHome }: LiftSelectorProps) 
             {selectedType.subtypes.map((subtype) => {
               const hasMapping = !!subtype.mapping;
               const hasQuestionTemplate = !!subtype.mapping?.question_template;
-              // MOD_HYD: saját rögzített HYDRO PDF flow, nincs szükség sablonra
-              const isHydroType = selectedType?.code === 'MOD_HYD';
+              // MOD_HYD altípus: saját rögzített HYDRO PDF flow, nincs szükség sablonra
+              const isHydroType = subtype.code === 'MOD_HYD';
               const isComplete = isHydroType || hasQuestionTemplate; 
               const IconComponent = getIconForSubtype(subtype.code);
 

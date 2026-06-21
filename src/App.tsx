@@ -602,6 +602,7 @@ function AppContent({
         return (
           <HydroQuestionnaire
             onHome={handleGoHome}
+            onNavigate={(s) => setCurrentScreen(s as Screen)}
           />
         );
 
@@ -628,14 +629,16 @@ function AppContent({
           />
         );
         
-      case 'erdungskontrolle':
+      case 'erdungskontrolle': {
+        const _erdSel = (() => { try { return JSON.parse(localStorage.getItem('liftSelection') || '{}'); } catch { return {}; } })();
+        const _erdFromHydro = _erdSel.liftType === 'MOD_HYD';
         return (
           <Erdungskontrolle
             key={`erdungskontrolle-${clearTrigger}`}
             formData={formData}
             setFormData={setFormData}
             onNext={() => setCurrentScreen('niedervolt')}
-            onBack={() => setCurrentScreen('questionnaire')}
+            onBack={() => setCurrentScreen(_erdFromHydro ? 'hydro-questionnaire' : 'questionnaire')}
             onHome={handleGoHome}
             onAdminAccess={handleAdminAccess}
             onStartNew={handleStartNew}
@@ -644,8 +647,11 @@ function AppContent({
             onReceptionDateChange={handleReceptionDateChange}
           />
         );
+      }
 
-      case 'niedervolt':
+      case 'niedervolt': {
+        const _nivSel = (() => { try { return JSON.parse(localStorage.getItem('liftSelection') || '{}'); } catch { return {}; } })();
+        const _nivFromHydro = _nivSel.liftType === 'MOD_HYD';
         return (
           <NiedervoltTable
             key={`niedervolt-table-${clearTrigger}`}
@@ -653,8 +659,8 @@ function AppContent({
             onMeasurementsChange={(measurements) => 
               setFormData(prev => ({ ...prev, niedervoltTableMeasurements: measurements }))
             }
-            onBack={handleNiedervoltBack}
-            onNext={handleNiedervoltNext}
+            onBack={_nivFromHydro ? () => setCurrentScreen('erdungskontrolle') : handleNiedervoltBack}
+            onNext={_nivFromHydro ? () => setCurrentScreen('hydro-questionnaire') : handleNiedervoltNext}
             receptionDate={formData.receptionDate}
             onReceptionDateChange={handleReceptionDateChange}
             onAdminAccess={handleAdminAccess}
@@ -664,6 +670,7 @@ function AppContent({
             setFormData={setFormData}
           />
         );
+      }
         
       case 'signature':
         return (

@@ -208,9 +208,10 @@ function saveState(state: Record<string, unknown>) {
 
 interface HydroQuestionnaireProps {
   onHome: () => void;
+  onNavigate?: (screen: string) => void;
 }
 
-export function HydroQuestionnaire({ onHome }: HydroQuestionnaireProps) {
+export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnaireProps) {
   const { toast } = useToast();
 
   const [currentChapterIdx, setCurrentChapterIdx] = useState(0);
@@ -399,6 +400,7 @@ export function HydroQuestionnaire({ onHome }: HydroQuestionnaireProps) {
             onGenerate={handleGeneratePdf}
             isGenerating={isPdfGenerating}
             fabrikationsNr={header.fabrikationsNr}
+            onNavigate={onNavigate}
           />
         )}
         {currentChapter && (
@@ -752,35 +754,87 @@ function PdfSection({
   onGenerate,
   isGenerating,
   fabrikationsNr,
+  onNavigate,
 }: {
   onGenerate: () => void;
   isGenerating: boolean;
   fabrikationsNr: string;
+  onNavigate?: (screen: string) => void;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 space-y-6">
-      <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg">
-        <FileText className="h-10 w-10 text-white" />
+    <div className="flex flex-col items-center justify-center py-10 space-y-6 max-w-md mx-auto">
+      {/* HYDRO PDF */}
+      <div className="w-full flex flex-col items-center space-y-4 p-6 bg-white dark:bg-gray-800 rounded-2xl border border-blue-200 dark:border-blue-700 shadow-sm">
+        <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow">
+          <FileText className="h-8 w-8 text-white" />
+        </div>
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">HYDRO Protokoll PDF</h2>
+          <p className="text-gray-500 dark:text-gray-400 text-xs">
+            Az összes B0–B14 adat bekerül az ABNAHME_HYDRO.pdf AcroForm mezőibe.
+            {fabrikationsNr && <><br /><span className="font-mono font-medium">{fabrikationsNr}</span></>}
+          </p>
+        </div>
+        <Button
+          onClick={onGenerate}
+          disabled={isGenerating}
+          size="lg"
+          className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+        >
+          {isGenerating ? (
+            <><Loader2 className="h-5 w-5 mr-2 animate-spin" /> Generálás...</>
+          ) : (
+            <><Download className="h-5 w-5 mr-2" /> HYDRO PDF letöltése</>
+          )}
+        </Button>
       </div>
-      <div className="text-center">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">HYDRO PDF Generálás</h2>
-        <p className="text-gray-500 dark:text-gray-400 text-sm max-w-xs">
-          Az összes kitöltött adat bekerül az ABNAHME_HYDRO.pdf AcroForm mezőibe.
-          {fabrikationsNr && <><br /><span className="font-mono font-medium">{fabrikationsNr}</span></>}
-        </p>
+
+      {/* Separator */}
+      <div className="flex items-center w-full gap-3">
+        <div className="flex-1 border-t border-gray-200 dark:border-gray-600" />
+        <span className="text-xs text-gray-400 dark:text-gray-500">További protokollok</span>
+        <div className="flex-1 border-t border-gray-200 dark:border-gray-600" />
       </div>
-      <Button
-        onClick={onGenerate}
-        disabled={isGenerating}
-        size="lg"
-        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 h-auto text-lg shadow-lg"
-      >
-        {isGenerating ? (
-          <><Loader2 className="h-6 w-6 mr-3 animate-spin" /> Generálás...</>
-        ) : (
-          <><Download className="h-6 w-6 mr-3" /> HYDRO PDF letöltése</>
-        )}
-      </Button>
+
+      {/* Grounding Protokoll */}
+      <div className="w-full flex flex-col items-center space-y-3 p-5 bg-white dark:bg-gray-800 rounded-2xl border border-green-200 dark:border-green-700 shadow-sm">
+        <div className="flex items-center gap-3 w-full">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow shrink-0">
+            <span className="text-white text-xl">⚡</span>
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">Grounding Protokoll</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Földelés ellenőrzési mérési lap + PDF</p>
+          </div>
+        </div>
+        <Button
+          onClick={() => onNavigate?.('erdungskontrolle')}
+          variant="outline"
+          className="w-full border-green-500 text-green-700 hover:bg-green-50 dark:text-green-400 dark:border-green-600 dark:hover:bg-green-900/20"
+        >
+          <ChevronRight className="h-4 w-4 mr-2" /> Grounding megnyitása
+        </Button>
+      </div>
+
+      {/* NIV Protokoll */}
+      <div className="w-full flex flex-col items-center space-y-3 p-5 bg-white dark:bg-gray-800 rounded-2xl border border-purple-200 dark:border-purple-700 shadow-sm">
+        <div className="flex items-center gap-3 w-full">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow shrink-0">
+            <span className="text-white text-xl">📊</span>
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">NIV Protokoll</h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Niedervolt mérési táblázat + PDF</p>
+          </div>
+        </div>
+        <Button
+          onClick={() => onNavigate?.('niedervolt')}
+          variant="outline"
+          className="w-full border-purple-500 text-purple-700 hover:bg-purple-50 dark:text-purple-400 dark:border-purple-600 dark:hover:bg-purple-900/20"
+        >
+          <ChevronRight className="h-4 w-4 mr-2" /> NIV megnyitása
+        </Button>
+      </div>
     </div>
   );
 }

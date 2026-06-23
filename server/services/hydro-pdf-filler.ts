@@ -241,19 +241,37 @@ function buildCheckboxFieldName(chapter: number, option: string, questionPath: s
 // SAFE FIELD SETTER (nem dob hibát, csak logol)
 // ============================================================
 function setCheckbox(form: any, fieldName: string, value: boolean, font?: any): void {
-  // 1. próba: TextField (mint a Grounding PDF-ben — egyszerű "X" szöveg)
+  // 1. próba: valódi AcroForm CheckBox — PDF eredeti megjelenésével
+  // A trükk: getOnValues() kinyeri a PDF saját "be" állapot nevét (pl. "Yes", "On", "Ja")
+  // Majd közvetlenül beállítjuk az értéket és a widget állapotát — updateAppearances() NÉLKÜL,
+  // hogy a PDF eredeti pipáját/X-ét megőrizzük (ne a pdf-lib saját fekete négyzetét).
+  try {
+    const field = form.getCheckBox(fieldName);
+    const acroField = field.acroField;
+
+    if (value) {
+      // Dinamikusan olvassuk ki a PDF-ben definiált "on" állapot nevét
+      const onValues: any[] = acroField.getOnValues?.() ?? [];
+      const onValue = onValues.length > 0 ? onValues[0] : PDFName.of('Yes');
+
+      // Értékbeállítás
+      acroField.setValue(onValue);
+
+      // Widget appearance state beállítása — updateAppearances() NÉLKÜL!
+      const widgets: any[] = acroField.getWidgets();
+      widgets.forEach((widget: any, i: number) => {
+        const widgetOn = onValues[i] ?? onValue;
+        widget.setAppearanceState(widgetOn);
+      });
+    }
+    return;
+  } catch { /* nem checkbox, próbáljuk TextField-ként */ }
+
+  // 2. próba: TextField — egyszerű "X" szöveg (Grounding-stílus)
   try {
     const field = form.getTextField(fieldName);
     field.setText(value ? 'X' : '');
     if (font) field.updateAppearances(font);
-    return;
-  } catch { /* nem TextField, próbáljuk checkbox-ként */ }
-
-  // 2. próba: valódi AcroForm CheckBox — field.check() az eredeti megjelenéssel
-  try {
-    const field = form.getCheckBox(fieldName);
-    if (value) field.check();
-    else field.uncheck();
   } catch {
     // mező nem létezik — csendben továbblépünk
   }

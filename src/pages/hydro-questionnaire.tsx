@@ -407,10 +407,10 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
 
       {/* ── Chapter tabs ── */}
       <div className={`border-b overflow-x-auto ${modern ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-blue-100 dark:border-blue-900' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'}`}>
-        <div className="flex min-w-max px-3 py-2 gap-1">
-          <TabBtn label="B0" active={currentChapterIdx === 0} color="blue" modern={modern} onClick={() => setCurrentChapterIdx(0)} />
+        <div className="flex w-max mx-auto px-3 py-2 gap-1">
+          <TabBtn label="Fejléc" active={currentChapterIdx === 0} color="blue" modern={modern} onClick={() => setCurrentChapterIdx(0)} />
           {CHAPTERS.map((ch, idx) => (
-            <TabBtn key={ch.id} label={`B${ch.id}`} active={currentChapterIdx === idx + 1} color="blue" modern={modern} onClick={() => setCurrentChapterIdx(idx + 1)} />
+            <TabBtn key={ch.id} label={`Blokk ${idx + 1}`} active={currentChapterIdx === idx + 1} color="blue" modern={modern} onClick={() => setCurrentChapterIdx(idx + 1)} />
           ))}
           <TabBtn label="📄 PDF" active={isLast} color="green" modern={modern} onClick={() => setCurrentChapterIdx(totalChapters + 1)} />
         </div>

@@ -3,7 +3,7 @@
 // Konvenció: B{chapter}_{option}_{questionPath}
 // Pl: B3_Ja_3.1.1 / B3_Nein_3.1.1 / B3_nz_3.1.1 / B3_U_3.1.1
 
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, PDFName } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import fs from 'fs';
 import path from 'path';
@@ -244,15 +244,23 @@ function setCheckbox(form: any, fieldName: string, value: boolean): void {
   try {
     const field = form.getCheckBox(fieldName);
     if (value) {
-      field.check();
-    } else {
-      field.uncheck();
+      // Raw értékbeállítás appearance-stream újragenerálás NÉLKÜL
+      // A field.check() pdf-lib saját fekete-satírozott megjelenést generál,
+      // felülírva a PDF eredeti pipáját/X-ét. Ezért közvetlenül a field dict-et módosítjuk.
+      const acroField = field.acroField;
+      acroField.setValue(PDFName.of('Yes'));
+      // Widget appearance state beállítása — megtartja az eredeti PDF megjelenést
+      const widgets = acroField.getWidgets();
+      for (const widget of widgets) {
+        widget.setAppearanceState(PDFName.of('Yes'));
+      }
     }
+    // ha false: hagyjuk az alapértéket (Off / üres)
   } catch {
-    // pdf-lib néha nem tudja a checkboxot kezelni, Text fieldként próbáljuk
+    // pdf-lib nem tudja checkbox-ként kezelni — Text fieldként próbáljuk X-el
     try {
       const field = form.getTextField(fieldName);
-      field.setText(value ? 'Yes' : '');
+      field.setText(value ? 'X' : '');
     } catch {
       // mező nem létezik vagy más típus — csendben továbblépünk
     }

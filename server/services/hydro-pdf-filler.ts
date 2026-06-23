@@ -3,7 +3,7 @@
 // Konvenció: B{chapter}_{option}_{questionPath}
 // Pl: B3_Ja_3.1.1 / B3_Nein_3.1.1 / B3_nz_3.1.1 / B3_U_3.1.1
 
-import { PDFDocument, PDFName } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFDict } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import fs from 'fs';
 import path from 'path';
@@ -240,34 +240,53 @@ function buildCheckboxFieldName(chapter: number, option: string, questionPath: s
 // ============================================================
 // SAFE FIELD SETTER (nem dob hibát, csak logol)
 // ============================================================
-function setCheckbox(form: any, fieldName: string, value: boolean, font?: any): void {
-  // 1. próba: valódi AcroForm CheckBox — PDF eredeti megjelenésével
-  // A trükk: getOnValues() kinyeri a PDF saját "be" állapot nevét (pl. "Yes", "On", "Ja")
-  // Majd közvetlenül beállítjuk az értéket és a widget állapotát — updateAppearances() NÉLKÜL,
-  // hogy a PDF eredeti pipáját/X-ét megőrizzük (ne a pdf-lib saját fekete négyzetét).
+/** AP dict közvetlen olvasásával keresi a "be" állapot nevét (pl. "/On", "/Yes").
+ *  A getOnValues() e PDF-fel üres tömböt ad — ezért közvetlen dict-olvasás szükséges. */
+function getCheckboxOnStateName(widget: any, pdfDoc: any): PDFName {
+  try {
+    const apRef = widget.dict?.get(PDFName.of('AP'));
+    if (apRef) {
+      const apObj = pdfDoc.context.lookupMaybe(apRef, PDFDict);
+      if (apObj) {
+        const nRef = apObj.get(PDFName.of('N'));
+        const nObj = pdfDoc.context.lookupMaybe(nRef, PDFDict);
+        if (nObj) {
+          for (const key of nObj.keys()) {
+            if (key.toString() !== '/Off') {
+              // key.toString() = "/On" → levágjuk a vezető perjelet
+              return PDFName.of(key.toString().slice(1));
+            }
+          }
+        }
+      }
+    }
+  } catch { /* ignore */ }
+  return PDFName.of('On'); // az ABNAHME_HYDRO.pdf minden checkboxánál "/On"
+}
+
+function setCheckbox(form: any, fieldName: string, value: boolean, pdfDoc?: any, font?: any): void {
+  // 1. próba: valódi AcroForm CheckBox — PDF eredeti megjelenésével, updateAppearances() NÉLKÜL
   try {
     const field = form.getCheckBox(fieldName);
     const acroField = field.acroField;
 
     if (value) {
-      // Dinamikusan olvassuk ki a PDF-ben definiált "on" állapot nevét
-      const onValues: any[] = acroField.getOnValues?.() ?? [];
-      const onValue = onValues.length > 0 ? onValues[0] : PDFName.of('Yes');
-
-      // Értékbeállítás
-      acroField.setValue(onValue);
-
-      // Widget appearance state beállítása — updateAppearances() NÉLKÜL!
       const widgets: any[] = acroField.getWidgets();
+      // Minden widget-hez a saját AP dict-jéből olvassuk a "on" nevet
+      const onValue = widgets.length > 0 && pdfDoc
+        ? getCheckboxOnStateName(widgets[0], pdfDoc)
+        : PDFName.of('On');
+
+      acroField.setValue(onValue);
       widgets.forEach((widget: any, i: number) => {
-        const widgetOn = onValues[i] ?? onValue;
-        widget.setAppearanceState(widgetOn);
+        const wOn = pdfDoc ? getCheckboxOnStateName(widget, pdfDoc) : onValue;
+        widget.setAppearanceState(wOn);
       });
     }
     return;
   } catch { /* nem checkbox, próbáljuk TextField-ként */ }
 
-  // 2. próba: TextField — egyszerű "X" szöveg (Grounding-stílus)
+  // 2. próba: TextField — egyszerű "X" szöveg (Grounding-stílus fallback)
   try {
     const field = form.getTextField(fieldName);
     field.setText(value ? 'X' : '');
@@ -308,11 +327,11 @@ export class HydroPdfFiller {
     // ----------------------------------------------------------
     // 1. FEJLÉC - B0 mezők
     // ----------------------------------------------------------
-    if (data.installationType === 'Neuanlage') setCheckbox(form, 'B0_Neuanlage', true);
-    if (data.installationType === 'Umbau') setCheckbox(form, 'B0_Umbau', true);
-    if (data.certType === 'Baumusterprüfung') setCheckbox(form, 'B0_Baumusterprüfung', true);
-    if (data.certType === 'Entwurfsprüfung') setCheckbox(form, 'B0_:Entwurfsprüfung', true);
-    if (data.machineRoomless) setCheckbox(form, 'B0_Maschinenraum', true);
+    if (data.installationType === 'Neuanlage') setCheckbox(form, 'B0_Neuanlage', true, pdfDoc);
+    if (data.installationType === 'Umbau') setCheckbox(form, 'B0_Umbau', true, pdfDoc);
+    if (data.certType === 'Baumusterprüfung') setCheckbox(form, 'B0_Baumusterprüfung', true, pdfDoc);
+    if (data.certType === 'Entwurfsprüfung') setCheckbox(form, 'B0_:Entwurfsprüfung', true, pdfDoc);
+    if (data.machineRoomless) setCheckbox(form, 'B0_Maschinenraum', true, pdfDoc);
 
     setTextField(form, 'B0_Adresse', data.adresse || '');
     setTextField(form, 'B0_Aufzugstyp', data.aufzugstyp || '');
@@ -402,11 +421,11 @@ export class HydroPdfFiller {
     setTextField(form, 'B7_RohrbruchTyp', data.b7_rohrbruchTyp || '');
     setTextField(form, 'B7_Drossel_Typ', data.b7_drosselTyp || '');
     // B7 hydraulikus komponens checkboxok (PDF valódi mezőnevei pypdf alapján)
-    if (data.b7_fang) setCheckbox(form, 'B7_nz_7.3.Fang', true);
-    if (data.b7_ausgleich) setCheckbox(form, 'B7_nz_7.4.Ausgleich', true);
-    if (data.b7_begrenzer) setCheckbox(form, 'B7_nz_7.2.Begrenzer', true);
-    if (data.b7_rohrbruch) setCheckbox(form, 'B7_nz_7.5.Rohrbruch', true);
-    if (data.b7_drossel) setCheckbox(form, 'B7_nz_7.6.Drossel', true);
+    if (data.b7_fang) setCheckbox(form, 'B7_nz_7.3.Fang', true, pdfDoc);
+    if (data.b7_ausgleich) setCheckbox(form, 'B7_nz_7.4.Ausgleich', true, pdfDoc);
+    if (data.b7_begrenzer) setCheckbox(form, 'B7_nz_7.2.Begrenzer', true, pdfDoc);
+    if (data.b7_rohrbruch) setCheckbox(form, 'B7_nz_7.5.Rohrbruch', true, pdfDoc);
+    if (data.b7_drossel) setCheckbox(form, 'B7_nz_7.6.Drossel', true, pdfDoc);
 
     // ----------------------------------------------------------
     // 7. B8 - HYDRAULIKANLAGE
@@ -492,20 +511,20 @@ export class HydroPdfFiller {
 
         // YES/NO/NA/U/Siehe jelölőnégyzetek
         if (upperAnswer === 'Ja' || upperAnswer === 'ja' || upperAnswer === 'yes' || upperAnswer === 'igen') {
-          setCheckbox(form, buildCheckboxFieldName(blockNum, 'Ja', questionPath), true);
+          setCheckbox(form, buildCheckboxFieldName(blockNum, 'Ja', questionPath), true, pdfDoc);
         } else if (upperAnswer === 'Nein' || upperAnswer === 'nein' || upperAnswer === 'no' || upperAnswer === 'nem') {
           const neinField = buildCheckboxFieldName(blockNum, 'Nein', questionPath);
-          setCheckbox(form, neinField, true);
+          setCheckbox(form, neinField, true, pdfDoc);
         } else if (upperAnswer === 'nz' || upperAnswer === 'n.z.' || upperAnswer === 'na') {
-          setCheckbox(form, buildCheckboxFieldName(blockNum, 'nz', questionPath), true);
+          setCheckbox(form, buildCheckboxFieldName(blockNum, 'nz', questionPath), true, pdfDoc);
         } else if (upperAnswer === 'U') {
-          setCheckbox(form, buildCheckboxFieldName(blockNum, 'U', questionPath), true);
+          setCheckbox(form, buildCheckboxFieldName(blockNum, 'U', questionPath), true, pdfDoc);
         } else if (upperAnswer === 'Siehe' || upperAnswer === 'siehe') {
           // "Siehe" = "Lásd" opció — B10.1-nél szerepel (XML: B10_Siehe_10.1)
-          setCheckbox(form, buildCheckboxFieldName(blockNum, 'Siehe', questionPath), true);
+          setCheckbox(form, buildCheckboxFieldName(blockNum, 'Siehe', questionPath), true, pdfDoc);
         } else if (upperAnswer === 'keine' || upperAnswer === 'Keine') {
           // "keine" = "nincs" opció — B1-nél szerepel (XML: B1_keine_1)
-          setCheckbox(form, buildCheckboxFieldName(blockNum, 'keine', questionPath), true);
+          setCheckbox(form, buildCheckboxFieldName(blockNum, 'keine', questionPath), true, pdfDoc);
         } else {
           // Szabad szöveg → szöveges mező kitöltés
           const neinTextField = buildCheckboxFieldName(blockNum, 'Nein', questionPath);

@@ -302,16 +302,21 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
     fabrikationsNr: '', aufzugstyp: '', standortadresse: '', adresse: '',
   });
   const [answers, setAnswers] = useState<Record<string, string>>(saved?.answers ?? {});
+  const [umbau,   setUmbau]   = useState<Record<string, boolean>>(saved?.umbau ?? {});
   const [b1, setB1] = useState<HydroB1Data>(saved?.b1 ?? { hubhoehe:'', stockwerke:'', zugaenge:'', nennlast:'', personen:'', anforderungen:'' });
   const [b7, setB7] = useState<HydroB7Comp>(saved?.b7 ?? { fang:false, ausgleich:false, begrenzer:false, rohrbruch:false, drossel:false });
   const [b8, setB8] = useState<HydroB8Data>(saved?.b8 ?? { hersteller:'', aggregatTyp:'', motortyp:'', aggregatNr:'', nennstrom:'', motorleistung:'', nennlast:'', leerlast:'', nennlastAuf:'', leerlastAb:'', druckbegrenzung:'' });
   const [b9, setB9] = useState<HydroB9Data>(saved?.b9 ?? { sollAuf:'', sollAb:'', istLeerAuf:'', istNennlastAb:'', stromLeer:'', stromNennlast:'', netzspannung:'', steuerspannung:'' });
   const [b13, setB13] = useState<HydroB13Data>(saved?.b13 ?? { firma:'', nameAbnahme:'', datum: new Date().toISOString().split('T')[0], bauseitigePendenzen:'', aufzugsseitigePendenzen:'' });
 
-  useEffect(() => { saveState({ header, answers, b1, b7, b8, b9, b13 }); }, [header, answers, b1, b7, b8, b9, b13]);
+  useEffect(() => { saveState({ header, answers, umbau, b1, b7, b8, b9, b13 }); }, [header, answers, umbau, b1, b7, b8, b9, b13]);
 
   const setAnswer = useCallback((path: string, value: string) => {
     setAnswers(prev => ({ ...prev, [path]: value }));
+  }, []);
+
+  const toggleUmbau = useCallback((path: string) => {
+    setUmbau(prev => ({ ...prev, [path]: !prev[path] }));
   }, []);
 
   // Progress
@@ -488,6 +493,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
           {currentChapter && (
             <ChapterSection
               chapter={currentChapter} answers={answers} setAnswer={setAnswer}
+              umbau={umbau} toggleUmbau={toggleUmbau}
               theme={theme} lang={lang}
               questionMap={questionMap} groupTitleMap={groupTitleMap}
               b7={currentChapter.id === 7 ? b7 : undefined}       setB7={currentChapter.id === 7 ? setB7 : undefined}
@@ -689,11 +695,12 @@ function B0Section({ header, setHeader, theme, lang }: {
 // ============================================================
 
 function ChapterSection({
-  chapter, answers, setAnswer, theme, lang,
+  chapter, answers, setAnswer, umbau, toggleUmbau, theme, lang,
   questionMap, groupTitleMap,
   b1Data, setB1, b7, setB7, b8Data, setB8, b9Data, setB9, b13Data, setB13,
 }: {
   chapter: Chapter; answers: Record<string, string>; setAnswer: (path: string, value: string) => void;
+  umbau: Record<string, boolean>; toggleUmbau: (path: string) => void;
   theme: 'modern' | 'classic'; lang: Lang;
   questionMap: Record<string, string>; groupTitleMap: Record<string, string>;
   b1Data?: HydroB1Data;  setB1?:  React.Dispatch<React.SetStateAction<HydroB1Data>>;
@@ -903,7 +910,8 @@ function ChapterSection({
                     </span>
                     {/* Option pills */}
                     <div className="flex flex-wrap items-center gap-2 shrink-0">
-                      {rowOptions.map(opt => {
+                      {/* Main exclusive options — U kizárva */}
+                      {rowOptions.filter(o => o !== 'U').map(opt => {
                         const isSelected = current === opt;
                         return (
                           <button key={opt} type="button" onClick={() => setAnswer(path, opt)}
@@ -913,6 +921,20 @@ function ChapterSection({
                           >{opt}</button>
                         );
                       })}
+                      {/* U (Umbau) — független toggle, elválasztóval */}
+                      {rowOptions.includes('U') && (
+                        <>
+                          <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center" />
+                          <button type="button" onClick={() => toggleUmbau(path)}
+                            className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
+                              umbau[path]
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-blue-200 dark:shadow-blue-900'
+                                : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-600'
+                            }`}
+                            title="Umbau – átépítés során érintett"
+                          >U</button>
+                        </>
+                      )}
                     </div>
                   </div>
                 </div>

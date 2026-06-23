@@ -240,30 +240,22 @@ function buildCheckboxFieldName(chapter: number, option: string, questionPath: s
 // ============================================================
 // SAFE FIELD SETTER (nem dob hibát, csak logol)
 // ============================================================
-function setCheckbox(form: any, fieldName: string, value: boolean): void {
+function setCheckbox(form: any, fieldName: string, value: boolean, font?: any): void {
+  // 1. próba: TextField (mint a Grounding PDF-ben — egyszerű "X" szöveg)
+  try {
+    const field = form.getTextField(fieldName);
+    field.setText(value ? 'X' : '');
+    if (font) field.updateAppearances(font);
+    return;
+  } catch { /* nem TextField, próbáljuk checkbox-ként */ }
+
+  // 2. próba: valódi AcroForm CheckBox — field.check() az eredeti megjelenéssel
   try {
     const field = form.getCheckBox(fieldName);
-    if (value) {
-      // Raw értékbeállítás appearance-stream újragenerálás NÉLKÜL
-      // A field.check() pdf-lib saját fekete-satírozott megjelenést generál,
-      // felülírva a PDF eredeti pipáját/X-ét. Ezért közvetlenül a field dict-et módosítjuk.
-      const acroField = field.acroField;
-      acroField.setValue(PDFName.of('Yes'));
-      // Widget appearance state beállítása — megtartja az eredeti PDF megjelenést
-      const widgets = acroField.getWidgets();
-      for (const widget of widgets) {
-        widget.setAppearanceState(PDFName.of('Yes'));
-      }
-    }
-    // ha false: hagyjuk az alapértéket (Off / üres)
+    if (value) field.check();
+    else field.uncheck();
   } catch {
-    // pdf-lib nem tudja checkbox-ként kezelni — Text fieldként próbáljuk X-el
-    try {
-      const field = form.getTextField(fieldName);
-      field.setText(value ? 'X' : '');
-    } catch {
-      // mező nem létezik vagy más típus — csendben továbblépünk
-    }
+    // mező nem létezik — csendben továbblépünk
   }
 }
 

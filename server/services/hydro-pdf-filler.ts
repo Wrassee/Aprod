@@ -3,7 +3,7 @@
 // Konvenció: B{chapter}_{option}_{questionPath}
 // Pl: B3_Ja_3.1.1 / B3_Nein_3.1.1 / B3_nz_3.1.1 / B3_U_3.1.1
 
-import { PDFDocument, PDFName, PDFDict } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFDict, PDFBool, PDFRef } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import fs from 'fs';
 import path from 'path';
@@ -289,6 +289,9 @@ function setCheckbox(form: any, fieldName: string, value: boolean, pdfDoc?: any,
     field.acroField.dict.set(PDFName.of('V'), targetState);
     widgets.forEach((widget: any) => {
       widget.dict.set(PDFName.of('AS'), targetState);
+      // AP-t nem töröljük — a pdfDoc.save({ updateFieldAppearances: false })
+      // gondoskodik arról, hogy pdf-lib ne nyúljon hozzá.
+      // NeedAppearances=true hatására a PDF olvasók saját pipájukat rajzolják.
     });
 
     return;
@@ -542,9 +545,28 @@ export class HydroPdfFiller {
     }
 
     // ----------------------------------------------------------
-    // 12. PDF lezárása (form mezők lapítása nélkül!)
+    // 12. NeedAppearances = true → Adobe/Foxit nyitáskor regenerálja a pipákat
+    //     a saját beépített motorjával (nem a sablonból hozott hibás AP stream-mel)
     // ----------------------------------------------------------
-    const filledPdfBytes = await pdfDoc.save();
+    try {
+      const catalog = pdfDoc.catalog;
+      let acroFormRef = catalog.get(PDFName.of('AcroForm'));
+      const acroForm: any = acroFormRef instanceof PDFRef
+        ? pdfDoc.context.lookup(acroFormRef)
+        : acroFormRef;
+      if (acroForm && typeof acroForm.set === 'function') {
+        acroForm.set(PDFName.of('NeedAppearances'), PDFBool.True);
+      }
+    } catch { /* ha nincs AcroForm, hagyjuk */ }
+
+    // ----------------------------------------------------------
+    // 13. PDF lezárása — updateFieldAppearances: false KRITIKUS!
+    //     Ha true (alapértelmezett), pdf-lib felülírja az /AP stream-eket
+    //     → fekete négyzet. false esetén az eredeti AP érintetlen marad,
+    //     a NeedAppearances=true flag pedig megmondja az olvasónak:
+    //     "rajzold újra a saját pipáiddal".
+    // ----------------------------------------------------------
+    const filledPdfBytes = await pdfDoc.save({ updateFieldAppearances: false });
     return Buffer.from(filledPdfBytes);
   }
 }

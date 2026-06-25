@@ -1,0 +1,89 @@
+A helyzet trükkösebb, mint amilyennek látszik, de most már teljesen világos, miért maradtak ott a fekete négyzetek.
+
+A Replit AI által írt alacsony szintű kód most már adat szinten tökéletes (helyesen állítja be a /V és /AS értékeket), de van egy óriási bökkenő magával a PDF sablonnal (ABNAHME_HYDRO.pdf).
+
+Miért fekete a négyzet, ha a kód már jó?
+Ez a PDF dokumentum (egy hivatalos svájci VSA felvonó-adatlap) olyan formátumban van elmentve, hogy a checkboxok beágyazott megjelenítési rétege (/AP stream) gyárilag egy üres formát vagy egy tömör kitöltő formát (bounding boxot) tartalmaz alapértelmezettként.
+
+Amikor kézzel kattintasz bele Adobe-ban vagy Foxitban: A PDF olvasó interaktív motorja átveszi az irányítást, figyelmen kívül hagyja a fájlban lévő statikus réteget, és a saját beépített betűkészletével (pl. ZapfDingbats) odarajzol egy gyönyörű, natív pipát.
+
+Amikor a programmal töltöd ki: A PDF olvasó látja, hogy a kód beállította az /On állapotot, de mivel egy kész, mentett fájlt nyit meg (nem élő kattintás történik), megpróbálja hűen kirajzolni azt a statikus grafikai réteget (/AP), ami a sablonban a checkboxhoz van rendelve. Mivel ez a beágyazott réteg hibás vagy hiányos, tömör fekete négyzetként jelenik meg.
+
+A végső megoldás: NeedAppearances és a gyorsítótár ürítése
+Ahhoz, hogy kényszerítsük az Adobe Pro-t és a Foxit Readert, hogy a programmal kitöltött checkboxoknál is pontosan ugyanazt a szép, saját natív pipájukat használják, mintha kézzel kattintottál volna rájuk, két dolgot kell tennünk:
+
+Ki kell törölnünk a checkboxokból a sablon által odarakott hibás megjelenítési réteget (/AP), hogy ne legyen miből hibás fekete négyzetet rajzolnia.
+
+Be kell állítanunk a PDF dokumentum gyökerében a /NeedAppearances zászlót true értékre. Ez egy hivatalos PDF szabványos parancs, ami megnyitáskor azt mondja az Adobe-nak/Foxitnak: "Hé, a fájlban lévő űrlapok kinézete elavult, kérlek rajzold őket újra a saját beépített motoroddal a megadott értékek alapján!"
+
+Módosítsátok a kódot az alábbi két lépésben:
+
+1. lépés: Frissítsétek a checkbox beállító függvényt (hogy törölje az /AP-t)
+Módosítsátok a függvényt úgy, hogy a widgeteknél ne csak beállítsa az /AS-t, hanem a widget.dict.delete(PDFName.of('AP')) sorral törölje el a fekete négyzetért felelős gyári réteget:
+
+TypeScript
+import { PDFDocument, PDFName, PDFDictionary, PDFRef, PDFBoolean } from 'pdf-lib';
+
+function setCheckboxLowLevel(form: any, fieldName: string, check: boolean) {
+  try {
+    const field = form.getField(fieldName);
+    if (!field) return;
+
+    let onState = PDFName.of('On'); 
+    const widgets = field.acroField.getWidgets();
+    
+    if (widgets.length > 0) {
+      const ap = widgets[0].dict.get(PDFName.of('AP'));
+      if (ap instanceof PDFDictionary) {
+        const n = ap.get(PDFName.of('N'));
+        if (n instanceof PDFDictionary) {
+          const keys = n.keys();
+          const foundOnKey = keys.find(k => k.decoded !== 'Off');
+          if (foundOnKey) onState = foundOnKey;
+        }
+      }
+    }
+
+    const targetState = check ? onState : PDFName.of('Off');
+
+    // 1. Érték beállítása alacsony szinten
+    field.acroField.dict.set(PDFName.of('V'), targetState);
+
+    // 2. Megjelenési állapot beállítása ÉS a hibás gyári grafika törlése
+    widgets.forEach((widget: any) => {
+      widget.dict.set(PDFName.of('AS'), targetState);
+      
+      // KRITIKUS JAVÍTÁS: Töröljük a sablonból hozott hibás megjelenítést,
+      // így az olvasó kénytelen lesz a saját pipáját használni!
+      widget.dict.delete(PDFName.of('AP')); 
+    });
+
+    console.log(`Low-level checkbox [${fieldName}] kész. Állapot: ${targetState.decoded}`);
+  } catch (error) {
+    console.error(`Hiba a checkboxnál (${fieldName}):`, error);
+  }
+}
+2. lépés: Kapcsoljátok be a globális NeedAppearances-t a mentés előtt
+Közvetlenül a kód legvégén, mielőtt a pdfDoc.save() meghívásra kerülne, szúrjátok be ezt a blokkot. Ez kényszeríti a PDF olvasókat az újrarajzolásra:
+
+TypeScript
+// --- EZT A BLOKKOT KÖZVETLENÜL A MENTÉS (pdfDoc.save()) ELÉ KELL TENNI ---
+
+const catalog = pdfDoc.catalog;
+let acroForm = catalog.get(PDFName.of('AcroForm'));
+
+// Ha az AcroForm csak egy referencia, feloldjuk a valódi szótárrá
+if (acroForm instanceof PDFRef) {
+  acroForm = pdfDoc.context.lookup(acroForm);
+}
+
+if (acroForm instanceof PDFDictionary) {
+  // Kényszerítjük a PDF olvasót (Adobe/Foxit), hogy nyitáskor generálja le a szép pipákat
+  acroForm.set(PDFName.of('NeedAppearances'), PDFBoolean.of(true));
+  console.log('NeedAppearances sikeresen bekapcsolva a dokumentum gyökerében.');
+}
+
+// És most jöhet a mentés, szigorúan updateAppearances nélkül!
+const pdfBytes = await pdfDoc.save();
+Mi fog történni a javítás után?
+Amikor a program legenerálja a PDF-et, az adott checkboxoknál nem lesz beágyazott hibás grafika, viszont a dokumentum fejlécében ott lesz a parancs: „Kedves Adobe Reader, rajzold újra a mezőket!” Amint a felhasználó megnyitja a kész fájlt PC-n Adobe Pro-ban vagy Foxit Readerben, a program azonnal lefutattja a saját belső interaktív kitöltőjét, és a fekete négyzetek helyén ott fognak tündökölni a tűéles, tökéletes gyári pipák!

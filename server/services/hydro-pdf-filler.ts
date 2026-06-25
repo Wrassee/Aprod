@@ -240,49 +240,57 @@ function buildCheckboxFieldName(chapter: number, option: string, questionPath: s
 // ============================================================
 // SAFE FIELD SETTER (nem dob hibát, csak logol)
 // ============================================================
-/** AP dict közvetlen olvasásával keresi a "be" állapot nevét (pl. "/On", "/Yes").
- *  A getOnValues() e PDF-fel üres tömböt ad — ezért közvetlen dict-olvasás szükséges. */
-function getCheckboxOnStateName(widget: any, pdfDoc: any): PDFName {
+/** Low-level checkbox beállítás — megőrzi a PDF eredeti vektorgrafikus pipáját.
+ *
+ *  Miért low-level? A magas szintű acroField.setValue() és check() mindkettő
+ *  automatikusan újragenerálja az /AP appearance stream-et (pdf-lib saját fekete négyzete).
+ *  Ezért KÖZVETLENÜL a dict-be írunk — a pdf-lib nem tudja felülírni az originált.
+ *
+ *  Lépések:
+ *  1. AP.N dict-ből olvassuk a "on" állapot nevét (pl. "/On", "/Yes")
+ *  2. field.acroField.dict.set('V', onState)  ← mező értéke, setValue() NÉLKÜL
+ *  3. widget.dict.set('AS', onState)          ← megjelenési állapot, setAppearanceState() NÉLKÜL
+ */
+function setCheckbox(form: any, fieldName: string, value: boolean, pdfDoc?: any, font?: any): void {
+  // 1. próba: valódi AcroForm CheckBox — low-level dict manipulációval
   try {
-    const apRef = widget.dict?.get(PDFName.of('AP'));
-    if (apRef) {
-      const apObj = pdfDoc.context.lookupMaybe(apRef, PDFDict);
-      if (apObj) {
-        const nRef = apObj.get(PDFName.of('N'));
-        const nObj = pdfDoc.context.lookupMaybe(nRef, PDFDict);
-        if (nObj) {
-          for (const key of nObj.keys()) {
-            if (key.toString() !== '/Off') {
-              // key.toString() = "/On" → levágjuk a vezető perjelet
-              return PDFName.of(key.toString().slice(1));
+    const field = form.getField(fieldName);
+    if (!field) throw new Error('field not found');
+
+    const widgets: any[] = field.acroField.getWidgets();
+
+    // Az "on" állapot nevének dinamikus kiolvasása az első widget AP.N dict-jéből
+    let onState: PDFName = PDFName.of('On'); // ABNAHME_HYDRO.pdf: mindig "/On"
+    if (widgets.length > 0 && pdfDoc) {
+      try {
+        const apRef = widgets[0].dict.get(PDFName.of('AP'));
+        if (apRef) {
+          const apObj = pdfDoc.context.lookupMaybe(apRef, PDFDict);
+          if (apObj) {
+            const nRef = apObj.get(PDFName.of('N'));
+            const nObj = pdfDoc.context.lookupMaybe(nRef, PDFDict);
+            if (nObj) {
+              for (const key of nObj.keys()) {
+                if (key.toString() !== '/Off') {
+                  onState = PDFName.of(key.toString().slice(1)); // "/On" → "On"
+                  break;
+                }
+              }
             }
           }
         }
-      }
+      } catch { /* maradj az alapértéknél */ }
     }
-  } catch { /* ignore */ }
-  return PDFName.of('On'); // az ABNAHME_HYDRO.pdf minden checkboxánál "/On"
-}
 
-function setCheckbox(form: any, fieldName: string, value: boolean, pdfDoc?: any, font?: any): void {
-  // 1. próba: valódi AcroForm CheckBox — PDF eredeti megjelenésével, updateAppearances() NÉLKÜL
-  try {
-    const field = form.getCheckBox(fieldName);
-    const acroField = field.acroField;
+    const targetState: PDFName = value ? onState : PDFName.of('Off');
 
-    if (value) {
-      const widgets: any[] = acroField.getWidgets();
-      // Minden widget-hez a saját AP dict-jéből olvassuk a "on" nevet
-      const onValue = widgets.length > 0 && pdfDoc
-        ? getCheckboxOnStateName(widgets[0], pdfDoc)
-        : PDFName.of('On');
+    // KRITIKUS: közvetlenül a dict-be írunk — setValue() / check() TILOS,
+    // mert azok újragenerálják az /AP appearance stream-et (fekete négyzet)!
+    field.acroField.dict.set(PDFName.of('V'), targetState);
+    widgets.forEach((widget: any) => {
+      widget.dict.set(PDFName.of('AS'), targetState);
+    });
 
-      acroField.setValue(onValue);
-      widgets.forEach((widget: any, i: number) => {
-        const wOn = pdfDoc ? getCheckboxOnStateName(widget, pdfDoc) : onValue;
-        widget.setAppearanceState(wOn);
-      });
-    }
     return;
   } catch { /* nem checkbox, próbáljuk TextField-ként */ }
 
@@ -290,7 +298,7 @@ function setCheckbox(form: any, fieldName: string, value: boolean, pdfDoc?: any,
   try {
     const field = form.getTextField(fieldName);
     field.setText(value ? 'X' : '');
-    if (font) field.updateAppearances(font);
+    // updateAppearances() szándékosan NINCS hívva — ne töröljük az eredeti megjelenést
   } catch {
     // mező nem létezik — csendben továbblépünk
   }

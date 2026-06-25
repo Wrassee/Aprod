@@ -1,0 +1,77 @@
+A probléma hátterében a pdf-lib könyvtár beépített, automatikus magatartása áll, amit a Replit AI legutóbbi javítása sajnos nem kezelt megfelelően.
+
+Mi a gyökérprobléma? (Miért lett fekete négyzet?)
+Bár a Replit AI helyesen ismerte fel, hogy a checkbox belső neve /On (és nem az alapértelmezett /Yes), elkövetett egy kritikus hibát: a mező értékét továbbra is a magas szintű acroField.setValue(PDFName.of('On')) függvénnyel módosította.
+
+A pdf-lib forráskódjában a setValue() (vagy a check()) meghívásakor a könyvtár automatikusan felülírja és teljesen újragenerálja a checkbox megjelenítési rétegét (az /AP szótárat) a saját beépített mintájára (ami egy egyszerű kereszt/négyzet). Mivel a pdf-lib nem ágyazza be a saját alapértelmezett betűtípusait ehhez a rajzoláshoz, vagy nem kompatibilis az adott PDF koordináta-rendszerével, az Adobe Pro és a Foxit Reader ezt a sérült vagy hiányos új megjelenítési streamet tömör fekete négyzetként fogja renderelni.
+
+Hiába futott le utána a widget.setAppearanceState(...), az eredeti PDF-ben lévő szép, gyári pipa vektorgrafikája ekkorra már végleg törlődött és felülíródott.
+
+A megoldás
+Meg kell tiltani a pdf-lib-nek, hogy hozzányúljon a megjelenéshez. Teljesen meg kell kerülni a magas szintű setValue() és check() függvényeket, és alacsony szinten (low-level), közvetlenül a PDF belső szótárában (Dictionary) kell átírni az értéket (/V) és az állapotot (/AS). Így a fájlban lévő eredeti vektorgrafikus pipa érintetlen marad, és a PDF olvasók tökéletesen fogják megjeleníteni.
+
+Cseréljétek ki a Replit-ben a checkbox beállító függvényt az alábbi alacsony szintű (low-level) verzióra:
+
+TypeScript
+import { PDFDocument, PDFName, PDFDictionary } from 'pdf-lib';
+
+/**
+ * Checkbox beállítása alacsony szinten, megőrizve az eredeti PDF pipát
+ */
+function setCheckboxLowLevel(form: any, fieldName: string, check: boolean) {
+  try {
+    const field = form.getField(fieldName);
+    if (!field) {
+      console.warn(`Mező nem található: ${fieldName}`);
+      return;
+    }
+
+    // 1. Kiderítjük a checkbox egyedi "On" állapot nevét dinamikusan az AP szótárból
+    // (A te dokumentumodnál ez a '/On' lesz, de így a kód teljesen univerzális marad)
+    let onState = PDFName.of('On'); 
+    const widgets = field.acroField.getWidgets();
+    
+    if (widgets.length > 0) {
+      const ap = widgets[0].dict.get(PDFName.of('AP'));
+      if (ap instanceof PDFDictionary) {
+        const n = ap.get(PDFName.of('N'));
+        if (n instanceof PDFDictionary) {
+          const keys = n.keys();
+          // Megkeressük az 'Off'-tól eltérő kulcsot (ez a bejelölt állapot neve)
+          const foundOnKey = keys.find(k => k.decoded !== 'Off');
+          if (foundOnKey) {
+            onState = foundOnKey;
+          }
+        }
+      }
+    }
+
+    // Kiválasztjuk a célállapotot a logikai érték alapján
+    const targetState = check ? onState : PDFName.of('Off');
+
+    // 2. KRITIKUS LÉPÉS: Közvetlenül a mező szótárába írjuk a /V értéket, 
+    // megkerülve a setValue()-t, így nem hívódik meg a pdf-lib saját rajzolója!
+    field.acroField.dict.set(PDFName.of('V'), targetState);
+
+    // 3. Közvetlenül beállítjuk a megjelenési állapotot (/AS) minden kapcsolódó widgeten
+    widgets.forEach((widget: any) => {
+      widget.dict.set(PDFName.of('AS'), targetState);
+    });
+
+    console.log(`Checkbox [${fieldName}] beállítva erre: ${targetState.decoded}`);
+  } catch (error) {
+    console.error(`Hiba a(z) ${fieldName} checkbox beállításakor:`, error);
+  }
+}
+Két nagyon fontos dolog, amire még figyelni kell:
+Tilos az updateAppearances(): Győződj meg róla, hogy a kódodban sehol (főleg nem a checkboxok kitöltése után) nincs meghívva a form.updateAppearances() vagy pdfDoc.getForm().updateAppearances(). Ez globálisan kényszerítené a pdf-lib-et a mezők újraformázására, ami megint tönkretenné a pipákat.
+
+A PDF mentése (pdfDoc.save()): Amikor elmented a kész PDF-et a kód végén, a sima await pdfDoc.save()-et használd. Véletlenül se legyen benne az { updateAppearances: true } kapcsoló, azaz:
+
+TypeScript
+// HELYES:
+const pdfBytes = await pdfDoc.save();
+
+// HIBÁS (ez visszahozná a fekete négyzeteket):
+// const pdfBytes = await pdfDoc.save({ updateAppearances: true });
+Ha ezt az alacsony szintű közvetlen módosítást alkalmazzátok, a pdf-lib csak a puszta adatot fogja átírni a háttérben, és a generált dokumentum megnyitásakor pontosan az a szép, eredeti pipa fog megjelenni, amit az Adobe-ban vagy Foxit-ban kézzel kattintva látsz.

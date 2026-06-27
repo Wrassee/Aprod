@@ -1,6 +1,6 @@
 import { Question, ProtocolError, ErrorSeverity } from "../../shared/schema.js";
 
-export type AnswerValue = string | number | boolean | null;
+export type AnswerValue = string | number | boolean | string[] | null | undefined;
 export interface MeasurementRow {
   id: string;
   measurementType: string;

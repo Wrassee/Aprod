@@ -69,7 +69,7 @@ const QuestionBlockComponent = ({
           <UltraStableInput
             type="number"
             placeholder={question.placeholder || "Enter number"}
-            value={value || ''}
+            value={(value as string | number) || ''}
             onChange={onChange}
             onKeyDown={(e) => {
               if (e.key === 'Enter') {
@@ -98,7 +98,7 @@ const QuestionBlockComponent = ({
           <UltraStableInput
             type="text"
             placeholder={question.placeholder || "Enter text"}
-            value={value || ''}
+            value={(value as string | number) || ''}
             onChange={onChange}
             multiline={true}
             onKeyDown={(e) => {

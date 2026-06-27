@@ -76,8 +76,8 @@ export function MeasurementQuestion({ question, value, onChange }: MeasurementQu
   
   const currentValue = getCachedValue();
   const isOutOfRange = currentValue !== undefined && !isNaN(currentValue) && (
-    (question.minValue !== undefined && currentValue < question.minValue) ||
-    (question.maxValue !== undefined && currentValue > question.maxValue)
+    (question.minValue != null && currentValue < question.minValue) ||
+    (question.maxValue != null && currentValue > question.maxValue)
   );
 
   return (

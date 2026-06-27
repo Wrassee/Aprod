@@ -1,23 +1,20 @@
 // src/components/ProtectedRoute.tsx
 
-import { useAuth } from '../contexts/AuthContext'; // Ellenőrizd az import útvonalát!
-import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../contexts/auth-context';
+import { Redirect } from 'wouter';
 
-const ProtectedRoute = () => {
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    // Amíg a sessiont ellenőrizzük, mutass egy töltőképernyőt
-    return <div>Profil betöltése...</div>; 
+    return <div>Profil betöltése...</div>;
   }
 
   if (!user) {
-    // Ha nincs bejelentkezett felhasználó, irányítsd át a login oldalra
-    return <Navigate to="/login" replace />;
+    return <Redirect to="/login" />;
   }
 
-  // Ha van felhasználó, jelenítsd meg a védett tartalmat (pl. az admin oldalt)
-  return <Outlet />;
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

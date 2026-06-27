@@ -67,7 +67,7 @@ export function NiedervoltMeasurements({
     }
   }, [measurements.length, onMeasurementsChange]);
 
-  const measurementTypes = MEASUREMENT_TYPES[language] || MEASUREMENT_TYPES.hu;
+  const measurementTypes = (MEASUREMENT_TYPES as Record<string, { id: string; name: string; unit: string; icon: string }[]>)[language] || MEASUREMENT_TYPES.hu;
 
   const addNewRow = () => {
     const newRow: MeasurementRow = {
@@ -99,7 +99,7 @@ export function NiedervoltMeasurements({
               const updatedRow = { ...r, [field]: value };
               
               if (field === 'measurementType') {
-                const selectedType = measurementTypes.find(type => type.id === value);
+                const selectedType = measurementTypes.find((type: { id: string; name: string; unit: string; icon: string }) => type.id === value);
                 if (selectedType) {
                   updatedRow.unit = selectedType.unit;
                 }
@@ -365,7 +365,7 @@ export function NiedervoltMeasurements({
                               <SelectValue placeholder="Válassz típust..." />
                             </SelectTrigger>
                             <SelectContent>
-                              {measurementTypes.map((type) => (
+                              {measurementTypes.map((type: { id: string; name: string; unit: string; icon: string }) => (
                                 <SelectItem key={type.id} value={type.id}>
                                   <span className="flex items-center gap-2">
                                     <span>{type.icon}</span>

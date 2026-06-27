@@ -293,7 +293,7 @@ export function SystemSettings() {
   };
 
   // MODERN THEME RENDER
-  if (theme === 'modern') {
+  if ((theme as string) === 'modern') {
     return (
       <div className="space-y-6">
         {/* Header */}

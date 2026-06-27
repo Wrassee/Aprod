@@ -5,7 +5,10 @@ export interface Translation {
   // Start Screen
   slogan: string;
   hungarian: string;
-  german: string;
+  german?: string;
+  english?: string;
+  french?: string;
+  italian?: string;
 
   
   // Header
@@ -172,15 +175,15 @@ export interface Translation {
   cacheFirstDescription: string;
   remoteOnly: string;
   remoteOnlyDescription: string;
-  offlineSupport: string;
-  cacheEnabled: string;
-  templateExists: string;
-  templateMissing: string;
-  saveSettings: string;
+  offlineSupport?: string;
+  cacheEnabled?: string;
+  templateExists?: string;
+  templateMissing?: string;
+  saveSettings?: string;
   settingsSaved: string;
   settingsSaveFailed: string;
   settingsDescription: string;
-  liftType: string;
+  liftType?: string;
   uploadFirstTemplate: string;
   selectQuestionTemplate: string;
   selectProtocolTemplate: string;
@@ -268,10 +271,13 @@ export interface Translation {
   no_mapping_available: string;
   missing_question_template: string;
   missing_protocol_template: string;
-  question_template: string;
-  protocol_template: string;
+  question_template?: string;
+  protocol_template?: string;
   error_loading_lift_types: string;
   back_to_start: string;
+  lift_management_subtitle?: string;
+  no_mappings_title?: string;
+  no_mappings_description?: string;
   no_lift_types_available: string;
   open_admin_panel_message: string;
   no_subtypes_for_type: string;
@@ -308,11 +314,11 @@ export interface Translation {
   active_mapping_exists: string;
 
   // Page specific translations
-  generalData: string;
-  machineRoom: string;
-  modernizationAffected: string;
-  questionsInGroup: string; 
-  groupOf: string;
+  generalData?: string;
+  machineRoom?: string;
+  modernizationAffected?: string;
+  questionsInGroup?: string; 
+  groupOf?: string;
   viewErrors: string;
   downloadErrorList: string;
   question: string;
@@ -410,6 +416,8 @@ export interface Translation {
       last5Protocols: string;
       noProtocols: string;
       protocolNumber: string;
+      status: string;
+      createdAt: string;
       completed: string;
       systemHealth: string;
       database: string;

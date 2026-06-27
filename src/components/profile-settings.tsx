@@ -124,7 +124,7 @@ export function ProfileSettings() {
     );
   }
 
-  const currentProfile = profile || { email: user?.email };
+  const currentProfile = (profile || { email: user?.email }) as typeof profile;
   const isCreating = !profile;
 
   const hasChanges = 

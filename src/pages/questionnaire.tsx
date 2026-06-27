@@ -219,7 +219,7 @@ function Questionnaire({
             questionsData = await response.json();
             try {
               localStorage.setItem(cacheKey, JSON.stringify(questionsData));
-              console.log(`💾 Cached ${questionsData.length} questions for offline use`);
+              console.log(`💾 Cached ${questionsData?.length ?? 0} questions for offline use`);
             } catch (e) { /* storage full, ignore */ }
           }
         } catch (fetchError) {
@@ -671,7 +671,7 @@ function Questionnaire({
                     questions={measurementQuestions}
                     values={localAnswers}
                     onChange={handleLocalAnswerChange}
-                    onAddError={handleAddError}
+                    onAddError={(e) => handleAddError({ ...e, images: e.images ?? [] })}
                   />
                 );
               }
@@ -688,7 +688,7 @@ function Questionnaire({
                         questions={mixedMeasurements}
                         values={localAnswers}
                         onChange={handleLocalAnswerChange}
-                        onAddError={handleAddError}
+                        onAddError={(e) => handleAddError({ ...e, images: e.images ?? [] })}
                       />
                     )}
                     <TrueFalseGroup
@@ -721,7 +721,7 @@ function Questionnaire({
                       questions={measurementQuestions}
                       values={localAnswers}
                       onChange={handleLocalAnswerChange}
-                      onAddError={handleAddError}
+                      onAddError={(e) => handleAddError({ ...e, images: e.images ?? [] })}
                     />
                   )}
                   {(radioQuestions.length > 0 || otherQuestions.length > 0) && (

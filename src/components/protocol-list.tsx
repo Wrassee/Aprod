@@ -305,7 +305,7 @@ export function ProtocolList() {
                 </div>
                 <div>
                   <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-sky-500 bg-clip-text text-transparent flex items-center gap-2">
-                    {t("Admin")?.tabs?.protocols || 'Protokollok'}
+                    {t("protocols") || 'Protokollok'}
                     <Sparkles className="h-5 w-5 text-cyan-500 animate-pulse" />
                   </CardTitle>
                   <CardDescription className="mt-1">
@@ -441,7 +441,7 @@ export function ProtocolList() {
           <div>
             <CardTitle className="flex items-center">
               <FileText className="h-5 w-5 mr-2" />
-              {t("Admin")?.tabs?.protocols || 'Protokollok'}
+              {t("protocols") || 'Protokollok'}
             </CardTitle>
             <CardDescription className="mt-2">
               {t("protocolListDescription")}

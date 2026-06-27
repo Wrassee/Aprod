@@ -19,7 +19,7 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
   
   // Use NEW group.title structure if available, fallback to groupName prop
   const lang = language || contextLanguage;
-  const displayName = questions[0]?.group?.title?.[lang] || groupName;
+  const displayName = (questions[0]?.group?.title as any)?.[lang] || groupName;
 
   if (questions.length === 0) return null;
 
@@ -77,7 +77,7 @@ export const TrueFalseGroup = memo(({ questions, values, onChange, groupName, la
 
             const currentValue = values[question.id]?.toString() || '';
             const isNegative = currentValue === 'no' || currentValue === 'false';
-            const questionTitle = question.title?.[lang] || (question.title as unknown as string) || '';
+            const questionTitle = (question.title as any)?.[lang] || (question.title as unknown as string) || '';
               
             return (
               <div key={question.id} className="flex items-center p-3 rounded-lg hover:bg-gray-50 min-h-[60px]">

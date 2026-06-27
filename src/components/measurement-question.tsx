@@ -49,8 +49,8 @@ export function MeasurementQuestion({ question, value, onChange }: MeasurementQu
 
   // Check if value is out of range
   const isOutOfRange = value !== undefined && !isNaN(value) && (
-    (question.minValue !== undefined && value < question.minValue) ||
-    (question.maxValue !== undefined && value > question.maxValue)
+    (question.minValue != null && value < question.minValue) ||
+    (question.maxValue != null && value > question.maxValue)
   );
 
   // ========================================

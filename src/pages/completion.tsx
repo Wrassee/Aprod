@@ -46,7 +46,10 @@ import { FileOpener } from '@capacitor-community/file-opener';
 
 interface CompletionProps {
   onEmailPDF: (recipient: string, attachments: { protocol: boolean; grounding: boolean; errorList: boolean }) => Promise<void>;
-  onSaveToCloud: () => void;
+  onSaveToCloud: () => Promise<void>;
+  onDownloadPDF?: () => void | Promise<void>;
+  onDownloadExcel?: () => void | Promise<void>;
+  onViewProtocol?: () => void | Promise<void>;
   onStartNew: () => void;
   onGoHome: () => void;
   onSettings: () => void;

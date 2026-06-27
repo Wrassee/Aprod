@@ -18,6 +18,7 @@ interface StyledRadioGroupProps {
   value: string;
   onChange: (value: string) => void;
   options: Option[];
+  direction?: string;
 }
 
 export const StyledRadioGroup = memo(({ questionId, value, onChange, options }: StyledRadioGroupProps) => {

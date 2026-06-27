@@ -1,5 +1,5 @@
 // src/pages/erdungskontrolle.tsx - THEME AWARE VERSION WITH STICKY HEADER FIX
-import { useState, useEffect, useCallback, useRef, useMemo, memo } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo, memo, Dispatch, SetStateAction } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -46,7 +46,7 @@ interface GroundingData {
 
 interface ErdungskontrolleProps {
   formData: FormData;
-  setFormData: (data: FormData) => void;
+  setFormData: Dispatch<SetStateAction<FormData>>;
   onNext: () => void;
   onBack: () => void;
   onHome?: () => void;

@@ -128,15 +128,14 @@ const IsolatedQuestionComponent = memo(({
         type={question.type as 'text' | 'number' | 'measurement' | 'select' | 'select_extended' | 'multi_select' | 'date' | 'time'}
         value={value?.toString() || ''}
         onChange={onChange}
-        placeholder={question.placeholder}
+        placeholder={question.placeholder ?? undefined}
         onKeyDown={handleEnterKeyNavigation}
         options={question.options}
         required={question.required}
-        min={question.min_value}
-        max={question.max_value}
-        maxLength={question.maxLength}
-        unit={question.unit}
-        calculationConfig={question.calculationConfig}
+        min={question.min_value ?? undefined}
+        max={question.max_value ?? undefined}
+        maxLength={question.max_length ?? undefined}
+        unit={question.unit ?? undefined}
         language={language}
       />
     );

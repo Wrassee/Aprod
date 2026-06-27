@@ -22,7 +22,7 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
     }
 
     try {
-      const inputIds = question.calculationInputs.split(',').map(id => id.trim());
+      const inputIds = (question.calculationInputs as unknown as string).split(',').map((id: string) => id.trim());
       let formula = question.calculationFormula;
       let hasAllInputs = true;
 
@@ -40,7 +40,7 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
       console.log(`🧮 [CalculatedResult ${question.id}] Numeric inputs:`, numericInputs);
       console.log(`🧮 [CalculatedResult ${question.id}] Original formula:`, formula);
 
-      inputIds.forEach(inputId => {
+      inputIds.forEach((inputId: string) => {
         const value = numericInputs[inputId];
         if (value === undefined || value === null || isNaN(value)) {
           console.log(`⚠️ [CalculatedResult ${question.id}] Missing value for ${inputId}`);
@@ -80,8 +80,8 @@ export function CalculatedResult({ question, inputValues }: CalculatedResultProp
 
   const isValid = calculationResult.value !== null && !calculationResult.error;
   const isOutOfRange = isValid && calculationResult.value !== null && (
-    (question.minValue !== undefined && calculationResult.value < question.minValue) ||
-    (question.maxValue !== undefined && calculationResult.value > question.maxValue)
+    (question.minValue != null && calculationResult.value < question.minValue) ||
+    (question.maxValue != null && calculationResult.value > question.maxValue)
   );
 
   const getStatusBadge = () => {

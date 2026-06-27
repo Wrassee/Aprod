@@ -29,6 +29,7 @@ interface PageHeaderProps {
   formData?: any;
   currentQuestionId?: string;
   errors?: any[];
+  language?: string;
 }
 
 const PageHeader: FC<PageHeaderProps> = ({

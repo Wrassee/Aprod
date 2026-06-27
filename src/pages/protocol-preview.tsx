@@ -371,7 +371,7 @@ export function ProtocolPreview({ onBack, formData, language }: ProtocolPreviewP
               <User className="h-5 w-5 text-gray-400 mr-3" />
               <div>
                 <p className="text-gray-800 font-medium">
-                  {formData.signerName || formData.signatureName || 'N/A'}
+                  {formData.signatureName || 'N/A'}
                 </p>
                 <p className="text-sm text-gray-600">
                   Létrehozva: {new Date(formData.receptionDate || Date.now()).toLocaleString('hu-HU')}

@@ -8,21 +8,21 @@ import { useTheme } from '@/contexts/theme-context'; // ← HOZZÁADVA!
 interface Question {
   id: string;
   title: string;
-  titleDe?: string;
-  titleHu?: string;
+  titleDe?: string | null;
+  titleHu?: string | null;
   type: string;
-  unit?: string;
-  minValue?: number;
-  maxValue?: number;
-  calculationFormula?: string;
-  calculationInputs?: string | string[];
+  unit?: string | null;
+  minValue?: number | null;
+  maxValue?: number | null;
+  calculationFormula?: string | null;
+  calculationInputs?: string | string[] | null;
 }
 
 interface MeasurementBlockProps {
   questions: Question[];
   values: Record<string, any>;
   onChange: (questionId: string, value: string | number | undefined) => void;
-  onAddError?: (error: { title: string; description: string; severity: 'low' | 'medium' | 'critical' }) => void;
+  onAddError?: (error: { title: string; description: string; severity: 'low' | 'medium' | 'critical'; images?: string[] }) => void;
 }
 
 export function MeasurementBlock({ questions, values, onChange, onAddError }: MeasurementBlockProps) {
@@ -212,8 +212,8 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                   const calculatedValue = calculatedValues[question.id];
                   const isOutOfBounds =
                     calculatedValue !== null &&
-                    question.minValue !== undefined &&
-                    question.maxValue !== undefined &&
+                    question.minValue != null &&
+                    question.maxValue != null &&
                     (calculatedValue < question.minValue || calculatedValue > question.maxValue);
 
                   return (
@@ -409,8 +409,8 @@ export function MeasurementBlock({ questions, values, onChange, onAddError }: Me
                 const calculatedValue = calculatedValues[question.id];
                 const isOutOfBounds =
                   calculatedValue !== null &&
-                  question.minValue !== undefined &&
-                  question.maxValue !== undefined &&
+                  question.minValue != null &&
+                  question.maxValue != null &&
                   (calculatedValue < question.minValue || calculatedValue > question.maxValue);
 
                 return (

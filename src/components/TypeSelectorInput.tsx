@@ -108,7 +108,7 @@ export function TypeSelectorInput({ value, onChange }: TypeSelectorInputProps) {
                 value={customValue}
                 onChange={handleCustomChange}
                 onClick={(e) => e.stopPropagation()}
-                autoFocus={isCustom}
+                autoFocus={!!isCustom}
                 className="border-2 border-blue-200 focus:border-blue-500 focus:ring-2 
                            focus:ring-blue-500/30 rounded-lg transition-all"
               />
@@ -171,7 +171,7 @@ export function TypeSelectorInput({ value, onChange }: TypeSelectorInputProps) {
             value={customValue}
             onChange={handleCustomChange}
             onClick={(e) => e.stopPropagation()}
-            autoFocus={isCustom}
+            autoFocus={!!isCustom}
             className="border-gray-300"
           />
           {isCustom && (

@@ -270,7 +270,6 @@ export function StableQuestionnaire({
           <ErrorExport 
             errors={errors}
             protocolData={{
-              buildingAddress: localAnswersRef.current['building_address'] as string,
               liftId: localAnswersRef.current['lift_id'] as string,
               inspectorName: localAnswersRef.current['inspector_name'] as string,
               inspectionDate: receptionDate

@@ -225,7 +225,7 @@ function AppContent({
   const handleAnswerChange = useCallback((questionId: string, value: AnswerValue) => {
     setFormData(prev => ({
       ...prev,
-      answers: { ...prev.answers, [questionId]: value }
+      answers: { ...prev.answers, [questionId]: value } as Record<string, AnswerValue>
     }));
   }, [setFormData]);
 
@@ -575,9 +575,7 @@ function AppContent({
 
       case 'reset-password':
         return (
-          <ResetPassword 
-            onSuccess={() => setCurrentScreen('login')}
-          />
+          <ResetPassword />
         );
 
       case 'auth-callback':

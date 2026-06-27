@@ -886,161 +886,175 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
 }) {
   const [showDiagram, setShowDiagram] = useState(false);
   const upd = (k: keyof HydroB3KopfData, v: string) => setB3kopf(p => ({ ...p, [k]: v }));
-  const num = (s: string) => { const n = parseFloat(s); return isNaN(n) ? 0 : n; };
+  const n = (s: string) => { const x = parseFloat(s); return isNaN(x) ? 0 : x; };
 
-  const S = num(b3kopf.S); const Z = num(b3kopf.Z); const U = num(b3kopf.U);
-  const hasBase = S > 0 || Z > 0 || U > 0;
+  const S = n(b3kopf.S), Z = n(b3kopf.Z), U = n(b3kopf.U);
+  const hasBase = b3kopf.S !== '' || b3kopf.Z !== '' || b3kopf.U !== '';
 
-  const effA = num(b3kopf.A) - S - Z - U;
-  const effB = num(b3kopf.B) - S - Z - U;
-  const effC = num(b3kopf.C) - S - Z - U;
-  const effD = num(b3kopf.D) - S - Z - U;
-  const effE = num(b3kopf.E) - S / 2 - Z - U;
+  const measurements = [
+    { id:'A', key:'A' as const, eff: n(b3kopf.A) - S - Z - U,         min:1000, color:'blue',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Stehfläche Kabinendach → Schachtkopf' },
+    { id:'B', key:'B' as const, eff: n(b3kopf.B) - S - Z - U,         min: 300, color:'purple',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Höchster Punkt Kabine → tiefster Punkt Schachtkopf' },
+    { id:'C', key:'C' as const, eff: n(b3kopf.C) - S - Z - U,         min: 100, color:'teal',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Kabinenführung → Schachtkopf' },
+    { id:'D', key:'D' as const, eff: n(b3kopf.D) - S - Z - U,         min: 100, color:'orange',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Kabinenführung → Schienenende' },
+    { id:'E', key:'E' as const, eff: n(b3kopf.E) - S / 2 - Z - U,     min: 100, color:'rose',
+      formula: (v: number) => `${v.toFixed(0)} − ${(S/2).toFixed(1)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Kolbenende → Schachtkopf' },
+  ] as const;
 
-  const hasResult = (k: keyof HydroB3KopfData) => num(b3kopf[k]) > 0;
+  const colorMap = {
+    blue:   { ring:'border-blue-400',   bg:'bg-blue-600',   light:'bg-blue-50 dark:bg-blue-950/30',   text:'text-blue-700 dark:text-blue-300',   inp:'border-blue-200 dark:border-blue-800 focus:ring-blue-400' },
+    purple: { ring:'border-purple-400', bg:'bg-purple-600', light:'bg-purple-50 dark:bg-purple-950/30',text:'text-purple-700 dark:text-purple-300',inp:'border-purple-200 dark:border-purple-800 focus:ring-purple-400' },
+    teal:   { ring:'border-teal-400',   bg:'bg-teal-600',   light:'bg-teal-50 dark:bg-teal-950/30',   text:'text-teal-700 dark:text-teal-300',   inp:'border-teal-200 dark:border-teal-800 focus:ring-teal-400' },
+    orange: { ring:'border-orange-400', bg:'bg-orange-500', light:'bg-orange-50 dark:bg-orange-950/30',text:'text-orange-700 dark:text-orange-300',inp:'border-orange-200 dark:border-orange-800 focus:ring-orange-400' },
+    rose:   { ring:'border-rose-400',   bg:'bg-rose-600',   light:'bg-rose-50 dark:bg-rose-950/30',   text:'text-rose-700 dark:text-rose-300',   inp:'border-rose-200 dark:border-rose-800 focus:ring-rose-400' },
+  };
 
-  const badgeCls = (val: number, min: number, has: boolean) =>
-    !has ? 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 border border-dashed border-gray-300 dark:border-gray-600'
-         : val >= min ? 'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300 border border-green-400 font-bold'
-                      : 'bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 border border-red-400 font-bold';
-
-  const inpCls = "text-center text-sm h-9 px-1 border-cyan-200 dark:border-cyan-800 focus:ring-2 focus:ring-cyan-400";
-  const baseCls = "text-center text-sm h-9 px-1 border-violet-200 dark:border-violet-800 focus:ring-2 focus:ring-violet-400";
-
-  const measurements: { id: string; key: keyof HydroB3KopfData; eff: number; min: number; desc: string }[] = [
-    { id:'A', key:'A', eff: effA, min:1000, desc:'Stehfläche Kabinendach → Schachtkopf' },
-    { id:'B', key:'B', eff: effB, min: 300, desc:'Höchster Punkt Kabine → tiefster Punkt Schachtkopf' },
-    { id:'C', key:'C', eff: effC, min: 100, desc:'Kabinenführung → Schachtkopf' },
-    { id:'D', key:'D', eff: effD, min: 100, desc:'Kabinenführung → Schienenende' },
-    { id:'E', key:'E', eff: effE, min: 100, desc:'Kolbenende → Schachtkopf' },
-  ];
+  const resultCls = (val: number, min: number, has: boolean) =>
+    !has ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-dashed border-gray-300'
+         : val >= min ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-200 dark:shadow-green-900/50'
+                      : 'bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-lg shadow-red-200 dark:shadow-red-900/50';
 
   return (
-    <Card className={modern ? 'shadow-lg border-2 border-cyan-100 dark:border-cyan-900/50 overflow-hidden' : 'shadow-md overflow-hidden'}>
-      <CardHeader className="relative overflow-hidden bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-400 text-white py-3 px-5">
-        {modern && <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-500 opacity-30 animate-pulse pointer-events-none" />}
-        <div className="relative flex items-center justify-between">
-          <CardTitle className="text-base font-bold">Sicherheitsabstände im Schachtkopf</CardTitle>
-          <button onClick={() => setShowDiagram(p => !p)}
-            className="text-xs bg-white/20 hover:bg-white/30 rounded-lg px-2.5 py-1 font-medium transition-colors flex items-center gap-1.5">
-            <span>{showDiagram ? '▲ Ábra elrejtése' : '▼ Ábra mutatása'}</span>
-          </button>
+    <div className="space-y-3">
+      {/* ── Header card ── */}
+      <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-cyan-100 dark:border-cyan-900/50">
+        <div className="relative overflow-hidden bg-gradient-to-r from-cyan-700 via-teal-600 to-emerald-500 text-white px-5 py-4">
+          {modern && <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none" />}
+          <div className="relative flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold tracking-tight">Schachtkopf Sicherheitsabstände</h3>
+              <p className="text-white/70 text-xs mt-0.5">Effektive Abstände werden automatisch berechnet</p>
+            </div>
+            <button onClick={() => setShowDiagram(p => !p)}
+              className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 active:bg-white/40 rounded-xl px-3 py-2 text-xs font-semibold transition-all">
+              {showDiagram ? '▲ Ábra' : '📐 Ábra'}
+            </button>
+          </div>
         </div>
-      </CardHeader>
-
-      <CardContent className="p-4 space-y-4">
 
         {/* Diagram */}
         {showDiagram && (
-          <div className="rounded-xl overflow-hidden border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-gray-900">
-            <img src="/schachtkopf-diagram.jpg" alt="Schachtkopf Sicherheitsabstände" className="w-full object-contain max-h-72" />
-            <p className="text-xs text-center text-gray-500 dark:text-gray-400 py-1.5 bg-gray-50 dark:bg-gray-800">
-              Schachtkopf – Sicherheitsabstände A, B, C, D, E
-            </p>
+          <div className="bg-white dark:bg-gray-900">
+            <img src="/schachtkopf-diagram.jpg" alt="Schachtkopf" className="w-full object-contain max-h-64" />
+            <p className="text-xs text-center text-gray-400 py-1.5 bg-gray-50 dark:bg-gray-800">A, B, C, D, E – Sicherheitsabstände</p>
           </div>
         )}
+      </div>
 
-        {/* ── 1. BASISWERTE ── */}
-        <div className="rounded-xl border border-violet-200 dark:border-violet-800 overflow-hidden">
-          <div className="bg-violet-600 text-white px-3 py-2 flex items-center gap-2">
-            <span className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold">1</span>
-            <span className="text-sm font-semibold">Basiswerte (gemeinsame Abzüge)</span>
+      {/* ── Basiswerte ── */}
+      <div className="rounded-2xl overflow-hidden border-2 border-violet-200 dark:border-violet-800 shadow-lg">
+        <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 py-3 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <div>
+            <p className="font-bold text-sm">Basiswerte — gemeinsame Abzüge</p>
+            <p className="text-white/70 text-xs">S, Z, U minden számítás alapja</p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-violet-50/40 dark:bg-violet-950/20">
-            <div>
-              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
-                S – Schwellenabstand <span className="font-normal text-violet-500">(mm)</span>
-              </Label>
-              <Input type="number" value={b3kopf.S} onChange={e => upd('S', e.target.value)}
-                placeholder="mm" className={baseCls} />
-              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Kabine–Schachttür</p>
-            </div>
-            <div>
-              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
-                Z – Zuschlag <span className="font-normal text-violet-500">(mm)</span>
-              </Label>
-              <Input type="number" value={b3kopf.Z} onChange={e => upd('Z', e.target.value)}
-                placeholder="mm" className={baseCls} />
-              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Sprunghöhe</p>
-            </div>
-            <div>
-              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
-                U – Überfahrt <span className="font-normal text-violet-500">(mm)</span>
-              </Label>
-              <Input type="number" value={b3kopf.U} onChange={e => upd('U', e.target.value)}
-                placeholder="mm" className={baseCls} />
-              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Kolbenhubbegr. oben</p>
-            </div>
-            <div>
-              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
-                v – Nenngeschw. <span className="font-normal text-violet-500">(m/s)</span>
-              </Label>
-              <Input type="number" value={b3kopf.nenngeschwindigkeit} onChange={e => upd('nenngeschwindigkeit', e.target.value)}
-                placeholder="m/s" className={baseCls} />
-              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Für Protokoll</p>
-            </div>
-          </div>
-          {!hasBase && (
-            <div className="px-3 pb-2 text-xs text-violet-500 dark:text-violet-400 italic">
-              ← Adja meg az S, Z, U értékeket — ezek alapján számítódnak az effektív távolságok
-            </div>
-          )}
         </div>
-
-        {/* ── 2. FIZIKAI MÉRÉSEK ── */}
-        <div className="rounded-xl border border-cyan-200 dark:border-cyan-800 overflow-hidden">
-          <div className="bg-cyan-600 text-white px-3 py-2 flex items-center gap-2">
-            <span className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold">2</span>
-            <span className="text-sm font-semibold">Gemessene Abstände (Rohwerte)</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3">
-            {measurements.map(m => (
-              <div key={m.id}>
-                <Label className="text-sm font-semibold text-cyan-700 dark:text-cyan-300 mb-1.5 block">
-                  <span className="inline-flex w-5 h-5 rounded-full bg-cyan-600 text-white text-xs font-bold items-center justify-center mr-1.5">{m.id}</span>
-                  <span className="font-normal text-cyan-500">(mm)</span>
-                </Label>
-                <Input type="number" value={b3kopf[m.key]} onChange={e => upd(m.key, e.target.value)}
-                  placeholder="mm" className={inpCls} />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-tight">{m.desc}</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 bg-violet-50/60 dark:bg-violet-950/20 divide-x divide-violet-100 dark:divide-violet-800">
+          {([
+            { key: 'S' as const, label: 'S', sub: 'Schwellenabstand', hint: 'Kabine → Schachttür' },
+            { key: 'Z' as const, label: 'Z', sub: 'Zuschlag', hint: 'Sprunghöhe' },
+            { key: 'U' as const, label: 'U', sub: 'Überfahrt', hint: 'Kolbenhubbegr. oben' },
+            { key: 'nenngeschwindigkeit' as const, label: 'v', sub: 'Nenngeschw.', hint: 'm/s — für Protokoll' },
+          ]).map((f, idx) => (
+            <div key={f.key} className={`p-3 ${idx >= 2 ? 'col-span-1' : ''}`}>
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-2xl font-black text-violet-700 dark:text-violet-300">{f.label}</span>
+                <span className="text-xs text-violet-500 font-medium">{f.key === 'nenngeschwindigkeit' ? '(m/s)' : '(mm)'}</span>
               </div>
-            ))}
+              <Input type="number" value={b3kopf[f.key]} onChange={e => upd(f.key, e.target.value)}
+                placeholder={f.key === 'nenngeschwindigkeit' ? '0.63' : '0'}
+                className="text-center text-base font-bold h-10 border-violet-300 dark:border-violet-700 focus:ring-2 focus:ring-violet-400 bg-white dark:bg-gray-900" />
+              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1.5 font-medium">{f.sub}</p>
+              <p className="text-xs text-violet-400 dark:text-violet-500 leading-tight">{f.hint}</p>
+            </div>
+          ))}
+        </div>
+        {!hasBase && (
+          <div className="px-4 py-2 bg-violet-100 dark:bg-violet-950/30 text-xs text-violet-600 dark:text-violet-400 flex items-center gap-2">
+            <span>💡</span>
+            <span>Adja meg az S, Z, U értékeket — ezek alapján számítódnak az effektív távolságok</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── Mérési értékek + Eredmények kombinált kártyák ── */}
+      <div className="rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-4 py-3 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold shrink-0">2</span>
+          <div>
+            <p className="font-bold text-sm">Gemessene Abstände → Effektive Sicherheitsabstände</p>
+            <p className="text-white/60 text-xs">Rohwert eingeben → Ergebnis wird sofort berechnet</p>
           </div>
         </div>
-
-        {/* ── 3. EREDMÉNYEK ── */}
-        <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <div className="bg-gray-700 dark:bg-gray-800 text-white px-3 py-2 flex items-center gap-2">
-            <span className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold">3</span>
-            <span className="text-sm font-semibold">Effektive Sicherheitsabstände (automatisch)</span>
-          </div>
-          <div className="divide-y divide-gray-100 dark:divide-gray-800">
-            {measurements.map(m => {
-              const has = hasResult(m.key) && hasBase;
-              return (
-                <div key={m.id} className="flex items-center px-3 py-2.5 gap-3 bg-white dark:bg-gray-900">
-                  <span className="w-7 h-7 rounded-full bg-cyan-600 text-white text-sm font-bold flex items-center justify-center shrink-0">{m.id}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{m.desc}</p>
-                    {has && (
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                        {m.id !== 'E'
-                          ? `${num(b3kopf[m.key]).toFixed(0)} − ${S.toFixed(0)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`
-                          : `${num(b3kopf[m.key]).toFixed(0)} − ${(S/2).toFixed(1)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`}
-                      </p>
-                    )}
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {measurements.map(m => {
+            const c = colorMap[m.color];
+            const val = n(b3kopf[m.key]);
+            const has = b3kopf[m.key] !== '' && hasBase;
+            return (
+              <div key={m.id} className={`${c.light} p-3`}>
+                <div className="flex items-start gap-3">
+                  {/* ID Badge */}
+                  <div className={`w-10 h-10 rounded-xl ${c.bg} text-white text-xl font-black flex items-center justify-center shrink-0 shadow-md mt-0.5`}>
+                    {m.id}
                   </div>
-                  <div className={`rounded-lg px-3 py-1.5 text-sm text-center min-w-[100px] shrink-0 ${badgeCls(m.eff, m.min, has)}`}>
-                    {has ? `${m.eff.toFixed(0)} mm` : `min. ${m.min} mm`}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-semibold ${c.text} mb-1 truncate`}>{m.desc}</p>
+                    {/* Input + Result row */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <Input type="number" value={b3kopf[m.key]} onChange={e => upd(m.key, e.target.value)}
+                          placeholder="mm"
+                          className={`text-center text-base font-bold h-10 ${c.inp} focus:ring-2 bg-white dark:bg-gray-900`} />
+                        {has && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 text-center">
+                            = {m.formula(val)}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-gray-400 font-bold text-lg shrink-0">→</div>
+                      {/* Result tile */}
+                      <div className={`w-28 h-10 rounded-xl flex flex-col items-center justify-center shrink-0 ${resultCls(m.eff, m.min, has)}`}>
+                        {has ? (
+                          <>
+                            <span className="text-sm font-black leading-none">{m.eff.toFixed(0)} mm</span>
+                            <span className="text-xs opacity-80">{m.eff >= m.min ? '✓ OK' : `✗ min.${m.min}`}</span>
+                          </>
+                        ) : (
+                          <span className="text-xs font-medium">min. {m.min} mm</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
+      </div>
 
-      </CardContent>
-    </Card>
+      {/* ── Összesítő eredmény sáv ── */}
+      {hasBase && measurements.some(m => b3kopf[m.key] !== '') && (
+        <div className={`rounded-2xl p-4 text-center font-bold text-sm shadow-lg ${
+          measurements.filter(m => b3kopf[m.key] !== '').every(m => m.eff >= m.min)
+            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+            : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
+        }`}>
+          {measurements.filter(m => b3kopf[m.key] !== '').every(m => m.eff >= m.min)
+            ? '✓ Alle eingegebenen Sicherheitsabstände erfüllt'
+            : `⚠ ${measurements.filter(m => b3kopf[m.key] !== '' && m.eff < m.min).map(m => m.id).join(', ')} — Mindestabstand nicht eingehalten`}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1269,6 +1283,7 @@ function ChapterSection({
 }) {
   const options = chapter.options ?? DEFAULT_OPTIONS;
   const modern  = theme === 'modern';
+  const [b3ActiveTab, setB3ActiveTab] = useState<'kopf' | 'fragen'>('kopf');
 
   const gradHdr = (gradient: string) =>
     modern ? `relative overflow-hidden ${gradient} text-white p-6` : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4';
@@ -1424,23 +1439,7 @@ function ChapterSection({
     while (i < paths.length) {
       const path = paths[i];
 
-      // ── Measurement card markers
-      if (path === '__KOPF_CARD__' && b3kopf && setB3kopf) {
-        elements.push(
-          <div key="__KOPF_CARD__" className="p-4 border-b border-blue-100 dark:border-blue-900/50 bg-cyan-50/30 dark:bg-cyan-950/10">
-            <B3KopfCard b3kopf={b3kopf} setB3kopf={setB3kopf} modern={modern} />
-          </div>
-        );
-        i++; continue;
-      }
-      if (path === '__GRUBE_CARD__' && b3grube && setB3grube) {
-        elements.push(
-          <div key="__GRUBE_CARD__" className="p-4 border-b border-blue-100 dark:border-blue-900/50 bg-emerald-50/30 dark:bg-emerald-950/10">
-            <B3GrubeCard b3grube={b3grube} setB3grube={setB3grube} modern={modern} />
-          </div>
-        );
-        i++; continue;
-      }
+      // ── Measurement card markers — shown in dedicated tab, skip here
       if (path.startsWith('__')) { i++; continue; }
 
       // ── Checkbox paths (n.z. toggle) — individual row
@@ -1737,29 +1736,79 @@ function ChapterSection({
         </Card>
       )}
 
-      {/* ── Questions card ── */}
-      <Card className={modern ? 'shadow-xl border-2 border-blue-100 dark:border-blue-900/50 overflow-hidden hover:shadow-2xl transition-shadow duration-300' : 'shadow-lg overflow-hidden'}>
-        <CardHeader className={gradHdr('bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400')}>
-          {pulseCls('bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500')}
-          <div className="relative flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold text-lg shadow-lg">
-              B{chapter.id}
-            </div>
-            <div>
-              <CardTitle className="text-xl font-bold">{chapter.title}</CardTitle>
-              <p className="text-white/80 text-sm mt-0.5">
+      {/* ── B3 Tab bar (Schachtkopf | Fragen) ── */}
+      {chapter.id === 3 && (
+        <div className="flex rounded-2xl overflow-hidden border-2 border-cyan-200 dark:border-cyan-800 shadow-lg">
+          <button
+            onClick={() => setB3ActiveTab('kopf')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-all duration-200 ${
+              b3ActiveTab === 'kopf'
+                ? 'bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-500 text-white shadow-inner'
+                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-cyan-50 dark:hover:bg-cyan-950/30'
+            }`}
+          >
+            <span className="text-base">📐</span>
+            <span>Schachtkopf / Grube</span>
+            {b3ActiveTab === 'kopf' && <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" />}
+          </button>
+          <div className="w-px bg-cyan-200 dark:bg-cyan-800" />
+          <button
+            onClick={() => setB3ActiveTab('fragen')}
+            className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-semibold transition-all duration-200 ${
+              b3ActiveTab === 'fragen'
+                ? 'bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400 text-white shadow-inner'
+                : 'bg-white dark:bg-gray-900 text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-950/30'
+            }`}
+          >
+            <span className="text-base">📋</span>
+            <span>B3 Kérdések</span>
+            {b3ActiveTab === 'fragen' && (
+              <span className="bg-white/30 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
                 {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && answers[p]).length}
-                {' / '}
-                {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p)).length}
-                {' '}{t('completed', lang)}
-              </p>
+                /{chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p)).length}
+              </span>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* ── B3 Schachtkopf + Grube Cards (dedicated tab) ── */}
+      {chapter.id === 3 && b3ActiveTab === 'kopf' && (
+        <div className="space-y-4">
+          {b3kopf && setB3kopf && <B3KopfCard b3kopf={b3kopf} setB3kopf={setB3kopf} modern={modern} />}
+          {b3grube && setB3grube && (
+            <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 overflow-hidden shadow-lg">
+              <B3GrubeCard b3grube={b3grube} setB3grube={setB3grube} modern={modern} />
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {renderQuestionList()}
-        </CardContent>
-      </Card>
+          )}
+        </div>
+      )}
+
+      {/* ── Questions card ── */}
+      {(chapter.id !== 3 || b3ActiveTab === 'fragen') && (
+        <Card className={modern ? 'shadow-xl border-2 border-blue-100 dark:border-blue-900/50 overflow-hidden hover:shadow-2xl transition-shadow duration-300' : 'shadow-lg overflow-hidden'}>
+          <CardHeader className={gradHdr('bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400')}>
+            {pulseCls('bg-gradient-to-r from-sky-400 via-blue-500 to-cyan-500')}
+            <div className="relative flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center font-bold text-lg shadow-lg">
+                B{chapter.id}
+              </div>
+              <div>
+                <CardTitle className="text-xl font-bold">{chapter.title}</CardTitle>
+                <p className="text-white/80 text-sm mt-0.5">
+                  {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && answers[p]).length}
+                  {' / '}
+                  {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p)).length}
+                  {' '}{t('completed', lang)}
+                </p>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {renderQuestionList()}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

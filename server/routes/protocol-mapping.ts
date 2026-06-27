@@ -391,7 +391,34 @@ router.post('/download-hydro-pdf', async (req, res) => {
       return res.status(400).json({ message: 'hydroData megadása kötelező.' });
     }
 
-    const pdfBuffer = await HydroPdfFiller.generateFilledPdf(hydroData);
+    // Flatten nested b3_kopf / b3_grube into the flat HydroFormData structure
+    const { b3_kopf, b3_grube, ...restData } = hydroData as Record<string, any>;
+    const flatData = {
+      ...restData,
+      ...(b3_kopf ? {
+        b3_A1: b3_kopf.A1,      b3_A2: b3_kopf.A2,      b3_A3: b3_kopf.A3,
+        b3_fill_A4: b3_kopf.fill_A4,
+        b3_B1: b3_kopf.B1,      b3_B2: b3_kopf.B2,      b3_B3: b3_kopf.B3,
+        b3_fill_B4: b3_kopf.fill_B4,
+        b3_C1: b3_kopf.C1,      b3_C2: b3_kopf.C2,      b3_C3: b3_kopf.C3,
+        b3_fill_C4: b3_kopf.fill_C4,
+        b3_D1: b3_kopf.D1,      b3_D2: b3_kopf.D2,      b3_D3: b3_kopf.D3,
+        b3_fill_D4: b3_kopf.fill_D4,
+        b3_E1: b3_kopf.E1,      b3_E3: b3_kopf.E3,
+        b3_fill_E4: b3_kopf.fill_E4,
+        b3_OberesUeberfahrt: b3_kopf.ueberfahrt,
+        b3_nenngeschwindigkeit: b3_kopf.nenngeschwindigkeit,
+      } : {}),
+      ...(b3_grube ? {
+        b3_F1: b3_grube.F1, b3_F2: b3_grube.F2, b3_F3: b3_grube.F3,
+        b3_G1: b3_grube.G1, b3_G2: b3_grube.G2, b3_G3: b3_grube.G3,
+        b3_H1: b3_grube.H1, b3_H2: b3_grube.H2, b3_H3: b3_grube.H3,
+        b3_J1: b3_grube.J1, b3_J2: b3_grube.J2, b3_J3: b3_grube.J3,
+      } : {}),
+    };
+    console.log('🔵 b3_kopf flattened fields:', Object.keys(flatData).filter(k => k.startsWith('b3_')));
+
+    const pdfBuffer = await HydroPdfFiller.generateFilledPdf(flatData);
 
     const fabNr = hydroData.fabrikationsNr
       ? String(hydroData.fabrikationsNr).replace(/[^a-zA-Z0-9]/g, '_')

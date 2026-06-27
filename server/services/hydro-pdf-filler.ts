@@ -33,11 +33,12 @@ export interface HydroFormData {
   b1_aufzugsbuch?: string[];                               // Liftskönyv mellékletek (max 7)
 
   // === B3 MÉRÉSI TÁBLÁZATOK ===
-  b3_A1?: string; b3_A2?: string; b3_A3?: string;          // Schachtkopf Mass A
-  b3_B1?: string; b3_B2?: string; b3_B3?: string;          // Mass B
-  b3_C1?: string; b3_C2?: string; b3_C3?: string;          // Mass C
-  b3_D1?: string; b3_D2?: string; b3_D3?: string;          // Mass D
-  b3_E1?: string;                b3_E3?: string;           // Mass E
+  b3_A1?: string; b3_A2?: string; b3_A3?: string; b3_fill_A4?: string;  // Schachtkopf Mass A
+  b3_B1?: string; b3_B2?: string; b3_B3?: string; b3_fill_B4?: string;  // Mass B
+  b3_C1?: string; b3_C2?: string; b3_C3?: string; b3_fill_C4?: string;  // Mass C
+  b3_D1?: string; b3_D2?: string; b3_D3?: string; b3_fill_D4?: string;  // Mass D
+  b3_E1?: string;                b3_E3?: string;  b3_fill_E4?: string;  // Mass E
+  b3_nenngeschwindigkeit?: string;                                        // Nenngeschwindigkeit
   b3_F1?: string; b3_F2?: string; b3_F3?: string;          // Schachtgrube Mass F
   b3_G1?: string; b3_G2?: string; b3_G3?: string;          // Mass G
   b3_H1?: string; b3_H2?: string; b3_H3?: string;          // Mass H
@@ -375,11 +376,21 @@ export class HydroPdfFiller {
     // 3. B3 - SCHACHT MÉRÉSI TÁBLÁZATOK
     // ----------------------------------------------------------
     const b3Measurements: Record<string, string | undefined> = {
+      // Schachtkopf – Rohwerte
       'B3_A1': data.b3_A1, 'B3_A2': data.b3_A2, 'B3_A3': data.b3_A3,
       'B3_B1': data.b3_B1, 'B3_B2': data.b3_B2, 'B3_B3': data.b3_B3,
       'B3_C1': data.b3_C1, 'B3_C2': data.b3_C2, 'B3_C3': data.b3_C3,
       'B3_D1': data.b3_D1, 'B3_D2': data.b3_D2, 'B3_D3': data.b3_D3,
       'B3_E1': data.b3_E1, 'B3_E3': data.b3_E3,
+      // Schachtkopf – Effektive Sicherheitsabstände (berechnete Werte)
+      'B3_fill_A4': data.b3_fill_A4,
+      'B3_fill_B4': data.b3_fill_B4,
+      'B3_fill_C4': data.b3_fill_C4,
+      'B3_fill_D4': data.b3_fill_D4,
+      'B3_fill_E4': data.b3_fill_E4,
+      // Nenngeschwindigkeit
+      'B3_Nenngeschwindigkeit': data.b3_nenngeschwindigkeit,
+      // Schachtgrube
       'B3_F1': data.b3_F1, 'B3_F2': data.b3_F2, 'B3_F3': data.b3_F3,
       'B3_G1': data.b3_G1, 'B3_G2': data.b3_G2, 'B3_G3': data.b3_G3,
       'B3_H1': data.b3_H1, 'B3_H2': data.b3_H2, 'B3_H3': data.b3_H3,

@@ -1,0 +1,45 @@
+Teljesen újra szeretném tervezni a PWA alkalmazásom Schachtkopf számítási szakaszának felhasználói felületét. A jelenlegi felhasználói felület egy zsúfolt bemeneti adatokból álló fal, és nagyon zavaró egy technikus számára, aki okostelefont használ a terepen. Kérlek, alakítsd át a komponenst Tailwind CSS és Lucide ikonok segítségével a következő UX alapelvek alapján: Lépésről lépésre (varázsló) vagy füles elrendezés: Osszd fel a beviteli mezőket pl. 3 logikai lépésre ahelyett, hogy egyszerre jelenítenéd meg őket: 1. lépés: Rendszergeometria (pl. Kabin távolsága az aknafejtől, Kabintető legmagasabb pont távolsága az aknafejtől, Kabin vezetősín hossza, Kabinküszöb aknaküszöb távolsága stb.) 2. lépés: Hidraulika specifikus mérések (pl. Dugattyú túlfutása, "Sprunghöhe" stb.) 3. lépés: Érvényesítési eredmények (A végső számításokat világosan jelenítsd meg nagy zöld/piros jelvényekkel, amelyek a szabvány szerint MEGFELELŐ vagy NEM NEM FELELŐS állapotot jeleznek). Egyértelmű címkézés: Minden beviteli mezőnek jól látható, felhasználóbarát címkével kell rendelkeznie (pl. Schachtkopfhöhe — $SK$ [mm]), és egy kis segédszöveg alatta, amely pontosan elmagyarázza, hogy honnan/hová kell mérni. Mobil – Első Érintéses Célok: Mobilon teljes szélességű bevitelt használjon, nagy betűméretekkel (text-base vagy text-lg), egyértelmű fókuszállapotokkal és könnyen megérinthető érintési célpontokkal. Használjon egyértelmű számbevitelt, amely iOS/Android rendszeren aktiválja a numerikus billentyűzetet. Dinamikus kontextus: Ha egy bizonyos érték egy korábbi kiválasztástól függ (pl. egy adott elrendezési opció kiválasztása a VSA táblázatból), dinamikusan rejtse el vagy tiltsa le a lényegtelen beviteli mezőket, hogy a felhasználó csak a feltétlenül szükségeseket töltse ki. Írd át a komponens JSX/TSX struktúráját, hogy vizuálisan tiszta, jól elosztott (space-y-4, p-4) és rendkívül könnyen használható legyen egy építkezésen.
+Feltöltöttem a Protokollban található ábrát ami segítheti a vizuális tájékozódást!
+
+Számításhoz Szükséges beviteli adatok:
+
+Abstand zwischen Kabinen Schwelle - Oberste Schachttür Schwelle = S
+Abstand zwischen Stehfläche Kabinendach - Schachtkopf = A
+Abstand zwischen Höchste Punkt Kabine - Tiefste Punkt Schachtkopf = B
+Abstand zwischen Kabinenführung - Schachtkopf = C
+Abstand zwischen Kabinenführung - Schienenende Kabine = D
+Abstand zwischen Kolbenende - Schachtkopf = E
+Zuschlag (Sprunghöhe der Kabine, Berechnungsbeispiel: v = 0.63 m/s Zuschlag = 0,035 x v2 = 0.01389 m = 15 mm (aufgerundet)) = Z
+Überfahrt (Kabine bündig oberste Haltestelle bis zu
+der Kolbenhubbegrenzung oben, bei 2/1 Anlagen die Berechnung beachten). = U
+
+Számítások: 
+-Effektiver Sicherheitsabstand "A" = A-S-Z-U (min. 1000mm)
+-Effektiver Sicherheitsabstand "B" = B-S-Z-U (min.  300mm)
+-Effektiver Sicherheitsabstand "C" = C-S-Z-U (min.  100mm)
+-Effektiver Sicherheitsabstand "D" = D-S-Z-U (min.  100mm)
+-Effektiver Sicherheitsabstand "E" = E-(S/2)-Z-U (min. 100mm)
+
+PDF Protokoll kitöltéséhez szükséges mezők:
+
+Nenngeschwindigkeit = Nenngeschwindigkeit (m/s)
+A1 = A-S
+A2 = Z
+A3 = U
+fill_A4 = Effektiver Sicherheitsabstand "A"
+B1 = B-S
+B2 = Z
+B3 = U
+fill_B4 = Effektiver Sicherheitsabstand "B"
+C1 = C-S
+C2 = Z
+C3 = U
+fill_C4 = Effektiver Sicherheitsabstand "C"
+D1 = D-S
+D2 = Z
+D3 = U
+fill_D4 = Effektiver Sicherheitsabstand "D"
+E1 = E-S/2
+E3 = U
+fill_E4 = Effektiver Sicherheitsabstand "E"
+Überfahrt = Überfahrt (mm)

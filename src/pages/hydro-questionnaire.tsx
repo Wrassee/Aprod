@@ -362,12 +362,14 @@ interface HydroHeader {
 interface HydroB1Data  { hubhoehe: string; stockwerke: string; zugaenge: string; nennlast: string; personen: string; }
 interface HydroB3KopfData {
   nenngeschwindigkeit: string;
-  A1: string; A2: string; A3: string;
-  B1: string; B2: string; B3: string;
-  C1: string; C2: string; C3: string;
-  D1: string; D2: string; D3: string;
-  E1: string; E3: string;
-  ueberfahrt: string;
+  S: string;  // Kabinenschwelle – oberste Schachttürschwelle
+  A: string;  // Stehfläche Kabinendach – Schachtkopf
+  B: string;  // Höchster Punkt Kabine – tiefster Punkt Schachtkopf
+  C: string;  // Kabinenführung – Schachtkopf
+  D: string;  // Kabinenführung – Schienenende
+  E: string;  // Kolbenende – Schachtkopf
+  Z: string;  // Zuschlag (Sprunghöhe)
+  U: string;  // Überfahrt
 }
 interface HydroB3GrubeData {
   F1: string; F2: string; F3: string;
@@ -397,7 +399,7 @@ interface HydroB9Data  {
 }
 interface HydroB13Data { firma: string; nameAbnahme: string; datum: string; }
 
-const STORAGE_KEY = 'hydro-form-data-v2';
+const STORAGE_KEY = 'hydro-form-data-v3';
 function loadState() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch { /**/ } return null; }
 function saveState(s: Record<string, unknown>) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /**/ } }
 
@@ -454,8 +456,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
   const [umbau,   setUmbau]   = useState<Record<string, boolean>>(saved?.umbau ?? {});
   const [b1, setB1] = useState<HydroB1Data>(saved?.b1 ?? { hubhoehe:'', stockwerke:'', zugaenge:'', nennlast:'', personen:'' });
   const [b3kopf, setB3kopf] = useState<HydroB3KopfData>(saved?.b3kopf ?? {
-    nenngeschwindigkeit:'', A1:'', A2:'', A3:'', B1:'', B2:'', B3:'',
-    C1:'', C2:'', C3:'', D1:'', D2:'', D3:'', E1:'', E3:'', ueberfahrt:'',
+    nenngeschwindigkeit:'', S:'', A:'', B:'', C:'', D:'', E:'', Z:'', U:'',
   });
   const [b3grube, setB3grube] = useState<HydroB3GrubeData>(saved?.b3grube ?? {
     F1:'', F2:'', F3:'', G1:'', G2:'', G3:'', H1:'', H2:'', H3:'', J1:'', J2:'', J3:'',
@@ -545,7 +546,33 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
         b13_firma: b13.firma, b13_nameAbnahme: b13.nameAbnahme, b13_datum: b13.datum,
         b13_bauseitigePendenzen: answers['B13_Bauseitige_Pendenzen'] ?? '',
         b13_aufzugsseitigePendenzen: answers['B13_Aufzugsseitige_Pendenzen'] ?? '',
-        b3_kopf: b3kopf,
+        b3_kopf: (() => {
+          const n = (s: string) => { const v = parseFloat(s); return isNaN(v) ? 0 : v; };
+          const S = n(b3kopf.S), Z = n(b3kopf.Z), U = n(b3kopf.U);
+          return {
+            nenngeschwindigkeit: b3kopf.nenngeschwindigkeit,
+            ueberfahrt: b3kopf.U,
+            A1: (n(b3kopf.A) - S).toFixed(1),
+            A2: Z.toFixed(1),
+            A3: U.toFixed(1),
+            fill_A4: (n(b3kopf.A) - S - Z - U).toFixed(1),
+            B1: (n(b3kopf.B) - S).toFixed(1),
+            B2: Z.toFixed(1),
+            B3: U.toFixed(1),
+            fill_B4: (n(b3kopf.B) - S - Z - U).toFixed(1),
+            C1: (n(b3kopf.C) - S).toFixed(1),
+            C2: Z.toFixed(1),
+            C3: U.toFixed(1),
+            fill_C4: (n(b3kopf.C) - S - Z - U).toFixed(1),
+            D1: (n(b3kopf.D) - S).toFixed(1),
+            D2: Z.toFixed(1),
+            D3: U.toFixed(1),
+            fill_D4: (n(b3kopf.D) - S - Z - U).toFixed(1),
+            E1: (n(b3kopf.E) - S / 2).toFixed(1),
+            E3: U.toFixed(1),
+            fill_E4: (n(b3kopf.E) - S / 2 - Z - U).toFixed(1),
+          };
+        })(),
         b3_grube: b3grube,
         questionAnswers: answers,
       };
@@ -857,101 +884,161 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
   b3kopf: HydroB3KopfData; setB3kopf: React.Dispatch<React.SetStateAction<HydroB3KopfData>>;
   modern: boolean;
 }) {
+  const [showDiagram, setShowDiagram] = useState(false);
   const upd = (k: keyof HydroB3KopfData, v: string) => setB3kopf(p => ({ ...p, [k]: v }));
-  const num = (s: string) => parseFloat(s || '0') || 0;
-  const A4 = num(b3kopf.A1) + num(b3kopf.A2) + num(b3kopf.A3);
-  const B4 = num(b3kopf.B1) + num(b3kopf.B2) + num(b3kopf.B3);
-  const C4 = num(b3kopf.C1) + num(b3kopf.C2) + num(b3kopf.C3);
-  const D4 = num(b3kopf.D1) + num(b3kopf.D2) + num(b3kopf.D3);
-  const E4 = num(b3kopf.E1) + num(b3kopf.E3);
+  const num = (s: string) => { const n = parseFloat(s); return isNaN(n) ? 0 : n; };
 
-  const okCls  = 'bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300 font-bold border border-green-400';
-  const nokCls = 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300 font-bold border border-red-400';
-  const empCls = 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 border border-gray-300';
-  const sumCls = (v: number, min: number) => v > 0 ? (v >= min ? okCls : nokCls) : empCls;
+  const S = num(b3kopf.S); const Z = num(b3kopf.Z); const U = num(b3kopf.U);
+  const hasBase = S > 0 || Z > 0 || U > 0;
 
-  const inp = (k: keyof HydroB3KopfData, ph = 'mm') => (
-    <Input type="number" value={b3kopf[k]} onChange={e => upd(k, e.target.value)} placeholder={ph}
-      className="w-full text-center text-xs h-7 px-1 border-cyan-200 dark:border-cyan-800 focus:ring-1 focus:ring-cyan-400" />
-  );
+  const effA = num(b3kopf.A) - S - Z - U;
+  const effB = num(b3kopf.B) - S - Z - U;
+  const effC = num(b3kopf.C) - S - Z - U;
+  const effD = num(b3kopf.D) - S - Z - U;
+  const effE = num(b3kopf.E) - S / 2 - Z - U;
 
-  // Each row: key, column headers, 2–3 input keys, sum, min
-  // A = Fahrkorb-Oberkante bis Schachtkopf: A1 (Kabinenrahmen) + A2 (Puffer oben) + A3 (Überfahrt)
-  // B = freier Raum Seite (Querschnitt): B1+B2+B3
-  // C = freier Raum oberhalb Kabine: C1+C2+C3
-  // D = Kabinendach bis feste Teile: D1+D2+D3
-  // E = Sicherheitsabstand Führungsschiene: E1+E3 (kein E2)
-  const rows: { id: string; desc: string; col1: string; col2: string; col3: string | null; k1: keyof HydroB3KopfData; k2: keyof HydroB3KopfData; k3: keyof HydroB3KopfData | null; sum: number; min: number }[] = [
-    { id:'A', desc:'Überfahrt (Kabinenrahmen + Puffer oben + Freiraum)', col1:'A1 – Kabinenrahmen', col2:'A2 – Puffer oben (mm)', col3:'A3 – Freiraum (mm)', k1:'A1', k2:'A2', k3:'A3', sum:A4, min:1000 },
-    { id:'B', desc:'Freiraum Kabinendach – Querseite (≥ 300 mm)',         col1:'B1 (mm)',          col2:'B2 (mm)',              col3:'B3 (mm)',           k1:'B1', k2:'B2', k3:'B3', sum:B4, min:300 },
-    { id:'C', desc:'Freiraum Kabinendach – Längsseite (≥ 100 mm)',        col1:'C1 (mm)',          col2:'C2 (mm)',              col3:'C3 (mm)',           k1:'C1', k2:'C2', k3:'C3', sum:C4, min:100 },
-    { id:'D', desc:'Kabinendach bis feste Teile (≥ 100 mm)',              col1:'D1 (mm)',          col2:'D2 (mm)',              col3:'D3 (mm)',           k1:'D1', k2:'D2', k3:'D3', sum:D4, min:100 },
-    { id:'E', desc:'Sicherheitsabstand Führungsschiene (≥ 100 mm)',       col1:'E1 (mm)',          col2:'—',                   col3:'E3 (mm)',           k1:'E1', k2:'E1', k3:'E3', sum:E4, min:100 },
+  const hasResult = (k: keyof HydroB3KopfData) => num(b3kopf[k]) > 0;
+
+  const badgeCls = (val: number, min: number, has: boolean) =>
+    !has ? 'bg-gray-100 text-gray-400 dark:bg-gray-700 dark:text-gray-500 border border-dashed border-gray-300 dark:border-gray-600'
+         : val >= min ? 'bg-green-100 text-green-800 dark:bg-green-950/50 dark:text-green-300 border border-green-400 font-bold'
+                      : 'bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300 border border-red-400 font-bold';
+
+  const inpCls = "text-center text-sm h-9 px-1 border-cyan-200 dark:border-cyan-800 focus:ring-2 focus:ring-cyan-400";
+  const baseCls = "text-center text-sm h-9 px-1 border-violet-200 dark:border-violet-800 focus:ring-2 focus:ring-violet-400";
+
+  const measurements: { id: string; key: keyof HydroB3KopfData; eff: number; min: number; desc: string }[] = [
+    { id:'A', key:'A', eff: effA, min:1000, desc:'Stehfläche Kabinendach → Schachtkopf' },
+    { id:'B', key:'B', eff: effB, min: 300, desc:'Höchster Punkt Kabine → tiefster Punkt Schachtkopf' },
+    { id:'C', key:'C', eff: effC, min: 100, desc:'Kabinenführung → Schachtkopf' },
+    { id:'D', key:'D', eff: effD, min: 100, desc:'Kabinenführung → Schienenende' },
+    { id:'E', key:'E', eff: effE, min: 100, desc:'Kolbenende → Schachtkopf' },
   ];
 
   return (
     <Card className={modern ? 'shadow-lg border-2 border-cyan-100 dark:border-cyan-900/50 overflow-hidden' : 'shadow-md overflow-hidden'}>
-      <CardHeader className={modern ? 'relative overflow-hidden bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-400 text-white py-3 px-5' : 'bg-gradient-to-r from-cyan-600 to-teal-500 text-white py-2 px-4'}>
+      <CardHeader className="relative overflow-hidden bg-gradient-to-r from-cyan-600 via-teal-500 to-emerald-400 text-white py-3 px-5">
         {modern && <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-500 opacity-30 animate-pulse pointer-events-none" />}
-        <CardTitle className="relative text-base font-bold">Sicherheitsabstände im Schachtkopf</CardTitle>
+        <div className="relative flex items-center justify-between">
+          <CardTitle className="text-base font-bold">Sicherheitsabstände im Schachtkopf</CardTitle>
+          <button onClick={() => setShowDiagram(p => !p)}
+            className="text-xs bg-white/20 hover:bg-white/30 rounded-lg px-2.5 py-1 font-medium transition-colors flex items-center gap-1.5">
+            <span>{showDiagram ? '▲ Ábra elrejtése' : '▼ Ábra mutatása'}</span>
+          </button>
+        </div>
       </CardHeader>
+
       <CardContent className="p-4 space-y-4">
-        {/* Kopf-adatok */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-cyan-50/50 dark:bg-cyan-950/20 rounded-xl p-3 border border-cyan-100 dark:border-cyan-900">
-          <div>
-            <Label className="text-xs font-semibold text-cyan-700 dark:text-cyan-300 mb-1 block">Nenngeschwindigkeit (m/s)</Label>
-            <Input value={b3kopf.nenngeschwindigkeit} onChange={e => upd('nenngeschwindigkeit', e.target.value)}
-              placeholder="m/s" className="text-sm h-8 border-cyan-200 dark:border-cyan-800" />
+
+        {/* Diagram */}
+        {showDiagram && (
+          <div className="rounded-xl overflow-hidden border border-cyan-200 dark:border-cyan-800 bg-white dark:bg-gray-900">
+            <img src="/schachtkopf-diagram.jpg" alt="Schachtkopf Sicherheitsabstände" className="w-full object-contain max-h-72" />
+            <p className="text-xs text-center text-gray-500 dark:text-gray-400 py-1.5 bg-gray-50 dark:bg-gray-800">
+              Schachtkopf – Sicherheitsabstände A, B, C, D, E
+            </p>
           </div>
-          <div>
-            <Label className="text-xs font-semibold text-cyan-700 dark:text-cyan-300 mb-1 block">Überfahrt-Soll (mm)</Label>
-            <Input value={b3kopf.ueberfahrt} onChange={e => upd('ueberfahrt', e.target.value)}
-              placeholder="mm" className="text-sm h-8 border-cyan-200 dark:border-cyan-800" />
+        )}
+
+        {/* ── 1. BASISWERTE ── */}
+        <div className="rounded-xl border border-violet-200 dark:border-violet-800 overflow-hidden">
+          <div className="bg-violet-600 text-white px-3 py-2 flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold">1</span>
+            <span className="text-sm font-semibold">Basiswerte (gemeinsame Abzüge)</span>
           </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 bg-violet-50/40 dark:bg-violet-950/20">
+            <div>
+              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
+                S – Schwellenabstand <span className="font-normal text-violet-500">(mm)</span>
+              </Label>
+              <Input type="number" value={b3kopf.S} onChange={e => upd('S', e.target.value)}
+                placeholder="mm" className={baseCls} />
+              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Kabine–Schachttür</p>
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
+                Z – Zuschlag <span className="font-normal text-violet-500">(mm)</span>
+              </Label>
+              <Input type="number" value={b3kopf.Z} onChange={e => upd('Z', e.target.value)}
+                placeholder="mm" className={baseCls} />
+              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Sprunghöhe</p>
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
+                U – Überfahrt <span className="font-normal text-violet-500">(mm)</span>
+              </Label>
+              <Input type="number" value={b3kopf.U} onChange={e => upd('U', e.target.value)}
+                placeholder="mm" className={baseCls} />
+              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Kolbenhubbegr. oben</p>
+            </div>
+            <div>
+              <Label className="text-sm font-semibold text-violet-700 dark:text-violet-300 mb-1.5 block">
+                v – Nenngeschw. <span className="font-normal text-violet-500">(m/s)</span>
+              </Label>
+              <Input type="number" value={b3kopf.nenngeschwindigkeit} onChange={e => upd('nenngeschwindigkeit', e.target.value)}
+                placeholder="m/s" className={baseCls} />
+              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1">Für Protokoll</p>
+            </div>
+          </div>
+          {!hasBase && (
+            <div className="px-3 pb-2 text-xs text-violet-500 dark:text-violet-400 italic">
+              ← Adja meg az S, Z, U értékeket — ezek alapján számítódnak az effektív távolságok
+            </div>
+          )}
         </div>
 
-        {/* Legende */}
-        <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
-          <strong className="text-gray-700 dark:text-gray-300">Útmutató:</strong> minden sorban adja meg a részértékeket — a Σ összeg automatikusan számítódik és zölddel jelzi, ha teljesül a minimumkövetelmény.
-        </div>
-
-        {/* Mérési sorok */}
-        <div className="space-y-3">
-          {rows.map(r => {
-            const showSum = r.sum > 0;
-            return (
-              <div key={r.id} className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                {/* Row header */}
-                <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 dark:bg-gray-800">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-cyan-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{r.id}</span>
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{r.desc}</span>
-                  </div>
-                  <div className={`rounded-lg px-3 py-1 text-xs font-bold min-w-[70px] text-center ${showSum ? sumCls(r.sum, r.min) : empCls}`}>
-                    {showSum ? `${r.sum.toFixed(0)} mm` : `min. ${r.min} mm`}
-                  </div>
-                </div>
-                {/* Input fields */}
-                <div className={`grid gap-2 p-2 bg-white dark:bg-gray-900 ${r.k3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
-                  <div>
-                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col1}</Label>
-                    {inp(r.k1)}
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col2}</Label>
-                    {r.id === 'E' ? <div className="h-7 flex items-center justify-center text-gray-400 text-xs border border-dashed border-gray-200 dark:border-gray-700 rounded">—</div> : inp(r.k2)}
-                  </div>
-                  {r.k3 && (
-                    <div>
-                      <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col3}</Label>
-                      {inp(r.k3)}
-                    </div>
-                  )}
-                </div>
+        {/* ── 2. FIZIKAI MÉRÉSEK ── */}
+        <div className="rounded-xl border border-cyan-200 dark:border-cyan-800 overflow-hidden">
+          <div className="bg-cyan-600 text-white px-3 py-2 flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold">2</span>
+            <span className="text-sm font-semibold">Gemessene Abstände (Rohwerte)</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3">
+            {measurements.map(m => (
+              <div key={m.id}>
+                <Label className="text-sm font-semibold text-cyan-700 dark:text-cyan-300 mb-1.5 block">
+                  <span className="inline-flex w-5 h-5 rounded-full bg-cyan-600 text-white text-xs font-bold items-center justify-center mr-1.5">{m.id}</span>
+                  <span className="font-normal text-cyan-500">(mm)</span>
+                </Label>
+                <Input type="number" value={b3kopf[m.key]} onChange={e => upd(m.key, e.target.value)}
+                  placeholder="mm" className={inpCls} />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 leading-tight">{m.desc}</p>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
+
+        {/* ── 3. EREDMÉNYEK ── */}
+        <div className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="bg-gray-700 dark:bg-gray-800 text-white px-3 py-2 flex items-center gap-2">
+            <span className="w-5 h-5 rounded-full bg-white/30 flex items-center justify-center text-xs font-bold">3</span>
+            <span className="text-sm font-semibold">Effektive Sicherheitsabstände (automatisch)</span>
+          </div>
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
+            {measurements.map(m => {
+              const has = hasResult(m.key) && hasBase;
+              return (
+                <div key={m.id} className="flex items-center px-3 py-2.5 gap-3 bg-white dark:bg-gray-900">
+                  <span className="w-7 h-7 rounded-full bg-cyan-600 text-white text-sm font-bold flex items-center justify-center shrink-0">{m.id}</span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{m.desc}</p>
+                    {has && (
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                        {m.id !== 'E'
+                          ? `${num(b3kopf[m.key]).toFixed(0)} − ${S.toFixed(0)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`
+                          : `${num(b3kopf[m.key]).toFixed(0)} − ${(S/2).toFixed(1)} − ${Z.toFixed(0)} − ${U.toFixed(0)}`}
+                      </p>
+                    )}
+                  </div>
+                  <div className={`rounded-lg px-3 py-1.5 text-sm text-center min-w-[100px] shrink-0 ${badgeCls(m.eff, m.min, has)}`}>
+                    {has ? `${m.eff.toFixed(0)} mm` : `min. ${m.min} mm`}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
       </CardContent>
     </Card>
   );

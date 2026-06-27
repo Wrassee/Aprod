@@ -1445,20 +1445,22 @@ function ChapterSection({
               ? 'bg-white dark:bg-gray-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/10'
               : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50')
           }`}>
-            <div className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 sm:p-4">
-              <span className="font-mono text-xs text-blue-500 dark:text-blue-400 shrink-0 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 self-start mt-0.5">
-                {path}
-              </span>
-              <span className="flex-1 text-sm text-gray-800 dark:text-gray-200 leading-snug min-w-0">
-                {questionText || path}
-              </span>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 p-3 sm:p-4">
+              <div className="flex items-start gap-2 flex-1 min-w-0">
+                <span className="font-mono text-xs text-blue-500 dark:text-blue-400 shrink-0 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 mt-0.5">
+                  {path}
+                </span>
+                <Label className="text-sm sm:text-base font-medium text-gray-800 dark:text-gray-200 flex-1 leading-snug cursor-default">
+                  {questionText || path}
+                </Label>
+              </div>
               {active && (
-                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <div className="flex flex-wrap items-center gap-2 sm:flex-shrink-0">
                   {effectiveOptions.filter(o => o !== 'U').map(opt => {
                     const isSelected = current === opt;
                     return (
                       <button key={opt} type="button" onClick={() => setAnswer(path, opt)}
-                        className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
+                        className={`group relative inline-flex items-center justify-center gap-1 sm:gap-2 rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap ${
                           isSelected ? PILL_ACTIVE[opt] : `bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 ${PILL_HOVER[opt]}`
                         }`}
                       >{opt}</button>
@@ -1468,7 +1470,7 @@ function ChapterSection({
                     <>
                       <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center" />
                       <button type="button" onClick={() => toggleUmbau(path)}
-                        className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
+                        className={`group relative inline-flex items-center justify-center rounded-xl px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap ${
                           umbau[path]
                             ? 'bg-blue-600 text-white border-blue-600'
                             : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-600'

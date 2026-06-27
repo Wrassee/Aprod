@@ -410,10 +410,10 @@ router.post('/download-hydro-pdf', async (req, res) => {
         b3_nenngeschwindigkeit: b3_kopf.nenngeschwindigkeit,
       } : {}),
       ...(b3_grube ? {
-        b3_F1: b3_grube.F1, b3_F2: b3_grube.F2, b3_F3: b3_grube.F3,
-        b3_G1: b3_grube.G1, b3_G2: b3_grube.G2, b3_G3: b3_grube.G3,
-        b3_H1: b3_grube.H1, b3_H2: b3_grube.H2, b3_H3: b3_grube.H3,
-        b3_J1: b3_grube.J1, b3_J2: b3_grube.J2, b3_J3: b3_grube.J3,
+        b3_F1: b3_grube.F1, b3_F2: b3_grube.F2, b3_F3: b3_grube.F3, b3_fill_F4: b3_grube.fill_F4,
+        b3_G1: b3_grube.G1, b3_G2: b3_grube.G2, b3_G3: b3_grube.G3, b3_fill_G4: b3_grube.fill_G4,
+        b3_H1: b3_grube.H1, b3_H2: b3_grube.H2, b3_H3: b3_grube.H3, b3_fill_H4: b3_grube.fill_H4,
+        b3_J1: b3_grube.J1, b3_J2: b3_grube.J2, b3_J3: b3_grube.J3, b3_fill_J4: b3_grube.fill_J4,
       } : {}),
     };
     console.log('🔵 b3_kopf flattened fields:', Object.keys(flatData).filter(k => k.startsWith('b3_')));

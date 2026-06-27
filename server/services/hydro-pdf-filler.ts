@@ -39,10 +39,10 @@ export interface HydroFormData {
   b3_D1?: string; b3_D2?: string; b3_D3?: string; b3_fill_D4?: string;  // Mass D
   b3_E1?: string;                b3_E3?: string;  b3_fill_E4?: string;  // Mass E
   b3_nenngeschwindigkeit?: string;                                        // Nenngeschwindigkeit
-  b3_F1?: string; b3_F2?: string; b3_F3?: string;          // Schachtgrube Mass F
-  b3_G1?: string; b3_G2?: string; b3_G3?: string;          // Mass G
-  b3_H1?: string; b3_H2?: string; b3_H3?: string;          // Mass H
-  b3_J1?: string; b3_J2?: string; b3_J3?: string;          // Mass J
+  b3_F1?: string; b3_F2?: string; b3_F3?: string; b3_fill_F4?: string;  // Schachtgrube Mass F
+  b3_G1?: string; b3_G2?: string; b3_G3?: string; b3_fill_G4?: string;  // Mass G
+  b3_H1?: string; b3_H2?: string; b3_H3?: string; b3_fill_H4?: string;  // Mass H
+  b3_J1?: string; b3_J2?: string; b3_J3?: string; b3_fill_J4?: string;  // Mass J
   b3_OberesUeberfahrt?: string;                            // Obere Überfahrt (mm)
   b3_FuhrungKabine?: string;                               // Führungsschiene Kabine
   b3_FuhrungAusgleich?: string;                            // Führungsschiene Ausgleich
@@ -391,10 +391,10 @@ export class HydroPdfFiller {
       // Nenngeschwindigkeit
       'B3_Nenngeschwindigkeit': data.b3_nenngeschwindigkeit,
       // Schachtgrube
-      'B3_F1': data.b3_F1, 'B3_F2': data.b3_F2, 'B3_F3': data.b3_F3,
-      'B3_G1': data.b3_G1, 'B3_G2': data.b3_G2, 'B3_G3': data.b3_G3,
-      'B3_H1': data.b3_H1, 'B3_H2': data.b3_H2, 'B3_H3': data.b3_H3,
-      'B3_J1': data.b3_J1, 'B3_J2': data.b3_J2, 'B3_J3': data.b3_J3,
+      'B3_F1': data.b3_F1, 'B3_F2': data.b3_F2, 'B3_F3': data.b3_F3, 'B3_fill_F4': data.b3_fill_F4,
+      'B3_G1': data.b3_G1, 'B3_G2': data.b3_G2, 'B3_G3': data.b3_G3, 'B3_fill_G4': data.b3_fill_G4,
+      'B3_H1': data.b3_H1, 'B3_H2': data.b3_H2, 'B3_H3': data.b3_H3, 'B3_fill_H4': data.b3_fill_H4,
+      'B3_J1': data.b3_J1, 'B3_J2': data.b3_J2, 'B3_J3': data.b3_J3, 'B3_fill_J4': data.b3_fill_J4,
       'B3_Fuhrung_Kabine': data.b3_FuhrungKabine,
       'B3_Fuhrung_Ausgleich': data.b3_FuhrungAusgleich,
       'B3_Fuhrung_Hilfsführung': data.b3_FuhrungHilfs,

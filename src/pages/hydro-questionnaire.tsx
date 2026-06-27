@@ -372,10 +372,13 @@ interface HydroB3KopfData {
   U: string;  // Überfahrt
 }
 interface HydroB3GrubeData {
-  F1: string; F2: string; F3: string;
-  G1: string; G2: string; G3: string;
-  H1: string; H2: string; H3: string;
-  J1: string; J2: string; J3: string;
+  S: string;  // Schwellenabstand (Kabine – unterste Schachttür-Schwelle)
+  F: string;  // Unterste Punkt Kabine – höchste Punkt Schachtgrube
+  G: string;  // Tiefste Punkt Kabine (Schürze) – Grubenboden
+  H: string;  // Unterste Punkt Kabine – Grubenboden
+  J: string;  // Kabinenführung – Schienenende Kabine
+  P: string;  // Pufferhub (Kabine)
+  U: string;  // Unterfahrt (bis Kabine Puffer berührt)
 }
 interface HydroB6Data {
   mode: 'seil' | 'kette' | '';
@@ -399,7 +402,7 @@ interface HydroB9Data  {
 }
 interface HydroB13Data { firma: string; nameAbnahme: string; datum: string; }
 
-const STORAGE_KEY = 'hydro-form-data-v3';
+const STORAGE_KEY = 'hydro-form-data-v4';
 function loadState() { try { const r = localStorage.getItem(STORAGE_KEY); if (r) return JSON.parse(r); } catch { /**/ } return null; }
 function saveState(s: Record<string, unknown>) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch { /**/ } }
 
@@ -459,7 +462,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
     nenngeschwindigkeit:'', S:'', A:'', B:'', C:'', D:'', E:'', Z:'', U:'',
   });
   const [b3grube, setB3grube] = useState<HydroB3GrubeData>(saved?.b3grube ?? {
-    F1:'', F2:'', F3:'', G1:'', G2:'', G3:'', H1:'', H2:'', H3:'', J1:'', J2:'', J3:'',
+    S:'', F:'', G:'', H:'', J:'', P:'', U:'',
   });
   const [b6, setB6] = useState<HydroB6Data>(saved?.b6 ?? { mode:'', seilAnzahl:'', seilNenn:'', ketteAnzahl:'', ketteDim:'' });
   const [b7, setB7] = useState<HydroB7Comp>(saved?.b7 ?? { fang:false, ausgleich:false, begrenzer:false, rohrbruch:false, drossel:false });
@@ -573,7 +576,20 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
             fill_E4: (n(b3kopf.E) - S / 2 - Z - U).toFixed(1),
           };
         })(),
-        b3_grube: b3grube,
+        b3_grube: (() => {
+          const nv = (s: string) => { const v = parseFloat(s); return isNaN(v) ? 0 : v; };
+          const S = nv(b3grube.S), P = nv(b3grube.P), U = nv(b3grube.U);
+          return {
+            F1: (nv(b3grube.F) - S).toFixed(1), F2: U.toFixed(1), F3: P.toFixed(1),
+            fill_F4: (nv(b3grube.F) - S - P - U).toFixed(1),
+            G1: (nv(b3grube.G) - S).toFixed(1), G2: U.toFixed(1), G3: P.toFixed(1),
+            fill_G4: (nv(b3grube.G) - S - P - U).toFixed(1),
+            H1: (nv(b3grube.H) - S).toFixed(1), H2: U.toFixed(1), H3: P.toFixed(1),
+            fill_H4: (nv(b3grube.H) - S - P - U).toFixed(1),
+            J1: (nv(b3grube.J) - S).toFixed(1), J2: U.toFixed(1), J3: P.toFixed(1),
+            fill_J4: (nv(b3grube.J) - S - P - U).toFixed(1),
+          };
+        })(),
         questionAnswers: answers,
       };
       const response = await fetch(getApiUrl('/api/protocols/download-hydro-pdf'), {
@@ -880,16 +896,44 @@ function B0Section({ header, setHeader, theme, lang }: {
 // B3 SCHACHTKOPF MÉRÉSI KÁRTYA
 // ============================================================
 
-function B3KopfCard({ b3kopf, setB3kopf, modern }: {
+function B3KopfCard({ b3kopf, setB3kopf, modern, lang }: {
   b3kopf: HydroB3KopfData; setB3kopf: React.Dispatch<React.SetStateAction<HydroB3KopfData>>;
-  modern: boolean;
+  modern: boolean; lang: Lang;
 }) {
   const [showDiagram, setShowDiagram] = useState(false);
   const upd = (k: keyof HydroB3KopfData, v: string) => setB3kopf(p => ({ ...p, [k]: v }));
   const n = (s: string) => { const x = parseFloat(s); return isNaN(x) ? 0 : x; };
 
+  // Z auto-calculation from Nenngeschwindigkeit
+  // Formula: Z = ceil(0.035 × v² × 1000 / 5) × 5 mm
+  const computeZ = (v: number) => {
+    if (v <= 0) return '';
+    return String(Math.ceil(0.035 * v * v * 1000 / 5) * 5);
+  };
+  useEffect(() => {
+    const vVal = n(b3kopf.nenngeschwindigkeit);
+    if (vVal > 0) {
+      const z = computeZ(vVal);
+      setB3kopf(p => ({ ...p, Z: z }));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [b3kopf.nenngeschwindigkeit]);
+
   const S = n(b3kopf.S), Z = n(b3kopf.Z), U = n(b3kopf.U);
   const hasBase = b3kopf.S !== '' || b3kopf.Z !== '' || b3kopf.U !== '';
+
+  const kopfI18n = {
+    title:    { hu:'Schachtkopf biztonsági távolságok', de:'Sicherheitsabstände im Schachtkopf', en:'Safety Distances in Shaft Head', fr:'Distances de sécurité en tête de gaine', it:'Distanze di sicurezza in testa pozzo' },
+    basisLbl: { hu:'Basiswerte (közös levonások)', de:'Basiswerte (gemeinsame Abzüge)', en:'Base Values (common deductions)', fr:'Valeurs de base (déductions communes)', it:'Valori base (deduzioni comuni)' },
+    autoCalc: { hu:'Automatikusan v-ből számítva', de:'Automatisch aus v berechnet', en:'Auto-calculated from v', fr:'Calculé automatiquement depuis v', it:'Calcolato automaticamente da v' },
+    baseHint: { hu:'Adja meg az S, Z, U értékeket — az effektív távolságok automatikusan számítódnak', de:'S, Z, U eingeben — Effektive Abstände werden automatisch berechnet', en:'Enter S, Z, U — effective distances auto-calculated', fr:'Entrez S, Z, U — distances effectives calculées automatiquement', it:'Inserire S, Z, U — distanze effettive calcolate automaticamente' },
+    measLbl:  { hu:'Gemessene Abstände → Effektive Sicherheitsabstände', de:'Gemessene Abstände → Effektive Sicherheitsabstände', en:'Measured Distances → Effective Safety Distances', fr:'Distances mesurées → Distances de sécurité effectives', it:'Distanze misurate → Distanze di sicurezza effettive' },
+    rawHint:  { hu:'Nyersérték → azonnali eredmény', de:'Rohwert eingeben → sofort berechnet', en:'Enter raw value → instantly calculated', fr:'Valeur brute → calculée immédiatement', it:'Valore grezzo → calcolato immediatamente' },
+    allOk:    { hu:'Minden biztonsági távolság teljesül', de:'Alle Sicherheitsabstände erfüllt', en:'All safety distances fulfilled', fr:'Toutes distances de sécurité respectées', it:'Tutte le distanze di sicurezza rispettate' },
+    someNok:  { hu:'— Mindestabstand nicht eingehalten', de:'— Mindestabstand nicht eingehalten', en:'— Minimum distance not met', fr:'— Distance minimale non respectée', it:'— Distanza minima non rispettata' },
+    diagramBtn:{ hu:'📐 Ábra', de:'📐 Diagramm', en:'📐 Diagram', fr:'📐 Schéma', it:'📐 Schema' },
+  };
+  const ki = (key: keyof typeof kopfI18n) => kopfI18n[key][lang] ?? kopfI18n[key]['de'];
 
   const measurements = [
     { id:'A', key:'A' as const, eff: n(b3kopf.A) - S - Z - U,         min:1000, color:'blue',
@@ -930,12 +974,12 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
           {modern && <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none" />}
           <div className="relative flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold tracking-tight">Schachtkopf Sicherheitsabstände</h3>
-              <p className="text-white/70 text-xs mt-0.5">Effektive Abstände werden automatisch berechnet</p>
+              <h3 className="text-lg font-bold tracking-tight">{ki('title')}</h3>
+              <p className="text-white/70 text-xs mt-0.5">{ki('rawHint')}</p>
             </div>
             <button onClick={() => setShowDiagram(p => !p)}
               className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 active:bg-white/40 rounded-xl px-3 py-2 text-xs font-semibold transition-all">
-              {showDiagram ? '▲ Ábra' : '📐 Ábra'}
+              {showDiagram ? '▲' : ki('diagramBtn')}
             </button>
           </div>
         </div>
@@ -954,34 +998,61 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
         <div className="bg-gradient-to-r from-violet-600 to-purple-600 text-white px-4 py-3 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold shrink-0">1</span>
           <div>
-            <p className="font-bold text-sm">Basiswerte — gemeinsame Abzüge</p>
-            <p className="text-white/70 text-xs">S, Z, U minden számítás alapja</p>
+            <p className="font-bold text-sm">{ki('basisLbl')}</p>
+            <p className="text-white/70 text-xs">S, Z, U, v</p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 bg-violet-50/60 dark:bg-violet-950/20 divide-x divide-violet-100 dark:divide-violet-800">
-          {([
-            { key: 'S' as const, label: 'S', sub: 'Schwellenabstand', hint: 'Kabine → Schachttür' },
-            { key: 'Z' as const, label: 'Z', sub: 'Zuschlag', hint: 'Sprunghöhe' },
-            { key: 'U' as const, label: 'U', sub: 'Überfahrt', hint: 'Kolbenhubbegr. oben' },
-            { key: 'nenngeschwindigkeit' as const, label: 'v', sub: 'Nenngeschw.', hint: 'm/s — für Protokoll' },
-          ]).map((f, idx) => (
-            <div key={f.key} className={`p-3 ${idx >= 2 ? 'col-span-1' : ''}`}>
-              <div className="flex items-baseline gap-1.5 mb-2">
-                <span className="text-2xl font-black text-violet-700 dark:text-violet-300">{f.label}</span>
-                <span className="text-xs text-violet-500 font-medium">{f.key === 'nenngeschwindigkeit' ? '(m/s)' : '(mm)'}</span>
-              </div>
-              <Input type="number" value={b3kopf[f.key]} onChange={e => upd(f.key, e.target.value)}
-                placeholder={f.key === 'nenngeschwindigkeit' ? '0.63' : '0'}
-                className="text-center text-base font-bold h-10 border-violet-300 dark:border-violet-700 focus:ring-2 focus:ring-violet-400 bg-white dark:bg-gray-900" />
-              <p className="text-xs text-violet-500 dark:text-violet-400 mt-1.5 font-medium">{f.sub}</p>
-              <p className="text-xs text-violet-400 dark:text-violet-500 leading-tight">{f.hint}</p>
+          {/* v — Nenngeschwindigkeit (zuerst eingeben) */}
+          <div className="p-3">
+            <div className="flex items-baseline gap-1.5 mb-2">
+              <span className="text-2xl font-black text-violet-700 dark:text-violet-300">v</span>
+              <span className="text-xs text-violet-500 font-medium">(m/s)</span>
             </div>
-          ))}
+            <Input type="number" value={b3kopf.nenngeschwindigkeit} onChange={e => upd('nenngeschwindigkeit', e.target.value)}
+              placeholder="0.63"
+              className="text-center text-base font-bold h-10 border-violet-300 dark:border-violet-700 focus:ring-2 focus:ring-violet-400 bg-white dark:bg-gray-900" />
+            <p className="text-xs text-violet-500 dark:text-violet-400 mt-1.5 font-medium">Nenngeschw.</p>
+          </div>
+          {/* Z — Zuschlag (auto-calculated) */}
+          <div className="p-3 relative">
+            <div className="flex items-baseline gap-1.5 mb-2">
+              <span className="text-2xl font-black text-violet-700 dark:text-violet-300">Z</span>
+              <span className="text-xs text-violet-500 font-medium">(mm)</span>
+              <span className="ml-auto text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 px-1.5 py-0.5 rounded-full font-medium">auto</span>
+            </div>
+            <Input type="number" value={b3kopf.Z} readOnly
+              className="text-center text-base font-bold h-10 border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/30 text-violet-700 dark:text-violet-300 cursor-default" />
+            <p className="text-xs text-violet-500 dark:text-violet-400 mt-1.5 font-medium">Zuschlag</p>
+            <p className="text-xs text-violet-400 dark:text-violet-500">= ⌈0.035×v²×1000/5⌉×5</p>
+          </div>
+          {/* S — Schwellenabstand */}
+          <div className="p-3">
+            <div className="flex items-baseline gap-1.5 mb-2">
+              <span className="text-2xl font-black text-violet-700 dark:text-violet-300">S</span>
+              <span className="text-xs text-violet-500 font-medium">(mm)</span>
+            </div>
+            <Input type="number" value={b3kopf.S} onChange={e => upd('S', e.target.value)} placeholder="0"
+              className="text-center text-base font-bold h-10 border-violet-300 dark:border-violet-700 focus:ring-2 focus:ring-violet-400 bg-white dark:bg-gray-900" />
+            <p className="text-xs text-violet-500 dark:text-violet-400 mt-1.5 font-medium">Schwellenabstand</p>
+            <p className="text-xs text-violet-400 dark:text-violet-500">Kabine → Schachttür</p>
+          </div>
+          {/* U — Überfahrt */}
+          <div className="p-3">
+            <div className="flex items-baseline gap-1.5 mb-2">
+              <span className="text-2xl font-black text-violet-700 dark:text-violet-300">U</span>
+              <span className="text-xs text-violet-500 font-medium">(mm)</span>
+            </div>
+            <Input type="number" value={b3kopf.U} onChange={e => upd('U', e.target.value)} placeholder="0"
+              className="text-center text-base font-bold h-10 border-violet-300 dark:border-violet-700 focus:ring-2 focus:ring-violet-400 bg-white dark:bg-gray-900" />
+            <p className="text-xs text-violet-500 dark:text-violet-400 mt-1.5 font-medium">Überfahrt</p>
+            <p className="text-xs text-violet-400 dark:text-violet-500">Kolbenhubbegr. oben</p>
+          </div>
         </div>
         {!hasBase && (
           <div className="px-4 py-2 bg-violet-100 dark:bg-violet-950/30 text-xs text-violet-600 dark:text-violet-400 flex items-center gap-2">
             <span>💡</span>
-            <span>Adja meg az S, Z, U értékeket — ezek alapján számítódnak az effektív távolságok</span>
+            <span>{ki('baseHint')}</span>
           </div>
         )}
       </div>
@@ -991,8 +1062,8 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
         <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-4 py-3 flex items-center gap-2">
           <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold shrink-0">2</span>
           <div>
-            <p className="font-bold text-sm">Gemessene Abstände → Effektive Sicherheitsabstände</p>
-            <p className="text-white/60 text-xs">Rohwert eingeben → Ergebnis wird sofort berechnet</p>
+            <p className="font-bold text-sm">{ki('measLbl')}</p>
+            <p className="text-white/60 text-xs">{ki('rawHint')}</p>
           </div>
         </div>
         <div className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -1050,8 +1121,8 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
             : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
         }`}>
           {measurements.filter(m => b3kopf[m.key] !== '').every(m => m.eff >= m.min)
-            ? '✓ Alle eingegebenen Sicherheitsabstände erfüllt'
-            : `⚠ ${measurements.filter(m => b3kopf[m.key] !== '' && m.eff < m.min).map(m => m.id).join(', ')} — Mindestabstand nicht eingehalten`}
+            ? `✓ ${ki('allOk')}`
+            : `⚠ ${measurements.filter(m => b3kopf[m.key] !== '' && m.eff < m.min).map(m => m.id).join(', ')} ${ki('someNok')}`}
         </div>
       )}
     </div>
@@ -1062,76 +1133,181 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
 // B3 SCHACHTGRUBE MÉRÉSI KÁRTYA
 // ============================================================
 
-function B3GrubeCard({ b3grube, setB3grube, modern }: {
+function B3GrubeCard({ b3grube, setB3grube, modern, lang }: {
   b3grube: HydroB3GrubeData; setB3grube: React.Dispatch<React.SetStateAction<HydroB3GrubeData>>;
-  modern: boolean;
+  modern: boolean; lang: Lang;
 }) {
+  const [showDiagram, setShowDiagram] = useState(false);
   const upd = (k: keyof HydroB3GrubeData, v: string) => setB3grube(p => ({ ...p, [k]: v }));
-  const num = (s: string) => parseFloat(s || '0') || 0;
-  const F4 = num(b3grube.F1) + num(b3grube.F2) + num(b3grube.F3);
-  const G4 = num(b3grube.G1) + num(b3grube.G2) + num(b3grube.G3);
-  const H4 = num(b3grube.H1) + num(b3grube.H2) + num(b3grube.H3);
-  const J4 = num(b3grube.J1) + num(b3grube.J2) + num(b3grube.J3);
+  const nv = (s: string) => { const x = parseFloat(s); return isNaN(x) ? 0 : x; };
 
-  const sumClass = (val: number, min: number) =>
-    val > 0 ? (val >= min ? 'bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300 font-bold border border-green-400' : 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300 font-bold border border-red-400') : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 border border-gray-300';
+  const S = nv(b3grube.S), P = nv(b3grube.P), U = nv(b3grube.U);
+  const hasBase = b3grube.S !== '' || b3grube.P !== '' || b3grube.U !== '';
 
-  const inp = (k: keyof HydroB3GrubeData) => (
-    <Input type="number" value={b3grube[k]} onChange={e => upd(k, e.target.value)} placeholder="mm"
-      className="text-center text-sm h-8 px-1 border-emerald-200 dark:border-emerald-800 focus:ring-1 focus:ring-emerald-400" />
-  );
+  const grubeI18n = {
+    title:    { hu:'Schachtgrube biztonsági távolságok', de:'Sicherheitsabstände in der Schachtgrube', en:'Safety Distances in Shaft Pit', fr:'Distances de sécurité dans la fosse', it:'Distanze di sicurezza nella fossa' },
+    basisLbl: { hu:'Basiswerte (közös levonások)', de:'Basiswerte (gemeinsame Abzüge)', en:'Base Values (common deductions)', fr:'Valeurs de base (déductions communes)', it:'Valori base (deduzioni comuni)' },
+    baseHint: { hu:'Adja meg az S, P, U értékeket — az effektív távolságok automatikusan számítódnak', de:'S, P, U eingeben — Effektive Abstände werden automatisch berechnet', en:'Enter S, P, U — effective distances auto-calculated', fr:'Entrez S, P, U — distances effectives calculées automatiquement', it:'Inserire S, P, U — distanze effettive calcolate automaticamente' },
+    measLbl:  { hu:'Gemessene Abstände → Effektive Sicherheitsabstände', de:'Gemessene Abstände → Effektive Sicherheitsabstände', en:'Measured Distances → Effective Safety Distances', fr:'Distances mesurées → Distances de sécurité effectives', it:'Distanze misurate → Distanze di sicurezza effettive' },
+    rawHint:  { hu:'Nyersérték → azonnali eredmény', de:'Rohwert eingeben → sofort berechnet', en:'Enter raw value → instantly calculated', fr:'Valeur brute → calculée immédiatement', it:'Valore grezzo → calcolato immediatamente' },
+    allOk:    { hu:'Minden biztonsági távolság teljesül', de:'Alle Sicherheitsabstände erfüllt', en:'All safety distances fulfilled', fr:'Toutes distances de sécurité respectées', it:'Tutte le distanze di sicurezza rispettate' },
+    someNok:  { hu:'— Mindestabstand nicht eingehalten', de:'— Mindestabstand nicht eingehalten', en:'— Minimum distance not met', fr:'— Distance minimale non respectée', it:'— Distanza minima non rispettata' },
+    diagramBtn:{ hu:'📐 Ábra', de:'📐 Diagramm', en:'📐 Diagram', fr:'📐 Schéma', it:'📐 Schema' },
+  };
+  const gi = (key: keyof typeof grubeI18n) => grubeI18n[key][lang] ?? grubeI18n[key]['de'];
 
-  const rows: { label: string; desc: string; col1: string; col2: string; col3: string; k1: keyof HydroB3GrubeData; k2: keyof HydroB3GrubeData; k3: keyof HydroB3GrubeData; sum: number; min: number }[] = [
-    { label:'F', desc:'Freiraum unter Fahrkorb – Querseite (≥ 300 mm)',    col1:'F1 (mm)', col2:'F2 (mm)', col3:'F3 (mm)', k1:'F1', k2:'F2', k3:'F3', sum: F4, min: 300 },
-    { label:'G', desc:'Freiraum unter Fahrkorb – Längsseite (≥ 100 mm)',   col1:'G1 (mm)', col2:'G2 (mm)', col3:'G3 (mm)', k1:'G1', k2:'G2', k3:'G3', sum: G4, min: 100 },
-    { label:'H', desc:'Grubenraumhöhe (Boden bis Fahrkorbunterkante, ≥ 500 mm)', col1:'H1 (mm)', col2:'H2 (mm)', col3:'H3 (mm)', k1:'H1', k2:'H2', k3:'H3', sum: H4, min: 500 },
-    { label:'J', desc:'Sonstiger Sicherheitsabstand in der Grube (≥ 100 mm)',     col1:'J1 (mm)', col2:'J2 (mm)', col3:'J3 (mm)', k1:'J1', k2:'J2', k3:'J3', sum: J4, min: 100 },
-  ];
+  const measurements = [
+    { id:'F', key:'F' as const, eff: nv(b3grube.F) - S - P - U, min: 300, color:'emerald',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${P.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Unterste Punkt Kabine – höchste Punkt Schachtgrube' },
+    { id:'G', key:'G' as const, eff: nv(b3grube.G) - S - P - U, min: 100, color:'green',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${P.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Tiefste Punkt Kabine (Schürze) – Grubenboden' },
+    { id:'H', key:'H' as const, eff: nv(b3grube.H) - S - P - U, min: 500, color:'teal',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${P.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Unterste Punkt Kabine – Grubenboden' },
+    { id:'J', key:'J' as const, eff: nv(b3grube.J) - S - P - U, min: 100, color:'cyan',
+      formula: (v: number) => `${v.toFixed(0)} − ${S.toFixed(0)} − ${P.toFixed(0)} − ${U.toFixed(0)}`,
+      desc:'Kabinenführung – Schienenende Kabine' },
+  ] as const;
+
+  const colorMap = {
+    emerald: { bg:'bg-emerald-600', light:'bg-emerald-50 dark:bg-emerald-950/30', text:'text-emerald-700 dark:text-emerald-300', inp:'border-emerald-200 dark:border-emerald-800 focus:ring-emerald-400' },
+    green:   { bg:'bg-green-600',   light:'bg-green-50 dark:bg-green-950/30',   text:'text-green-700 dark:text-green-300',   inp:'border-green-200 dark:border-green-800 focus:ring-green-400'   },
+    teal:    { bg:'bg-teal-600',    light:'bg-teal-50 dark:bg-teal-950/30',     text:'text-teal-700 dark:text-teal-300',     inp:'border-teal-200 dark:border-teal-800 focus:ring-teal-400'     },
+    cyan:    { bg:'bg-cyan-600',    light:'bg-cyan-50 dark:bg-cyan-950/30',     text:'text-cyan-700 dark:text-cyan-300',     inp:'border-cyan-200 dark:border-cyan-800 focus:ring-cyan-400'     },
+  };
+
+  const resultCls = (val: number, min: number, has: boolean) =>
+    !has ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 dark:text-gray-500 border border-dashed border-gray-300'
+         : val >= min ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white shadow-lg shadow-green-200 dark:shadow-green-900/50'
+                      : 'bg-gradient-to-br from-red-500 to-rose-600 text-white shadow-lg shadow-red-200 dark:shadow-red-900/50';
 
   return (
-    <Card className={modern ? 'shadow-lg border-2 border-emerald-100 dark:border-emerald-900/50 overflow-hidden' : 'shadow-md overflow-hidden'}>
-      <CardHeader className={modern ? 'relative overflow-hidden bg-gradient-to-r from-emerald-600 via-green-500 to-teal-400 text-white py-3 px-5' : 'bg-gradient-to-r from-emerald-600 to-green-500 text-white py-2 px-4'}>
-        {modern && <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 opacity-30 animate-pulse pointer-events-none" />}
-        <CardTitle className="relative text-base font-bold">Sicherheitsabstände in der Schachtgrube</CardTitle>
-      </CardHeader>
-      <CardContent className="p-4 space-y-4">
-        <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
-          <strong className="text-gray-700 dark:text-gray-300">Útmutató:</strong> minden sorban adja meg a részértékeket — a Σ összeg automatikusan számítódik.
+    <div className="space-y-3">
+      {/* ── Header ── */}
+      <div className="rounded-2xl overflow-hidden shadow-xl border-2 border-emerald-100 dark:border-emerald-900/50">
+        <div className="relative overflow-hidden bg-gradient-to-r from-emerald-700 via-green-600 to-teal-500 text-white px-5 py-4">
+          {modern && <div className="absolute inset-0 bg-white/10 animate-pulse pointer-events-none" />}
+          <div className="relative flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold tracking-tight">{gi('title')}</h3>
+              <p className="text-white/70 text-xs mt-0.5">{gi('rawHint')}</p>
+            </div>
+            <button onClick={() => setShowDiagram(p => !p)}
+              className="flex items-center gap-1.5 bg-white/20 hover:bg-white/30 active:bg-white/40 rounded-xl px-3 py-2 text-xs font-semibold transition-all">
+              {showDiagram ? '▲' : gi('diagramBtn')}
+            </button>
+          </div>
         </div>
-        <div className="space-y-3">
-          {rows.map(r => {
-            const showSum = r.sum > 0;
+        {showDiagram && (
+          <div className="bg-white dark:bg-gray-900">
+            <img src="/schachtgrube-diagram.jpg" alt="Schachtgrube" className="w-full object-contain max-h-72" />
+            <p className="text-xs text-center text-gray-400 py-1.5 bg-gray-50 dark:bg-gray-800">F, G, H, J – Sicherheitsabstände</p>
+          </div>
+        )}
+      </div>
+
+      {/* ── Basiswerte (S, P, U) ── */}
+      <div className="rounded-2xl overflow-hidden border-2 border-emerald-200 dark:border-emerald-800 shadow-lg">
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white px-4 py-3 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold shrink-0">1</span>
+          <div>
+            <p className="font-bold text-sm">{gi('basisLbl')}</p>
+            <p className="text-white/70 text-xs">S, P, U</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-0 bg-emerald-50/60 dark:bg-emerald-950/20 divide-x divide-emerald-100 dark:divide-emerald-800">
+          {([
+            { key:'S' as const, label:'S', sub:'Schwellenabstand', hint:'Kabine – unterste Schachttür-Schwelle' },
+            { key:'P' as const, label:'P', sub:'Pufferhub',        hint:'Kabine' },
+            { key:'U' as const, label:'U', sub:'Unterfahrt',       hint:'bis Kabine den Puffer berührt' },
+          ]).map(f => (
+            <div key={f.key} className="p-3">
+              <div className="flex items-baseline gap-1.5 mb-2">
+                <span className="text-2xl font-black text-emerald-700 dark:text-emerald-300">{f.label}</span>
+                <span className="text-xs text-emerald-500 font-medium">(mm)</span>
+              </div>
+              <Input type="number" value={b3grube[f.key]} onChange={e => upd(f.key, e.target.value)} placeholder="0"
+                className="text-center text-base font-bold h-10 border-emerald-300 dark:border-emerald-700 focus:ring-2 focus:ring-emerald-400 bg-white dark:bg-gray-900" />
+              <p className="text-xs text-emerald-500 dark:text-emerald-400 mt-1.5 font-medium">{f.sub}</p>
+              <p className="text-xs text-emerald-400 dark:text-emerald-500 leading-tight">{f.hint}</p>
+            </div>
+          ))}
+        </div>
+        {!hasBase && (
+          <div className="px-4 py-2 bg-emerald-100 dark:bg-emerald-950/30 text-xs text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
+            <span>💡</span><span>{gi('baseHint')}</span>
+          </div>
+        )}
+      </div>
+
+      {/* ── Messungen + Ergebnisse ── */}
+      <div className="rounded-2xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-white px-4 py-3 flex items-center gap-2">
+          <span className="w-6 h-6 rounded-full bg-white/25 flex items-center justify-center text-xs font-bold shrink-0">2</span>
+          <div>
+            <p className="font-bold text-sm">{gi('measLbl')}</p>
+            <p className="text-white/60 text-xs">{gi('rawHint')}</p>
+          </div>
+        </div>
+        <div className="divide-y divide-gray-100 dark:divide-gray-800">
+          {measurements.map(m => {
+            const c = colorMap[m.color];
+            const val = nv(b3grube[m.key]);
+            const has = b3grube[m.key] !== '' && hasBase;
             return (
-              <div key={r.label} className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 dark:bg-gray-800">
-                  <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{r.label.charAt(0)}</span>
-                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{r.desc}</span>
+              <div key={m.id} className={`${c.light} p-3`}>
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-xl ${c.bg} text-white text-xl font-black flex items-center justify-center shrink-0 shadow-md mt-0.5`}>
+                    {m.id}
                   </div>
-                  <div className={`rounded-lg px-3 py-1 text-xs font-bold min-w-[70px] text-center ${showSum ? sumClass(r.sum, r.min) : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 border border-gray-300'}`}>
-                    {showSum ? `${r.sum.toFixed(0)} mm` : `min. ${r.min} mm`}
-                  </div>
-                </div>
-                <div className="grid grid-cols-3 gap-2 p-2 bg-white dark:bg-gray-900">
-                  <div>
-                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col1}</Label>
-                    {inp(r.k1)}
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col2}</Label>
-                    {inp(r.k2)}
-                  </div>
-                  <div>
-                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col3}</Label>
-                    {inp(r.k3)}
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-xs font-semibold ${c.text} mb-1 truncate`}>{m.desc}</p>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <Input type="number" value={b3grube[m.key]} onChange={e => upd(m.key, e.target.value)}
+                          placeholder="mm"
+                          className={`text-center text-base font-bold h-10 ${c.inp} focus:ring-2 bg-white dark:bg-gray-900`} />
+                        {has && (
+                          <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 text-center">
+                            = {m.formula(val)}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-gray-400 font-bold text-lg shrink-0">→</div>
+                      <div className={`w-28 h-10 rounded-xl flex flex-col items-center justify-center shrink-0 ${resultCls(m.eff, m.min, has)}`}>
+                        {has ? (
+                          <>
+                            <span className="text-sm font-black leading-none">{m.eff.toFixed(0)} mm</span>
+                            <span className="text-xs opacity-80">{m.eff >= m.min ? '✓ OK' : `✗ min.${m.min}`}</span>
+                          </>
+                        ) : (
+                          <span className="text-xs font-medium">min. {m.min} mm</span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             );
           })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* ── Összesítő ── */}
+      {hasBase && measurements.some(m => b3grube[m.key] !== '') && (
+        <div className={`rounded-2xl p-4 text-center font-bold text-sm shadow-lg ${
+          measurements.filter(m => b3grube[m.key] !== '').every(m => m.eff >= m.min)
+            ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white'
+            : 'bg-gradient-to-r from-red-500 to-rose-600 text-white'
+        }`}>
+          {measurements.filter(m => b3grube[m.key] !== '').every(m => m.eff >= m.min)
+            ? `✓ ${gi('allOk')}`
+            : `⚠ ${measurements.filter(m => b3grube[m.key] !== '' && m.eff < m.min).map(m => m.id).join(', ')} ${gi('someNok')}`}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -1748,7 +1924,9 @@ function ChapterSection({
             }`}
           >
             <span className="text-base">📐</span>
-            <span>Schachtkopf / Grube</span>
+            <span>
+              {{ hu:'Schachtkopf / Akna', de:'Schachtkopf / Grube', en:'Shaft Head / Pit', fr:'Tête / Fosse', it:'Testa / Fossa' }[lang]}
+            </span>
             {b3ActiveTab === 'kopf' && <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" />}
           </button>
           <div className="w-px bg-cyan-200 dark:bg-cyan-800" />
@@ -1761,7 +1939,9 @@ function ChapterSection({
             }`}
           >
             <span className="text-base">📋</span>
-            <span>B3 Kérdések</span>
+            <span>
+              {{ hu:'B3 Kérdések', de:'B3 Fragen', en:'B3 Questions', fr:'Questions B3', it:'Domande B3' }[lang]}
+            </span>
             {b3ActiveTab === 'fragen' && (
               <span className="bg-white/30 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
                 {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && answers[p]).length}
@@ -1775,12 +1955,8 @@ function ChapterSection({
       {/* ── B3 Schachtkopf + Grube Cards (dedicated tab) ── */}
       {chapter.id === 3 && b3ActiveTab === 'kopf' && (
         <div className="space-y-4">
-          {b3kopf && setB3kopf && <B3KopfCard b3kopf={b3kopf} setB3kopf={setB3kopf} modern={modern} />}
-          {b3grube && setB3grube && (
-            <div className="rounded-xl border border-emerald-200 dark:border-emerald-800 overflow-hidden shadow-lg">
-              <B3GrubeCard b3grube={b3grube} setB3grube={setB3grube} modern={modern} />
-            </div>
-          )}
+          {b3kopf && setB3kopf && <B3KopfCard b3kopf={b3kopf} setB3kopf={setB3kopf} modern={modern} lang={lang} />}
+          {b3grube && setB3grube && <B3GrubeCard b3grube={b3grube} setB3grube={setB3grube} modern={modern} lang={lang} />}
         </div>
       )}
 

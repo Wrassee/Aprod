@@ -1406,7 +1406,7 @@ function ChapterSection({
                 const disabled = linkedNz ? answers[linkedNz] === 'true' : false;
                 return (
                   <div key={p} className={disabled ? 'opacity-40 pointer-events-none' : ''}>
-                    <Label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 block">{label}</Label>
+                    <Label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">{label}</Label>
                     <Input value={answers[p] ?? ''} onChange={e => setAnswer(p, e.target.value)}
                       placeholder={label}
                       className="text-sm h-8 border-slate-200 dark:border-slate-700 focus:ring-1 focus:ring-blue-400" />
@@ -1504,7 +1504,7 @@ function ChapterSection({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {b1Fields.map(([key, label]) => (
                 <div key={key}>
-                  <Label className="text-xs mb-1.5 block font-medium text-blue-700 dark:text-blue-300">{label}</Label>
+                  <Label className="text-sm mb-1.5 block font-medium text-blue-700 dark:text-blue-300">{label}</Label>
                   <Input value={b1Data[key]} onChange={e => setB1(p => ({ ...p, [key]: e.target.value }))} placeholder={label}
                     className="text-sm border-blue-200 dark:border-blue-800 focus:ring-2 focus:ring-blue-400" />
                 </div>
@@ -1513,7 +1513,7 @@ function ChapterSection({
             {/* Zusätzliche Anforderungen – conditional on answers['1'] === 'Ja' */}
             {answers['1'] === 'Ja' && (
               <div className="mt-4 pt-4 border-t border-blue-100 dark:border-blue-800">
-                <Label className="text-xs mb-1.5 block font-medium text-blue-700 dark:text-blue-300">
+                <Label className="text-sm mb-1.5 block font-medium text-blue-700 dark:text-blue-300">
                   {t('b1ZusatzLabel', lang)}
                 </Label>
                 <Textarea
@@ -1571,7 +1571,7 @@ function ChapterSection({
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
               {b8Fields.map(([key, label]) => (
                 <div key={key}>
-                  <Label className="text-xs mb-1.5 block font-medium text-purple-700 dark:text-purple-300">{label}</Label>
+                  <Label className="text-sm mb-1.5 block font-medium text-purple-700 dark:text-purple-300">{label}</Label>
                   <Input value={b8Data[key]} onChange={e => setB8(p => ({ ...p, [key]: e.target.value }))} placeholder={label}
                     className="text-sm border-purple-200 dark:border-purple-800 focus:ring-2 focus:ring-purple-400" />
                 </div>
@@ -1593,7 +1593,7 @@ function ChapterSection({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {b9SpeedFields.map(([key, label]) => (
                   <div key={key}>
-                    <Label className="text-xs mb-1.5 block font-medium text-teal-700 dark:text-teal-300">{label}</Label>
+                    <Label className="text-sm mb-1.5 block font-medium text-teal-700 dark:text-teal-300">{label}</Label>
                     <Input value={b9Data[key]} onChange={e => setB9(p => ({ ...p, [key]: e.target.value }))} placeholder={label}
                       className="text-sm border-teal-200 dark:border-teal-800 focus:ring-2 focus:ring-teal-400" />
                   </div>
@@ -1611,7 +1611,7 @@ function ChapterSection({
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {b9ElecFields.map(([key, label]) => (
                   <div key={key}>
-                    <Label className="text-xs mb-1.5 block font-medium text-cyan-700 dark:text-cyan-300">{label}</Label>
+                    <Label className="text-sm mb-1.5 block font-medium text-cyan-700 dark:text-cyan-300">{label}</Label>
                     <Input value={b9Data[key]} onChange={e => setB9(p => ({ ...p, [key]: e.target.value }))} placeholder={label}
                       className="text-sm border-cyan-200 dark:border-cyan-800 focus:ring-2 focus:ring-cyan-400" />
                   </div>
@@ -1633,7 +1633,7 @@ function ChapterSection({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {b13Fields.map(([key, label]) => (
                 <div key={key}>
-                  <Label className="text-xs mb-1.5 block font-medium text-green-700 dark:text-green-300">{label}</Label>
+                  <Label className="text-sm mb-1.5 block font-medium text-green-700 dark:text-green-300">{label}</Label>
                   <Input type={key === 'datum' ? 'date' : 'text'} value={b13Data[key]}
                     onChange={e => setB13(p => ({ ...p, [key]: e.target.value }))} placeholder={label}
                     className="text-sm border-green-200 dark:border-green-800 focus:ring-2 focus:ring-green-400" />
@@ -1641,7 +1641,7 @@ function ChapterSection({
               ))}
               {/* Unterschrift */}
               <div className="sm:col-span-2">
-                <Label className="text-xs mb-1.5 block font-medium text-green-700 dark:text-green-300">Unterschrift (Name Abnahmetechniker)</Label>
+                <Label className="text-sm mb-1.5 block font-medium text-green-700 dark:text-green-300">Unterschrift (Name Abnahmetechniker)</Label>
                 <Input value={answers['B13_Unterschrift'] ?? ''} onChange={e => setAnswer('B13_Unterschrift', e.target.value)}
                   placeholder="Name..." className="text-sm border-green-200 dark:border-green-800 focus:ring-2 focus:ring-green-400" />
               </div>

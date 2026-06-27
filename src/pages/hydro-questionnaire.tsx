@@ -545,6 +545,8 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
         b13_firma: b13.firma, b13_nameAbnahme: b13.nameAbnahme, b13_datum: b13.datum,
         b13_bauseitigePendenzen: answers['B13_Bauseitige_Pendenzen'] ?? '',
         b13_aufzugsseitigePendenzen: answers['B13_Aufzugsseitige_Pendenzen'] ?? '',
+        b3_kopf: b3kopf,
+        b3_grube: b3grube,
         questionAnswers: answers,
       };
       const response = await fetch(getApiUrl('/api/protocols/download-hydro-pdf'), {
@@ -863,20 +865,28 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
   const D4 = num(b3kopf.D1) + num(b3kopf.D2) + num(b3kopf.D3);
   const E4 = num(b3kopf.E1) + num(b3kopf.E3);
 
-  const sumClass = (val: number, min: number) =>
-    val > 0 ? (val >= min ? 'bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300 font-bold border border-green-400' : 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300 font-bold border border-red-400') : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 border border-gray-300';
+  const okCls  = 'bg-green-100 text-green-800 dark:bg-green-950/40 dark:text-green-300 font-bold border border-green-400';
+  const nokCls = 'bg-red-100 text-red-800 dark:bg-red-950/40 dark:text-red-300 font-bold border border-red-400';
+  const empCls = 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 border border-gray-300';
+  const sumCls = (v: number, min: number) => v > 0 ? (v >= min ? okCls : nokCls) : empCls;
 
-  const inp = (k: keyof HydroB3KopfData) => (
-    <Input type="number" value={b3kopf[k]} onChange={e => upd(k, e.target.value)} placeholder="mm"
-      className="text-center text-sm h-8 px-1 border-blue-200 dark:border-blue-800 focus:ring-1 focus:ring-blue-400" />
+  const inp = (k: keyof HydroB3KopfData, ph = 'mm') => (
+    <Input type="number" value={b3kopf[k]} onChange={e => upd(k, e.target.value)} placeholder={ph}
+      className="w-full text-center text-xs h-7 px-1 border-cyan-200 dark:border-cyan-800 focus:ring-1 focus:ring-cyan-400" />
   );
 
-  const rows: { label: string; k1: keyof HydroB3KopfData; k2: keyof HydroB3KopfData; k3: keyof HydroB3KopfData; sum: number; min: number; isE?: boolean }[] = [
-    { label: 'A (Überfahrt ≥ 1000 mm)', k1:'A1', k2:'A2', k3:'A3', sum: A4, min: 1000 },
-    { label: 'B (≥ 300 mm)',              k1:'B1', k2:'B2', k3:'B3', sum: B4, min: 300 },
-    { label: 'C (≥ 100 mm)',              k1:'C1', k2:'C2', k3:'C3', sum: C4, min: 100 },
-    { label: 'D (≥ 100 mm)',              k1:'D1', k2:'D2', k3:'D3', sum: D4, min: 100 },
-    { label: 'E (≥ 100 mm)',              k1:'E1', k2:'A2', k3:'E3', sum: E4, min: 100, isE: true },
+  // Each row: key, column headers, 2–3 input keys, sum, min
+  // A = Fahrkorb-Oberkante bis Schachtkopf: A1 (Kabinenrahmen) + A2 (Puffer oben) + A3 (Überfahrt)
+  // B = freier Raum Seite (Querschnitt): B1+B2+B3
+  // C = freier Raum oberhalb Kabine: C1+C2+C3
+  // D = Kabinendach bis feste Teile: D1+D2+D3
+  // E = Sicherheitsabstand Führungsschiene: E1+E3 (kein E2)
+  const rows: { id: string; desc: string; col1: string; col2: string; col3: string | null; k1: keyof HydroB3KopfData; k2: keyof HydroB3KopfData; k3: keyof HydroB3KopfData | null; sum: number; min: number }[] = [
+    { id:'A', desc:'Überfahrt (Kabinenrahmen + Puffer oben + Freiraum)', col1:'A1 – Kabinenrahmen', col2:'A2 – Puffer oben (mm)', col3:'A3 – Freiraum (mm)', k1:'A1', k2:'A2', k3:'A3', sum:A4, min:1000 },
+    { id:'B', desc:'Freiraum Kabinendach – Querseite (≥ 300 mm)',         col1:'B1 (mm)',          col2:'B2 (mm)',              col3:'B3 (mm)',           k1:'B1', k2:'B2', k3:'B3', sum:B4, min:300 },
+    { id:'C', desc:'Freiraum Kabinendach – Längsseite (≥ 100 mm)',        col1:'C1 (mm)',          col2:'C2 (mm)',              col3:'C3 (mm)',           k1:'C1', k2:'C2', k3:'C3', sum:C4, min:100 },
+    { id:'D', desc:'Kabinendach bis feste Teile (≥ 100 mm)',              col1:'D1 (mm)',          col2:'D2 (mm)',              col3:'D3 (mm)',           k1:'D1', k2:'D2', k3:'D3', sum:D4, min:100 },
+    { id:'E', desc:'Sicherheitsabstand Führungsschiene (≥ 100 mm)',       col1:'E1 (mm)',          col2:'—',                   col3:'E3 (mm)',           k1:'E1', k2:'E1', k3:'E3', sum:E4, min:100 },
   ];
 
   return (
@@ -885,47 +895,62 @@ function B3KopfCard({ b3kopf, setB3kopf, modern }: {
         {modern && <div className="absolute inset-0 bg-gradient-to-r from-teal-400 to-cyan-500 opacity-30 animate-pulse pointer-events-none" />}
         <CardTitle className="relative text-base font-bold">Sicherheitsabstände im Schachtkopf</CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+      <CardContent className="p-4 space-y-4">
+        {/* Kopf-adatok */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 bg-cyan-50/50 dark:bg-cyan-950/20 rounded-xl p-3 border border-cyan-100 dark:border-cyan-900">
           <div>
-            <Label className="text-xs font-medium text-cyan-700 dark:text-cyan-300 mb-1 block">Nenngeschwindigkeit (m/s)</Label>
+            <Label className="text-xs font-semibold text-cyan-700 dark:text-cyan-300 mb-1 block">Nenngeschwindigkeit (m/s)</Label>
             <Input value={b3kopf.nenngeschwindigkeit} onChange={e => upd('nenngeschwindigkeit', e.target.value)}
               placeholder="m/s" className="text-sm h-8 border-cyan-200 dark:border-cyan-800" />
           </div>
           <div>
-            <Label className="text-xs font-medium text-cyan-700 dark:text-cyan-300 mb-1 block">Überfahrt (mm)</Label>
+            <Label className="text-xs font-semibold text-cyan-700 dark:text-cyan-300 mb-1 block">Überfahrt-Soll (mm)</Label>
             <Input value={b3kopf.ueberfahrt} onChange={e => upd('ueberfahrt', e.target.value)}
               placeholder="mm" className="text-sm h-8 border-cyan-200 dark:border-cyan-800" />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800">
-                <th className="text-left p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">Méret</th>
-                <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-24">+1</th>
-                <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-24">+2</th>
-                {rows.some(r => !r.isE) && <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-24">+3</th>}
-                <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-28">= Σ (mm)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(r => (
-                <tr key={r.label}>
-                  <td className="p-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium whitespace-nowrap">{r.label}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">{inp(r.k1)}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">{r.isE ? <span className="block text-center text-gray-400 text-xs">—</span> : inp(r.k2)}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">{inp(r.k3)}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">
-                    <div className={`rounded px-2 py-1 text-center text-sm ${sumClass(r.sum, r.min)}`}>
-                      {r.sum > 0 ? r.sum.toFixed(0) : '—'}
+        {/* Legende */}
+        <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+          <strong className="text-gray-700 dark:text-gray-300">Útmutató:</strong> minden sorban adja meg a részértékeket — a Σ összeg automatikusan számítódik és zölddel jelzi, ha teljesül a minimumkövetelmény.
+        </div>
+
+        {/* Mérési sorok */}
+        <div className="space-y-3">
+          {rows.map(r => {
+            const showSum = r.sum > 0;
+            return (
+              <div key={r.id} className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                {/* Row header */}
+                <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 dark:bg-gray-800">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-cyan-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{r.id}</span>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{r.desc}</span>
+                  </div>
+                  <div className={`rounded-lg px-3 py-1 text-xs font-bold min-w-[70px] text-center ${showSum ? sumCls(r.sum, r.min) : empCls}`}>
+                    {showSum ? `${r.sum.toFixed(0)} mm` : `min. ${r.min} mm`}
+                  </div>
+                </div>
+                {/* Input fields */}
+                <div className={`grid gap-2 p-2 bg-white dark:bg-gray-900 ${r.k3 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                  <div>
+                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col1}</Label>
+                    {inp(r.k1)}
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col2}</Label>
+                    {r.id === 'E' ? <div className="h-7 flex items-center justify-center text-gray-400 text-xs border border-dashed border-gray-200 dark:border-gray-700 rounded">—</div> : inp(r.k2)}
+                  </div>
+                  {r.k3 && (
+                    <div>
+                      <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col3}</Label>
+                      {inp(r.k3)}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
@@ -955,11 +980,11 @@ function B3GrubeCard({ b3grube, setB3grube, modern }: {
       className="text-center text-sm h-8 px-1 border-emerald-200 dark:border-emerald-800 focus:ring-1 focus:ring-emerald-400" />
   );
 
-  const rows: { label: string; k1: keyof HydroB3GrubeData; k2: keyof HydroB3GrubeData; k3: keyof HydroB3GrubeData; sum: number; min: number }[] = [
-    { label: 'F (≥ 300 mm)', k1:'F1', k2:'F2', k3:'F3', sum: F4, min: 300 },
-    { label: 'G (≥ 100 mm)', k1:'G1', k2:'G2', k3:'G3', sum: G4, min: 100 },
-    { label: 'H (≥ 500 mm)', k1:'H1', k2:'H2', k3:'H3', sum: H4, min: 500 },
-    { label: 'J (≥ 100 mm)', k1:'J1', k2:'J2', k3:'J3', sum: J4, min: 100 },
+  const rows: { label: string; desc: string; col1: string; col2: string; col3: string; k1: keyof HydroB3GrubeData; k2: keyof HydroB3GrubeData; k3: keyof HydroB3GrubeData; sum: number; min: number }[] = [
+    { label:'F', desc:'Freiraum unter Fahrkorb – Querseite (≥ 300 mm)',    col1:'F1 (mm)', col2:'F2 (mm)', col3:'F3 (mm)', k1:'F1', k2:'F2', k3:'F3', sum: F4, min: 300 },
+    { label:'G', desc:'Freiraum unter Fahrkorb – Längsseite (≥ 100 mm)',   col1:'G1 (mm)', col2:'G2 (mm)', col3:'G3 (mm)', k1:'G1', k2:'G2', k3:'G3', sum: G4, min: 100 },
+    { label:'H', desc:'Grubenraumhöhe (Boden bis Fahrkorbunterkante, ≥ 500 mm)', col1:'H1 (mm)', col2:'H2 (mm)', col3:'H3 (mm)', k1:'H1', k2:'H2', k3:'H3', sum: H4, min: 500 },
+    { label:'J', desc:'Sonstiger Sicherheitsabstand in der Grube (≥ 100 mm)',     col1:'J1 (mm)', col2:'J2 (mm)', col3:'J3 (mm)', k1:'J1', k2:'J2', k3:'J3', sum: J4, min: 100 },
   ];
 
   return (
@@ -968,34 +993,41 @@ function B3GrubeCard({ b3grube, setB3grube, modern }: {
         {modern && <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 opacity-30 animate-pulse pointer-events-none" />}
         <CardTitle className="relative text-base font-bold">Sicherheitsabstände in der Schachtgrube</CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="bg-gray-50 dark:bg-gray-800">
-                <th className="text-left p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700">Méret</th>
-                <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-24">+1</th>
-                <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-24">+2</th>
-                <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-24">+3</th>
-                <th className="p-2 font-semibold text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 w-28">= Σ (mm)</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map(r => (
-                <tr key={r.label}>
-                  <td className="p-2 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium">{r.label}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">{inp(r.k1)}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">{inp(r.k2)}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">{inp(r.k3)}</td>
-                  <td className="p-1 border border-gray-200 dark:border-gray-700">
-                    <div className={`rounded px-2 py-1 text-center text-sm ${sumClass(r.sum, r.min)}`}>
-                      {r.sum > 0 ? r.sum.toFixed(0) : '—'}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <CardContent className="p-4 space-y-4">
+        <div className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
+          <strong className="text-gray-700 dark:text-gray-300">Útmutató:</strong> minden sorban adja meg a részértékeket — a Σ összeg automatikusan számítódik.
+        </div>
+        <div className="space-y-3">
+          {rows.map(r => {
+            const showSum = r.sum > 0;
+            return (
+              <div key={r.label} className="rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 dark:bg-gray-800">
+                  <div className="flex items-center gap-2">
+                    <span className="w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center shrink-0">{r.label.charAt(0)}</span>
+                    <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{r.desc}</span>
+                  </div>
+                  <div className={`rounded-lg px-3 py-1 text-xs font-bold min-w-[70px] text-center ${showSum ? sumClass(r.sum, r.min) : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400 border border-gray-300'}`}>
+                    {showSum ? `${r.sum.toFixed(0)} mm` : `min. ${r.min} mm`}
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2 p-2 bg-white dark:bg-gray-900">
+                  <div>
+                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col1}</Label>
+                    {inp(r.k1)}
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col2}</Label>
+                    {inp(r.k2)}
+                  </div>
+                  <div>
+                    <Label className="text-xs text-gray-500 dark:text-gray-400 mb-0.5 block">{r.col3}</Label>
+                    {inp(r.k3)}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </CardContent>
     </Card>
@@ -1290,130 +1322,171 @@ function ChapterSection({
     return true;
   };
 
-  // Render a single question row
-  const renderRow = (path: string, idx: number) => {
-    // Skip marker paths
-    if (path.startsWith('__')) return null;
+  // Grouped question list renderer:
+  // - Consecutive TEXT_INPUT_PATHS (non-textarea) → compact 3-col grid (like B9 card)
+  // - TEXTAREA_PATHS → full-width individual
+  // - CHECKBOX_PATHS_LOCAL → individual checkbox row
+  // - Marker paths (__KOPF_CARD__, __GRUBE_CARD__) → measurement cards
+  // - Regular question paths → pill rows with divider tracking via lastQuestionGroupTitle
+  const renderQuestionList = () => {
+    const elements: React.ReactNode[] = [];
+    const paths = chapter.paths;
+    let i = 0;
+    let lastQuestionGroupTitle = ''; // tracks last REAL question's group title (ignores text fields)
 
-    const rowOptions  = chapter.specialOptions?.[path] ?? options;
-    const current     = answers[path] ?? '';
-    const questionText = questionMap[path] ?? TEXT_LABELS[path] ?? '';
-    const groupTitle   = groupTitleMap[path] ?? '';
+    while (i < paths.length) {
+      const path = paths[i];
 
-    const prevPath      = chapter.paths[idx - 1];
-    const prevGroupTitle = prevPath ? (groupTitleMap[prevPath] ?? '') : '';
-    const showDivider   = idx > 0 && groupTitle && groupTitle !== prevGroupTitle && !path.startsWith('B') && !path.startsWith('__');
+      // ── Measurement card markers
+      if (path === '__KOPF_CARD__' && b3kopf && setB3kopf) {
+        elements.push(
+          <div key="__KOPF_CARD__" className="p-4 border-b border-blue-100 dark:border-blue-900/50 bg-cyan-50/30 dark:bg-cyan-950/10">
+            <B3KopfCard b3kopf={b3kopf} setB3kopf={setB3kopf} modern={modern} />
+          </div>
+        );
+        i++; continue;
+      }
+      if (path === '__GRUBE_CARD__' && b3grube && setB3grube) {
+        elements.push(
+          <div key="__GRUBE_CARD__" className="p-4 border-b border-blue-100 dark:border-blue-900/50 bg-emerald-50/30 dark:bg-emerald-950/10">
+            <B3GrubeCard b3grube={b3grube} setB3grube={setB3grube} modern={modern} />
+          </div>
+        );
+        i++; continue;
+      }
+      if (path.startsWith('__')) { i++; continue; }
 
-    // B7 activity
-    const active = chapter.id === 7 ? b7SectionActive(path) : true;
-
-    // ── Checkbox path (n.z. toggle for Führung)
-    if (CHECKBOX_PATHS_LOCAL.has(path)) {
-      const isChecked = current === 'true';
-      return (
-        <Fragment key={path}>
-          <div className={`flex items-center gap-3 px-4 py-2 border-b dark:border-gray-700 bg-amber-50 dark:bg-amber-950/20 ${isChecked ? 'opacity-50' : ''}`}>
+      // ── Checkbox paths (n.z. toggle) — individual row
+      if (CHECKBOX_PATHS_LOCAL.has(path)) {
+        const isChecked = (answers[path] ?? '') === 'true';
+        elements.push(
+          <div key={path} className={`flex items-center gap-3 px-4 py-2 border-b dark:border-gray-700 bg-amber-50 dark:bg-amber-950/20 ${isChecked ? 'opacity-50' : ''}`}>
             <Checkbox id={path} checked={isChecked} onCheckedChange={v => setAnswer(path, v ? 'true' : 'false')} />
             <Label htmlFor={path} className="cursor-pointer text-xs text-amber-700 dark:text-amber-300 font-medium">
               n.z. – {TEXT_LABELS[NZ_CHECKBOX_TO_FIELD[path]] ?? 'nicht zutreffend'}
             </Label>
           </div>
-        </Fragment>
-      );
-    }
-
-    // ── Text input path
-    if (TEXT_INPUT_PATHS.has(path)) {
-      const label = TEXT_LABELS[path] ?? path;
-      // Check if disabled by a linked nz checkbox
-      const linkedNz = Object.entries(NZ_CHECKBOX_TO_FIELD).find(([, f]) => f === path)?.[0];
-      const disabled = linkedNz ? answers[linkedNz] === 'true' : false;
-
-      if (TEXTAREA_PATHS.has(path)) {
-        return (
-          <Fragment key={path}>
-            <div className={`px-4 py-3 border-b dark:border-gray-700 bg-white dark:bg-gray-900 ${disabled ? 'opacity-40 pointer-events-none' : ''}`}>
-              <Label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">{label}</Label>
-              <Textarea value={current} onChange={e => setAnswer(path, e.target.value)}
-                placeholder={label} rows={3}
-                className="text-sm border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-blue-400 resize-y" />
-            </div>
-          </Fragment>
         );
+        i++; continue;
       }
 
-      return (
+      // ── Textarea paths — full-width individual
+      if (TEXTAREA_PATHS.has(path)) {
+        const label = TEXT_LABELS[path] ?? path;
+        elements.push(
+          <div key={path} className="px-4 py-3 border-b dark:border-gray-700 bg-white dark:bg-gray-900">
+            <Label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">{label}</Label>
+            <Textarea value={answers[path] ?? ''} onChange={e => setAnswer(path, e.target.value)}
+              placeholder={label} rows={3}
+              className="text-sm border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-blue-400 resize-y" />
+          </div>
+        );
+        i++; continue;
+      }
+
+      // ── Compact-grid TEXT_INPUT_PATHS (non-textarea): group consecutive ones
+      if (TEXT_INPUT_PATHS.has(path)) {
+        const group: string[] = [];
+        while (
+          i < paths.length &&
+          TEXT_INPUT_PATHS.has(paths[i]) &&
+          !TEXTAREA_PATHS.has(paths[i]) &&
+          !CHECKBOX_PATHS_LOCAL.has(paths[i]) &&
+          !paths[i].startsWith('__')
+        ) {
+          group.push(paths[i]);
+          i++;
+        }
+        elements.push(
+          <div key={group.join('|')} className="px-4 py-3 border-b dark:border-gray-700 bg-slate-50/70 dark:bg-slate-800/30">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {group.map(p => {
+                const label = TEXT_LABELS[p] ?? p;
+                const linkedNz = Object.entries(NZ_CHECKBOX_TO_FIELD).find(([, f]) => f === p)?.[0];
+                const disabled = linkedNz ? answers[linkedNz] === 'true' : false;
+                return (
+                  <div key={p} className={disabled ? 'opacity-40 pointer-events-none' : ''}>
+                    <Label className="text-xs font-medium text-slate-600 dark:text-slate-400 mb-1 block">{label}</Label>
+                    <Input value={answers[p] ?? ''} onChange={e => setAnswer(p, e.target.value)}
+                      placeholder={label}
+                      className="text-sm h-8 border-slate-200 dark:border-slate-700 focus:ring-1 focus:ring-blue-400" />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+        continue;
+      }
+
+      // ── Standard yes/no pill row
+      const rowOptions    = chapter.specialOptions?.[path] ?? options;
+      const current       = answers[path] ?? '';
+      const questionText  = questionMap[path] ?? '';
+      const groupTitle    = groupTitleMap[path] ?? '';
+      // Only show group divider when the title changes relative to the last REAL question (not text fields)
+      const showDivider   = !!groupTitle && groupTitle !== lastQuestionGroupTitle;
+      if (groupTitle) lastQuestionGroupTitle = groupTitle;
+
+      const active           = chapter.id === 7 ? b7SectionActive(path) : true;
+      const rowBg            = current && active ? ROW_BG[current] : '';
+      const effectiveOptions = NO_NZ_PATHS.has(path) ? rowOptions.filter(o => o !== 'nz') : rowOptions;
+
+      elements.push(
         <Fragment key={path}>
-          <div className={`flex flex-col sm:flex-row sm:items-center gap-2 px-4 py-2 border-b dark:border-gray-700 bg-white dark:bg-gray-900 ${disabled ? 'opacity-40 pointer-events-none' : ''}`}>
-            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400 shrink-0 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-800 self-start mt-0.5">
-              {path.startsWith('B') ? '✎' : path}
-            </span>
-            <Label className="text-xs font-medium text-gray-600 dark:text-gray-400 shrink-0 whitespace-nowrap">{label}:</Label>
-            <Input value={current} onChange={e => setAnswer(path, e.target.value)} placeholder={label}
-              className="text-sm h-8 flex-1 border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-blue-400" />
+          {showDivider && (
+            <div className="px-4 pt-3 pb-1.5 bg-gray-50 dark:bg-gray-800/60 border-b border-t border-blue-100 dark:border-blue-900/50">
+              <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">{groupTitle}</span>
+            </div>
+          )}
+          <div className={`relative border-b dark:border-gray-700 last:border-b-0 transition-all duration-300 ${
+            !active ? 'opacity-40 bg-gray-50 dark:bg-gray-800/50' :
+            rowBg || (modern
+              ? 'bg-white dark:bg-gray-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/10'
+              : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50')
+          }`}>
+            <div className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 sm:p-4">
+              <span className="font-mono text-xs text-blue-500 dark:text-blue-400 shrink-0 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 self-start mt-0.5">
+                {path}
+              </span>
+              <span className="flex-1 text-sm text-gray-800 dark:text-gray-200 leading-snug min-w-0">
+                {questionText || path}
+              </span>
+              {active && (
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  {effectiveOptions.filter(o => o !== 'U').map(opt => {
+                    const isSelected = current === opt;
+                    return (
+                      <button key={opt} type="button" onClick={() => setAnswer(path, opt)}
+                        className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
+                          isSelected ? PILL_ACTIVE[opt] : `bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 ${PILL_HOVER[opt]}`
+                        }`}
+                      >{opt}</button>
+                    );
+                  })}
+                  {effectiveOptions.includes('U') && (
+                    <>
+                      <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center" />
+                      <button type="button" onClick={() => toggleUmbau(path)}
+                        className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
+                          umbau[path]
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-600'
+                        }`}
+                        title="Umbau – átépítés során érintett"
+                      >U</button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </Fragment>
       );
+      i++;
     }
 
-    // ── Standard pill row
-    const rowBg = current && active ? ROW_BG[current] : '';
-    // Effective options: remove nz if NO_NZ_PATHS
-    const effectiveOptions = NO_NZ_PATHS.has(path)
-      ? rowOptions.filter(o => o !== 'nz')
-      : rowOptions;
-
-    return (
-      <Fragment key={path}>
-        {showDivider && (
-          <div className="px-4 pt-3 pb-1.5 bg-gray-50 dark:bg-gray-800/60 border-b border-t border-blue-100 dark:border-blue-900/50">
-            <span className="text-xs font-semibold uppercase tracking-wider text-blue-600 dark:text-blue-400">{groupTitle}</span>
-          </div>
-        )}
-        <div className={`relative border-b dark:border-gray-700 last:border-b-0 transition-all duration-300 ${
-          !active ? 'opacity-40 bg-gray-50 dark:bg-gray-800/50' :
-          rowBg || (modern
-            ? 'bg-white dark:bg-gray-900 hover:bg-blue-50/30 dark:hover:bg-blue-950/10'
-            : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700/50')
-        }`}>
-          <div className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 sm:p-4">
-            <span className="font-mono text-xs text-blue-500 dark:text-blue-400 shrink-0 bg-blue-50 dark:bg-blue-950/40 px-2 py-0.5 rounded-md border border-blue-200 dark:border-blue-800 self-start mt-0.5">
-              {path}
-            </span>
-            <span className="flex-1 text-sm text-gray-800 dark:text-gray-200 leading-snug min-w-0">
-              {questionText || path}
-            </span>
-            {active && (
-              <div className="flex flex-wrap items-center gap-2 shrink-0">
-                {effectiveOptions.filter(o => o !== 'U').map(opt => {
-                  const isSelected = current === opt;
-                  return (
-                    <button key={opt} type="button" onClick={() => setAnswer(path, opt)}
-                      className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
-                        isSelected ? PILL_ACTIVE[opt] : `bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 ${PILL_HOVER[opt]}`
-                      }`}
-                    >{opt}</button>
-                  );
-                })}
-                {effectiveOptions.includes('U') && (
-                  <>
-                    <span className="w-px h-6 bg-gray-300 dark:bg-gray-600 self-center" />
-                    <button type="button" onClick={() => toggleUmbau(path)}
-                      className={`inline-flex items-center justify-center rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold border-2 cursor-pointer transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap ${
-                        umbau[path]
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-gray-600 hover:border-blue-400 hover:text-blue-600'
-                      }`}
-                      title="Umbau – átépítés során érintett"
-                    >U</button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </Fragment>
-    );
+    return elements;
   };
 
   return (
@@ -1595,25 +1668,7 @@ function ChapterSection({
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {chapter.paths.map((path, idx) => {
-            // Measurement card markers
-            if (path === '__KOPF_CARD__' && b3kopf && setB3kopf) {
-              return (
-                <div key="__KOPF_CARD__" className="p-4 border-b border-blue-100 dark:border-blue-900/50 bg-cyan-50/30 dark:bg-cyan-950/10">
-                  <B3KopfCard b3kopf={b3kopf} setB3kopf={setB3kopf} modern={modern} />
-                </div>
-              );
-            }
-            if (path === '__GRUBE_CARD__' && b3grube && setB3grube) {
-              return (
-                <div key="__GRUBE_CARD__" className="p-4 border-b border-blue-100 dark:border-blue-900/50 bg-emerald-50/30 dark:bg-emerald-950/10">
-                  <B3GrubeCard b3grube={b3grube} setB3grube={setB3grube} modern={modern} />
-                </div>
-              );
-            }
-            // Regular rows
-            return renderRow(path, idx);
-          })}
+          {renderQuestionList()}
         </CardContent>
       </Card>
     </div>

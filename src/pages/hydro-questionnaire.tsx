@@ -54,12 +54,16 @@ const T = {
     it: 'HYDRO Protocollo di accettazione ascensore idraulico',
   },
   b0CardTitle:   {
-    hu: 'B0 – Általános információk',
-    de: 'B0 – Allgemeine Informationen',
-    en: 'B0 – General Information',
-    fr: 'B0 – Informations générales',
-    it: 'B0 – Informazioni generali',
+    hu: 'Általános információk',
+    de: 'Allgemeine Informationen',
+    en: 'General Information',
+    fr: 'Informations générales',
+    it: 'Informazioni generali',
   },
+  headerTab:     { hu: 'Fejléc', de: 'Kopfdaten', en: 'Header', fr: 'En-tête', it: 'Intestazione' },
+  blockTab:      { hu: 'Blokk', de: 'Block', en: 'Block', fr: 'Bloc', it: 'Blocco' },
+  newProtocol:   { hu: 'Új protokoll', de: 'Neues Protokoll', en: 'New Protocol', fr: 'Nouveau protocole', it: 'Nuovo protocollo' },
+  newProtocolConfirm: { hu: 'Biztosan törli az összes adatot és kezd egy új protokollt?', de: 'Alle Daten löschen und neues Protokoll starten?', en: 'Delete all data and start a new protocol?', fr: 'Supprimer toutes les données et démarrer un nouveau protocole?', it: 'Eliminare tutti i dati e avviare un nuovo protocollo?' },
   anlageTyp:     { hu: 'Berendezés típusa',   de: 'Anlage Typ',       en: 'Installation Type',    fr: "Type d'installation",   it: 'Tipo di installazione' },
   pruefungsart:  { hu: 'Vizsgálat típusa',     de: 'Prüfungsart',      en: 'Inspection Type',      fr: "Type d'inspection",     it: 'Tipo di ispezione'     },
   b1CardTitle:   { hu: 'Berendezési adatok',   de: 'Anlagedaten',      en: 'Installation Data',    fr: "Données d'installation",it: 'Dati di installazione' },
@@ -193,12 +197,12 @@ interface Chapter {
 
 const CHAPTERS: Chapter[] = [
   {
-    id: 1, title: 'B1 – Anlagedaten',
+    id: 1, title: 'Anlagedaten',
     paths: ['1'],
     options: ['Ja', 'Nein'],
   },
   {
-    id: 2, title: 'B2 – Aufstellungsort der Maschine und Steuerung sowie Seilrollen',
+    id: 2, title: 'Aufstellungsort der Maschine und Steuerung sowie Seilrollen',
     paths: [
       '2.1.1',
       '2.1.2', 'B2_Einsatzbereich', 'B2_Anlagenennstrom',
@@ -209,7 +213,7 @@ const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 3, title: 'B3 – Schacht',
+    id: 3, title: 'Schacht',
     paths: [
       '3.1.1', '__KOPF_CARD__',
       '3.1.2', '3.1.3', '3.1.4', '3.1.5', '3.1.6', 'B3_Notendschalter', '3.1.7',
@@ -220,14 +224,14 @@ const CHAPTERS: Chapter[] = [
       '3.4.1', '3.4.2', '3.4.3', '3.4.4', '3.4.5', '3.4.6', '3.4.7', '3.4.8', '3.4.9',
       '3.4.10', '3.4.11', '3.4.12', '3.4.13', '3.4.14', '3.4.15', '3.4.16', '3.4.17', '3.4.18', '3.4.19',
       '3.5.1', '3.5.2', '3.5.3', '3.5.4',
-      '3.6.1', 'B3_Fuhrung_Kabine', 'B3_nz_Fuh_1', 'B3_Fuhrung_Ausgleich', 'B3_nz_Fuh_2',
-      'B3_Fuhrung_Hilfs', 'B3_nz_Fuh_3', 'B3_Fuhrung_Heber',
+      '3.6.1', 'B3_nz_Fuh_1', 'B3_Fuhrung_Kabine', 'B3_nz_Fuh_2', 'B3_Fuhrung_Ausgleich',
+      'B3_nz_Fuh_3', 'B3_Fuhrung_Hilfs', 'B3_Fuhrung_Heber',
       '3.6.2', '3.6.2_A', 'B3_nz_362_1', '3.6.2_B', 'B3_nz_362_2', '3.6.2_C', 'B3_nz_362_3',
       '3.6.3', '3.7.1',
     ],
   },
   {
-    id: 4, title: 'B4 – Schachttüren',
+    id: 4, title: 'Schachttüren',
     paths: [
       '4.1.1', '4.1.2', '4.1.3', 'B4_Feuerwiderstandsklasse', 'B4_Fabrikationstyp',
       '4.1.4', '4.1.5', '4.1.6', '4.1.7', '4.1.8', 'B4_Fabrikationstyp_1',
@@ -236,7 +240,7 @@ const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 5, title: 'B5 – Kabine',
+    id: 5, title: 'Kabine',
     paths: [
       '5.1.1', '5.1.2', '5.1.3', '5.1.4', '5.1.5', '5.1.6', '5.1.7', '5.1.8', '5.1.9', '5.1.10',
       '5.2.1', '5.2.2', '5.2.3', '5.2.4', '5.2.5', '5.2.6',
@@ -245,7 +249,7 @@ const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 6, title: 'B6 – Aufhängung',
+    id: 6, title: 'Aufhängung',
     paths: [
       // B6 special: A.6.x/B.6.x/C.6.x are conditional (rendered in B6 special card)
       // Here only always-visible questions
@@ -254,7 +258,7 @@ const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 7, title: 'B7 – Fangvorrichtungen und Geschwindigkeitsbegrenzer',
+    id: 7, title: 'Fangvorrichtungen und Geschwindigkeitsbegrenzer',
     paths: [
       // Fangvorrichtung (Kabine)
       '7.1.1',
@@ -287,7 +291,7 @@ const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 8, title: 'B8 – Hydraulikanlage',
+    id: 8, title: 'Hydraulikanlage',
     paths: [
       '8.1.1', '8.1.2', '8.1.3', '8.1.4', '8.1.5', '8.1.6',
       '8.2.1', '8.3.1', 'B8_HeberTyp', '8.3.2',
@@ -299,31 +303,34 @@ const CHAPTERS: Chapter[] = [
     ],
   },
   {
-    id: 9, title: 'B9 – Elektrisches System',
+    id: 9, title: 'Elektrisches System',
     paths: ['9.1.1.1', '9.1.1.2', '9.2.1', '9.2.1_a', '9.2.2', '9.2.3'],
   },
   {
-    id: 10, title: 'B10 – Steuerung',
+    id: 10, title: 'Steuerung',
     paths: ['10.1', '10.2', '10.3', '10.4', '10.5', '10.6', '10.7'],
     specialOptions: { '10.1': ['Ja', 'Nein', 'nz', 'U', 'Siehe'] },
   },
   {
-    id: 11, title: 'B11 – Verhalten von Aufzügen im Brandfall',
+    id: 11, title: 'Verhalten von Aufzügen im Brandfall',
     paths: [
       '11.1_Main', '11.1.1', '11.1.2', '11.1.3', '11.1.4', '11.1.5',
       '11.2.1', '11.2.2', '11.2.3', '11.2.4', '11.2.5',
       '11.3.1', '11.3.2', '11.3.3', '11.3.4', '11.3.5', '11.3.6', '11.3.7', '11.3.8', '11.3.9', '11.3.10', '11.3.11',
     ],
   },
-  { id: 12, title: 'B12 – Unterlagen', paths: ['16.2', '16.3'], options: ['Ja', 'Nein', 'U'] },
+  { id: 12, title: 'Unterlagen', paths: ['16.2', '16.3'], options: ['Ja', 'Nein', 'U'] },
   {
-    id: 13, title: 'B13 – Konformitätserklärung',
+    id: 13, title: 'Konformitätserklärung',
     paths: ['13.1', 'B13_Bauseitige_Pendenzen', '13.2', 'B13_Aufzugsseitige_Pendenzen', '13.3', '13.4', 'B13_Unterschrift'],
   },
-  { id: 14, title: 'B14 – Nachkontrolle', paths: ['14.1.1', '14.1.2', '14.2.1', '14.2.2'] },
+  { id: 14, title: 'Nachkontrolle', paths: ['14.1.1', '14.1.2', '14.2.1', '14.2.2'] },
 ];
 
 const DEFAULT_OPTIONS: QuestionOption[] = ['Ja', 'Nein', 'nz', 'U'];
+
+// Paths that are auto-filled by logic (not shown as manual questions)
+const AUTO_FILLED_PATHS = new Set(['8.5.1']);
 
 const PILL_ACTIVE: Record<string, string> = {
   Ja:    'bg-gradient-to-r from-green-500 to-emerald-500 text-white border-green-500 shadow-lg scale-105',
@@ -422,6 +429,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
   const lang         = toLang(language);
 
   const [currentChapterIdx, setCurrentChapterIdx] = useState(0);
+  const [b3ActiveTab, setB3ActiveTab]             = useState<'kopf' | 'fragen'>('kopf');
   const [isPdfGenerating, setIsPdfGenerating]     = useState(false);
   const [saveStatus, setSaveStatus]               = useState<'idle' | 'saving' | 'saved'>('idle');
 
@@ -492,22 +500,66 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
     setUmbau(prev => ({ ...prev, [path]: !prev[path] }));
   }, []);
 
-  // Count only real question paths (not marker paths like __KOPF_CARD__)
+  // ── 8.5.1 auto-fill: mark as 'U' when B8 pressure fields are both filled ──
+  useEffect(() => {
+    if (b8.druckbegrenzung.trim() && b8.druckbegrenzungHandpumpe.trim()) {
+      setAnswers(prev => prev['8.5.1'] === 'U' ? prev : { ...prev, '8.5.1': 'U' });
+    }
+  }, [b8.druckbegrenzung, b8.druckbegrenzungHandpumpe]);
+
+  // ── Navigation with B3-tab awareness ──
+  const currentChapter = currentChapterIdx >= 1 && currentChapterIdx <= CHAPTERS.length
+    ? CHAPTERS[currentChapterIdx - 1] : null;
+
+  const handleNext = useCallback(() => {
+    if (currentChapter?.id === 3 && b3ActiveTab === 'kopf') {
+      setB3ActiveTab('fragen');
+    } else {
+      setCurrentChapterIdx(prev => Math.min(CHAPTERS.length + 1, prev + 1));
+      if (currentChapter?.id === 3) setB3ActiveTab('kopf');
+    }
+  }, [currentChapter, b3ActiveTab]);
+
+  const handlePrev = useCallback(() => {
+    if (currentChapter?.id === 3 && b3ActiveTab === 'fragen') {
+      setB3ActiveTab('kopf');
+    } else {
+      setCurrentChapterIdx(prev => Math.max(0, prev - 1));
+    }
+  }, [currentChapter, b3ActiveTab]);
+
+  const handleNewProtocol = useCallback(() => {
+    if (!window.confirm(t('newProtocolConfirm', lang))) return;
+    localStorage.removeItem(STORAGE_KEY);
+    setHeader({ installationType: 'Neuanlage', certType: 'Baumusterprüfung', fabrikationsNr: '', aufzugstyp: '', standortadresse: '', adresse: '' });
+    setAnswers({});
+    setUmbau({});
+    setB1({ hubhoehe:'', stockwerke:'', zugaenge:'', nennlast:'', personen:'' });
+    setB3kopf({ nenngeschwindigkeit:'', S:'', A:'', B:'', C:'', D:'', E:'', Z:'', U:'' });
+    setB3grube({ S:'', F:'', G:'', H:'', J:'', P:'', U:'' });
+    setB6({ mode:'', seilAnzahl:'', seilNenn:'', ketteAnzahl:'', ketteDim:'' });
+    setB7({ fang:false, ausgleich:false, begrenzer:false, rohrbruch:false, drossel:false });
+    setB8({ hersteller:'', aggregatTyp:'', motortyp:'', aggregatNr:'', nennstrom:'', motorleistung:'', nennlast:'', leerlast:'', nennlastAuf:'', leerlastAb:'', druckbegrenzung:'', druckbegrenzungHandpumpe:'' });
+    setB9({ sollAuf:'', sollAb:'', istLeerAuf:'', istNennlastAb:'', istLeerAufKorr:'', istNennlastAbKorr:'', zurueckAuf:'', zurueckAb:'', pufferGeschwindigkeit:'', nenngeschwindigkeit:'', stromLeer:'', stromNennlast:'', netzspannung:'', steuerspannung:'' });
+    setB13({ firma:'', nameAbnahme:'', datum: new Date().toISOString().split('T')[0] });
+    setCurrentChapterIdx(0);
+    setB3ActiveTab('kopf');
+  }, [lang]);
+
+  // Count only real question paths (not marker paths like __KOPF_CARD__ or auto-filled)
   const totalQuestions    = CHAPTERS.reduce((s, ch) =>
-    s + ch.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p)).length, 0);
+    s + ch.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p)).length, 0);
   const answeredQuestions = CHAPTERS.reduce((s, ch) =>
-    s + ch.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && answers[p]).length, 0);
+    s + ch.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p) && answers[p]).length, 0);
   const progressPercent   = totalQuestions > 0 ? Math.round((answeredQuestions / totalQuestions) * 100) : 0;
 
   const totalChapters = CHAPTERS.length;
   const isLast        = currentChapterIdx === totalChapters + 1;
-  const currentChapter = (currentChapterIdx > 0 && currentChapterIdx <= totalChapters)
-    ? CHAPTERS[currentChapterIdx - 1] : null;
 
   const chapterAnswered = currentChapter
-    ? currentChapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && answers[p]).length : 0;
+    ? currentChapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p) && answers[p]).length : 0;
   const chapterTotal    = currentChapter
-    ? currentChapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p)).length : 0;
+    ? currentChapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p)).length : 0;
   const chapterPercent  = chapterTotal > 0 ? Math.round((chapterAnswered / chapterTotal) * 100) : 0;
 
   const chapterTitle = currentChapterIdx === 0
@@ -627,9 +679,9 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
 
       <div className={`border-b overflow-x-auto ${modern ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-blue-100 dark:border-blue-900' : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'}`}>
         <div className="flex w-max mx-auto px-3 py-2 gap-1">
-          <TabBtn label="Fejléc" active={currentChapterIdx === 0} color="blue" modern={modern} onClick={() => setCurrentChapterIdx(0)} />
+          <TabBtn label={t('headerTab', lang)} active={currentChapterIdx === 0} color="blue" modern={modern} onClick={() => setCurrentChapterIdx(0)} />
           {CHAPTERS.map((ch, idx) => (
-            <TabBtn key={ch.id} label={`Blokk ${idx + 1}`} active={currentChapterIdx === idx + 1} color="blue" modern={modern} onClick={() => setCurrentChapterIdx(idx + 1)} />
+            <TabBtn key={ch.id} label={`${t('blockTab', lang)} ${idx + 1}`} active={currentChapterIdx === idx + 1} color="blue" modern={modern} onClick={() => { setCurrentChapterIdx(idx + 1); setB3ActiveTab('kopf'); }} />
           ))}
           <TabBtn label="📄 PDF" active={isLast} color="green" modern={modern} onClick={() => setCurrentChapterIdx(totalChapters + 1)} />
         </div>
@@ -689,7 +741,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
 
           {/* Content */}
           {currentChapterIdx === 0 && (
-            <B0Section header={header} setHeader={setHeader} theme={theme} lang={lang} />
+            <B0Section header={header} setHeader={setHeader} theme={theme} lang={lang} onNewProtocol={handleNewProtocol} />
           )}
           {currentChapterIdx === totalChapters + 1 && (
             <PdfSection onGenerate={handleGeneratePdf} isGenerating={isPdfGenerating}
@@ -701,6 +753,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
               umbau={umbau} toggleUmbau={toggleUmbau}
               theme={theme} lang={lang}
               questionMap={questionMap} groupTitleMap={groupTitleMap}
+              b3ActiveTab={b3ActiveTab} setB3ActiveTab={setB3ActiveTab}
               b1Data={currentChapter.id === 1 ? b1 : undefined} setB1={currentChapter.id === 1 ? setB1 : undefined}
               b3kopf={currentChapter.id === 3 ? b3kopf : undefined} setB3kopf={currentChapter.id === 3 ? setB3kopf : undefined}
               b3grube={currentChapter.id === 3 ? b3grube : undefined} setB3grube={currentChapter.id === 3 ? setB3grube : undefined}
@@ -715,7 +768,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
           {/* Navigation */}
           <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 mt-8 pt-6 border-t-2 border-blue-100 dark:border-blue-900">
             {modern ? (
-              <button onClick={() => setCurrentChapterIdx(Math.max(0, currentChapterIdx - 1))}
+              <button onClick={handlePrev}
                 disabled={currentChapterIdx === 0}
                 className="group relative overflow-hidden px-6 py-3 rounded-xl border-2 border-blue-500 text-blue-600 dark:text-blue-400 transition-all hover:bg-blue-50 dark:hover:bg-blue-950/20 disabled:opacity-40 disabled:cursor-not-allowed">
                 <div className="flex items-center justify-center gap-2">
@@ -725,7 +778,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
               </button>
             ) : (
               <Button variant="outline" disabled={currentChapterIdx === 0}
-                onClick={() => setCurrentChapterIdx(Math.max(0, currentChapterIdx - 1))}
+                onClick={handlePrev}
                 className="flex items-center gap-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white">
                 <ArrowLeft className="h-4 w-4" />{t('prev', lang)}
               </Button>
@@ -755,7 +808,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
 
               {currentChapterIdx < totalChapters + 1 ? (
                 modern ? (
-                  <button onClick={() => setCurrentChapterIdx(Math.min(totalChapters + 1, currentChapterIdx + 1))}
+                  <button onClick={handleNext}
                     className="group relative overflow-hidden px-8 py-3 rounded-xl font-semibold transition-all">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-400" />
                     <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-1000 pointer-events-none" />
@@ -765,7 +818,7 @@ export function HydroQuestionnaire({ onHome, onNavigate }: HydroQuestionnairePro
                     </div>
                   </button>
                 ) : (
-                  <Button onClick={() => setCurrentChapterIdx(Math.min(totalChapters + 1, currentChapterIdx + 1))}
+                  <Button onClick={handleNext}
                     className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
                     {t('next', lang)}<ArrowRight className="h-4 w-4" />
                   </Button>
@@ -818,9 +871,10 @@ function TabBtn({ label, active, color, modern, onClick }: {
 // B0 FEJLÉC SZEKCIÓ
 // ============================================================
 
-function B0Section({ header, setHeader, theme, lang }: {
+function B0Section({ header, setHeader, theme, lang, onNewProtocol }: {
   header: HydroHeader; setHeader: React.Dispatch<React.SetStateAction<HydroHeader>>;
   theme: 'modern' | 'classic'; lang: Lang;
+  onNewProtocol: () => void;
 }) {
   const upd = (key: keyof HydroHeader, value: string | boolean) =>
     setHeader(prev => ({ ...prev, [key]: value }));
@@ -886,6 +940,18 @@ function B0Section({ header, setHeader, theme, lang }: {
                 className="border-blue-200 dark:border-blue-800 focus:ring-2 focus:ring-blue-500" />
             </div>
           ))}
+        </div>
+
+        {/* Neues Protokoll */}
+        <div className="pt-2 border-t border-gray-100 dark:border-gray-700">
+          <button onClick={onNewProtocol}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border-2 border-red-300 text-red-600 dark:border-red-700 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/20 transition-all font-semibold text-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            {t('newProtocol', lang)}
+          </button>
+          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1.5 ml-1">{t('newProtocolConfirm', lang)}</p>
         </div>
       </CardContent>
     </Card>
@@ -1443,11 +1509,13 @@ function ChapterSection({
   questionMap, groupTitleMap,
   b1Data, setB1, b3kopf, setB3kopf, b3grube, setB3grube,
   b6Data, setB6, b7, setB7, b8Data, setB8, b9Data, setB9, b13Data, setB13,
+  b3ActiveTab, setB3ActiveTab,
 }: {
   chapter: Chapter; answers: Record<string, string>; setAnswer: (path: string, value: string) => void;
   umbau: Record<string, boolean>; toggleUmbau: (path: string) => void;
   theme: 'modern' | 'classic'; lang: Lang;
   questionMap: Record<string, string>; groupTitleMap: Record<string, string>;
+  b3ActiveTab: 'kopf' | 'fragen'; setB3ActiveTab: React.Dispatch<React.SetStateAction<'kopf' | 'fragen'>>;
   b1Data?: HydroB1Data;      setB1?:  React.Dispatch<React.SetStateAction<HydroB1Data>>;
   b3kopf?: HydroB3KopfData;  setB3kopf?: React.Dispatch<React.SetStateAction<HydroB3KopfData>>;
   b3grube?: HydroB3GrubeData; setB3grube?: React.Dispatch<React.SetStateAction<HydroB3GrubeData>>;
@@ -1459,7 +1527,6 @@ function ChapterSection({
 }) {
   const options = chapter.options ?? DEFAULT_OPTIONS;
   const modern  = theme === 'modern';
-  const [b3ActiveTab, setB3ActiveTab] = useState<'kopf' | 'fragen'>('kopf');
 
   const gradHdr = (gradient: string) =>
     modern ? `relative overflow-hidden ${gradient} text-white p-6` : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4';
@@ -1618,18 +1685,37 @@ function ChapterSection({
       // ── Measurement card markers — shown in dedicated tab, skip here
       if (path.startsWith('__')) { i++; continue; }
 
-      // ── Checkbox paths (n.z. toggle) — individual row
+      // ── Auto-filled paths — skip rendering (managed by useEffect)
+      if (AUTO_FILLED_PATHS.has(path)) { i++; continue; }
+
+      // ── Checkbox paths (n.z. toggle) — with linked text field below ──
       if (CHECKBOX_PATHS_LOCAL.has(path)) {
         const isChecked = (answers[path] ?? '') === 'true';
+        const linkedField = NZ_CHECKBOX_TO_FIELD[path];
+        const nextIsLinked = i + 1 < paths.length && paths[i + 1] === linkedField;
+        const fieldLabel = TEXT_LABELS[linkedField] ?? linkedField;
         elements.push(
-          <div key={path} className={`flex items-center gap-3 px-4 py-2 border-b dark:border-gray-700 bg-amber-50 dark:bg-amber-950/20 ${isChecked ? 'opacity-50' : ''}`}>
-            <Checkbox id={path} checked={isChecked} onCheckedChange={v => setAnswer(path, v ? 'true' : 'false')} />
-            <Label htmlFor={path} className="cursor-pointer text-xs text-amber-700 dark:text-amber-300 font-medium">
-              n.z. – {TEXT_LABELS[NZ_CHECKBOX_TO_FIELD[path]] ?? 'nicht zutreffend'}
-            </Label>
+          <div key={path} className="border-b dark:border-gray-700">
+            <div className="flex items-center gap-3 px-4 py-2.5 bg-amber-50 dark:bg-amber-950/20">
+              <Checkbox id={path} checked={isChecked} onCheckedChange={v => setAnswer(path, v ? 'true' : 'false')} />
+              <Label htmlFor={path} className="cursor-pointer text-sm font-semibold text-amber-700 dark:text-amber-300 flex-1">
+                n.z. – {fieldLabel}
+              </Label>
+              {isChecked && <span className="text-xs italic text-amber-500 dark:text-amber-400">nicht zutreffend</span>}
+            </div>
+            {nextIsLinked && (
+              <div className={`px-6 py-2.5 bg-white dark:bg-gray-900 transition-opacity ${isChecked ? 'opacity-30 pointer-events-none' : 'opacity-100'}`}>
+                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">{fieldLabel}</Label>
+                <Input value={answers[linkedField] ?? ''} onChange={e => setAnswer(linkedField, e.target.value)}
+                  placeholder={fieldLabel}
+                  className="text-sm h-9 border-gray-200 dark:border-gray-700 focus:ring-1 focus:ring-blue-400 max-w-xs" />
+              </div>
+            )}
           </div>
         );
-        i++; continue;
+        i++;
+        if (nextIsLinked) i++;
+        continue;
       }
 
       // ── Textarea paths — full-width individual
@@ -1646,7 +1732,7 @@ function ChapterSection({
         i++; continue;
       }
 
-      // ── Compact-grid TEXT_INPUT_PATHS (non-textarea): group consecutive ones
+      // ── TEXT_INPUT_PATHS: group consecutive, render right-aligned row ──
       if (TEXT_INPUT_PATHS.has(path)) {
         const group: string[] = [];
         while (
@@ -1656,22 +1742,27 @@ function ChapterSection({
           !CHECKBOX_PATHS_LOCAL.has(paths[i]) &&
           !paths[i].startsWith('__')
         ) {
+          // Skip if this field is handled inline by a checkbox above it
+          const isHandledByCheckbox = Object.values(NZ_CHECKBOX_TO_FIELD).includes(paths[i]) &&
+            i > 0 && CHECKBOX_PATHS_LOCAL.has(paths[i - 1]);
+          if (isHandledByCheckbox) { i++; continue; }
           group.push(paths[i]);
           i++;
         }
+        if (group.length === 0) continue;
         elements.push(
-          <div key={group.join('|')} className="px-4 py-3 border-b dark:border-gray-700 bg-slate-50/70 dark:bg-slate-800/30">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div key={group.join('|')} className="px-4 py-3 border-b dark:border-gray-700 bg-slate-50/40 dark:bg-slate-800/20">
+            <div className="flex flex-wrap justify-end gap-4">
               {group.map(p => {
                 const label = TEXT_LABELS[p] ?? p;
                 const linkedNz = Object.entries(NZ_CHECKBOX_TO_FIELD).find(([, f]) => f === p)?.[0];
                 const disabled = linkedNz ? answers[linkedNz] === 'true' : false;
                 return (
-                  <div key={p} className={disabled ? 'opacity-40 pointer-events-none' : ''}>
-                    <Label className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-1 block">{label}</Label>
+                  <div key={p} className={`flex items-center gap-3 ${disabled ? 'opacity-30 pointer-events-none' : ''}`}>
+                    <Label className="text-base font-semibold text-gray-800 dark:text-gray-200 whitespace-nowrap">{label}</Label>
                     <Input value={answers[p] ?? ''} onChange={e => setAnswer(p, e.target.value)}
-                      placeholder={label}
-                      className="text-sm h-8 border-slate-200 dark:border-slate-700 focus:ring-1 focus:ring-blue-400" />
+                      placeholder="—"
+                      className="text-base font-semibold h-10 w-40 border-blue-200 dark:border-blue-800 focus:ring-2 focus:ring-blue-400 text-right" />
                   </div>
                 );
               })}
@@ -1944,8 +2035,8 @@ function ChapterSection({
             </span>
             {b3ActiveTab === 'fragen' && (
               <span className="bg-white/30 text-white text-xs rounded-full px-1.5 py-0.5 font-bold">
-                {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && answers[p]).length}
-                /{chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p)).length}
+                {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p) && answers[p]).length}
+                /{chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p)).length}
               </span>
             )}
           </button>
@@ -1972,9 +2063,9 @@ function ChapterSection({
               <div>
                 <CardTitle className="text-xl font-bold">{chapter.title}</CardTitle>
                 <p className="text-white/80 text-sm mt-0.5">
-                  {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && answers[p]).length}
+                  {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p) && answers[p]).length}
                   {' / '}
-                  {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p)).length}
+                  {chapter.paths.filter(p => !p.startsWith('__') && !TEXT_INPUT_PATHS.has(p) && !TEXTAREA_PATHS.has(p) && !AUTO_FILLED_PATHS.has(p)).length}
                   {' '}{t('completed', lang)}
                 </p>
               </div>
